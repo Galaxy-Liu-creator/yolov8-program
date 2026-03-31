@@ -23,7 +23,13 @@ class WorkwearMissingViolation(BaseVio):
     rule_code = "workwear_missing"
     rule_name = getattr(settings, "WORKWEAR_VIOLATION_NAME", "作业区人员疑似未穿工服")
 
-    def run(self) -> bool | None:
+    def run(self) -> list | None:
+        """执行工服违规规则判定，返回所有触发 track 的告警结果列表。
+
+        返回值：
+        - list: 至少有一个 track 触发时，返回各 track 的 save() 结果列表
+        - None: 无触发
+        """
         workwear_labels = self._load_workwear_labels()
         if not workwear_labels:
             LOGGER.warning(
@@ -72,7 +78,7 @@ class WorkwearMissingViolation(BaseVio):
             self.plot_targets.clear()
             return None
 
-        triggered_track = None
+        triggered_tracks: list[int] = []
         for tid, stats in track_stats.items():
             if stats["appear"] < min_appear:
                 continue
@@ -80,19 +86,25 @@ class WorkwearMissingViolation(BaseVio):
                 continue
             ratio = stats["violation"] / stats["appear"]
             if ratio >= trigger_ratio:
-                triggered_track = tid
-                break
+                triggered_tracks.append(tid)
 
-        if triggered_track is None or not self.plot_targets:
+        if not triggered_tracks or not self.plot_targets:
             self.plot_targets.clear()
             return None
 
-        self._filter_plot_targets_by_track(triggered_track)
+        all_plot_targets = dict(self.plot_targets)
+        results = []
+        for tid in triggered_tracks:
+            self.plot_targets = dict(all_plot_targets)
+            self._filter_plot_targets_by_track(tid)
+            if not self.plot_targets:
+                continue
+            result = self.save(self.rule_name)
+            if result:
+                results.append(result)
 
-        if not self.plot_targets:
-            return None
-
-        return self.save(self.rule_name)
+        self.plot_targets.clear()
+        return results if results else None
 
     @staticmethod
     def _extract_persons(frame_item: dict | object) -> list[dict]:

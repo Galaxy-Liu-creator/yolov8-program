@@ -2,6 +2,58 @@
 
 更新时间：2026-03-31
 
+---
+
+## 更新记录
+
+### 2026-03-31 — 完成 P1（最小 Flask 骨架）+ P2（最小数据层与路由依赖）
+
+**目标：** 补齐 `create_app()` 的全部 import 依赖，使 Flask 应用的模块导入链路可以完整执行。
+
+**P1 — 最小 Flask 骨架（6 个文件）：**
+
+| 文件 | 操作 | 说明 |
+|------|------|------|
+| `applications/config.py` | 新建 | 从旧项目裁剪，SYSTEM_NAME 改为"加油站工服检测"，去掉警务/人脸/面板配置 |
+| `applications/extensions/__init__.py` | 新建 | 最小化，只初始化 SQLAlchemy + Marshmallow，暴露 `db`, `ma`, `init_plugs` |
+| `applications/extensions/init_sqlalchemy.py` | 新建 | 从旧项目复制，提供 `db`, `ma`, `init_databases()`, 自定义 `Query` 类 |
+| `applications/common/flask_log.py` | 新建 | 从旧项目复制，`handle_global_exceptions(app)` |
+| `applications/common/script/__init__.py` | 新建 | 空壳，当前无 CLI 命令需注册 |
+| `applications/view/__init__.py` | 修改 | 实现 `init_bps(app)`，只注册 `hk_camera` 蓝图 |
+
+**P2 — 最小数据层与路由依赖（17 个文件）：**
+
+| 文件 | 操作 | 说明 |
+|------|------|------|
+| `applications/models/__init__.py` | 新建 | 导出 Photo, HKCamera, Station, ViolateRule, ViolatePhoto, DeptRelations |
+| `applications/models/admin_photo.py` | 新建 | Photo 模型 |
+| `applications/models/admin_hk_camera.py` | 新建 | HKCamera 模型 |
+| `applications/models/admin_police_station.py` | 新建 | Station 模型（comment 已适配加油站场景） |
+| `applications/models/admin_violate_rule.py` | 新建 | ViolateRule 模型 |
+| `applications/models/admin_dept_relations.py` | 新建 | DeptRelations 模型 |
+| `applications/schemas/__init__.py` | 新建 | 空文件 |
+| `applications/schemas/admin_police_station.py` | 新建 | StationSchema |
+| `applications/schemas/admin_hk_camera.py` | 新建 | HkCameraOutSchema |
+| `applications/common/curd.py` | 新建 | CRUD 工具函数 |
+| `applications/common/user_auth.py` | 新建 | 权限判断函数 |
+| `applications/common/utils/__init__.py` | 新建 | 空文件 |
+| `applications/common/utils/http.py` | 新建 | success_api, fail_api, table_api |
+| `applications/common/utils/rights.py` | 新建 | authorize 装饰器（裁剪掉 admin_log 依赖） |
+| `applications/common/utils/validate.py` | 新建 | str_escape（escape 改用 markupsafe） |
+| `applications/common/utils/upload.py` | 新建 | 最小空壳，hk_camera.py 有 import 但当前未调用 |
+| `applications/common/utils/thread_camera.py` | 新建 | 最小空壳，已被 hk_custom_threading_plus.py 替代 |
+
+**关键适配细节：**
+
+- `rights.py` 裁剪掉 `admin_log` 依赖，避免引入 AdminLog 警务模型
+- `validate.py` 将 `from flask import escape` 改为 `from markupsafe import escape`（Flask 2.3+ 兼容）
+- `extensions/__init__.py` 只初始化 SQLAlchemy + Marshmallow，不引入 login/mail/upload/migrate/session 等扩展
+- `upload.py` 和 `thread_camera.py` 为空壳，仅满足 `hk_camera.py` 的 import 需要
+
+**验证结果：** 全部 23 个文件语法检查通过（`py_compile`）
+
+---
+
 ## 1. 当前项目目标
 
 结合当前背景，项目目标已经明确，不再保留分叉解释：
@@ -121,14 +173,15 @@
 
 ## 3.2 已经有代码，但没有真正打通的部分
 
-- `PARTIAL` 应用工厂重构了一半
+- `DONE` 应用工厂依赖已补齐
   - `inspection-flask/applications/__init__.py`
   - 已写出模型初始化、线程管理、调度初始化的结构
-  - 但依赖文件不完整，当前不能真正启动
+  - P1+P2 已补齐全部 import 依赖（config, extensions, flask_log, script, view/init_bps）
+  - 待数据库配置和 Flask 依赖安装后可真正启动
 
-- `PARTIAL` 摄像头视图层已经部分适配
+- `DONE` 摄像头视图层依赖已补齐
   - `inspection-flask/applications/view/system/hk_camera.py`
-  - 但它依赖的基础模块还缺失，当前不能独立工作
+  - P2 已补齐全部依赖模块（models, schemas, curd, user_auth, utils）
 
 - `PARTIAL` 离线验证口径还不够严谨
   - `inspection-flask/main.py`
@@ -138,24 +191,24 @@
 
 ## 3.3 当前明确缺失的部分
 
-- `MISSING` Flask 基础骨架
+- `DONE` Flask 基础骨架（2026-03-31 P1 补齐）
   - `inspection-flask/applications/config.py`
   - `inspection-flask/applications/extensions/__init__.py`
   - `inspection-flask/applications/common/flask_log.py`
   - `inspection-flask/applications/common/script/__init__.py`
-  - `inspection-flask/applications/view/__init__.py` 当前只有说明文字，没有真正的 `init_bps()`
+  - `inspection-flask/applications/view/__init__.py` 已实现 `init_bps()`
 
-- `MISSING` 摄像头管理所需的最小工具层
+- `DONE` 摄像头管理所需的最小工具层（2026-03-31 P2 补齐）
   - `inspection-flask/applications/common/curd.py`
   - `inspection-flask/applications/common/user_auth.py`
   - `inspection-flask/applications/common/utils/http.py`
   - `inspection-flask/applications/common/utils/rights.py`
   - `inspection-flask/applications/common/utils/validate.py`
 
-- `MISSING` ORM / Schema 出口层
+- `DONE` ORM / Schema 出口层（2026-03-31 P2 补齐）
   - `inspection-flask/applications/models/__init__.py`
   - `inspection-flask/applications/schemas/admin_hk_camera.py`
-  - 以及 `HKCamera`、`Station`、`ViolateRule`、`DeptRelations` 等必要模型出口
+  - 已导出 `HKCamera`、`Station`、`ViolateRule`、`ViolatePhoto`、`DeptRelations`、`Photo`
 
 - `MISSING` 海康实时 SDK 链路
   - `inspection-flask/hk/hksdk/device.py` 当前是空文件
@@ -196,11 +249,11 @@
 
 ## P1：补齐最小 Flask 工程骨架，让 inspection-flask 真正能启动
 
-- [ ] 从 `inspection-flask_old` 借鉴并裁剪出最小可用版 `applications/config.py`
-- [ ] 从 `inspection-flask_old` 借鉴并裁剪出最小可用版 `applications/extensions/__init__.py`
-- [ ] 补齐 `applications/common/flask_log.py`
-- [ ] 补齐 `applications/common/script/__init__.py`
-- [ ] 重写 `applications/view/__init__.py`
+- [x] 从 `inspection-flask_old` 借鉴并裁剪出最小可用版 `applications/config.py`
+- [x] 从 `inspection-flask_old` 借鉴并裁剪出最小可用版 `applications/extensions/__init__.py`
+- [x] 补齐 `applications/common/flask_log.py`
+- [x] 补齐 `applications/common/script/__init__.py`
+- [x] 重写 `applications/view/__init__.py`
   - 只注册当前真正需要的蓝图
   - 当前阶段优先保留：
     - `hk_camera`
@@ -214,17 +267,17 @@
 
 ## P2：补齐最小数据层与路由依赖，让“摄像头启停 + 违规记录”能工作
 
-- [ ] 补齐 `applications/models/__init__.py`
-- [ ] 至少保证以下模型可被统一导出：
+- [x] 补齐 `applications/models/__init__.py`
+- [x] 至少保证以下模型可被统一导出：
   - `HKCamera`
   - `Station`
   - `ViolateRule`
   - `ViolatePhoto`
   - `DeptRelations`
 
-- [ ] 补齐 `applications/schemas/admin_hk_camera.py`
+- [x] 补齐 `applications/schemas/admin_hk_camera.py`
 
-- [ ] 补齐 `hk_camera.py` 依赖的最小工具层
+- [x] 补齐 `hk_camera.py` 依赖的最小工具层
   - `applications/common/curd.py`
   - `applications/common/user_auth.py`
   - `applications/common/utils/http.py`
@@ -330,9 +383,19 @@
 5. 再修工服主线的统计与 tracker 问题。
 6. 最后补验证、清理文档、准备部署。
 
-## 8. 后续迭代约束
+## 8. 更新约束条件
 
-## 8.1 目标约束
+每次更新 `to_list.md` 时必须遵循以下规则：
+
+- 更新记录统一写在"更新记录"区域，**历史在后，最新在前**
+- 每条更新记录必须包含：日期、完成了什么、修改/新建了哪些文件、关键适配细节
+- 已完成的 checklist 项必须标记为 `[x]`
+- "当前真实状态"（第 3 节）必须同步更新，将已补齐的 MISSING/PARTIAL 改为 DONE
+- 不允许删除历史更新记录
+
+## 9. 后续迭代约束
+
+## 9.1 目标约束
 
 - 以后任何新增代码，必须首先回答一个问题：
   - 它是否直接服务于“加油站工人未穿戴工服检测”？
@@ -340,7 +403,7 @@
 - 如果答案是否定的：
   - 默认不进入当前迭代
 
-## 8.2 旧项目使用约束
+## 9.2 旧项目使用约束
 
 - `inspection-flask_old` 只能作为以下两类参考：
   - 工程结构参考
@@ -348,13 +411,13 @@
 
 - 不允许直接因为旧项目里有某个模块，就默认把它列入当前待办。
 
-## 8.3 数据结构约束
+## 9.3 数据结构约束
 
 - 当前主链路统一使用 `person_context` 风格的数据结构。
 - 不要为了“兼容旧逻辑”重新退回旧版列表式 `target` 作为核心结构。
 - 如果必须兼容旧结构，必须额外写适配层，不能污染主链路。
 
-## 8.4 规则口径约束
+## 9.4 规则口径约束
 
 - 工服合规判断只能统一走：
   - `inspection-flask/utils/workwear_policy.py`
@@ -365,12 +428,12 @@
   - `vio_workwear_missing.py`
   中各写一套不同口径。
 
-## 8.5 海康链路约束
+## 9.5 海康链路约束
 
 - `frame_path` 只允许作为调试模式输入。
 - 一旦进入在线模式，必须使用真实海康流或等价真实视频流输入。
 
-## 8.6 文档维护约束
+## 9.6 文档维护约束
 
 - 每次完成一轮代码修改后，至少同步检查：
   - `docs/to_list.md`
@@ -379,7 +442,7 @@
 
 - 文档必须保持“当前项目目标明确，不漂移”。
 
-## 9. 当前结论
+## 10. 当前结论
 
 当前最应该完成的代码，不是继续恢复旧警务项目的各种违规模块，而是以下三部分：
 

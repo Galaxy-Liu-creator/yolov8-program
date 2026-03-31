@@ -235,11 +235,11 @@ class HKCustomThread(threading.Thread):
             )
         return contexts
 
-    def run_rule_engine(self) -> bool | None:
+    def run_rule_engine(self) -> list | None:
         """对当前时间窗口执行工服违规规则判定。
 
         WorkwearMissingViolation.run() 内部完成证据图保存与数据库写入。
-        触发违规时返回 True；窗口未达阈值或无有效人员时返回 None。
+        触发违规时返回告警结果列表；窗口未达阈值或无有效人员时返回 None。
         """
         violation = WorkwearMissingViolation()
         frames = [item["frame"] for item in self.window]
@@ -265,13 +265,28 @@ class HKCustomThread(threading.Thread):
         suppression = getattr(settings, "alert_suppression_seconds", 300)
         return (timestamp - self.last_alert_ts).total_seconds() < suppression
 
-    def emit_event(self, triggered):
+    def _compute_window_span(self) -> str:
+        """计算当前窗口首尾帧的时间跨度，用于日志输出。"""
+        n = len(self.window)
+        if n < 2:
+            return f"{n}帧"
+        try:
+            first_ts = self.window[0]["timestamp"]
+            last_ts = self.window[-1]["timestamp"]
+            delta = (last_ts - first_ts).total_seconds()
+            return f"{delta:.0f}s（{n}帧）"
+        except Exception:
+            return f"{n}帧"
+
+    def emit_event(self, triggered, window_span: str = ""):
         """违规触发后记录日志。triggered 为 True（saving 已由 violation.run() 完成）。"""
         if not triggered:
             return
+        span_info = f"，窗口跨度 {window_span}" if window_span else ""
         self.app.logger.warning(
-            "camera %s 触发工服未穿戴违规告警，证据图已保存",
+            "camera %s 触发工服未穿戴违规告警，证据图已保存%s",
             self.camera.id,
+            span_info,
         )
 
     def run(self):
@@ -318,12 +333,14 @@ class HKCustomThread(threading.Thread):
                         time.sleep(round_sleep)
                         continue
 
-                    triggered = self.run_rule_engine()
-                    if triggered:
+                    triggered_list = self.run_rule_engine()
+                    if triggered_list:
                         self.last_alert_ts = timestamp
+                        window_span = self._compute_window_span()
                         self.window.clear()
                         self.tracker.reset()
-                        self.emit_event(triggered)
+                        for triggered in triggered_list:
+                            self.emit_event(triggered, window_span=window_span)
 
                     time.sleep(round_sleep)
 

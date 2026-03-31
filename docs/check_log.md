@@ -1,5 +1,251 @@
 # Check Log
 
+## 2026-03-31 `inspection-flask` 单正类标注前提补充复检修正记录
+
+本次基于"基于 `clothes` 单正类标注前提的补充复检记录"提出的 6 个问题，逐一核实后处理。
+
+### 已修复项
+
+#### 补充复检 问题 1 — validate --labels 的 GT 逻辑与 clothes 单正类标注不兼容
+
+状态：**已修复**
+
+修改文件：`main.py` `_load_ground_truth()`、argparse 定义、P/R/F1 评估逻辑
+
+修正内容：
+- 新增 `--gt-mode` 参数，支持 `paired`（默认，person+clothes 两类标注）和 `clothes-only`（仅 clothes 正类标注）。
+- `clothes-only` 模式下只读取 clothes 框数量作为 gt_compliant，不依赖 person 标注。
+- P/R/F1 评估改为评估合规检出匹配度，输出标题标注 `[clothes-only 模式: 仅评估合规检出率，无法评估违规检出]`。
+
+#### 补充复检 问题 5 — 在线时序窗口时间尺度不稳定
+
+状态：**已补充日志**
+
+修改文件：`hk_custom_threading_plus.py` `emit_event()` 及新增 `_compute_window_span()`
+
+修正内容：
+- 告警触发时计算窗口首尾帧时间差，在日志中输出窗口跨度（如"窗口跨度 440s（5帧）"）。
+- 帮助现场调参人员直观理解窗口实际覆盖的真实时间。
+
+#### 补充复检 问题 6 — 递归数据集可视化输出覆盖同名图片
+
+状态：**已修复**
+
+修改文件：`main.py` `_process_single_image()`
+
+修正内容：
+- 新增 `base_dir` 参数，传入后可视化输出路径保留相对目录结构。
+- `cmd_validate()` 调用时传入 `dataset_dir` 作为 base_dir，避免子目录同名图片覆盖。
+
+### 不做代码改动的问题
+
+| 问题 | 处理 |
+|---|---|
+| 问题 2 — 监管对象是 person 非工人 | ROI = 作业区，区内 person 默认为员工是合理的业务假设；无工人分类模型，代码层面无法区分 |
+| 问题 3 — 违规判定对正类召回敏感 | 单正类模式的内在结构，规则名已含"疑似"限定（`WORKWEAR_VIOLATION_NAME = "作业区人员疑似未穿工服"`） |
+| 问题 4 — 离线/在线口径差异 | main.py 顶部 docstring 及 `_OFFLINE_NOTE` 已充分说明离线模式局限性 |
+
+---
+
+## 2026-03-31 `inspection-flask` 基于 `clothes` 单正类标注前提的补充复检记录
+
+变更来源：
+- 用户补充数据集前提：当前数据集**没有工人/顾客分类**，且**只对正常穿戴工服的工人标注 `clothes` 正类**。
+- 复检依据：
+  - [check_log.md](check_log.md)
+  - [update_log.md](update_log.md)
+  - [Analysis_For_yolov8.md](Analysis_For_yolov8.md)
+
+本轮复检范围
+- `inspection-flask/main.py`
+- `inspection-flask/settings.py`
+- `inspection-flask/utils/models.py`
+- `inspection-flask/utils/workwear_policy.py`
+- `inspection-flask/applications/common/hk_custom_threading_plus.py`
+- `inspection-flask/applications/common/hk_recorder_threading.py`
+- `inspection-flask/violation_module/vio_workwear_missing.py`
+- `inspection-flask/applications/__init__.py`
+
+本轮前提修正
+- 之前关于“`clothes` 只是普通衣物标签、不能代表工服”的判断，在当前数据集前提下**不成立**。
+- 当前代码里 `WORKWEAR_LABELS = ["clothes"]` 与你的数据集标注口径是一致的。
+- 但在这个前提下，代码仍然存在“真值格式不匹配、在线监管对象过宽、违规判定过度依赖正类召回、离线/在线口径不一致、时序窗口时间语义不稳”等问题。
+
+本轮先确认
+- `python -m compileall inspection-flask` 通过，本轮未发现新的语法错误。
+- 本轮仅补充复检记录，**未改动任何代码文件**。
+
+### 问题 1
+
+标题：`validate --labels` 的真值读取逻辑与当前 `clothes` 单正类标注格式不兼容
+
+定位文件
+- [main.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/main.py#L358)
+- [main.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/main.py#L400)
+- [main.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/main.py#L488)
+- [main.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/main.py#L530)
+
+问题说明
+- 当前 `_load_ground_truth()` 的标注口径是：同时读取 `person` 框和 `clothes` 框，再通过“person 与 clothes 是否相交”推导真值合规/违规人数。
+- 但你现在补充的真实数据前提是：数据集**只有正常穿戴工服的工人正类 `clothes` 标注**，并没有 `person` 标注，也没有“未穿工服”负类标注。
+- 在这种前提下，`gt_total / gt_compliant / gt_violation` 的定义基础已经不存在；继续沿用当前 GT 读取逻辑，得到的真值统计天然失真。
+- 后面的 `tp / fp / fn` 又继续使用 `pred_violations` 与 `gt_violation` 做数量对账，进一步放大了这个问题。
+
+影响
+- 当前 `validate --labels` 不能正确评估这套 `clothes` 单正类数据集，输出的 Precision / Recall / F1 不具备可靠业务意义。
+- 如果后续继续把这组指标当成“未穿工服检测准确率”使用，会误导模型选择和阈值调参。
+
+### 问题 2
+
+标题：在线主链路监管对象仍然是 ROI 内所有 `person`，不是“已知工人”
+
+定位文件
+- [settings.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/settings.py#L45)
+- [models.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/utils/models.py#L95)
+- [hk_custom_threading_plus.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/applications/common/hk_custom_threading_plus.py#L186)
+- [vio_workwear_missing.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/violation_module/vio_workwear_missing.py#L49)
+
+问题说明
+- 当前一级检测器按 `MONITORED_PERSON_LABELS = ["person"]` 过滤，后续所有进入 ROI 的 `person` 都会进入工服判定链路。
+- 但数据集并没有“工人 / 顾客 / 路人”身份区分能力，代码也没有任何额外身份筛选逻辑。
+- 因而当前系统的真实业务含义其实是：**ROI 内 person 未检出 `clothes` 正类，即判为疑似未穿工服**。
+- 这与“检测加油站未穿工服的工人”之间仍存在语义差距，除非现场场景能额外保证 ROI 内出现的人基本都是员工。
+
+影响
+- 只要 ROI 内可能出现顾客、临时访客、配送人员或其他非员工，当前规则就会把这些人也纳入“未穿工服”候选，形成误报来源。
+- 这个问题不是单个阈值能解决的，而是当前检测目标定义本身偏宽。
+
+### 问题 3
+
+标题：违规判定本质上是“未检出 `clothes` 即违规”，对正类召回率高度敏感
+
+定位文件
+- [main.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/main.py#L153)
+- [main.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/main.py#L159)
+- [hk_custom_threading_plus.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/applications/common/hk_custom_threading_plus.py#L214)
+- [workwear_policy.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/utils/workwear_policy.py#L70)
+- [vio_workwear_missing.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/violation_module/vio_workwear_missing.py#L70)
+
+问题说明
+- 在当前数据集口径下，`clothes` 是“正常穿戴工服工人”的正类，因此代码里的 `has_workwear = evaluate_workwear_compliance(workwear_items)` 实际等价于“是否成功检出 `clothes` 正类”。
+- 反过来，只要当前帧未检出 `clothes`，就会被当成“不合规”；在线规则再把这种单帧结果累计成时序违规。
+- 这意味着遮挡、背身、半身入镜、小目标、夜间噪声、裁剪不准、阈值偏高等正类漏检因素，会被直接放大成“未穿工服”。
+- 从工程严谨性上看，这不是普通误差，而是“以正类召回近似反推负类违规”的结构性风险。
+
+影响
+- 当前链路更接近“疑似未检出工服正类的人”而不是“确定未穿工服的人”。
+- 如果不在日志、页面或对外描述中明确这是“疑似”结论，业务侧很容易高估系统判定强度。
+
+### 问题 4
+
+标题：离线 `image/validate` 结果不能直接代表在线告警效果
+
+定位文件
+- [main.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/main.py#L15)
+- [main.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/main.py#L45)
+- [hk_custom_threading_plus.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/applications/common/hk_custom_threading_plus.py#L301)
+- [vio_workwear_missing.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/violation_module/vio_workwear_missing.py#L81)
+
+问题说明
+- 离线工具顶部 docstring 和 `_OFFLINE_NOTE` 已明确说明：离线模式不包含 `MIN_TRACK_APPEAR_FRAMES`、`TEMPORAL_TRIGGER_RATIO` 和 track 跟踪。
+- 在线告警链路则依赖 `track_id + ROI + TEMPORAL_WINDOW_SIZE + MIN_TRACK_APPEAR_FRAMES + TEMPORAL_TRIGGER_RATIO` 的组合规则。
+- 因此，离线单帧 `image` 或数据集级 `validate` 的结果，只能说明“单帧 clothes 正类检出情况”，不能直接说明在线告警的稳定性和最终误报率。
+
+影响
+- 如果后续直接用离线结果给在线系统背书，容易出现“离线看起来准，在线误报/漏报仍高”的认知偏差。
+- 这也会让调参与复检出现错位：离线调的是单帧召回，在线真正受影响的是时序累计结果。
+
+### 问题 5
+
+标题：在线时序窗口的真实时间尺度仍然不稳定
+
+定位文件
+- [settings.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/settings.py#L82)
+- [settings.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/settings.py#L110)
+- [applications/__init__.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/applications/__init__.py#L111)
+- [hk_custom_threading_plus.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/applications/common/hk_custom_threading_plus.py#L292)
+
+问题说明
+- 调度器层面按 `get_image_interval = 110` 秒定时抓图。
+- 但检测线程在拿不到新帧时，又会主动调用一次 `recorder_manager.run_once()` 并继续轮询。
+- 这导致 `TEMPORAL_WINDOW_SIZE = 5` 的 5 帧窗口，其真实覆盖时间并没有被单一机制严格定义。
+- 对“连续违规才报警”的业务规则来说，这意味着当前窗口更像“最近 5 次有效取帧结果”，而不是一个明确稳定的真实时间窗。
+
+影响
+- 同样的 `TEMPORAL_WINDOW_SIZE / TEMPORAL_TRIGGER_RATIO` 配置，在不同运行节奏下可能对应不同的业务时间语义。
+- 这会削弱规则解释性，也会让现场调参缺少稳定基准。
+
+### 问题 6
+
+标题：递归数据集验证时，可视化输出文件仍然会覆盖同名图片
+
+定位文件
+- [main.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/main.py#L230)
+- [main.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/main.py#L447)
+- [main.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/main.py#L483)
+
+问题说明
+- 当前 `validate` 已经支持递归遍历数据集，也已经按相对目录定位标注文件。
+- 但可视化输出仍然使用 `det_{image_path.stem}.jpg` 命名，只保留 stem，不保留相对目录。
+- 只要数据集中存在不同子目录下的同名图片，后处理结果就会被后写入的图片覆盖。
+
+影响
+- 离线人工复核时，输出目录中的证据图不再与原始样本一一对应。
+- 这不会直接影响线上告警，但会影响离线复检和问题追踪的可靠性。
+
+---
+
+## 2026-03-31 `inspection-flask` 再次复检问题修正记录
+
+本次基于"再次复检记录"提出的 4 个问题，逐一核实后进行修正。
+
+### 已修复项
+
+#### 再次复检 问题 1 — validate --roi --labels 的 GT 口径未过滤 ROI
+
+状态：**已修复**
+
+修改文件：`main.py` `_load_ground_truth()` 及 `cmd_validate()`
+
+修正内容：
+- `_load_ground_truth()` 新增 `roi` 可选参数。
+- 传入 roi 时，GT person 框按与预测侧相同的重叠比例逻辑过滤，ROI 外 GT person 不计入统计。
+- `cmd_validate()` 调用时传入 roi 参数，确保预测侧和 GT 侧口径对齐。
+
+#### 再次复检 问题 2 — 递归数据集标注查找不保留相对目录
+
+状态：**已修复**
+
+修改文件：`main.py` `cmd_validate()`
+
+修正内容：
+- 标注路径查找从 `labels_dir / f"{img_path.stem}.txt"` 改为 `labels_dir / img_path.relative_to(dataset_dir).with_suffix(".txt")`。
+- 多级子目录数据集的标注能正确按相对目录定位，避免同名文件错位。
+
+#### 再次复检 问题 3 — P/R/F1 只是图片级数量统计
+
+状态：**已标注说明**
+
+修改文件：`main.py` 真值对比输出区域
+
+修正内容：
+- 在真值对比输出标题处增加 `[注意: 以下为图片级数量统计，非实例级检测评估]` 说明。
+- 计算逻辑未改变，实例级评估留作后续迭代。
+
+#### 再次复检 问题 4 — 在线告警只保留第一个触发 track
+
+状态：**已修复**
+
+修改文件：`vio_workwear_missing.py` `run()`，`hk_custom_threading_plus.py` `run_rule_engine()` 及主循环
+
+修正内容：
+- `run()` 不再遇到第一个满足条件的 track 就 break，而是收集所有满足条件的 triggered_tracks。
+- 对每个 triggered track 分别过滤 plot_targets 并独立调用 save() 保存证据图。
+- 返回值从 `bool | None` 改为 `list | None`（告警结果列表）。
+- 主循环对列表中的每个告警结果逐一调用 emit_event()。
+
+---
+
 ## 2026-03-31 `inspection-flask` 再次复检记录
 
 本轮复检范围

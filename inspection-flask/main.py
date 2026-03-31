@@ -178,6 +178,7 @@ def _process_single_image(
     workwear_model: WorkwearDetector,
     output_dir: Path | None,
     roi: list | None = None,
+    base_dir: Path | None = None,
 ) -> dict:
     """对单张图片执行完整检测管线并打印结果。
 
@@ -229,7 +230,12 @@ def _process_single_image(
 
     if output_dir is not None:
         canvas = _draw_results(frame, contexts)
-        out_path = output_dir / f"det_{image_path.stem}.jpg"
+        if base_dir is not None:
+            rel = image_path.relative_to(base_dir)
+            out_path = output_dir / rel.parent / f"det_{image_path.stem}.jpg"
+            out_path.parent.mkdir(parents=True, exist_ok=True)
+        else:
+            out_path = output_dir / f"det_{image_path.stem}.jpg"
         cv2.imwrite(str(out_path), canvas)
         print(f"    可视化已保存: {out_path}")
 
@@ -356,23 +362,26 @@ def cmd_image(args: argparse.Namespace) -> None:
 
 
 def _load_ground_truth(label_path: Path, img_w: int, img_h: int,
-                       person_cls: int = 0, clothes_cls: int = 0) -> dict:
+                       person_cls: int = 0, clothes_cls: int = 1,
+                       roi: list | None = None,
+                       gt_mode: str = "paired") -> dict:
     """读取 YOLO 格式标注文件，返回该图片的真值统计。
 
-    标注约定：
-    - person 标注行的 class_id == person_cls
-    - clothes 标注行的 class_id == clothes_cls
-    - 有 clothes 标注框与某 person 框 IoU > 0 即视为该 person 真值合规
+    gt_mode:
+    - "paired": 标注含 person + clothes 两类框，通过相交判断合规（默认）
+    - "clothes-only": 标注仅含 clothes 正类框，每个框 = 1 个合规工人
 
     返回:
-        {"gt_total": int, "gt_compliant": int, "gt_violation": int}
+        {"gt_total": int, "gt_compliant": int, "gt_violation": int, "gt_mode": str}
     """
-    if person_cls == clothes_cls:
+    empty = {"gt_total": 0, "gt_compliant": 0, "gt_violation": 0, "gt_mode": gt_mode}
+
+    if gt_mode == "paired" and person_cls == clothes_cls:
         print(f"[WARN] person_cls 与 clothes_cls 相同 ({person_cls})，GT 统计将不准确，请检查 --person-cls / --clothes-cls 参数")
-        return {"gt_total": 0, "gt_compliant": 0, "gt_violation": 0}
+        return empty
 
     if not label_path.exists():
-        return {"gt_total": 0, "gt_compliant": 0, "gt_violation": 0}
+        return empty
 
     persons_xyxy: list[list[float]] = []
     clothes_xyxy: list[list[float]] = []
@@ -387,10 +396,28 @@ def _load_ground_truth(label_path: Path, img_w: int, img_h: int,
         y1 = (cy - h / 2) * img_h
         x2 = (cx + w / 2) * img_w
         y2 = (cy + h / 2) * img_h
-        if cls_id == person_cls:
-            persons_xyxy.append([x1, y1, x2, y2])
-        elif cls_id == clothes_cls:
-            clothes_xyxy.append([x1, y1, x2, y2])
+        if gt_mode == "paired":
+            if cls_id == person_cls:
+                persons_xyxy.append([x1, y1, x2, y2])
+            elif cls_id == clothes_cls:
+                clothes_xyxy.append([x1, y1, x2, y2])
+        else:
+            if cls_id == clothes_cls:
+                clothes_xyxy.append([x1, y1, x2, y2])
+
+    if gt_mode == "clothes-only":
+        if roi is not None:
+            clothes_xyxy = [cb for cb in clothes_xyxy if _check_in_roi(cb, roi)]
+        gt_compliant = len(clothes_xyxy)
+        return {
+            "gt_total": gt_compliant,
+            "gt_compliant": gt_compliant,
+            "gt_violation": 0,
+            "gt_mode": gt_mode,
+        }
+
+    if roi is not None:
+        persons_xyxy = [pb for pb in persons_xyxy if _check_in_roi(pb, roi)]
 
     gt_compliant = 0
     for pb in persons_xyxy:
@@ -411,6 +438,7 @@ def _load_ground_truth(label_path: Path, img_w: int, img_h: int,
         "gt_total": gt_total,
         "gt_compliant": gt_compliant,
         "gt_violation": gt_total - gt_compliant,
+        "gt_mode": gt_mode,
     }
 
 
@@ -435,7 +463,8 @@ def cmd_validate(args: argparse.Namespace) -> None:
             sys.exit(1)
 
     person_cls = int(getattr(args, "person_cls", 0))
-    clothes_cls = int(getattr(args, "clothes_cls", 0))
+    clothes_cls = int(getattr(args, "clothes_cls", 1))
+    gt_mode = getattr(args, "gt_mode", "paired")
 
     person_model, workwear_model, device = _load_models()
 
@@ -451,7 +480,7 @@ def cmd_validate(args: argparse.Namespace) -> None:
     if roi:
         print(f"[ROI] 已启用离线 ROI 过滤: {roi}")
     if labels_dir:
-        print(f"[真值] 标注目录: {labels_dir} (person_cls={person_cls}, clothes_cls={clothes_cls})")
+        print(f"[真值] 标注目录: {labels_dir} (gt_mode={gt_mode}, person_cls={person_cls}, clothes_cls={clothes_cls})")
     else:
         print("[模式] 推理统计（无真值对比）")
 
@@ -467,6 +496,7 @@ def cmd_validate(args: argparse.Namespace) -> None:
     for img_path in image_paths:
         result = _process_single_image(
             img_path, person_model, workwear_model, output_dir, roi=roi,
+            base_dir=dataset_dir,
         )
         results.append(result)
 
@@ -475,11 +505,12 @@ def cmd_validate(args: argparse.Namespace) -> None:
                 label_counter[lbl] = label_counter.get(lbl, 0) + cnt
 
         if labels_dir and "error" not in result:
-            label_path = labels_dir / f"{img_path.stem}.txt"
+            rel = img_path.relative_to(dataset_dir)
+            label_path = labels_dir / rel.with_suffix(".txt")
             frame = cv2.imread(str(img_path))
             if frame is not None:
                 h, w = frame.shape[:2]
-                gt = _load_ground_truth(label_path, w, h, person_cls, clothes_cls)
+                gt = _load_ground_truth(label_path, w, h, person_cls, clothes_cls, roi=roi, gt_mode=gt_mode)
                 gt["pred_violations"] = result["violations"]
                 gt["pred_compliant"] = result["compliant"]
                 gt_results.append(gt)
@@ -521,26 +552,45 @@ def cmd_validate(args: argparse.Namespace) -> None:
             print(f"    {lbl:20s}: {cnt}")
 
     if labels_dir and gt_results:
-        tp = sum(min(g["pred_violations"], g["gt_violation"]) for g in gt_results)
-        fp = sum(max(0, g["pred_violations"] - g["gt_violation"]) for g in gt_results)
-        fn = sum(max(0, g["gt_violation"] - g["pred_violations"]) for g in gt_results)
-        precision = tp / max(tp + fp, 1)
-        recall = tp / max(tp + fn, 1)
-        f1 = 2 * precision * recall / max(precision + recall, 1e-9)
         gt_total = sum(g["gt_total"] for g in gt_results)
-        gt_vio = sum(g["gt_violation"] for g in gt_results)
         gt_comp = sum(g["gt_compliant"] for g in gt_results)
+        gt_vio = sum(g["gt_violation"] for g in gt_results)
 
-        print(f"\n  真值对比:")
-        print(f"    真值人数(总)  : {gt_total}")
-        print(f"    真值合规      : {gt_comp}")
-        print(f"    真值违规      : {gt_vio}")
-        print(f"    TP (正确检出) : {tp}")
-        print(f"    FP (误报)     : {fp}")
-        print(f"    FN (漏报)     : {fn}")
-        print(f"    Precision     : {precision:.4f}")
-        print(f"    Recall        : {recall:.4f}")
-        print(f"    F1            : {f1:.4f}")
+        if gt_mode == "clothes-only":
+            tp = sum(min(g["pred_compliant"], g["gt_compliant"]) for g in gt_results)
+            fp = sum(max(0, g["pred_compliant"] - g["gt_compliant"]) for g in gt_results)
+            fn = sum(max(0, g["gt_compliant"] - g["pred_compliant"]) for g in gt_results)
+            precision = tp / max(tp + fp, 1)
+            recall = tp / max(tp + fn, 1)
+            f1 = 2 * precision * recall / max(precision + recall, 1e-9)
+
+            print(f"\n  真值对比 [clothes-only 模式: 仅评估合规检出率，无法评估违规检出]:")
+            print(f"    GT 合规工人数 : {gt_comp}")
+            print(f"    预测合规人数  : {total_compliant}")
+            print(f"    TP (正确合规) : {tp}")
+            print(f"    FP (多报合规) : {fp}")
+            print(f"    FN (漏报合规) : {fn}")
+            print(f"    Precision     : {precision:.4f}")
+            print(f"    Recall        : {recall:.4f}")
+            print(f"    F1            : {f1:.4f}")
+        else:
+            tp = sum(min(g["pred_violations"], g["gt_violation"]) for g in gt_results)
+            fp = sum(max(0, g["pred_violations"] - g["gt_violation"]) for g in gt_results)
+            fn = sum(max(0, g["gt_violation"] - g["pred_violations"]) for g in gt_results)
+            precision = tp / max(tp + fp, 1)
+            recall = tp / max(tp + fn, 1)
+            f1 = 2 * precision * recall / max(precision + recall, 1e-9)
+
+            print(f"\n  真值对比 [注意: 以下为图片级数量统计，非实例级检测评估]:")
+            print(f"    真值人数(总)  : {gt_total}")
+            print(f"    真值合规      : {gt_comp}")
+            print(f"    真值违规      : {gt_vio}")
+            print(f"    TP (正确检出) : {tp}")
+            print(f"    FP (误报)     : {fp}")
+            print(f"    FN (漏报)     : {fn}")
+            print(f"    Precision     : {precision:.4f}")
+            print(f"    Recall        : {recall:.4f}")
+            print(f"    F1            : {f1:.4f}")
 
     print("=" * 60)
 
@@ -576,6 +626,11 @@ def main():
     validate_parser.add_argument(
         "--clothes-cls", dest="clothes_cls", type=int, default=1,
         help="标注文件中 clothes 类别 ID（默认 1）",
+    )
+    validate_parser.add_argument(
+        "--gt-mode", dest="gt_mode", choices=["paired", "clothes-only"],
+        default="paired",
+        help="真值模式: paired=标注含person+clothes两类; clothes-only=仅clothes正类标注（默认 paired）",
     )
 
     args = parser.parse_args()
