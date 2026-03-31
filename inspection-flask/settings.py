@@ -83,6 +83,9 @@ TEMPORAL_WINDOW_SIZE   = 5
 # 触发比例阈值：窗口内 >= 60% 帧未检出工服则触发告警
 TEMPORAL_TRIGGER_RATIO = 0.6
 
+# 跟踪器丢失容忍帧数：track 连续 N 帧未匹配后才移除，避免单帧漏检导致断轨
+TRACKER_MAX_AGE = 2
+
 # 同一摄像头告警抑制窗口（秒），避免短时间重复报警
 alert_suppression_seconds = 300
 

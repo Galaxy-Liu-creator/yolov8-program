@@ -17,10 +17,14 @@ class SimpleIoUTracker:
 
     固定机位、帧间隔 2 秒左右的加油站场景下，
     IoU 贪心匹配足够区分连续出现的同一人和不同人。
+
+    max_age 参数控制丢失容忍：当某 track 连续 max_age 帧未被匹配到时才移除，
+    避免单帧漏检导致同一人被切成新 track。
     """
 
-    def __init__(self, iou_threshold: float = 0.3):
+    def __init__(self, iou_threshold: float = 0.3, max_age: int = 2):
         self.iou_threshold = iou_threshold
+        self.max_age = max(1, max_age)
         self._next_id = 0
         self._prev_tracks: list[dict] = []
 
@@ -49,9 +53,14 @@ class SimpleIoUTracker:
         """对当前帧的 person_contexts 分配 track_id 并返回。
 
         贪心匹配：按 IoU 从大到小配对，超过阈值沿用旧 track_id，否则分配新 ID。
+        未匹配的旧 track 在 max_age 帧内保留，超龄后移除。
         """
         if not person_contexts:
-            self._prev_tracks = []
+            self._prev_tracks = [
+                {**t, "age": t.get("age", 0) + 1}
+                for t in self._prev_tracks
+                if t.get("age", 0) + 1 <= self.max_age
+            ]
             return person_contexts
 
         prev = self._prev_tracks
@@ -78,10 +87,15 @@ class SimpleIoUTracker:
             tid = assignments.get(ci, self._alloc_id())
             ctx["track_id"] = tid
 
-        self._prev_tracks = [
-            {"bbox": ctx.get("bbox", []), "track_id": ctx["track_id"]}
+        new_prev = [
+            {"bbox": ctx.get("bbox", []), "track_id": ctx["track_id"], "age": 0}
             for ctx in person_contexts
         ]
+        for pi, pt in enumerate(prev):
+            if pi not in used_prev and pt.get("age", 0) + 1 <= self.max_age:
+                new_prev.append({**pt, "age": pt.get("age", 0) + 1})
+        self._prev_tracks = new_prev
+
         return person_contexts
 
     def reset(self):
@@ -97,7 +111,10 @@ class HKCustomThread(threading.Thread):
         self._running = threading.Event()
         self._running.set()
         self.window = deque(maxlen=getattr(settings, "TEMPORAL_WINDOW_SIZE", 5))
-        self.tracker = SimpleIoUTracker(iou_threshold=0.3)
+        self.tracker = SimpleIoUTracker(
+            iou_threshold=0.3,
+            max_age=getattr(settings, "TRACKER_MAX_AGE", 2),
+        )
         self.last_processed_ts = None
         self.last_alert_ts = None
         self._pipeline_error_logged = False

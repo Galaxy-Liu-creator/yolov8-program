@@ -1,5 +1,237 @@
 # Check Log
 
+## 2026-03-31 `inspection-flask` 再次复检记录
+
+本轮复检范围
+- `inspection-flask/main.py`
+- `inspection-flask/applications/common/hk_custom_threading_plus.py`
+- `inspection-flask/violation_module/vio_workwear_missing.py`
+- `inspection-flask/applications/common/logic_judge.py`
+- `inspection-flask/settings.py`
+
+本轮先确认
+- `python -m compileall inspection-flask` 通过，本轮未发现新的语法错误。
+- 上一轮指出的两项问题已修复：离线 `--roi` 统计已按 `in_roi` 过滤；`validate --labels` 默认 `--clothes-cls` 已改为 `1`，并补了 `person_cls == clothes_cls` 的防呆检查。
+
+### 问题 1
+
+标题：`validate --roi --labels` 的 GT 口径仍然错误，预测过滤了 ROI，GT 却没有过滤 ROI
+
+定位文件
+- [main.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/main.py#L200)
+- [main.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/main.py#L358)
+- [main.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/main.py#L482)
+
+问题说明
+- `_process_single_image()` 在传入 `roi` 时，已经只对 `in_roi=True` 的人员做 `valid_persons / compliant / violations` 统计。
+- 但 `_load_ground_truth()` 完全没有 ROI 参数，也没有任何 GT 侧 ROI 过滤逻辑。
+- `cmd_validate()` 传了 `--roi` 后，预测值按 ROI 收缩，GT 仍按整图统计，两边口径不一致。
+
+影响
+- 一旦用户使用 `validate --roi --labels` 做离线复核，输出的 Precision / Recall / F1 会被系统性带偏。
+- 这会让复核报告看起来像是“基于 ROI 的准确率”，但实际上并不是。
+
+### 问题 2
+
+标题：递归数据集的标注文件查找方式仍然不稳，子目录数据集和同名文件会被错误对齐
+
+定位文件
+- [main.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/main.py#L443)
+- [main.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/main.py#L478)
+
+问题说明
+- 图片是通过 `dataset_dir.rglob("*")` 递归扫描的，说明代码允许多级子目录数据集。
+- 但标注路径是直接按 `labels_dir / f"{img_path.stem}.txt"` 拼的，只保留文件名 stem，没有保留相对目录。
+- 这样只要出现 `a/cam1/0001.jpg` 和 `b/cam2/0001.jpg` 这类同名图片，或者标注目录按 YOLO 常见方式保留子目录结构，当前查找就会错位。
+
+影响
+- `validate --labels` 在多目录数据集上会读错标注，或者把本该存在的标注当成缺失。
+- 复核结果会失真，而且这种错误不容易从汇总数字里直接看出来。
+
+### 问题 3
+
+标题：`validate` 里的 Precision / Recall / F1 仍然只是“按数量对账”，不是真正的检测评估
+
+定位文件
+- [main.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/main.py#L523)
+- [main.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/main.py#L524)
+- [main.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/main.py#L527)
+
+问题说明
+- 当前 `tp / fp / fn` 是通过 `min(pred_violations, gt_violation)` 和数量差直接算出来的。
+- 它没有做预测框与 GT 框的实例匹配，也没有验证“哪个人被判成违规/合规”是否真的对应同一个人。
+- 只要某张图里“预测违规人数”和“GT 违规人数”数量碰巧接近，指标就可能看起来不错，即便定位对象已经错了。
+
+影响
+- 这个 `validate` 更接近“人数级统计对账”，不能当作标准检测准确率评估。
+- 如果后续用它来宣称模型或规则“准确率多少”，结论会偏乐观，甚至误导调参。
+
+### 问题 4
+
+标题：在线告警仍然只保留第一个触发 track，多个同时违规人员会被压掉
+
+定位文件
+- [vio_workwear_missing.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/violation_module/vio_workwear_missing.py#L68)
+- [vio_workwear_missing.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/violation_module/vio_workwear_missing.py#L76)
+- [vio_workwear_missing.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/violation_module/vio_workwear_missing.py#L83)
+- [hk_custom_threading_plus.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/applications/common/hk_custom_threading_plus.py#L315)
+- [hk_custom_threading_plus.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/applications/common/hk_custom_threading_plus.py#L323)
+
+问题说明
+- `WorkwearMissingViolation.run()` 遍历 `track_stats` 时，只要遇到第一个满足阈值的 `track_id` 就 `break`。
+- 后面又调用 `_filter_plot_targets_by_track(triggered_track)`，把证据只保留给这一个 track。
+- 触发后主线程会 `window.clear()`、`tracker.reset()`，并进入告警抑制周期；这意味着同窗口内其他也满足条件的违规人员不会被单独保存。
+
+影响
+- 如果一个 ROI 内同时有两名及以上未穿工服人员，当前实现通常只能落一条告警证据。
+- 这会造成“现场有多个违规人，但系统只记录到一个”的漏记。
+
+
+## 2026-03-31 `inspection-flask` 代码修正记录
+
+本次基于前三轮检查记录，逐一核实后进行代码修正。
+
+### 已修复项
+
+#### 继续复检 问题 1 — 离线 ROI 统计口径错误
+
+状态：**已修复**
+
+修改文件：`main.py` `_process_single_image()`
+
+修正内容：
+- 当传入 `--roi` 时，统计 `valid_persons` / `violation_count` / `compliant_count` 前先过滤 `in_roi=False` 的人员。
+- 打印输出区分"ROI 内有效目标"和"面积过滤总人数"。
+
+#### 继续复检 问题 2 — validate 默认 person_cls 与 clothes_cls 冲突
+
+状态：**已修复**
+
+修改文件：`main.py` argparse 定义 及 `_load_ground_truth()`
+
+修正内容：
+- `--clothes-cls` 默认值由 `0` 改为 `1`，符合常见 YOLO 标注约定。
+- `_load_ground_truth()` 入口新增校验：若 `person_cls == clothes_cls` 则打印警告并返回空结果。
+
+#### 继续复检 问题 3 — SimpleIoUTracker 单帧漏检断轨
+
+状态：**已修复**
+
+修改文件：`hk_custom_threading_plus.py` `SimpleIoUTracker` 类，`settings.py`
+
+修正内容：
+- 新增 `max_age` 参数（默认 2），控制丢失容忍帧数。
+- 空帧时不再直接清空 `_prev_tracks`，而是对已有 track 的 age 计数器 +1，超龄才移除。
+- 正常匹配帧中，未匹配的旧 track 同样 age+1 保留，匹配成功的 track age 重置为 0。
+- `settings.py` 新增 `TRACKER_MAX_AGE = 2` 配置项。
+
+### 已确认修复（前轮遗留）
+
+| 问题 | 状态 |
+|---|---|
+| 复检 问题 5 — `utils/plots.py` 缺失 | **已修复**，文件已存在且功能完整 |
+| 复检 问题 3 — 证据图未绑定 triggered_track | **已修复**，`_filter_plot_targets_by_track()` 已实现 |
+| 初检 问题 7 — ROI 中心点判定 | **已修复**，已改为重叠比例判定 |
+| 一致性复核 问题 3 — `logic_judge.py` 过时 | **已标注废弃**，文件头已标注 DEPRECATED |
+
+### 确认存在但不在本次修正范围
+
+| 问题 | 原因 |
+|---|---|
+| 继续复检 问题 4 — 帧去重 hash 粗糙 | 改进需单独测试不同场景去重效果 |
+| 复检 问题 2 — 检测对象是 person 非工人 | 需新模型或标注方案支持身份区分 |
+| 初检 问题 6 — 工服合规判断过粗 | 依赖模型输出标签粒度 |
+| 复检 问题 6 — 缺少验证集回归测试 | 属工程建设，非逻辑修正 |
+
+---
+
+## 2026-03-31 `inspection-flask` 继续复检记录
+
+本轮复检范围
+- `inspection-flask/main.py`
+- `inspection-flask/applications/common/hk_custom_threading_plus.py`
+- `inspection-flask/applications/common/hk_recorder_threading.py`
+- `inspection-flask/applications/common/logic_judge.py`
+- `inspection-flask/violation_module/vio_workwear_missing.py`
+- `inspection-flask/utils/models.py`
+- `inspection-flask/utils/workwear_policy.py`
+
+复检结论
+- `python -m compileall inspection-flask` 通过，本轮未发现新的语法错误。
+- 但从“检测逻辑严谨性 / 是否能够确保检测正确性”看，当前代码仍不能给出“可以确保正确”的结论，下面这些逻辑问题还会直接影响结果可信度。
+
+### 问题 1
+
+标题：离线 `--roi` 统计口径仍然错误，ROI 外人员会被计入合规/违规数量
+
+定位文件
+- [main.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/main.py#L151)
+- [main.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/main.py#L161)
+- [main.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/main.py#L199)
+
+问题说明
+- `_build_person_contexts()` 已经给每个人写入了 `in_roi` 字段。
+- 但 `_process_single_image()` 里 `valid_persons = len(contexts)`、`violation_count = sum(...)`、`compliant_count = valid_persons - violation_count` 仍然是对全部 `contexts` 直接计数，没有先过滤 `in_roi=True`。
+- 这意味着离线 `image` / `validate` 命令即便传了 `--roi`，也只是打印时给 ROI 外目标加了 `ROI外` 标记，并没有真正把他们排除在统计之外。
+
+影响
+- 会直接把离线复核报告的人数、合规数、违规数统计带偏。
+- 也会继续放大“离线验证结果”和“在线告警规则”之间的口径差异。
+
+### 问题 2
+
+标题：带标注的 `validate` 默认参数是错误的，默认就会把 GT 统计算偏
+
+定位文件
+- [main.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/main.py#L352)
+- [main.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/main.py#L427)
+- [main.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/main.py#L563)
+
+问题说明
+- `cmd_validate()` 默认 `--person-cls=0`、`--clothes-cls=0`。
+- `_load_ground_truth()` 里又是 `if cls_id == person_cls ... elif cls_id == clothes_cls ...`。
+- 当两个默认值都等于 `0` 时，标注文件里的 `class 0` 会全部先落入 `person` 分支，`clothes` 分支永远进不去。
+
+影响
+- 只要用户直接用默认参数跑 `validate --labels`，GT 的 `gt_compliant / gt_violation` 就会天然失真。
+- 这会让输出的 Precision / Recall / F1 看起来像是“评估结果”，但实际上默认就是错的。
+
+### 问题 3
+
+标题：当前 track 逻辑过于脆弱，单帧漏检就可能把同一人切成新 track，导致时序规则失效
+
+定位文件
+- [hk_custom_threading_plus.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/applications/common/hk_custom_threading_plus.py#L48)
+- [hk_custom_threading_plus.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/applications/common/hk_custom_threading_plus.py#L53)
+- [hk_custom_threading_plus.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/applications/common/hk_custom_threading_plus.py#L81)
+- [vio_workwear_missing.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/violation_module/vio_workwear_missing.py#L68)
+
+问题说明
+- `SimpleIoUTracker` 只和“上一帧”做 IoU 匹配，没有 `max_age`、没有丢失容忍、也没有更稳的外观/速度信息。
+- 更关键的是，一旦某一帧 `person_contexts` 为空，`update()` 会直接把 `self._prev_tracks = []` 清空。
+- 这样只要出现一次单帧漏检、遮挡或人移动较快导致 IoU 掉到阈值以下，同一个人下一帧就会拿到新的 `track_id`。
+
+影响
+- `MIN_TRACK_APPEAR_FRAMES` 和 `TEMPORAL_TRIGGER_RATIO` 都是基于 `track_id` 统计的；track 一断，时序累计就断。
+- 结果是会出现明显漏报：现实里同一个未穿工服的人持续存在，但规则层面被切成多个短 track，最终谁都达不到触发条件。
+
+### 问题 4
+
+标题：帧去重 hash 过于粗糙，细小但真实的画面变化可能被当成“同一帧”跳过
+
+定位文件
+- [hk_recorder_threading.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/applications/common/hk_recorder_threading.py#L18)
+- [hk_recorder_threading.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/applications/common/hk_recorder_threading.py#L72)
+
+问题说明
+- 当前 `_compute_frame_hash()` 只是把整帧缩到 `8x8` 后做均值二值化。
+- 这个 hash 能解决“完全静止图片被反复当新帧”的问题，但它对局部、小幅变化并不敏感。
+- 如果画面主体很大、工人只占很小 ROI，或者只是有人进入边缘区域、动作幅度不大，理论上有可能 hash 不变。
+
+影响
+- 一旦 hash 不变，该帧就不会更新到 `hk_frame_cache`，检测线程也就拿不到这次真实变化。
+- 这会让系统在低运动、小目标场景下存在漏检风险，因此仍然不能说“可以确保检测正确性”。
+
 用于持续记录代码检查中发现的问题。
 
 当前约定：

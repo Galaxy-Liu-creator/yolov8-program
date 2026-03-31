@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -m py_compile inspection-flask/main.py)",
+      "Bash(python -m py_compile inspection-flask/applications/common/hk_custom_threading_plus.py)",
+      "Bash(python -m py_compile inspection-flask/settings.py)"
+    ]
+  }
+}

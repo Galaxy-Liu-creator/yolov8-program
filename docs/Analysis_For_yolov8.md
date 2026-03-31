@@ -283,7 +283,7 @@ def get_class_names(self) -> dict | list:
 
 1. `track_id` 生成方式。
 2. `TEMPORAL_WINDOW_SIZE` 的窗口聚合方式。
-3. ROI 中心点判定逻辑。
+3. ROI 中心点判定逻辑。 **[已过时: 代码已改为 ROI 重叠比例判定 `ROI_MIN_OVERLAP_RATIO`]**
 4. 告警抑制窗口逻辑。
 
 这些逻辑跟 YOLOv8/YOLO11 无关，且已经是围绕加油站固定机位场景定制的。如果为了“降版本”去动这些部分，只会额外引入行为回归。
@@ -486,6 +486,7 @@ print(workwear_model.get_class_names())
 
 - 只负责抓图和缓存，不关心模型版本。
 - 除非你要切换视频输入方式，否则不需要改。
+- **[已过时: 该文件已加入帧内容哈希去重逻辑 `_compute_frame_hash()`，不再是"不需要改"的状态]**
 
 ### 6.2 `inspection-flask/violation_module/vio_zsmjwcjf.py`
 
@@ -526,7 +527,7 @@ print(workwear_model.get_class_names())
    - 尤其是固定机位、夜间、加油岛远端区域。
 
 5. 检查 ROI 边缘人员。
-   - 当前是“中心点落入 ROI 即算监管对象”，这个策略应继续保留。
+   - 当前是“中心点落入 ROI 即算监管对象”，这个策略应继续保留。 **[已过时: 已改为 ROI_MIN_OVERLAP_RATIO 重叠比例判定]**
 
 6. 检查时间窗口径。
    - 同一人持续违规是否触发正确。

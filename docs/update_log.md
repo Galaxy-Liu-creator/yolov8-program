@@ -16,6 +16,122 @@
 8. **保持一致性**：`settings.py` 中的配置项名称与代码中 `getattr(settings, ...)` 的引用必须一致。新增配置项后需全文检索是否有遗漏引用点。
 9. **验证链路完整性**：涉及新文件创建（如 `utils/plots.py`）时，必须在记录中说明调用方、被调用签名以及已验证的兼容性。
 10. **不改动的部分必须声明**：如果某些模块/逻辑被评估后决定不改动，必须在记录中说明原因，防止后续重复评估。
+11. **CLI 与离线工具同步**：若修改 `main.py` 子命令、参数或离线输出格式，须在本日志中更新对应条目，并保持模块顶部 docstring 与 `argparse` 帮助一致。
+
+---
+
+## 2026-03-31 Analysis_For_yolov8.md 一致性复核修改
+
+变更来源：
+- [check_log.md](check_log.md) — 2026-03-31 `Analysis_For_yolov8.md` 一致性复核记录（问题 1–4）
+- [一致性复核问题修改计划](../plans/一致性复核问题修改_c5e7b302.plan.md)
+
+### 变更总览
+
+| 序号 | 变更内容 | 对应复核问题 | 涉及文件 |
+|------|---------|-------------|---------|
+| 1a | 离线 `person_context` 补齐 `in_roi`，与在线结构对齐 | 问题 1（高） | `main.py` |
+| 1b | 修复 `validate` 每张图二次完整推理的性能问题 | 问题 1（高） | `main.py` |
+| 1c | `image` / `validate` 输出离线局限性说明 | 问题 1（高） | `main.py` |
+| 2 | `validate` 可选 YOLO 标注真值对比（TP/FP/FN 等） | 问题 2（中高） | `main.py` |
+| 3 | `logic_judge.py` 标记为废弃并写明与在线规则口径差异 | 问题 3（中） | `logic_judge.py` |
+| 4 | `Analysis_For_yolov8.md` 三处过时表述旁行内标注 | 问题 4（中） | `Analysis_For_yolov8.md` |
+
+### 不改动的部分
+
+| 模块 | 决定 | 原因 |
+|------|------|------|
+| `hk_custom_threading_plus.py` | 维持现状 | 在线规则口径无误，本轮仅对齐离线侧 |
+| `vio_workwear_missing.py` | 维持现状 | 上一轮已修复 |
+| `settings.py` | 无新增项 | 离线 ROI 复用既有 `ROI_MIN_OVERLAP_RATIO` |
+| `base.py` | 维持现状 | 与本轮无关 |
+
+---
+
+### 变更 1: 离线/在线口径对齐 + validate 去重推理
+
+**涉及文件**: `inspection-flask/main.py`
+
+**1a `in_roi` 与 ROI 命令行**
+
+- 新增 `_parse_roi_arg()`、`_check_in_roi()`：与在线 `HKCustomThread._in_roi()` 使用相同的重叠比例算法，阈值来自 `settings.ROI_MIN_OVERLAP_RATIO`。
+- `_build_person_contexts(..., roi=None)`：为每个 context 写入 `"in_roi": bool`；未传 `--roi` 时等价于全帧在区内（`in_roi=True`）。
+- `image`、`validate` 子命令增加 `--roi x1,y1,x2,y2`。
+- 单图打印中违规/合规行增加 `ROI外` 标记（当 `in_roi` 为 False 时）。
+
+**1b 去除 validate 双重推理**
+
+- `_process_single_image()` 返回值增加 `label_counts: dict[str, int]`（按工服检测标签聚合）。
+- `cmd_validate()` 仅汇总各图的 `result["label_counts"]`，不再在循环内二次 `imread` + `infer`。
+
+**1c 离线局限性提示**
+
+- 模块 docstring 增加「离线模式局限性」说明。
+- 常量 `_OFFLINE_NOTE`：`cmd_image`、`cmd_validate` 启动时打印，明确不含时序规则与 track。
+
+**兼容性注意**
+
+- `_build_person_contexts` 新增可选参数 `roi`，默认 `None`，旧调用方式仍有效。
+- `_process_single_image` 成功路径返回值必含 `label_counts`（可能为空 dict）。
+
+---
+
+### 变更 2: validate 真值对比模式（可选）
+
+**涉及文件**: `inspection-flask/main.py`
+
+**新增 CLI**
+
+| 参数 | 作用 |
+|------|------|
+| `--labels <dir>` | YOLO txt 标注目录，与图片同名 `stem.txt` |
+| `--person-cls` | 标注中 person 的 class_id，默认 `0` |
+| `--clothes-cls` | 标注中 clothes 的 class_id，默认 `0` |
+
+**新增函数 `_load_ground_truth()`**
+
+- 解析 YOLO 行格式 `class_id cx cy w h`（归一化中心与宽高）。
+- 真值合规：某 person 框与任一 clothes 框存在正面积交集即视为该 person 合规；否则计入真值违规人数。
+- 报告标题：无 `--labels` 时为「推理统计（无真值对比）」；有标注时为「真值对比」并输出 TP、FP、FN、Precision、Recall、F1。
+
+**口径说明**
+
+- TP/FP/FN 按「每张图上的预测违规人数 vs 真值违规人数」做逐图 min/max 聚合，属于**图像级人数对比**，非逐人 IoU 匹配；用于快速回归，精细评估需扩展匹配策略时应在后续迭代中单独记录。
+
+**配置项**
+
+- 本轮未改 `settings.py`；ROI 阈值仍用 `ROI_MIN_OVERLAP_RATIO`。
+
+---
+
+### 变更 3: logic_judge.py 废弃声明
+
+**涉及文件**: `inspection-flask/applications/common/logic_judge.py`
+
+- 文件顶部增加模块级说明：标记为**已废弃**、无仓库内引用；说明替代模块。
+- 明确 `count_violation_frames()` 与当前在线规则（按 `track_id` + `MIN_TRACK_APPEAR_FRAMES` + `TEMPORAL_TRIGGER_RATIO`）的口径差异。
+- **不删除**既有函数，供历史参考。
+
+---
+
+### 变更 4: Analysis_For_yolov8.md 行内标注
+
+**涉及文件**: `docs/Analysis_For_yolov8.md`
+
+- 「强烈建议不要改」列表中 ROI 中心点条目旁标注已改为重叠比例。
+- 「6.1 hk_recorder_threading」小节旁标注已加入帧哈希去重。
+- 「7.1 必做检查项」中 ROI 边缘人员条目旁标注已改为 `ROI_MIN_OVERLAP_RATIO`。
+
+---
+
+### check_log 一致性复核问题状态映射
+
+| 复核问题 | 处理状态 | 本次变更编号 |
+|---------|---------|-------------|
+| 问题 1: main 离线/在线口径不一致 | 已修复（结构对齐 + 去重推理 + 提示） | 变更 1 |
+| 问题 2: validate 非准确率验证 | 已增强（可选真值对比） | 变更 2 |
+| 问题 3: logic_judge 落后 | 已标注废弃 | 变更 3 |
+| 问题 4: 文档过时 | 已行内标注 | 变更 4 |
 
 ---
 

@@ -1,3 +1,27 @@
+"""[已废弃] 早期调试辅助模块 -- 统计口径与当前在线规则不一致。
+
+本模块的函数在整个代码库中没有外部调用方，已被以下模块替代：
+- 合规判定: utils.workwear_policy.evaluate_workwear_compliance
+- 在线违规规则: violation_module.vio_workwear_missing.WorkwearMissingViolation
+- 离线验证: main.py cmd_image / cmd_validate
+- 可视化: main.py _draw_results / utils.plots
+
+主要口径差异:
+  count_violation_frames()
+    旧口径: 窗口内任一帧存在任一未合规人员即计为一帧违规（不区分 track_id）。
+    新口径 (vio_workwear_missing.py): 按 track_id 维度聚合，同一人的
+    "违规帧数 / 出现帧数 >= TEMPORAL_TRIGGER_RATIO" 才触发，且 track 至少
+    出现 MIN_TRACK_APPEAR_FRAMES 帧。
+
+  has_compliant_workwear()
+    委托给 evaluate_workwear_compliance()，口径一致，但本函数已无调用方。
+
+  draw_person_workwear_boxes()
+    功能与 main.py _draw_results() 重叠，已无调用方。
+
+保留本文件供历史参考，不建议在新代码中引用。
+"""
+
 from __future__ import annotations
 
 import cv2
