@@ -68,9 +68,13 @@ MIN_PERSON_AREA_MODE = "absolute"
 MIN_PERSON_BOX_AREA = 3000
 MIN_PERSON_AREA_RATIO = 0.005
 
+# ─── ROI 与停留过滤 ─────────────────────────────────────────────────────────
+ROI_MIN_OVERLAP_RATIO = 0.5   # 人框与ROI交叠面积占人框面积的最低比例
+MIN_TRACK_APPEAR_FRAMES = 2   # track 至少出现 N 帧才进入违规判定，过滤短暂掠过目标
+
 # 违规规则编码与名称（写入数据库 rule_code / rule_name 字段）
 WORKWEAR_VIOLATION_TYPE = "workwear_missing"
-WORKWEAR_VIOLATION_NAME = "未穿工服"
+WORKWEAR_VIOLATION_NAME = "作业区人员疑似未穿工服"
 WORKWEAR_VIOLATION_ID = None
 
 # ─── 时序稳定性配置 ────────────────────────────────────────────────────────────

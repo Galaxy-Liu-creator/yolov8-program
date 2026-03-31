@@ -287,6 +287,90 @@ def cmd_image(args: argparse.Namespace) -> None:
     print("=" * 60)
 
 
+def cmd_validate(args: argparse.Namespace) -> None:
+    """批量评估数据集，输出合规/违规统计与各类标签分布。"""
+    dataset_dir = Path(args.path)
+    if not dataset_dir.is_dir():
+        print(f"[ERROR] 数据集目录不存在: {dataset_dir}")
+        sys.exit(1)
+
+    output_dir: Path | None = None
+    if args.output:
+        output_dir = Path(args.output)
+        output_dir.mkdir(parents=True, exist_ok=True)
+
+    person_model, workwear_model, device = _load_models()
+
+    image_paths = sorted(
+        p for p in dataset_dir.rglob("*")
+        if p.is_file() and p.suffix.lower() in _IMAGE_EXTS
+    )
+    if not image_paths:
+        print(f"[WARN] 数据集目录中未找到图片: {dataset_dir}")
+        sys.exit(1)
+
+    print(f"\n数据集: {dataset_dir}")
+    print(f"图片数量: {len(image_paths)}")
+    print("-" * 60)
+
+    results = []
+    label_counter: dict[str, int] = {}
+    t_total = time.perf_counter()
+
+    for img_path in image_paths:
+        result = _process_single_image(img_path, person_model, workwear_model, output_dir)
+        results.append(result)
+
+        if "error" in result:
+            continue
+        frame = cv2.imread(str(img_path))
+        if frame is None:
+            continue
+        persons = person_model.infer(frame, conf_threshold=getattr(settings, "PERSON_CONF", 0.55))
+        contexts = _build_person_contexts(frame, persons, workwear_model)
+        for ctx in contexts:
+            for item in ctx.get("workwear_items", []):
+                lbl = item.get("label", "unknown")
+                label_counter[lbl] = label_counter.get(lbl, 0) + 1
+
+    elapsed_total = time.perf_counter() - t_total
+
+    valid_results = [r for r in results if "error" not in r]
+    error_results = [r for r in results if "error" in r]
+    total_persons = sum(r["total_persons"] for r in valid_results)
+    total_valid = sum(r["valid_persons"] for r in valid_results)
+    total_violations = sum(r["violations"] for r in valid_results)
+    total_compliant = sum(r["compliant"] for r in valid_results)
+
+    compliant_images = sum(1 for r in valid_results if r["violations"] == 0)
+    violation_images = sum(1 for r in valid_results if r["violations"] > 0)
+
+    print("\n" + "=" * 60)
+    print("数据集评估报告")
+    print("=" * 60)
+    print(f"  数据集路径    : {dataset_dir}")
+    print(f"  图片总数      : {len(image_paths)}")
+    print(f"  成功处理      : {len(valid_results)}")
+    print(f"  读取失败      : {len(error_results)}")
+    print(f"  检测人数(总)  : {total_persons}")
+    print(f"  有效人数(面积): {total_valid}")
+    print(f"  穿戴合规人数  : {total_compliant}")
+    print(f"  未穿工服人数  : {total_violations}")
+    print(f"  全合规图片    : {compliant_images}")
+    print(f"  含违规图片    : {violation_images}")
+    if total_valid > 0:
+        print(f"  合规率        : {total_compliant / total_valid * 100:.1f}%")
+    print(f"  总耗时        : {elapsed_total:.2f}s")
+    print(f"  平均耗时      : {elapsed_total / max(len(valid_results), 1) * 1000:.1f}ms/张")
+
+    if label_counter:
+        print(f"\n  工服标签分布:")
+        for lbl, cnt in sorted(label_counter.items(), key=lambda x: -x[1]):
+            print(f"    {lbl:20s}: {cnt}")
+
+    print("=" * 60)
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="YOLOv8 加油站工服检测管线 -- 独立诊断与验证工具",
@@ -299,12 +383,18 @@ def main():
     image_parser.add_argument("path", help="图片路径或包含图片的目录")
     image_parser.add_argument("-o", "--output", help="可视化结果输出目录（可选）")
 
+    validate_parser = subparsers.add_parser("validate", help="批量数据集评估与统计")
+    validate_parser.add_argument("path", help="数据集目录路径")
+    validate_parser.add_argument("-o", "--output", help="可视化结果输出目录（可选）")
+
     args = parser.parse_args()
 
     if args.command == "check":
         cmd_check(args)
     elif args.command == "image":
         cmd_image(args)
+    elif args.command == "validate":
+        cmd_validate(args)
     else:
         parser.print_help()
         sys.exit(1)

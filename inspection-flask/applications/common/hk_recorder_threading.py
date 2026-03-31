@@ -15,6 +15,18 @@ _FAIL_COUNTS: dict[int, int] = {}
 _FAIL_WARN_THRESHOLD = 5
 
 
+def _compute_frame_hash(image, size: int = 8) -> bytes:
+    """计算帧内容的轻量级感知哈希，用于检测图像内容是否真正变化。
+
+    将图像缩放到 size x size 灰度图后做均值二值化，
+    性能开销极低，足以区分"同一张静态图"和"真正的新帧"。
+    """
+    small = cv2.resize(image, (size, size), interpolation=cv2.INTER_AREA)
+    gray = cv2.cvtColor(small, cv2.COLOR_BGR2GRAY) if len(small.shape) == 3 else small
+    mean_val = gray.mean()
+    return bytes(int(px > mean_val) for px in gray.flatten())
+
+
 def _read_frame_from_camera(camera):
     """从摄像头读取一帧。
 
@@ -57,7 +69,14 @@ def get_img(cameras, app):
             app.logger.info("camera %s 抓图恢复正常", cid)
         _FAIL_COUNTS[cid] = 0
 
-        app.config["hk_frame_cache"][cid] = {"frame": image, "ts": datetime.now()}
+        new_hash = _compute_frame_hash(image)
+        existing = app.config["hk_frame_cache"].get(cid)
+        if existing and existing.get("frame_hash") == new_hash:
+            continue
+
+        app.config["hk_frame_cache"][cid] = {
+            "frame": image, "ts": datetime.now(), "frame_hash": new_hash,
+        }
 
 
 class HKRecorderThread(threading.Thread):

@@ -144,19 +144,27 @@ class HKCustomThread(threading.Thread):
         return False
 
     def _in_roi(self, bbox: list) -> bool:
-        """判断目标是否在 ROI 区域内（中心点策略）。
+        """判断目标是否在 ROI 区域内（重叠比例策略）。
 
-        只要人框中心点落入 ROI 即视为在监管区域内，
-        不再要求整个人框完全包含于 ROI，避免边缘工人被误排除。
+        计算人框与 ROI 的交叠面积占人框面积的比例，
+        达到 ROI_MIN_OVERLAP_RATIO 阈值即视为在监管区域内。
         """
         roi = getattr(self.camera, "roi", None)
         if not roi:
             return True
         x1, y1, x2, y2 = bbox
-        cx = (x1 + x2) / 2
-        cy = (y1 + y2) / 2
         rx1, ry1, rx2, ry2 = roi
-        return rx1 <= cx <= rx2 and ry1 <= cy <= ry2
+        ix1 = max(x1, rx1)
+        iy1 = max(y1, ry1)
+        ix2 = min(x2, rx2)
+        iy2 = min(y2, ry2)
+        if ix2 <= ix1 or iy2 <= iy1:
+            return False
+        inter_area = (ix2 - ix1) * (iy2 - iy1)
+        person_area = max(1, (x2 - x1) * (y2 - y1))
+        overlap_ratio = inter_area / person_area
+        min_ratio = getattr(settings, "ROI_MIN_OVERLAP_RATIO", 0.5)
+        return overlap_ratio >= min_ratio
 
     def build_person_contexts(self, frame: np.ndarray, persons: list) -> list[dict]:
         """为每个有效人员构建包含工服检测结果的上下文字典。

@@ -7,6 +7,103 @@
 - 本次记录基于静态代码检查。
 - 本次记录按用户要求，先忽略包导入、依赖安装、环境缺失等问题，只记录代码逻辑与工程实现问题。
 
+## 2026-03-31 `Analysis_For_yolov8.md` 一致性复核记录
+
+检查范围：
+- [Analysis_For_yolov8.md](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/docs/Analysis_For_yolov8.md)
+- `inspection-flask/main.py`
+- `inspection-flask/applications/common/hk_custom_threading_plus.py`
+- `inspection-flask/applications/common/hk_recorder_threading.py`
+- `inspection-flask/applications/common/logic_judge.py`
+- `inspection-flask/violation_module/vio_workwear_missing.py`
+- `inspection-flask/utils/models.py`
+- `inspection-flask/utils/workwear_policy.py`
+
+结论：
+- 当前代码相较文档里的早期方案已经落地了一部分改造建议，但“离线验证口径”和“在线规则口径”仍然没有完全对齐。
+- `docs/Analysis_For_yolov8.md` 中也存在几处已经过时的描述，本次已补充校正说明。
+
+### 问题 1
+
+严重级别：高
+
+标题：`main.py` 的离线验证口径与在线规则口径仍不一致
+
+涉及文件：
+- [main.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/main.py#L80)
+- [hk_custom_threading_plus.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/applications/common/hk_custom_threading_plus.py#L146)
+- [vio_workwear_missing.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/violation_module/vio_workwear_missing.py#L68)
+
+问题描述：
+- 在线规则已使用 ROI 重叠比例 `ROI_MIN_OVERLAP_RATIO` 做有效区域判定。
+- 在线规则已引入 `MIN_TRACK_APPEAR_FRAMES` 过滤短暂出现目标。
+- 但 `main.py` 的 `_build_person_contexts()` 仍然只做面积过滤与工服检测，没有 ROI 口径，也没有时序最小出现帧数约束。
+
+影响：
+- 离线 `image` / `validate` 输出不能直接代表在线真实告警口径。
+- 用离线脚本做阈值调参与效果判断时，可能得出与线上不同的结论。
+
+### 问题 2
+
+严重级别：中高
+
+标题：`validate` 模式目前不是“准确率验证”，只能算无标注统计
+
+涉及文件：
+- [main.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/main.py#L290)
+- [Analysis_For_yolov8.md](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/docs/Analysis_For_yolov8.md)
+
+问题描述：
+- 文档把 `main.py` 定位为“确保 YOLOv8 切换后检测正确性”的关键验证脚本。
+- 但当前 `cmd_validate()` 只输出图像数量、检测人数、合规/违规数量和标签分布。
+- 它没有读取标注真值，也没有输出真正意义上的误报、漏报、准确率、召回率等指标。
+
+影响：
+- 当前 `validate` 更接近“批量跑推理后的统计汇总”，不是严格意义上的验证闭环。
+- 如果直接拿它作为“准确率验证工具”，会高估其验证能力。
+
+### 问题 3
+
+严重级别：中
+
+标题：`logic_judge.py` 的调试统计逻辑已经落后于当前在线规则
+
+涉及文件：
+- [logic_judge.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/applications/common/logic_judge.py#L61)
+- [hk_custom_threading_plus.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/applications/common/hk_custom_threading_plus.py#L169)
+- [vio_workwear_missing.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/violation_module/vio_workwear_missing.py#L121)
+
+问题描述：
+- `logic_judge.count_violation_frames()` 仍按“窗口内任意一帧出现未合规人员即记一帧违规”的旧思路统计。
+- 它仍然使用绝对面积阈值参数 `min_area`。
+- 它没有体现在线规则新增的 `MIN_TRACK_APPEAR_FRAMES` 与按 `track_id` 做比例判定的逻辑。
+
+影响：
+- 作为调试辅助时，可能给出与真实在线规则不同的判断结果。
+- 这会误导排查和调参。
+
+### 问题 4
+
+严重级别：中
+
+标题：`Analysis_For_yolov8.md` 存在已过时描述，容易误导后续检查
+
+涉及文件：
+- [Analysis_For_yolov8.md](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/docs/Analysis_For_yolov8.md)
+- [hk_custom_threading_plus.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/applications/common/hk_custom_threading_plus.py#L146)
+- [hk_recorder_threading.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/applications/common/hk_recorder_threading.py#L18)
+
+问题描述：
+- 文档中仍有“继续保留 ROI 中心点判定”的表述，但代码已改为 ROI 重叠比例判定。
+- 文档中仍把 `hk_recorder_threading.py` 归类为“通常不需要动”的文件，但代码已加入帧哈希去重。
+- 文档中关于共享策略文件、validate 模式等建议，代码其实已经部分落地。
+
+影响：
+- 如果继续直接按旧文档逐条对代码做判断，会把“已完成项”继续当问题，也可能忽略当前真正的新分叉点。
+
+状态：
+- 本次已在文档顶部增加校正说明。
+
 ## 2026-03-31 `inspection-flask` 复检记录
 
 检查范围：

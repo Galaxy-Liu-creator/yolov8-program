@@ -1,5 +1,21 @@
 # inspection-flask 从 YOLOv11 降到 YOLOv8 的代码改造说明
 
+## 0. 2026-03-31 校正说明
+
+下面几条是基于当前代码状态对本文档的补充校正，避免把早期分析结论继续当成现状：
+
+1. 当前代码已经新增并接入共享策略模块 `inspection-flask/utils/workwear_policy.py`，因此本文中关于“建议新增共享工服策略文件”的部分，应理解为“该建议已落地”。
+2. 当前代码已经新增 `main.py validate` 命令，因此本文中关于“建议新增 validate 模式”的部分，也应理解为“该建议已部分落地”，但其评估口径是否与在线规则完全一致，仍需要继续复核。
+3. 当前在线 ROI 判定已经不是“中心点落入 ROI 即算命中”，而是“人框与 ROI 的重叠比例达到 `ROI_MIN_OVERLAP_RATIO` 阈值”。因此，本文中所有“继续保留中心点 ROI 判定”的表述已经过时，应以代码现状为准。
+4. 当前 `inspection-flask/applications/common/hk_recorder_threading.py` 已经加入基于帧哈希的去重逻辑，因此本文中“该文件通常不需要改”的判断只适用于早期版本，不再完全反映现状。
+5. 当前 `inspection-flask/violation_module/vio_workwear_missing.py` 已经加入：
+   - `MIN_TRACK_APPEAR_FRAMES`
+   - 仅保留触发 `track` 的证据标注
+   因此，本文中对应条目应视为“已实现或部分实现”。
+6. 当前仓库内已经存在 `inspection-flask/utils/plots.py`，证据图绘制所需的本地工具文件已补齐。
+
+后续如果继续以本文档作为检查依据，应优先将“文档中的设计意图”与“当前代码状态”分开看待，避免把已完成项重复当成缺陷，也避免把已过时假设继续当成基准。
+
 ## 1. 结论先行
 
 基于对 `inspection-flask` 目录下代码的逐文件阅读，这套系统当前的真实检测链路是：

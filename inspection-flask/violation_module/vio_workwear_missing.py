@@ -10,16 +10,18 @@ LOGGER = logging.getLogger(__name__)
 
 
 class WorkwearMissingViolation(BaseVio):
-    """YOLOv8 未穿工服规则。
+    """YOLOv8 作业区人员疑似未穿工服规则。
 
     规则口径：
-    1. 只统计 ROI 内、面积满足阈值的人体目标。
+    1. 只统计 ROI 内的人体目标（面积过滤已由上游 build_person_contexts 完成）。
     2. 按 track_id 维度做时序判定：同一人连续违规才触发，不同人拼出的违规帧不累计。
-    3. 任一 track 的「违规帧数 / 该 track 出现帧数 >= trigger_ratio」即触发告警。
+    3. track 至少出现 MIN_TRACK_APPEAR_FRAMES 帧才进入违规判定，过滤短暂掠过目标。
+    4. 任一 track 的「违规帧数 / 该 track 出现帧数 >= trigger_ratio」即触发告警。
+    5. 证据图只保留触发 track 的标注，不混入其他 track 的数据。
     """
 
     rule_code = "workwear_missing"
-    rule_name = "未穿工服"
+    rule_name = getattr(settings, "WORKWEAR_VIOLATION_NAME", "作业区人员疑似未穿工服")
 
     def run(self) -> bool | None:
         workwear_labels = self._load_workwear_labels()
@@ -31,8 +33,8 @@ class WorkwearMissingViolation(BaseVio):
             self.plot_targets.clear()
             return None
 
-        min_area = self._load_min_person_area()
         trigger_ratio = self._load_trigger_ratio()
+        min_appear = self._load_min_track_appear()
 
         if not self.targets:
             self.plot_targets.clear()
@@ -43,7 +45,7 @@ class WorkwearMissingViolation(BaseVio):
         for frame_idx, frame_item in enumerate(self.targets):
             persons = self._extract_persons(frame_item)
             for person in persons:
-                if not self._is_valid_person(person, min_area):
+                if not self._is_valid_person(person):
                     continue
 
                 track_id = person.get("track_id")
@@ -72,6 +74,8 @@ class WorkwearMissingViolation(BaseVio):
 
         triggered_track = None
         for tid, stats in track_stats.items():
+            if stats["appear"] < min_appear:
+                continue
             if stats["appear"] == 0:
                 continue
             ratio = stats["violation"] / stats["appear"]
@@ -81,6 +85,11 @@ class WorkwearMissingViolation(BaseVio):
 
         if triggered_track is None or not self.plot_targets:
             self.plot_targets.clear()
+            return None
+
+        self._filter_plot_targets_by_track(triggered_track)
+
+        if not self.plot_targets:
             return None
 
         return self.save(self.rule_name)
@@ -109,14 +118,6 @@ class WorkwearMissingViolation(BaseVio):
         }
 
     @staticmethod
-    def _load_min_person_area() -> int:
-        raw_value = getattr(settings, "MIN_PERSON_BOX_AREA", 3000)
-        try:
-            return max(int(raw_value), 0)
-        except (TypeError, ValueError):
-            return 3000
-
-    @staticmethod
     def _load_trigger_ratio() -> float:
         raw_value = getattr(settings, "TEMPORAL_TRIGGER_RATIO", 0.6)
         try:
@@ -125,7 +126,20 @@ class WorkwearMissingViolation(BaseVio):
             return 0.6
 
     @staticmethod
-    def _is_valid_person(person: dict, min_area: int) -> bool:
+    def _load_min_track_appear() -> int:
+        raw_value = getattr(settings, "MIN_TRACK_APPEAR_FRAMES", 2)
+        try:
+            return max(int(raw_value), 1)
+        except (TypeError, ValueError):
+            return 2
+
+    @staticmethod
+    def _is_valid_person(person: dict) -> bool:
+        """校验人员上下文是否有效。
+
+        面积过滤已由上游 build_person_contexts 统一完成，
+        此处仅做 bbox 格式校验、ROI 判定和基本面积正值校验。
+        """
         bbox = person.get("bbox", [])
         if not isinstance(bbox, list) or len(bbox) != 4:
             return False
@@ -139,7 +153,7 @@ class WorkwearMissingViolation(BaseVio):
         except (TypeError, ValueError):
             return False
 
-        return area_value >= float(min_area)
+        return area_value > 0
 
     @staticmethod
     def _has_compliant_workwear(person: dict, workwear_labels: set[str]) -> bool:
@@ -157,5 +171,18 @@ class WorkwearMissingViolation(BaseVio):
         except (TypeError, ValueError):
             return
 
+        track_id = person.get("track_id")
         person_target = [x1, y1, x2, y2, confidence, "person"]
-        self.add_plot_targets(frame_idx, [person_target, [], confidence])
+        self.add_plot_targets(frame_idx, [person_target, [], confidence, track_id])
+
+    def _filter_plot_targets_by_track(self, triggered_track) -> None:
+        """只保留属于触发 track 的证据标注，确保证据图与触发目标一致。"""
+        filtered: dict = {}
+        for frame_idx, target_lists in self.plot_targets.items():
+            kept = [
+                t for t in target_lists
+                if isinstance(t, list) and len(t) >= 4 and t[3] == triggered_track
+            ]
+            if kept:
+                filtered[frame_idx] = kept
+        self.plot_targets = filtered
