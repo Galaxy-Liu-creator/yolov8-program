@@ -6,6 +6,87 @@
 
 ## 更新记录
 
+### 2026-04-02 — 最小运行链路静态复核与字段策略补充
+
+**目标：** 在“先运行起来”的前提下，把当前真实边界写清楚，避免把运行时兼容误写成数据库闭环已完成。
+
+**本轮新增/修改重点：**
+
+- `inspection-flask/settings.py`
+  - 补了一组明确的启动兼容配置定义，确保 `AUTH_ENABLED` 等开关可被稳定读取
+
+- `docs/run_todo_list.md`
+  - 为“问题 4：相机模型与运行时字段可能未对齐”补充当前落地状态
+  - 明确：
+    - 当前已通过 `camera_runtime_overrides` 打通 `roi` / `frame_path` / `stream_url`
+    - 当前仍未完成正式数据库字段迁移
+
+- `docs/check_log.md`
+  - 新增本轮静态复核记录
+  - 补充项目最小启动前置条件与尚未闭环项说明
+
+**当前边界补充：**
+
+- 当前可以先以“运行时字段覆盖”模式把主链启动起来
+- 但这不等于 `HKCamera` 的持久化字段闭环已经完成
+- 检测正确性仍需真实权重、真实视频流与样例复核共同验证
+
+### 2026-04-02 — 最小运行链路软降级落地
+
+**目标：** 先让 `inspection-flask` 在“依赖安装后、数据库/旧登录体系/原生海康 SDK 未完全恢复”的条件下也能启动并验证主链。
+
+**本轮新增/修改重点：**
+
+- `inspection-flask/pyproject.toml`
+  - 新增当前项目依赖元数据文件，集中维护运行依赖
+
+- `inspection-flask/settings.py`
+  - 新增最小运行兼容开关：
+    - `AUTH_ENABLED`
+    - `DB_STRICT_STARTUP`
+    - `ENABLE_BACKGROUND_SCHEDULER`
+    - `ALLOW_SAVE_VIOLATION_WITHOUT_DB`
+    - `DEFAULT_STREAM_URL`
+    - `RTSP_PORT`
+    - `RTSP_PATH_TEMPLATE`
+
+- `inspection-flask/applications/extensions/init_sqlalchemy.py`
+  - 数据库连接失败不再默认直接退出
+  - 改为记录 `database_ready` / `database_init_error`
+
+- `inspection-flask/applications/__init__.py`
+  - 数据库未就绪时跳过 scheduler 启动
+  - 初始化 `camera_runtime_overrides`
+
+- `inspection-flask/applications/common/utils/rights.py`
+  - `AUTH_ENABLED=False` 时绕过旧登录权限链
+
+- `inspection-flask/applications/view/system/hk_camera.py`
+  - 新增健康检查接口
+  - 支持无数据库模式下的运行时摄像头启停
+  - 支持无数据库模式下的内存违规记录查询
+  - 支持模板缺失时 JSON 降级
+
+- `inspection-flask/hk/hksdk/device.py`
+  - 从空文件改为最小兼容取流封装
+
+- `inspection-flask/applications/common/hk_recorder_threading.py`
+  - 支持：
+    - 单图调试
+    - 图集目录轮播
+    - 本地视频
+    - `stream_url`
+    - RTSP fallback
+
+- `inspection-flask/templates/system/hk_camera/*.html`
+  - 补齐最小模板，避免页面路由 500
+
+**当前边界：**
+
+- 这是“最小运行链路已具备软降级能力”
+- 不是“真实海康原生 SDK 已完整恢复”
+- 也不是“检测正确性已完成闭环验证”
+
 ### 2026-03-31 — 完成 P1（最小 Flask 骨架）+ P2（最小数据层与路由依赖）
 
 **目标：** 补齐 `create_app()` 的全部 import 依赖，使 Flask 应用的模块导入链路可以完整执行。
@@ -177,17 +258,28 @@
   - `inspection-flask/applications/__init__.py`
   - 已写出模型初始化、线程管理、调度初始化的结构
   - P1+P2 已补齐全部 import 依赖（config, extensions, flask_log, script, view/init_bps）
-  - 待数据库配置和 Flask 依赖安装后可真正启动
+  - 2026-04-02 已补“数据库失败不直接退出 + 无数据库时跳过 scheduler”的软降级启动能力
+  - 仍需安装依赖后才能真正运行
 
 - `DONE` 摄像头视图层依赖已补齐
   - `inspection-flask/applications/view/system/hk_camera.py`
   - P2 已补齐全部依赖模块（models, schemas, curd, user_auth, utils）
+  - 2026-04-02 已补最小模板与无数据库运行时启停/查询兼容
 
 - `PARTIAL` 离线验证口径还不够严谨
   - `inspection-flask/main.py`
   - 当前还存在已记录的问题：
     - ROI 外目标统计口径问题
     - `validate --labels` 默认参数问题
+
+- `PARTIAL` 最小后台已具备软降级能力
+  - `inspection-flask/applications/common/utils/rights.py`
+  - `inspection-flask/applications/view/system/hk_camera.py`
+  - 当前已支持：
+    - 无旧登录体系时访问最小页面 / 接口
+    - 无数据库时查看健康状态
+    - 无数据库时直接用运行时参数启动线程
+  - 但这不等于完整后台管理能力已恢复
 
 ## 3.3 当前明确缺失的部分
 
@@ -210,11 +302,24 @@
   - `inspection-flask/applications/schemas/admin_hk_camera.py`
   - 已导出 `HKCamera`、`Station`、`ViolateRule`、`ViolatePhoto`、`DeptRelations`、`Photo`
 
-- `MISSING` 海康实时 SDK 链路
-  - `inspection-flask/hk/hksdk/device.py` 当前是空文件
-  - `inspection-flask/hk/hksdk/HCNetSDK.py`
-  - `inspection-flask/hk/hksdk/header.py`
-  - SDK 依赖库文件
+- `PARTIAL` 海康取流兼容层
+  - `inspection-flask/hk/hksdk/device.py` 已补最小兼容实现
+  - `inspection-flask/applications/common/hk_recorder_threading.py` 已支持：
+    - `frame_path` 单图
+    - 图集目录
+    - 本地视频
+    - `stream_url`
+    - RTSP fallback
+  - 但以下内容仍未恢复：
+    - `HCNetSDK.py`
+    - `header.py`
+    - 原生 SDK 动态库
+    - 完整海康原生取流能力
+
+- `PARTIAL` 数据库与存证软降级
+  - 当前数据库失败时 Flask 可继续启动
+  - 无数据库时违规事件可降级写入内存队列
+  - 但这不等于数据库闭环已完成，正式环境仍需 PostgreSQL 与完整表结构
 
 ## 4. 当前必须统一的项目判断
 
@@ -244,7 +349,7 @@
 
 完成标准：
 
-- `to_list.md`、后续文档、代码注释中，项目目标统一为“加油站工服检测”
+- `file_todo_list.md`、后续文档、代码注释中，项目目标统一为“加油站工服检测”
 - 不再把 `inspection-flask_old` 视为需要全量恢复的目标项目
 
 ## P1：补齐最小 Flask 工程骨架，让 inspection-flask 真正能启动
@@ -385,7 +490,7 @@
 
 ## 8. 更新约束条件
 
-每次更新 `to_list.md` 时必须遵循以下规则：
+每次更新 `file_todo_list.md` 时必须遵循以下规则：
 
 - 更新记录统一写在"更新记录"区域，**历史在后，最新在前**
 - 每条更新记录必须包含：日期、完成了什么、修改/新建了哪些文件、关键适配细节
@@ -436,7 +541,7 @@
 ## 9.6 文档维护约束
 
 - 每次完成一轮代码修改后，至少同步检查：
-  - `docs/to_list.md`
+  - `docs/file_todo_list.md`
   - `docs/update_log.md`
   - `docs/check_log.md`
 

@@ -1,5 +1,177 @@
 # Check Log
 
+## 2026-04-02 `inspection-flask` 代码严谨性 / 正确性闭环 / 最小运行缺口复核
+
+本轮复核目标不是继续改代码，而是回答三个问题：
+
+1. 当前代码逻辑是否足够严谨；
+2. 现阶段能否宣称“检测正确”；
+3. 距离“最小正常运行”还差哪些前置条件。
+
+### 运行环境复核说明
+
+- 本节已按用户补充信息，改用 `conda` 环境 `yolo_code` 重新检查。
+- 实际解释器：
+  - `D:\Miniconda3_python\envs\yolo_code\python.exe`
+  - `Python 3.9.25`
+- 因此，本节后续“可运行 / 不可运行”的判断，以 `yolo_code` 为准，不再以机器默认 `base` 解释器为准。
+
+### 静态代码严谨性结论
+
+- **结论**：从静态代码结构看，当前 `inspection-flask` 已经具备一条相对自洽的最小检测链路，但仍属于“可运行 + 可调试”阶段，不属于“业务正确性已闭环验收”的阶段。
+- **正向结论**：
+  - `applications/__init__.py` 先初始化模型，再初始化线程管理器和缓存，并用 `detection_pipeline_ready` 阻断未就绪线程启动，启动顺序是合理的。
+  - 在线线程 `inspection-flask/applications/common/hk_custom_threading_plus.py` 与离线验证工具 `inspection-flask/main.py` 复用了同一套工服裁剪与合规判定策略：`inspection-flask/utils/workwear_policy.py`，这有助于降低“线上一套口径、线下一套口径”的漂移。
+  - ROI 判定、最小人框面积过滤、时序触发比例、按 `track_id` 聚合违规帧的思路是自洽的；`WorkwearMissingViolation` 也已经做到“只保留触发 track 的证据框”，证据图口径比早期版本严谨。
+  - 数据库不可用时，系统允许降级启动，并把违规事件写入图片和内存队列，最小调试链路不再被数据库完全卡死。
+- **仍需保守看待的点**：
+  - `SimpleIoUTracker` 只是轻量 IoU 贪心关联，适合固定机位、低密度、低遮挡场景；一旦多人交错、遮挡、镜头抖动或采样间隔过大，`track_id` 漂移仍然可能发生，从而影响时序统计是否落在同一个人身上。
+  - 线上链路把“ROI 内的人”当作监管对象，但这并不等价于“员工”；这属于业务假设，不是代码可以自动证明的事实。
+  - `hk_recorder_threading.py` 的帧哈希去重逻辑有利于避免重复处理同一帧，但如果调试时只喂一张静态图片，线程侧无法持续累积新的时间窗，在线告警链路不适合用“单张静态图反复读取”来做端到端验证。
+
+### 检测正确性闭环状态
+
+- **结论**：当前不能宣称“已经确保检测正确性”，最多只能说“实现了较一致的检测逻辑，并提供了离线评估入口，但正确性仍依赖数据、ROI 和现场输入条件”。
+- **原因 1：数据口径本身不闭环**
+  - `docs/dataset.md` 明确当前示例数据集是单类检测，类别只有 `0 -> clothes`。
+  - 这意味着数据集本身只直接标注“穿了工服的目标”，并没有提供“未穿工服”的显式负类，也没有“员工 / 非员工”身份标签。
+  - 因此，系统当前的“未穿工服”实质上是：`person 检出` 且 `person crop 内未检出 clothes`。这是一种业务推断，不是由现有标注直接闭环验证出来的事实。
+- **原因 2：正确性高度依赖 ROI**
+  - `docs/check_detail_ROI.md` 已经明确：不能把“进入 ROI”直接等价成“员工”；ROI 只能缩小监管区域，不能提供身份语义。
+  - 因而即使模型检测稳定，只要 ROI 画得过大、覆盖路人区域，系统仍可能把非目标人员纳入规则引擎。
+- **原因 3：当前离线验证默认参数与本仓库数据文档不一致**
+  - `inspection-flask/main.py` 的 `validate` 默认使用 `--gt-mode paired --person-cls 0 --clothes-cls 1`。
+  - 但 `docs/dataset.md` 当前写的是单类 `clothes` 数据集，类别 ID 为 `0`。
+  - 这意味着：**如果直接使用默认参数跑当前数据集的真值对比，结果会失真或失去参考意义。**
+  - 对当前文档描述的数据集，离线真值对比至少应显式使用类似：
+    - `python inspection-flask/main.py validate <images_dir> --labels <labels_dir> --gt-mode clothes-only --clothes-cls 0`
+- **归纳**：现在更准确的表述应继续保持为“ROI 内作业区人员疑似未穿工服检测”，而不是“已证明能正确识别员工未穿工服”。
+
+### 最小正常运行缺口
+
+基于本轮实际检查，离“最小正常运行”还差的不是主流程代码，而是**环境与资源条件**：
+
+- **缺口 1：`yolo_code` 只具备离线推理依赖，缺少 Flask 侧依赖**
+  - 在 `yolo_code` 中实测已存在：
+    - `cv2 4.13.0`
+    - `numpy 2.0.2`
+    - `torch 2.8.0+cpu`
+    - `ultralytics 8.4.23`
+  - 因而 `inspection-flask/main.py` 这条离线命令链路已经能进入真实自检逻辑。
+  - 但 `yolo_code` 中仍缺少以下 Flask / 数据库 / 调度相关依赖：
+    - `flask`
+    - `sqlalchemy`
+    - `flask_sqlalchemy`
+    - `flask_marshmallow`
+    - `marshmallow_sqlalchemy`
+    - `apscheduler`
+    - `psycopg2-binary`
+  - 结论：**当前环境能部分支撑离线检查，不足以启动完整 Flask 服务。**
+- **缺口 2：权重目录缺失**
+  - 实测 `inspection-flask/weights` 目录不存在，因此 `settings.py` 中声明的两套权重当前都没有落地：
+    - `inspection-flask/weights/person_detect_yolov8.pt`
+    - `inspection-flask/weights/workwear_detect_yolov8.pt`
+  - 即使依赖补齐，也还不能完成真实推理。
+  - 额外检查发现，仓库中仅在 `inspection-flask_old/weights/` 下存在旧版 `.pt` 文件；当前 `inspection-flask` 所需的 YOLOv8 权重并未就位，不能直接视为已满足当前版本运行条件。
+- **缺口 3：至少需要一种真实可读输入源**
+  - 运行期最少需要以下三者之一：
+    - `frame_path`
+    - `stream_url`
+    - 可拼出 RTSP 地址的海康相机参数
+  - 代码已经支持这三类输入，但“配置入口已打通”不等于“现场输入一定可读”。
+- **缺口 4：若要做‘当前数据集’的正确性复核，命令参数必须收紧**
+  - 当前仓库文档对应的数据集是单类 `clothes`，不能直接套 `validate` 默认真值模式。
+  - 若不显式指定 `--gt-mode clothes-only --clothes-cls 0`，离线评估结论容易误导。
+
+### 本轮实际检查结果
+
+- `python -m compileall inspection-flask`：**通过**
+  - 说明当前仓库内 Python 文件在静态语法层面没有明显问题。
+- `yolo_code` 下 `python inspection-flask/main.py check`：**可执行，但因权重缺失退出**
+  - 说明离线 CLI 所需核心推理依赖已经基本具备。
+  - 当前阻塞点不是 `cv2` / `torch` / `ultralytics`，而是 `inspection-flask/weights/` 下缺少目标权重文件。
+- `yolo_code` 下导入 `inspection-flask/app.py`：**失败**
+  - 失败点为 `ModuleNotFoundError: No module named 'apscheduler'`。
+  - 这说明完整 Flask 服务链路目前还未达到最小可启动状态。
+- `inspection-flask/weights`：**不存在**
+  - 当前仓库内未发现最小推理所需权重目录。
+
+### 当前阶段的审慎结论
+
+- 可以说：**代码主链路已经比较成型，静态逻辑基本自洽，具备最小调试闭环。**
+- 不可以说：**已经确保检测正确，或已经完成业务验收。**
+- 当前更准确的状态描述应为：
+  - **代码层面**：已具备“模型初始化 → 取帧 → 人体检测 → 工服检测 → ROI / 时序规则 → 证据保存”的最小链路；
+  - **运行层面**：
+    - 对离线 CLI 而言：还缺当前版本权重、真实输入源；
+    - 对完整 Flask 服务而言：除权重外，还缺 `flask` / `apscheduler` / `sqlalchemy` 等服务端依赖；
+  - **验收层面**：还缺与当前单类数据集口径一致的离线验证，以及基于真实 ROI / 真实视频流的现场验证。
+
+### 建议的下一步验证顺序
+
+1. 先在 `yolo_code` 中补齐 `inspection-flask/pyproject.toml` 缺失的 Flask 侧依赖；
+2. 补齐 `inspection-flask/weights/` 下的人体权重与工服权重；
+3. 先用 `D:\Miniconda3_python\envs\yolo_code\python.exe inspection-flask/main.py check` 验证离线自检通过；
+4. 再用单张图 / 图像目录跑 `image` 子命令验证裁剪与工服标签输出；
+5. 针对当前文档数据集，使用 `--gt-mode clothes-only --clothes-cls 0` 重新做离线统计；
+6. 最后再补做 Flask 服务启动验证与真实 ROI + 视频流 / RTSP 在线线程验证，确认时序告警是否符合现场预期。
+
+## 2026-04-02 `inspection-flask` 最小运行链路静态复核记录
+
+本轮复核目标：
+- 检查当前“先运行起来”改造是否已经形成最小启动闭环
+- 明确哪些能力已经具备，哪些仍然只是软降级或运行时兼容
+
+### 复核结论
+
+#### 结论 1 — 最小启动链路已经具备静态层面的可运行条件
+
+状态：**已复核**
+
+结论说明：
+- 依赖元数据已集中到 `inspection-flask/pyproject.toml`
+- `create_app()` 已具备：
+  - 模型初始化失败可记录错误而不是直接崩溃
+  - 数据库未就绪时的软降级启动
+  - 无数据库时跳过 scheduler
+- `hk_camera` 已具备最小模板 / JSON 降级 / 运行时启停接口
+
+当前最小前置条件：
+- 安装 `inspection-flask/pyproject.toml` 中声明的依赖
+- 准备至少两套权重：
+  - `inspection-flask/weights/person_detect_yolov8.pt`
+  - `inspection-flask/weights/workwear_detect_yolov8.pt`
+- 准备至少一种可读输入：
+  - `frame_path`
+  - `stream_url`
+  - 或按默认 RTSP 模板可访问的视频流
+
+#### 结论 2 — 问题 4 当前只完成到“运行时字段打通”，不是“数据库字段闭环”
+
+状态：**部分推进**
+
+结论说明：
+- 当前 `roi` / `frame_path` / `stream_url` 已可通过运行时参数进入：
+  - `hk_camera.py`
+  - `hk_recorder_threading.py`
+  - `hk_custom_threading_plus.py`
+- 当前采用 `camera_runtime_overrides` 缓存运行时覆盖参数
+- 当前没有正式修改 `HKCamera` 数据表结构，因此：
+  - 可先跑
+  - 但不能宣称这些字段已经稳定持久化落库
+
+#### 结论 3 — 检测正确性仍未闭环，当前不能宣称“检测已验证正确”
+
+状态：**未闭环**
+
+结论说明：
+- 当前改造重点是“把启动链路和采图链路先跑起来”
+- 真正的检测正确性仍取决于：
+  - 权重文件是否与当前 `settings.py` 口径一致
+  - 真实视频流输入是否稳定
+  - 在线告警结果是否经过样例复核
+  - 离线验证结果与在线时序规则是否完成联合验证
+
 ## 2026-03-31 `inspection-flask` 单正类标注前提补充复检修正记录
 
 本次基于"基于 `clothes` 单正类标注前提的补充复检记录"提出的 6 个问题，逐一核实后处理。

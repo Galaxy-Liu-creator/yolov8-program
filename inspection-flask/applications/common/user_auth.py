@@ -4,6 +4,21 @@ from sqlalchemy import or_
 from applications.models import Station, DeptRelations
 
 
+def _auth_enabled():
+    try:
+        from flask import current_app
+        return current_app.config.get("AUTH_ENABLED", False)
+    except Exception:
+        return False
+
+
+def _role_code():
+    roles = getattr(current_user, "role", None) or []
+    if not roles:
+        return None
+    return getattr(roles[0], "code", None)
+
+
 def judge_station_generate_auth(code):
     roles = ['common', 'dept', 'sub', 'city']
     if code in roles:
@@ -12,18 +27,23 @@ def judge_station_generate_auth(code):
 
 
 def detect_auth():
-    if current_user.role[0].code == "admin":
+    if not _auth_enabled():
+        return True
+    if _role_code() == "admin":
         return True
     return False
 
 
 def stations_auth():
+    if not _auth_enabled():
+        return None
     station_ids = []
     filters = [(DeptRelations.type == 0) | (DeptRelations.type == 1)]
 
-    if current_user.role[0].code == "sub":
+    role_code = _role_code()
+    if role_code == "sub":
         filters.append(DeptRelations.sub_id == current_user.sub_id)
-    if current_user.role[0].code == "dept" or current_user.role[0].code == "common":
+    if role_code == "dept" or role_code == "common":
         filters.append(DeptRelations.sub_id == current_user.sub_id)
         filters.append(DeptRelations.dept_id == current_user.dept_id)
 
@@ -34,12 +54,15 @@ def stations_auth():
 
 
 def dept_auth():
+    if not _auth_enabled():
+        return None
     dept_ids = []
     filters = [DeptRelations.type == 1]
 
-    if current_user.role[0].code == "sub":
+    role_code = _role_code()
+    if role_code == "sub":
         filters.append(DeptRelations.sub_id == current_user.sub_id)
-    if current_user.role[0].code == "dept" or current_user.role[0].code == "common":
+    if role_code == "dept" or role_code == "common":
         filters.append(DeptRelations.sub_id == current_user.sub_id)
         filters.append(DeptRelations.dept_id == current_user.dept_id)
 
@@ -50,14 +73,16 @@ def dept_auth():
 
 
 def sub_auth():
+    if not _auth_enabled():
+        return None
     sub_ids = []
     filters = [Station.type == 3]
 
-    if current_user.role[0].code == "sub" or current_user.role[0].code == "dept" or current_user.role[
-        0].code == "common":
+    role_code = _role_code()
+    if role_code == "sub" or role_code == "dept" or role_code == "common":
         filters.append(Station.id == current_user.sub_id)
         filters.append(Station.is_delete == 0)
-    if current_user.role[0].code == "city":
+    if role_code == "city":
         filters.append(Station.is_delete == 0)
     _ids = Station.query.filter(*filters).with_entities(
         Station.id).all()

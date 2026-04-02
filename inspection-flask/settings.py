@@ -3,6 +3,17 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent  # 根目录
 
+# ─── 启动与运行模式 ────────────────────────────────────────────────────────────
+# 当前阶段优先保证“检测服务先跑起来”：
+# - AUTH_ENABLED=False：默认关闭旧后台鉴权链，避免因未恢复登录系统导致接口不可用
+# - DB_STRICT_STARTUP=False：数据库异常时允许 Flask 先启动，便于先调试模型/路由/模板
+# - ALLOW_SAVE_VIOLATION_WITHOUT_DB=True：数据库不可用时，证据图仍可保留并写入内存事件队列
+AUTH_ENABLED = False
+DB_STRICT_STARTUP = False
+ENABLE_BACKGROUND_SCHEDULER = True
+ALLOW_SAVE_VIOLATION_WITHOUT_DB = True
+TEMPLATE_UI_ENABLED = True
+
 # ─── 图像与存储路径 ────────────────────────────────────────────────────────────
 VIO_IMAGE_PATH = BASE_DIR.joinpath('vio_data')
 
@@ -95,6 +106,9 @@ thread_idle_sleep = 2
 # ─── 海康摄像头默认参数 ────────────────────────────────────────────────────────
 DEFAULT_CAMERA_PORT    = 8000
 DEFAULT_CAMERA_CHANNEL = 1
+DEFAULT_STREAM_URL = None
+RTSP_PORT = 554
+RTSP_PATH_TEMPLATE = "rtsp://{username}:{password}@{ip}:{port}/Streaming/Channels/{channel_code}"
 
 # ─── 海康日志路径 ──────────────────────────────────────────────────────────────
 LOG_DIR = BASE_DIR.joinpath("logs")

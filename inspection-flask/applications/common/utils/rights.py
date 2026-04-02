@@ -13,29 +13,36 @@ def authorize(power: str, log: bool = False):
     """
 
     def decorator(func):
-        @login_required
         @wraps(func)
         def wrapper(*args, **kwargs):
-            if current_user.username == current_app.config.get("SUPERADMIN"):
+            if not current_app.config.get("AUTH_ENABLED", False):
                 return func(*args, **kwargs)
-            permissions = session.get('ducha_permissions', None)
-            if permissions is None:
-                role = current_user.role
-                user_power = []
-                for i in role:
-                    if i.enable == 0:
-                        continue
-                    for p in i.power:
-                        if p.enable == 0:
+
+            @login_required
+            def protected():
+                if getattr(current_user, "username", None) == current_app.config.get("SUPERADMIN"):
+                    return func(*args, **kwargs)
+                permissions = session.get('ducha_permissions', None)
+                if permissions is None:
+                    role = getattr(current_user, "role", []) or []
+                    user_power = []
+                    for item in role:
+                        if getattr(item, "enable", 1) == 0:
                             continue
-                        user_power.append(p.code)
-                session['ducha_permissions'] = user_power
-            if not power in session.get('ducha_permissions'):
-                if request.method == 'GET':
-                    abort(403)
-                else:
+                        for permission in getattr(item, "power", []) or []:
+                            if getattr(permission, "enable", 1) == 0:
+                                continue
+                            code = getattr(permission, "code", None)
+                            if code:
+                                user_power.append(code)
+                    session['ducha_permissions'] = user_power
+                if power not in session.get('ducha_permissions', []):
+                    if request.method == 'GET':
+                        abort(403)
                     return jsonify(success=False, msg="权限不足!")
-            return func(*args, **kwargs)
+                return func(*args, **kwargs)
+
+            return protected()
 
         return wrapper
 

@@ -385,6 +385,7 @@ class ThreadManager:
                 return False
             new_thread = HKCustomThread(camera, self.app)
             self.threads[camera_id] = new_thread
+            self.app.config.setdefault("camera_registry", {})[camera_id] = camera
             new_thread.start()
             return True
 
@@ -422,15 +423,29 @@ class ThreadManager:
         if app is None:
             return
 
+        registry_snapshot = list(app.config.get("camera_registry", {}).values())
         self.stop_all_threads(app)
+        runtime_overrides = app.config.get("camera_runtime_overrides", {})
+        cameras = []
+        if app.config.get("database_ready", False):
+            try:
+                from applications.models import HKCamera
 
-        from applications.models import HKCamera
+                with app.app_context():
+                    cameras = HKCamera.query.filter_by(is_delete=0, enable=1).all()
+            except Exception:
+                app.logger.exception("从数据库重载摄像头失败，回退到内存 camera_registry")
+                cameras = []
 
-        with app.app_context():
-            cameras = HKCamera.query.filter_by(is_delete=0, enable=1).all()
-            for camera in cameras:
-                if self.add_thread(camera):
-                    app.logger.info("重启工服检测线程 camera %s", camera.id)
-                    time.sleep(0.2)
-                else:
-                    app.logger.warning("工服检测线程 camera %s 重启失败或已在运行", camera.id)
+        if not cameras:
+            cameras = registry_snapshot
+
+        for camera in cameras:
+            overrides = runtime_overrides.get(str(camera.id), {}) or runtime_overrides.get(camera.id, {})
+            for key, value in overrides.items():
+                setattr(camera, key, value)
+            if self.add_thread(camera):
+                app.logger.info("重启工服检测线程 camera %s", camera.id)
+                time.sleep(0.2)
+            else:
+                app.logger.warning("工服检测线程 camera %s 重启失败或已在运行", camera.id)

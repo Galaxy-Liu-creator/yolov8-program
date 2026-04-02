@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <title>加油站工服检测 - 摄像头管理</title>
+</head>
+<body>
+    <h1>{{ system_name or "inspection-flask" }}</h1>
+    <p>这是当前项目的最小摄像头管理页面占位模板。</p>
+    <ul>
+        <li>数据库状态：{{ "就绪" if database_ready else "未就绪" }}</li>
+        <li>检测链状态：{{ "就绪" if detection_pipeline_ready else "未就绪" }}</li>
+    </ul>
+    <p>推荐先访问 <code>/hk_camera/health</code> 检查运行状态。</p>
+</body>
+</html>

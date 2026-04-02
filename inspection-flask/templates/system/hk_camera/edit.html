@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <title>编辑摄像头</title>
+</head>
+<body>
+    <h1>编辑摄像头</h1>
+    <p>当前为最小占位模板。</p>
+    {% if camera %}
+    <ul>
+        <li>ID: {{ camera.id }}</li>
+        <li>名称: {{ camera.name }}</li>
+        <li>IP: {{ camera.ip }}</li>
+        <li>端口: {{ camera.port }}</li>
+        <li>通道: {{ camera.channel }}</li>
+    </ul>
+    {% else %}
+    <p>未找到摄像头数据。</p>
+    {% endif %}
+</body>
+</html>

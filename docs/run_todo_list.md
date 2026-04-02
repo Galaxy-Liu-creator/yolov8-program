@@ -89,6 +89,30 @@
 
 这说明当前项目的主要问题已经不是“没有主链”，而是“主链的运行资源和工程闭环还没有补齐”。
 
+### 3.1 2026-04-02 当前新增落地状态
+
+- `DONE` 当前项目已经新增依赖元数据文件
+  - `inspection-flask/pyproject.toml`
+
+- `PARTIAL` 应用已支持软降级启动
+  - 数据库连接失败时默认不再直接退出
+  - 无数据库时跳过后台 scheduler
+  - 这意味着应用更容易“先启动起来”，但不代表数据库链已经闭环
+
+- `PARTIAL` 最小后台已具备兼容运行能力
+  - 鉴权默认可绕过旧登录体系
+  - 页面模板已补齐最小占位版本
+  - `hk_camera` 已支持健康检查与无数据库运行时启停
+
+- `PARTIAL` 采图链已具备最小兼容输入源
+  - 当前已支持：
+    - 单图
+    - 图集目录
+    - 本地视频
+    - `stream_url`
+    - RTSP fallback
+  - 但这不是“海康原生 SDK 完整恢复”
+
 ---
 
 ## 4. 当前阻塞问题与对应解决方案
@@ -124,6 +148,23 @@
   - 若保留登录鉴权，还需补：
     - `flask-login`
     - `validators`
+
+### 推荐安装命令（Windows / PowerShell）
+
+- 在仓库根目录执行：
+  - `cd inspection-flask`
+  - `python -m venv .venv`
+  - `.\.venv\Scripts\activate`
+  - `python -m pip install --upgrade pip`
+  - `pip install -e .`
+
+### 安装后最小验证命令
+
+- 依赖安装完成后，至少执行：
+  - `python main.py check`
+  - `python -c "from applications import create_app; app = create_app(); print({'database_ready': app.config.get('database_ready'), 'database_init_error': app.config.get('database_init_error')})"`
+- 若只想先验证路由与最小后台链路，可继续检查：
+  - `python -c "from applications import create_app; app = create_app(); print(app.url_map)"`
 
 ### 完成标准
 
@@ -206,6 +247,17 @@
   - `frame_path` 仅作为本地图回放输入
 - 不再把 `frame_path` 视为线上正式链路
 
+### 当前落地状态
+
+- 已补：
+  - `inspection-flask/hk/hksdk/device.py` 的最小兼容实现
+  - `inspection-flask/applications/common/hk_recorder_threading.py` 对单图 / 图集目录 / 本地视频 / `stream_url` / RTSP fallback 的支持
+- 当前仍未完成：
+  - 原生 `HCNetSDK.py`
+  - 原生 `header.py`
+  - SDK 动态库接回
+  - 真实海康原生 SDK 完整闭环
+
 ### 完成标准
 
 - 单路海康摄像头能持续写入 `hk_frame_cache`
@@ -247,6 +299,21 @@
   - 摄像头启用接口
   - 检测线程读取逻辑
 
+### 当前落地状态
+
+- 已补运行时字段兼容：
+  - `inspection-flask/applications/view/system/hk_camera.py`
+  - `inspection-flask/applications/common/hk_custom_threading_plus.py`
+  - `inspection-flask/applications/common/hk_recorder_threading.py`
+- 当前 `roi` / `frame_path` / `stream_url` 已可通过运行时参数传入，并由
+  - `camera_runtime_overrides`
+  统一缓存后传递给线程与采图链路
+- 当前**没有**直接改动 `HKCamera` 数据表结构：
+  - 这是有意保守处理，避免在未做正式迁移前破坏现有数据库
+- 因此问题 4 当前状态是：
+  - `PARTIAL` 运行时字段链路已打通
+  - `MISSING` 正式持久化字段迁移与表结构闭环仍待完成
+
 ### 完成标准
 
 - 后台保存摄像头后，`roi` 能稳定落库并被线程读到
@@ -284,6 +351,18 @@
   - 先让 `main.py` 离线工具和最小检测链跑通
 - 第二步：
   - 再打通 Web + DB + 摄像头后台链路
+
+### 当前落地状态
+
+- 已补软降级能力：
+  - 数据库失败时应用不再默认直接退出
+  - 会记录 `database_ready` / `database_init_error`
+  - 数据库未就绪时跳过后台 scheduler
+  - 违规事件可回退到内存队列
+- 当前仍未完成：
+  - PostgreSQL 正式落地
+  - 真实表结构验证
+  - 正式环境下的完整写库闭环
 
 ### 完成标准
 
@@ -325,7 +404,18 @@
   - 登录/用户/角色链
   - 完整模板页面
   - 会话与权限逻辑
-  - 更完善的后台管理功能
+- 更完善的后台管理功能
+
+### 当前落地状态
+
+- 已补：
+  - 最小模板
+  - 模板缺失时 JSON 降级
+  - 健康检查接口
+  - 无数据库模式下的运行时摄像头启停与违规事件查询
+- 当前仍不是：
+  - 旧项目级别的完整后台
+  - 完整登录/角色/菜单/权限系统
 
 ### 完成标准
 

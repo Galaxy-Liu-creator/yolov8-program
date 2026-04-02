@@ -1,5 +1,4 @@
 import datetime
-import os
 
 from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
@@ -87,9 +86,18 @@ ma = Marshmallow()
 def init_databases(app: Flask):
     db.init_app(app)
     ma.init_app(app)
-    if os.environ.get('WERKZEUG_RUN_MAIN') == 'true':
-        with app.app_context():
-            try:
-                db.engine.connect()
-            except Exception as e:
-                exit(f"数据库连接失败: {e}")
+    app.config["database_ready"] = False
+    app.config["database_init_error"] = None
+
+    with app.app_context():
+        try:
+            connection = db.engine.connect()
+            connection.close()
+            app.config["database_ready"] = True
+            app.config["database_init_error"] = None
+        except Exception as exc:
+            app.config["database_ready"] = False
+            app.config["database_init_error"] = str(exc)
+            if app.config.get("DB_STRICT_STARTUP", False):
+                raise RuntimeError(f"数据库连接失败: {exc}") from exc
+            app.logger.warning("数据库连接失败，Flask 将以降级模式继续启动: %s", exc)

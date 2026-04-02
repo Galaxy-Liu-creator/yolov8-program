@@ -94,6 +94,7 @@ def create_app():
 
     app.config['violation_events'] = []     # 全局违规事件队列（供页面或推送消费）
     app.config['camera_registry']  = {}     # 当前启用摄像头注册表 {camera_id: HKCamera}
+    app.config['camera_runtime_overrides'] = {}  # 运行时覆盖配置 {camera_id: {"roi": [...], "frame_path": str, "stream_url": str}}
     # ══════════════════════════════════════════════════════════════════════════
 
     # 注册 Flask 插件
@@ -106,33 +107,41 @@ def create_app():
     # ══════════════════════════════════════════════════════════════════════════
     # 第三阶段：定时调度（不依赖模型，直接激活）
     # ──────────────────────────────────────────────────────────────────────────
-    with app.app_context():
-        scheduler = BackgroundScheduler()
-        # 定时抓图：按 get_image_interval 周期驱动海康录像线程取帧
-        scheduler.add_job(
-            app.config['hk_recorder_thread_manager'].run,
-            trigger='interval',
-            seconds=settings.get_image_interval,
-            args=(app,),
-        )
-        # 每天凌晨 4 点重启所有检测线程，避免长时间运行后线程失效
-        scheduler.add_job(
-            app.config['hk_threadManager'].restart_all_threads,
-            trigger='cron',
-            hour=4,
-            minute=0,
-            args=(app,),
-        )
-        # 启动后延迟 2 个采集周期再做一次全量重启，确保摄像头初始化完成
-        re_start_time = datetime.now() + timedelta(seconds=settings.get_image_interval * 2)
-        scheduler.add_job(
-            app.config['hk_threadManager'].restart_all_threads,
-            trigger='date',
-            run_date=re_start_time,
-            args=(app,),
-        )
-        scheduler.start()
-        app.config["scheduler"] = scheduler
+    app.config["scheduler"] = None
+    if app.config.get("ENABLE_BACKGROUND_SCHEDULER", True):
+        if app.config.get("database_ready", False):
+            with app.app_context():
+                scheduler = BackgroundScheduler()
+                # 定时抓图：按 get_image_interval 周期驱动海康录像线程取帧
+                scheduler.add_job(
+                    app.config['hk_recorder_thread_manager'].run,
+                    trigger='interval',
+                    seconds=settings.get_image_interval,
+                    args=(app,),
+                )
+                # 每天凌晨 4 点重启所有检测线程，避免长时间运行后线程失效
+                scheduler.add_job(
+                    app.config['hk_threadManager'].restart_all_threads,
+                    trigger='cron',
+                    hour=4,
+                    minute=0,
+                    args=(app,),
+                )
+                # 启动后延迟 2 个采集周期再做一次全量重启，确保摄像头初始化完成
+                re_start_time = datetime.now() + timedelta(seconds=settings.get_image_interval * 2)
+                scheduler.add_job(
+                    app.config['hk_threadManager'].restart_all_threads,
+                    trigger='date',
+                    run_date=re_start_time,
+                    args=(app,),
+                )
+                scheduler.start()
+                app.config["scheduler"] = scheduler
+        else:
+            app.logger.warning(
+                "数据库未就绪，跳过后台调度器启动: %s",
+                app.config.get("database_init_error"),
+            )
     # ══════════════════════════════════════════════════════════════════════════
 
     # 注册全局异常处理

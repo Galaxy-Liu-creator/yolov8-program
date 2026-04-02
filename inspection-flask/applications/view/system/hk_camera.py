@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 import os
 import threading
 import time
+from pathlib import Path
 from types import SimpleNamespace
 
 import cv2
@@ -30,11 +31,154 @@ from applications.common.utils import upload as upload_curd
 bp = Blueprint('hk_camera', __name__, url_prefix='/hk_camera')
 
 
+def _database_ready():
+    return bool(current_app.config.get("database_ready", False))
+
+
+def _template_file_exists(template_name: str) -> bool:
+    return Path(current_app.root_path).joinpath("templates", template_name).exists()
+
+
+def _render_or_json(template_name: str, **context):
+    if getattr(settings, "TEMPLATE_UI_ENABLED", True) and _template_file_exists(template_name):
+        return render_template(template_name, **context)
+    payload = {"template": template_name}
+    payload.update(context)
+    return jsonify(payload)
+
+
+def _coerce_int(value, default=None):
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return default
+
+
+def _parse_roi(raw_roi):
+    if raw_roi in (None, "", []):
+        return None
+    if isinstance(raw_roi, str):
+        parts = [part.strip() for part in raw_roi.split(",")]
+    elif isinstance(raw_roi, (list, tuple)):
+        parts = list(raw_roi)
+    else:
+        return None
+    if len(parts) != 4:
+        return None
+    try:
+        roi = [int(float(part)) for part in parts]
+    except (TypeError, ValueError):
+        return None
+    x1, y1, x2, y2 = roi
+    if x2 <= x1 or y2 <= y1:
+        return None
+    return roi
+
+
+def _collect_runtime_overrides(payload: dict) -> dict:
+    overrides = {}
+    roi = _parse_roi(payload.get("roi") or payload.get("ROI"))
+    if roi is not None:
+        overrides["roi"] = roi
+    frame_path = str_escape(payload.get("framePath") or payload.get("frame_path"))
+    if frame_path:
+        overrides["frame_path"] = frame_path
+    stream_url = str_escape(payload.get("streamUrl") or payload.get("stream_url"))
+    if stream_url:
+        overrides["stream_url"] = stream_url
+    return overrides
+
+
+def _serialize_camera(camera):
+    thread = current_app.config.get("hk_threadManager").threads.get(str(camera.id))
+    return {
+        "id": camera.id,
+        "name": getattr(camera, "name", None),
+        "ip": getattr(camera, "ip", None),
+        "port": getattr(camera, "port", None),
+        "username": getattr(camera, "username", None),
+        "channel": getattr(camera, "channel", None),
+        "type": getattr(camera, "type", None),
+        "enable": getattr(camera, "enable", 1),
+        "station_id": getattr(camera, "station_id", None),
+        "dept_id": getattr(camera, "dept_id", None),
+        "sub_id": getattr(camera, "sub_id", None),
+        "roi": getattr(camera, "roi", None),
+        "frame_path": getattr(camera, "frame_path", None),
+        "stream_url": getattr(camera, "stream_url", None),
+        "thread_alive": bool(thread and thread.is_alive()),
+    }
+
+
+def _memory_camera_rows(station_id=None, parent_id=None):
+    registry = current_app.config.get("camera_registry", {})
+    rows = []
+    for camera in registry.values():
+        row = _serialize_camera(camera)
+        if station_id and row.get("dept_id") != station_id:
+            continue
+        if parent_id and row.get("sub_id") != parent_id:
+            continue
+        rows.append(row)
+    return rows
+
+
+def _append_runtime_violation_event(event: dict):
+    events = current_app.config.setdefault("violation_events", [])
+    events.insert(0, event)
+    del events[500:]
+
+
+def _build_runtime_camera(payload: dict):
+    camera_id = _coerce_int(payload.get("cameraId") or payload.get("id"), int(time.time() * 1000))
+    overrides = _collect_runtime_overrides(payload)
+    port = str_escape(payload.get("port")) or str(getattr(settings, "DEFAULT_CAMERA_PORT", 8000))
+    channel = _coerce_int(payload.get("channel"), getattr(settings, "DEFAULT_CAMERA_CHANNEL", 1))
+    camera = SimpleNamespace(
+        id=camera_id,
+        name=str_escape(payload.get("cameraName") or payload.get("name")) or f"camera-{camera_id}",
+        ip=str_escape(payload.get("location") or payload.get("ip")),
+        port=port,
+        username=str_escape(payload.get("userName") or payload.get("username")),
+        password=str_escape(payload.get("passWord") or payload.get("password")),
+        channel=channel,
+        type=_coerce_int(payload.get("cameraType") or payload.get("type"), 0),
+        enable=1,
+        is_delete=0,
+        station_id=_coerce_int(payload.get("stationId") or payload.get("station_id")),
+        dept_id=_coerce_int(payload.get("stationId") or payload.get("dept_id")),
+        sub_id=_coerce_int(payload.get("parentId") or payload.get("sub_id")),
+        roi=overrides.get("roi"),
+        frame_path=overrides.get("frame_path"),
+        stream_url=overrides.get("stream_url"),
+    )
+    return camera, overrides
+
+
 # 摄像头管理主页页面跳转
 @bp.get('/')
 @authorize("system:camera:main")
 def index():
-    return render_template('system/hk_camera/main.html')
+    return _render_or_json(
+        'system/hk_camera/main.html',
+        system_name=current_app.config.get("SYSTEM_NAME", "inspection-flask"),
+        database_ready=_database_ready(),
+        detection_pipeline_ready=current_app.config.get("detection_pipeline_ready", False),
+    )
+
+
+@bp.get('/health')
+def health():
+    return jsonify({
+        "success": True,
+        "database_ready": _database_ready(),
+        "database_init_error": current_app.config.get("database_init_error"),
+        "detection_pipeline_ready": current_app.config.get("detection_pipeline_ready", False),
+        "detection_model_init_error": current_app.config.get("detection_model_init_error"),
+        "scheduler_started": current_app.config.get("scheduler") is not None,
+        "camera_count": len(current_app.config.get("camera_registry", {})),
+        "thread_count": len(current_app.config.get("hk_threadManager").threads),
+    })
 
 
 # 表格数据
@@ -50,19 +194,24 @@ def table():
     if sort_field not in _SORT_WHITELIST:
         sort_field = "id"
 
+    if not _database_ready():
+        data = _memory_camera_rows(station_id=stationId, parent_id=parentId)
+        data.sort(key=lambda item: item.get(sort_field) or 0, reverse=(sort_order == 'desc'))
+        return table_api(data=data, count=len(data))
+
     filters = [HKCamera.is_delete == 0]
     authorized_depts = dept_auth()
 
-    if stationId:
+    if stationId and authorized_depts is not None:
         if stationId not in authorized_depts:
             return table_api(data=[], count=0)
         filters.append(HKCamera.dept_id == stationId)
-    elif parentId:
+    elif parentId and authorized_depts is not None:
         if parentId not in sub_auth():
             return table_api(data=[], count=0)
         filters.append(HKCamera.sub_id == parentId)
         filters.append(HKCamera.dept_id.in_(authorized_depts))
-    else:
+    elif authorized_depts is not None:
         filters.append(HKCamera.dept_id.in_(authorized_depts))
 
     cameras = HKCamera.query.filter(*filters)
@@ -145,6 +294,12 @@ def table():
 @bp.get('/edit/<int:id>')
 @authorize("system:camera:edit", log=True)
 def edit(id):
+    if not _database_ready():
+        camera = current_app.config.get("camera_registry", {}).get(str(id))
+        if camera is None:
+            return fail_api(msg="摄像头不存在")
+        return _render_or_json('system/hk_camera/edit.html', camera=_serialize_camera(camera))
+
     # 把当前的信息查出来
     c = get_one_by_id(model=HKCamera, id=id)
 
@@ -162,7 +317,7 @@ def edit(id):
     # return render_template('system/camera/edit.html', camera=c, rootStations=root_stations, stations=stations,
     #                        rootId=root_id[0],
     #                        parentStation=parent_station)
-    return render_template('system/hk_camera/edit.html', camera=c)
+    return _render_or_json('system/hk_camera/edit.html', camera=c)
 
 
 @bp.get('/add')
@@ -171,7 +326,7 @@ def add():
     # stations = Station.query.filter(Station.is_delete == 0, Station.type == 2).with_entities(Station.id,
     #                                                                                          Station.dept_name)
 
-    return render_template('system/hk_camera/add.html')
+    return _render_or_json('system/hk_camera/add.html')
 
 
 def _validate_camera_params(ip, port, channel):
@@ -199,7 +354,11 @@ def _validate_camera_params(ip, port, channel):
 @bp.post('/save')
 @authorize("system:camera:add", log=True)
 def save():
+    if not _database_ready():
+        return fail_api(msg="数据库未就绪；当前请直接调用 /hk_camera/enable 并携带运行时摄像头参数")
+
     req_json = request.get_json(force=True)
+    runtime_overrides = _collect_runtime_overrides(req_json)
     username = str_escape(req_json.get("userName"))
     password = str_escape(req_json.get("passWord"))
     ip = str_escape(req_json.get("location"))
@@ -223,6 +382,8 @@ def save():
     )
     db.session.add(camera)
     db.session.commit()
+    if runtime_overrides:
+        current_app.config.setdefault("camera_runtime_overrides", {})[str(camera.id)] = runtime_overrides
     return success_api(msg="成功")
 
 
@@ -230,7 +391,11 @@ def save():
 @bp.put('/update')
 @authorize("system:camera:edit", log=True)
 def update():
+    if not _database_ready():
+        return fail_api(msg="数据库未就绪；当前不支持持久化更新摄像头配置")
+
     req_json = request.get_json(force=True)
+    runtime_overrides = _collect_runtime_overrides(req_json)
     id = req_json.get("cameraId")
     username = str_escape(req_json.get("userName"))
     password = str_escape(req_json.get("passWord"))
@@ -255,6 +420,8 @@ def update():
     }
     camera = HKCamera.query.filter_by(id=id).update(data)
     db.session.commit()
+    if runtime_overrides:
+        current_app.config.setdefault("camera_runtime_overrides", {})[str(id)] = runtime_overrides
     if not camera:
         return fail_api(msg="更新监控信息失败")
     return success_api(msg="更新监控信息成功")
@@ -263,6 +430,12 @@ def update():
 @bp.delete('/remove/<int:id>')
 @authorize("system:camera:remove", log=True)
 def remove(id):
+    if not _database_ready():
+        current_app.config.get("camera_registry", {}).pop(str(id), None)
+        current_app.config.get("camera_runtime_overrides", {}).pop(str(id), None)
+        current_app.config['hk_threadManager'].stop_thread(id)
+        return success_api(msg="已从运行时移除")
+
     # r = curd.logic_delete_one_by_id(Camera, id)
     r = HKCamera.query.filter_by(id=id).update({"is_delete": 1, "enable": 0})
     db.session.commit()
@@ -274,6 +447,9 @@ def remove(id):
 @bp.post('/add_dept')
 @authorize("system:camera:main", log=True)
 def add_dept():
+    if not _database_ready():
+        return fail_api(msg="数据库未就绪，无法执行初始化关系写入")
+
     # 把所有的区查询出来
     root_stations = Station.query.filter(Station.is_delete == 0, Station.type == 3).with_entities(
         Station.id).all()
@@ -306,6 +482,9 @@ def add_dept():
 @bp.post('/add_room')
 @authorize("system:camera:main", log=True)
 def add_room():
+    if not _database_ready():
+        return fail_api(msg="数据库未就绪，无法执行初始化关系写入")
+
     # 把所有的区查询出来
     root_stations = Station.query.filter(Station.is_delete == 0, Station.type == 3).with_entities(
         Station.id).all()
@@ -345,62 +524,78 @@ def add_room():
 @bp.put('/enable')
 @authorize("system:camera:edit", log=True)
 def enable():
-    id = request.get_json(force=True).get('cameraId')
-    if not id:
-        return fail_api(msg="数据错误")
+    payload = request.get_json(force=True)
+    camera_id = payload.get('cameraId')
+    runtime_overrides = _collect_runtime_overrides(payload)
 
-    res = enable_status(HKCamera, id)
-    if not res:
-        return fail_api(msg="出错啦")
+    if _database_ready() and camera_id:
+        res = enable_status(HKCamera, camera_id)
+        if not res:
+            return fail_api(msg="出错啦")
 
-    camera_instance = curd.get_one_by_id(HKCamera, id)
-    if camera_instance is None:
-        disable_status(HKCamera, id)
-        return fail_api(msg="摄像头不存在")
+        camera_instance = curd.get_one_by_id(HKCamera, camera_id)
+        if camera_instance is None:
+            disable_status(HKCamera, camera_id)
+            return fail_api(msg="摄像头不存在")
 
-    camera_info = SimpleNamespace(
-        id=camera_instance.id,
-        name=getattr(camera_instance, "name", None),
-        ip=getattr(camera_instance, "ip", None),
-        port=getattr(camera_instance, "port", None),
-        username=getattr(camera_instance, "username", None),
-        password=getattr(camera_instance, "password", None),
-        channel=getattr(camera_instance, "channel", None),
-        type=getattr(camera_instance, "type", None),
-        enable=camera_instance.enable,
-        is_delete=camera_instance.is_delete,
-        station_id=getattr(camera_instance, "station_id", None),
-        dept_id=getattr(camera_instance, "dept_id", None),
-        sub_id=getattr(camera_instance, "sub_id", None),
-        roi=getattr(camera_instance, "roi", None),
-        frame_path=getattr(camera_instance, "frame_path", None),
-    )
+        stored_overrides = current_app.config.setdefault("camera_runtime_overrides", {}).get(str(camera_id), {})
+        merged_overrides = dict(stored_overrides)
+        merged_overrides.update(runtime_overrides)
+        if merged_overrides:
+            current_app.config.setdefault("camera_runtime_overrides", {})[str(camera_id)] = merged_overrides
+
+        camera_info = SimpleNamespace(
+            id=camera_instance.id,
+            name=getattr(camera_instance, "name", None),
+            ip=getattr(camera_instance, "ip", None),
+            port=getattr(camera_instance, "port", None),
+            username=getattr(camera_instance, "username", None),
+            password=getattr(camera_instance, "password", None),
+            channel=getattr(camera_instance, "channel", None),
+            type=getattr(camera_instance, "type", None),
+            enable=camera_instance.enable,
+            is_delete=camera_instance.is_delete,
+            station_id=getattr(camera_instance, "station_id", None),
+            dept_id=getattr(camera_instance, "dept_id", None),
+            sub_id=getattr(camera_instance, "sub_id", None),
+            roi=merged_overrides.get("roi"),
+            frame_path=merged_overrides.get("frame_path"),
+            stream_url=merged_overrides.get("stream_url"),
+        )
+    else:
+        camera_info, runtime_overrides = _build_runtime_camera(payload)
+        current_app.config.setdefault("camera_runtime_overrides", {})[str(camera_info.id)] = runtime_overrides
 
     started = current_app.config['hk_threadManager'].add_thread(camera_info)
     if not started:
-        disable_status(HKCamera, id)
-        init_error = current_app.config.get("detection_model_init_error") or "检测模型未就绪"
-        current_app.logger.error("工服检测线程 camera %s 启动失败: %s", id, init_error)
+        if _database_ready() and camera_id:
+            disable_status(HKCamera, camera_id)
+        init_error = current_app.config.get("detection_model_init_error") or "检测模型未就绪或线程已在运行"
+        current_app.logger.error("工服检测线程 camera %s 启动失败: %s", camera_info.id, init_error)
         return fail_api(msg=f"启动失败：{init_error}")
-    return success_api(msg="启动成功")
+    return jsonify({"success": True, "msg": "启动成功", "camera_id": camera_info.id})
 
 
 @bp.put('/disable')
 @authorize("system:camera:edit", log=True)
 def dis_enable():
-    _id = request.get_json(force=True).get('cameraId')
+    payload = request.get_json(force=True)
+    _id = payload.get('cameraId') or payload.get("id")
     if not _id:
         return fail_api(msg="数据错误")
 
     thread_stopped = current_app.config['hk_threadManager'].stop_thread(_id)
+    current_app.config.get("camera_registry", {}).pop(str(_id), None)
+    current_app.config.get("camera_runtime_overrides", {}).pop(str(_id), None)
     if thread_stopped:
         current_app.logger.info("工服检测线程 camera %s 已关闭", _id)
     else:
         current_app.logger.warning("工服检测线程 camera %s 关闭失败或不存在", _id)
 
-    res = disable_status(HKCamera, _id)
-    if not res:
-        return fail_api(msg="数据库状态更新失败")
+    if _database_ready():
+        res = disable_status(HKCamera, _id)
+        if not res:
+            return fail_api(msg="数据库状态更新失败")
 
     if not thread_stopped:
         return success_api(msg="已禁用（线程可能未完全退出，将在下次重启时清理）")
@@ -418,8 +613,17 @@ def violations():
     """
     camera_id = request.args.get('camera_id', type=int)
     limit = min(request.args.get('limit', 100, type=int), 500)
+    if not _database_ready():
+        rows = current_app.config.get("violation_events", [])
+        if camera_id:
+            rows = [row for row in rows if row.get("camera_id") == camera_id]
+        rows = rows[:limit]
+        return jsonify({"code": 0, "count": len(rows), "data": rows})
+
     authorized_depts = dept_auth()
-    filters = [ViolatePhoto.is_delete == 0, ViolatePhoto.dept_id.in_(authorized_depts)]
+    filters = [ViolatePhoto.is_delete == 0]
+    if authorized_depts is not None:
+        filters.append(ViolatePhoto.dept_id.in_(authorized_depts))
     if camera_id:
         filters.append(ViolatePhoto.camera_id == camera_id)
     records = ViolatePhoto.query.filter(*filters).order_by(
@@ -450,15 +654,26 @@ def violations_by_camera(camera_id):
     按摄像头 ID 查询该摄像头的违规记录，最多返回最新 200 条。
     校验 camera_id 归属当前用户权限范围。
     """
+    if not _database_ready():
+        rows = [
+            row for row in current_app.config.get("violation_events", [])
+            if row.get("camera_id") == camera_id
+        ][:200]
+        return jsonify({"code": 0, "camera_id": camera_id, "count": len(rows), "data": rows})
+
     authorized_depts = dept_auth()
     camera = HKCamera.query.filter_by(id=camera_id, is_delete=0).first()
-    if camera is None or camera.dept_id not in authorized_depts:
+    if camera is None:
         return jsonify({"code": 0, "camera_id": camera_id, "count": 0, "data": []})
-    records = ViolatePhoto.query.filter(
+    if authorized_depts is not None and camera.dept_id not in authorized_depts:
+        return jsonify({"code": 0, "camera_id": camera_id, "count": 0, "data": []})
+    filters = [
         ViolatePhoto.camera_id == camera_id,
         ViolatePhoto.is_delete == 0,
-        ViolatePhoto.dept_id.in_(authorized_depts),
-    ).order_by(desc(ViolatePhoto.position_time)).limit(200).all()
+    ]
+    if authorized_depts is not None:
+        filters.append(ViolatePhoto.dept_id.in_(authorized_depts))
+    records = ViolatePhoto.query.filter(*filters).order_by(desc(ViolatePhoto.position_time)).limit(200).all()
     data = [
         {
             "id": r.id,
@@ -498,6 +713,10 @@ def _load_violate_rule_columns():
     cached_columns = current_app.config.get("violate_rule_table_columns")
     if cached_columns is not None:
         return cached_columns
+
+    if not _database_ready():
+        current_app.config["violate_rule_table_columns"] = set()
+        return set()
 
     inspector = inspect(db.engine)
     if not inspector.has_table("admin_violate_rule"):
@@ -671,11 +890,34 @@ def save_violate_photo(rule_value, id, frame, station_id, dept_id, sub_id, path,
     display_name = rule_name if rule_name else f"违规类型{type}"
     current_app.logger.warning(
         f"工服检测-摄像头ID：{id} [{display_name}] 证据图已保存：{file_url}")
+
+    event_time = position_time or datetime.now()
+    event_payload = {
+        "id": int(time.time() * 1000),
+        "camera_id": id,
+        "violate_id": type,
+        "rule_code": resolved_rule_code,
+        "rule_name": resolved_rule_name or display_name,
+        "href": href,
+        "position_time": event_time.strftime("%Y-%m-%d %H:%M:%S") if hasattr(event_time, "strftime") else str(event_time),
+        "station_id": station_id,
+        "dept_id": dept_id,
+        "sub_id": sub_id,
+    }
+
+    if not _database_ready():
+        if getattr(settings, "ALLOW_SAVE_VIOLATION_WITHOUT_DB", True):
+            _append_runtime_violation_event(event_payload)
+            current_app.logger.warning("数据库未就绪，违规事件仅写文件并缓存到内存队列")
+            return href
+        current_app.logger.error("数据库未就绪，取消违规事件落库")
+        return None
+
     violatePhoto = ViolatePhoto(
         violate_id=type,
         camera_id=id,
         href=href,
-        position_time=position_time or datetime.now(),
+        position_time=event_time,
         is_delete=0,
         station_id=station_id,
         sub_id=sub_id,
@@ -688,6 +930,10 @@ def save_violate_photo(rule_value, id, frame, station_id, dept_id, sub_id, path,
         db.session.commit()
     except Exception:
         db.session.rollback()
+        if getattr(settings, "ALLOW_SAVE_VIOLATION_WITHOUT_DB", True):
+            _append_runtime_violation_event(event_payload)
+            current_app.logger.exception("工服检测-摄像头ID：%s 写库失败，已降级写入内存事件队列", id)
+            return href
         if os.path.exists(file_path):
             os.remove(file_path)
         current_app.logger.exception("工服检测-摄像头ID：%s 违规记录写库失败，已回滚证据图", id)

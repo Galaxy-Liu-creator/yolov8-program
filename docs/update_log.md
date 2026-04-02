@@ -1,5 +1,29 @@
 # Update Log
 
+## 2026-04-02 安装元数据与模板鉴权收尾
+
+变更来源：
+- 用户需求：继续按 `docs/run_todo_list.md` 收尾，提升 `inspection-flask` 的可运行性与严谨性
+- 最小运行链路改造后的复核结果：需要补齐 `pyproject.toml` 的可编辑安装包发现，并修正模板侧 `authorize()` 在鉴权开启时恒为 `False` 的逻辑问题
+
+变更总览：
+1. 强化 `inspection-flask/pyproject.toml`，补充 `py-modules` 与包发现规则，降低执行 `pip install -e .` 时的工程化风险。
+2. 修正 `inspection-flask/applications/extensions/init_template_directives.py`，使模板侧权限判断在 `AUTH_ENABLED=True` 时回退到与路由鉴权一致的权限计算逻辑，而不是一律返回 `False`。
+3. 清理 `inspection-flask/settings.py` 中重复的启动兼容配置定义，避免后续维护时产生同名配置重复声明的歧义。
+涉及文件：
+- `inspection-flask/pyproject.toml`
+- `inspection-flask/settings.py`
+- `inspection-flask/applications/extensions/init_template_directives.py`
+- `docs/update_log.md`
+
+新增 / 变更配置项：
+- 无新增配置项；本次仅对既有配置定义做去重整理。
+
+兼容性注意：
+- `AUTH_ENABLED=False` 时，模板仍保持最小可运行模式下的全放行逻辑。
+- `AUTH_ENABLED=True` 时，模板里的 `authorize()` 现在会复用会话权限 / 角色权限计算逻辑，不再错误隐藏所有受控按钮。
+- `pyproject.toml` 新增的是打包发现规则，不改变现有运行时导入路径，只提升依赖安装与可编辑安装的稳定性。
+
 用于记录每次代码变更的详细内容、变更原因、涉及文件与配置项。
 
 ## 维护约束
@@ -17,6 +41,211 @@
 9. **验证链路完整性**：涉及新文件创建（如 `utils/plots.py`）时，必须在记录中说明调用方、被调用签名以及已验证的兼容性。
 10. **不改动的部分必须声明**：如果某些模块/逻辑被评估后决定不改动，必须在记录中说明原因，防止后续重复评估。
 11. **CLI 与离线工具同步**：若修改 `main.py` 子命令、参数或离线输出格式，须在本日志中更新对应条目，并保持模块顶部 docstring 与 `argparse` 帮助一致。
+
+---
+
+## 2026-04-02 最小运行链路静态复核与字段策略说明补充
+
+变更来源：
+- 用户需求：继续按 `docs/run_todo_list.md` 收口，让项目先可运行，并按文档要求同步日志
+- `docs/run_todo_list.md` — 问题 4（相机模型与运行时字段可能未对齐）
+- `docs/file_todo_list.md` — 文档维护约束，要求同步更新当前真实状态
+
+变更总览：
+1. 在 `inspection-flask/settings.py` 中补入明确的启动兼容开关定义，确保 `AUTH_ENABLED` 等配置能被稳定读取。
+2. 在 `docs/run_todo_list.md` 中补充问题 4 的“当前落地状态”，明确当前采用的是运行时覆盖策略，而不是数据库迁移已完成。
+3. 在 `docs/check_log.md` 中增加本轮静态复核说明，写清最小启动前置条件和仍未闭环部分。
+
+涉及文件：
+- `inspection-flask/settings.py`
+- `docs/run_todo_list.md`
+- `docs/file_todo_list.md`
+- `docs/check_log.md`
+- `docs/update_log.md`
+
+边界说明：
+- 当前 `roi` / `frame_path` / `stream_url` 已能通过运行时参数驱动线程与采图链路。
+- 当前仍未声称 `HKCamera` 表结构已经正式扩展；若要长期持久化这些字段，仍需后续数据库迁移。
+- 当前仍未声称“检测正确性已闭环验证”；真实效果仍依赖权重、输入流与样例复核。
+
+## 2026-04-02 最小可运行链文档同步
+
+变更来源：
+- `docs/run_todo_list.md`（新增关于 `inspection-flask/pyproject.toml`、虚拟环境与验证指令、BaseConfig 从环境变量读取、SQLAlchemy/调度器容错以及软降级检测路径的说明）
+- `docs/file_todo_list.md`（同步状态视图，明确标注当前处于“部分推进 / 具备软降级能力”阶段，并提示 Hikvision SDK 与检测精度闭环尚未完成）
+- `docs/update_log.md`（本条目本身）
+
+变更总览：
+1. 把依赖安装 + `python main.py check`/`create_app` 验证步骤写入文档，依赖 `pyproject` 里声明，以便重新搭建环境时不需翻代码。
+2. 说明运行时兼容性保障：`BaseConfig` 环境变量驱动、SQLAlchemy 初始化对 DB 断开的容忍、调度器在数据库可用后才启动，以及检测线程可通过 HKStream 或本地帧目录的软降级跳过 Hikvision SDK。
+3. 通过 `docs/file_todo_list.md` 的状态总结保持“软降级”可见度，提醒后续仍需补齐 HK SDK 接入与检测正确性验证，避免过度宣称完成。
+4. 清理文档中的旧文件名引用，把残留的 `to_list.md` 统一更正为 `file_todo_list.md`，避免后续维护继续误指向不存在的文件。
+
+## 2026-04-02 inspection-flask 最小运行链路落地改造
+
+变更来源：
+- 用户需求：按 `docs/run_todo_list.md` 中提到的问题推进，让 `inspection-flask` 先运行起来，并同步更新日志
+- `docs/run_todo_list.md` — 问题 1（运行环境依赖未安装）
+- `docs/run_todo_list.md` — 问题 3（真实海康取流链路未恢复）
+- `docs/run_todo_list.md` — 问题 5（数据库仍是运行硬前提）
+- `docs/run_todo_list.md` — 问题 6（当前后台是“最小骨架”，不是“完整后台”）
+- `docs/file_todo_list.md` — P1 / P2 / P3 / P5 当前阶段落地路线
+
+### 变更总览
+
+| 序号 | 变更内容 | 对应来源 | 涉及文件 |
+|------|---------|---------|---------|
+| 1 | 新增项目依赖元数据文件 | `run_todo_list` 问题 1 | `inspection-flask/pyproject.toml`, `docs/run_todo_list.md` |
+| 2 | 应用启动软降级 | `run_todo_list` 问题 5 | `inspection-flask/settings.py`, `inspection-flask/applications/config.py`, `inspection-flask/applications/extensions/init_sqlalchemy.py`, `inspection-flask/applications/__init__.py` |
+| 3 | 最小后台运行兼容 | `run_todo_list` 问题 6 | `inspection-flask/applications/extensions/__init__.py`, `inspection-flask/applications/extensions/init_template_directives.py`, `inspection-flask/applications/common/utils/rights.py`, `inspection-flask/applications/common/user_auth.py`, `inspection-flask/applications/view/system/hk_camera.py`, `inspection-flask/templates/system/hk_camera/main.html`, `inspection-flask/templates/system/hk_camera/add.html`, `inspection-flask/templates/system/hk_camera/edit.html` |
+| 4 | 采图链兼容增强 | `run_todo_list` 问题 3 | `inspection-flask/hk/hksdk/__init__.py`, `inspection-flask/hk/hksdk/device.py`, `inspection-flask/applications/common/hk_recorder_threading.py`, `inspection-flask/applications/common/hk_custom_threading_plus.py`, `inspection-flask/applications/view/system/hk_camera.py` |
+| 5 | 文档状态同步 | 用户需求 | `docs/update_log.md`, `docs/file_todo_list.md`, `docs/run_todo_list.md` |
+
+### 不改动的部分
+
+| 模块 | 决定 | 原因 |
+|------|------|------|
+| `inspection-flask/utils/models.py` | 维持现状 | 当前 YOLOv8 双模型包装层已可用，本轮重点不在模型解析层 |
+| `inspection-flask/utils/workwear_policy.py` | 维持现状 | 工服裁剪与合规判定主口径已统一，不应在“先跑起来”阶段再次分叉 |
+| `inspection-flask/violation_module/vio_workwear_missing.py` | 维持现状 | 时序规则主逻辑已建立，本轮不夸大为“检测正确性已闭环” |
+| 旧警务多违规则、人脸、枪库、躺卧链路 | 明确不迁入 | 不属于当前工服项目主线，避免范围漂移 |
+
+---
+
+### 变更 1：新增依赖元数据文件
+
+**涉及文件**:
+- `inspection-flask/pyproject.toml`
+- `docs/run_todo_list.md`
+
+**改动内容**:
+
+- 新增 `inspection-flask/pyproject.toml`，统一维护当前项目最小运行依赖。
+- 在 `docs/run_todo_list.md` 中补充虚拟环境创建、`pip install -e .`、验证命令等安装说明。
+
+---
+
+### 变更 2：应用启动软降级
+
+**涉及文件**:
+- `inspection-flask/settings.py`
+- `inspection-flask/applications/config.py`
+- `inspection-flask/applications/extensions/init_sqlalchemy.py`
+- `inspection-flask/applications/__init__.py`
+
+**改动内容**:
+
+- 新增最小运行兼容配置：
+  - `AUTH_ENABLED`
+  - `DB_STRICT_STARTUP`
+  - `ENABLE_BACKGROUND_SCHEDULER`
+  - `ALLOW_SAVE_VIOLATION_WITHOUT_DB`
+  - `DEFAULT_STREAM_URL`
+  - `RTSP_PORT`
+  - `RTSP_PATH_TEMPLATE`
+- 数据库连接失败时默认不再直接退出，改为：
+  - 记录 `database_ready=False`
+  - 记录 `database_init_error`
+  - 以降级模式继续启动
+- 后台调度器仅在数据库就绪且配置允许时启动，避免数据库未连通时启动即持续报错。
+- `BaseConfig` 增加：
+  - `SUPERADMIN`
+  - `SQLALCHEMY_TRACK_MODIFICATIONS = False`
+  - 环境变量可覆盖数据库连接参数
+
+---
+
+### 变更 3：最小后台运行兼容
+
+**涉及文件**:
+- `inspection-flask/applications/extensions/__init__.py`
+- `inspection-flask/applications/extensions/init_template_directives.py`
+- `inspection-flask/applications/common/utils/rights.py`
+- `inspection-flask/applications/common/user_auth.py`
+- `inspection-flask/applications/view/system/hk_camera.py`
+- `inspection-flask/templates/system/hk_camera/main.html`
+- `inspection-flask/templates/system/hk_camera/add.html`
+- `inspection-flask/templates/system/hk_camera/edit.html`
+
+**改动内容**:
+
+- 在插件初始化阶段补入最小模板全局指令 `authorize()`，避免模板渲染缺少旧指令时报错。
+- `AUTH_ENABLED=False` 时，`authorize()` 直接放行，不再强依赖旧登录系统。
+- `user_auth.py` 增加无鉴权模式下的安全兜底，避免角色链缺失时直接异常。
+- `hk_camera.py` 增加：
+  - 页面模板缺失时的 JSON 降级返回
+  - `/hk_camera/health` 健康检查接口
+  - 无数据库模式下的运行时摄像头启停
+  - 无数据库模式下的内存相机列表与违规事件查询
+  - 违规写库失败时的内存事件回退
+- 补齐最小模板，避免页面路由直接 500。
+
+---
+
+### 变更 4：采图链兼容增强
+
+**涉及文件**:
+- `inspection-flask/hk/hksdk/__init__.py`
+- `inspection-flask/hk/hksdk/device.py`
+- `inspection-flask/applications/common/hk_recorder_threading.py`
+- `inspection-flask/applications/common/hk_custom_threading_plus.py`
+- `inspection-flask/applications/view/system/hk_camera.py`
+
+**改动内容**:
+
+- 新增最小 `HKStream` 兼容封装，保留旧项目接口风格，但先支持 OpenCV 可读输入源。
+- `hk_recorder_threading.py` 改为兼容：
+  - 本地单图
+  - 本地图集目录
+  - 本地视频
+  - `stream_url`
+  - 按海康常见格式构造的 RTSP 地址
+- 采图管理器新增流客户端缓存与释放逻辑。
+- 检测线程重启时，支持回退到 `camera_registry` 和运行时覆盖配置。
+
+**边界说明**:
+
+- 本轮新增的是“最小兼容取流层”，不是“海康原生 SDK 已完整恢复”。
+
+---
+
+### 变更 5：文档状态同步
+
+**涉及文件**:
+- `docs/update_log.md`
+- `docs/file_todo_list.md`
+- `docs/run_todo_list.md`
+
+**改动内容**:
+
+- 新增本轮更新记录。
+- 同步 `file_todo_list` 的当前真实状态：
+  - 应用已具备软降级启动能力
+  - 最小模板已补齐
+  - 采图层已支持 `frame_path` / `stream_url` / RTSP fallback
+- 在 `run_todo_list` 中补充当前已落地状态，明确哪些问题已“部分推进”，哪些仍未闭环。
+
+### 新增 / 变更配置项
+
+| 配置项 | 默认值 | 用途 |
+|--------|--------|------|
+| `AUTH_ENABLED` | `False` | 控制是否启用旧登录权限链 |
+| `DB_STRICT_STARTUP` | `False` | 数据库连接失败时是否阻断 Flask 启动 |
+| `ENABLE_BACKGROUND_SCHEDULER` | `True` | 控制后台调度器是否允许启动 |
+| `ALLOW_SAVE_VIOLATION_WITHOUT_DB` | `True` | 写库失败或数据库未就绪时，是否保留证据图并写入内存事件 |
+| `DEFAULT_STREAM_URL` | `None` | 默认视频流输入源（可作为调试输入） |
+| `RTSP_PORT` | `554` | RTSP 默认端口 |
+| `RTSP_PATH_TEMPLATE` | `rtsp://{username}:{password}@{ip}:{port}/Streaming/Channels/{channel_code}` | 构造 RTSP 地址 |
+| `BaseConfig.SUPERADMIN` | `"admin"` | 旧权限链下的超级管理员用户名 |
+| `BaseConfig.SQLALCHEMY_TRACK_MODIFICATIONS` | `False` | 关闭 SQLAlchemy 变更跟踪警告 |
+
+### 兼容性注意
+
+- `AUTH_ENABLED=False` 时，接口和页面将绕过旧登录系统，这用于“先运行起来”的最小兼容，不等于完整权限体系已恢复。
+- 数据库连接失败时应用可启动，但 DB 相关接口与持久化能力不等于已经完整可用。
+- 后台调度器仅在 `database_ready=True` 时启动；无数据库模式下更适合手动启停运行时摄像头。
+- 新增的 `stream_url` / RTSP fallback 只是最小兼容取流能力，不代表原生 HCNetSDK 已完全接回。
+- 本轮没有把“检测正确性”宣布为已闭环；模型权重、真实在线闭环、准确率验证仍需后续继续完成。
 
 ---
 

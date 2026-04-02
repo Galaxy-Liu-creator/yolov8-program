@@ -8,11 +8,16 @@ from pathlib import Path
 
 import cv2
 
+from hk.hksdk.device import HKStream
 import settings
 
 # 连续抓图失败计数，达到阈值时升级为 warning 日志（每摄像头独立计数）
 _FAIL_COUNTS: dict[int, int] = {}
 _FAIL_WARN_THRESHOLD = 5
+_STREAM_CLIENTS: dict[int, HKStream] = {}
+_DIRECTORY_CURSOR: dict[int, int] = {}
+_IMAGE_EXTS = {".jpg", ".jpeg", ".png", ".bmp", ".webp"}
+_VIDEO_EXTS = {".mp4", ".avi", ".mov", ".mkv", ".wmv", ".flv", ".mpeg", ".mpg"}
 
 
 def _compute_frame_hash(image, size: int = 8) -> bytes:
@@ -27,20 +32,111 @@ def _compute_frame_hash(image, size: int = 8) -> bytes:
     return bytes(int(px > mean_val) for px in gray.flatten())
 
 
+def _camera_source_signature(camera) -> tuple:
+    return (
+        getattr(camera, "frame_path", None),
+        getattr(camera, "stream_url", None),
+        getattr(camera, "ip", None),
+        getattr(camera, "port", None),
+        getattr(camera, "username", None),
+        getattr(camera, "password", None),
+        getattr(camera, "channel", None),
+    )
+
+
+def _read_first_frame_from_video(video_path: Path):
+    capture = cv2.VideoCapture(str(video_path))
+    try:
+        if not capture.isOpened():
+            return None
+        ok, frame = capture.read()
+        if ok and frame is not None and getattr(frame, "size", 0) > 0:
+            return frame
+        return None
+    finally:
+        capture.release()
+
+
+def _read_from_frame_path(camera):
+    frame_path = getattr(camera, "frame_path", None)
+    if not frame_path:
+        return None
+
+    path_obj = Path(frame_path)
+    if not path_obj.exists():
+        return None
+
+    camera_id = int(camera.id)
+    if path_obj.is_file():
+        suffix = path_obj.suffix.lower()
+        if suffix in _IMAGE_EXTS:
+            return cv2.imread(str(path_obj))
+        return None
+
+    if not path_obj.is_dir():
+        return None
+
+    candidates = sorted(
+        p for p in path_obj.iterdir()
+        if p.is_file() and p.suffix.lower() in (_IMAGE_EXTS | _VIDEO_EXTS)
+    )
+    if not candidates:
+        return None
+
+    cursor = _DIRECTORY_CURSOR.get(camera_id, 0)
+    selected = candidates[cursor % len(candidates)]
+    _DIRECTORY_CURSOR[camera_id] = (cursor + 1) % len(candidates)
+    if selected.suffix.lower() in _IMAGE_EXTS:
+        return cv2.imread(str(selected))
+    return _read_first_frame_from_video(selected)
+
+
+def _get_stream_client(camera):
+    camera_id = int(camera.id)
+    signature = _camera_source_signature(camera)
+    client = _STREAM_CLIENTS.get(camera_id)
+
+    if client is None or getattr(client, "source_signature", None) != signature:
+        if client is not None:
+            client.logout()
+        client = HKStream(
+            team=f"camera-{camera_id}",
+            stream_url=getattr(camera, "stream_url", None) or getattr(settings, "DEFAULT_STREAM_URL", None),
+            frame_path=getattr(camera, "frame_path", None),
+        )
+        port = getattr(camera, "port", None) or getattr(settings, "DEFAULT_CAMERA_PORT", 8000)
+        channel = getattr(camera, "channel", None) or getattr(settings, "DEFAULT_CAMERA_CHANNEL", 1)
+        if not client.login(
+            getattr(camera, "ip", None),
+            port,
+            getattr(camera, "username", None),
+            getattr(camera, "password", None),
+        ):
+            return None
+        client.play_preview({str(camera.id): channel})
+        client.source_signature = signature
+        _STREAM_CLIENTS[camera_id] = client
+
+    return client
+
+
 def _read_frame_from_camera(camera):
     """从摄像头读取一帧。
 
-    优先读取 frame_path 指定的图片文件（调试用）。
+    读取优先级：
+    1. frame_path：本地图像回放（调试）
+    2. stream_url：视频文件 / RTSP / OpenCV 支持的其他流
+
     若未配置或读取失败则返回 None，避免把占位图当作真实检测输入。
     """
-    frame_path = getattr(camera, "frame_path", None)
-    if frame_path:
-        image_path = Path(frame_path)
-        if image_path.exists():
-            image = cv2.imread(str(image_path))
-            if image is not None:
-                return image
-    return None
+    local_frame = _read_from_frame_path(camera)
+    if local_frame is not None and getattr(local_frame, "size", 0) > 0:
+        return local_frame
+
+    client = _get_stream_client(camera)
+    if client is None:
+        return None
+    return client.read_frame(str(camera.id))
 
 
 def get_img(cameras, app):
@@ -59,7 +155,7 @@ def get_img(cameras, app):
             app.config["hk_frame_cache"].pop(cid, None)
             if fail_count == 1 or fail_count % _FAIL_WARN_THRESHOLD == 0:
                 app.logger.warning(
-                    "camera %s 连续第 %d 次抓图失败，请检查设备连接或 frame_path 配置",
+                    "camera %s 连续第 %d 次抓图失败，请检查设备连接、frame_path 或 stream_url 配置",
                     cid,
                     fail_count,
                 )
@@ -121,6 +217,10 @@ class HKRecorderThreadManager:
         except (TypeError, ValueError):
             cache_key = camera_id
         _FAIL_COUNTS.pop(cache_key, None)
+        _DIRECTORY_CURSOR.pop(cache_key, None)
+        stream_client = _STREAM_CLIENTS.pop(cache_key, None)
+        if stream_client is not None:
+            stream_client.logout()
         if self.app is not None:
             self.app.config.get("hk_frame_cache", {}).pop(cache_key, None)
 
