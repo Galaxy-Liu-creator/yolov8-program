@@ -19,7 +19,7 @@ class ViolatePhoto(db.Model):
     review       = db.Column(db.Integer, nullable=False, default=0, comment='0未审核 1审核通过 2审核不通过')
     # 违规规则字段（YOLOv8 工服检测新增，与 violation_module 保持一致）
     rule_code    = db.Column(db.String(64),  nullable=True, comment='违规规则编码，如 workwear_missing')
-    rule_name    = db.Column(db.String(100), nullable=True, comment='违规规则名称，如 未穿工服')
+    rule_name    = db.Column(db.String(100), nullable=True, comment='违规规则名称，如 作业区人员疑似未穿工服')
     create_time  = db.Column(db.DateTime, default=datetime.datetime.now, comment='创建时间')
     update_time  = db.Column(db.DateTime, default=datetime.datetime.now, onupdate=datetime.datetime.now, comment='更新时间')
 

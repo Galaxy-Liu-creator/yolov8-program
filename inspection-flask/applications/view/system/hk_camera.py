@@ -831,7 +831,7 @@ def _resolve_violate_rule(rule_value, rule_name=None):
             resolved_id = configured_rule_id
 
     if resolved_name is None and resolved_code == _normalize_rule_value(getattr(settings, "WORKWEAR_VIOLATION_TYPE", None)):
-        resolved_name = getattr(settings, "WORKWEAR_VIOLATION_NAME", "未穿工服")
+        resolved_name = getattr(settings, "WORKWEAR_VIOLATION_NAME", settings.WORKWEAR_VIOLATION_NAME)
 
     if table_available and resolved_id is None:
         result = (None, resolved_code, resolved_name)
@@ -855,7 +855,7 @@ def save_violate_photo(rule_value, id, frame, station_id, dept_id, sub_id, path,
     :param sub_id:     部门 ID
     :param path:       图片保存目录
     :param position_time: 违规发生时间
-    :param rule_name:  违规规则名称（如"未穿工服"），用于日志动态展示
+    :param rule_name:  违规规则名称（如"作业区人员疑似未穿工服"），用于日志动态展示
     :param extra_meta: 扩展元数据（预留，暂不入库）
     """
     from applications.models import ViolatePhoto

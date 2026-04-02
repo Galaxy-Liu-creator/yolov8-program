@@ -1,5 +1,194 @@
 # Check Log
 
+## 2026-04-02 `inspection-flask` 当前严谨性与可运行性复核（仅限项目内）
+
+本轮复核范围：
+
+- 仅检查 `inspection-flask`
+- 不扩展到仓库其他目录
+- 重点回答两个问题：
+  - 当前代码是否足够严谨
+  - 当前机器上是否已经达到“可正常运行”
+
+### 本轮实际检查
+
+#### 1. 静态语法检查
+
+执行：
+
+- `D:\Miniconda3_python\envs\yolo_code\python.exe -m compileall inspection-flask`
+
+结果：
+
+- **通过**
+
+结论：
+
+- 当前 `inspection-flask` 在 `Python 3.9.25` 环境下通过了静态编译检查。
+- 至少从语法层面看，没有阻断运行的显式 Python 语法错误。
+
+#### 2. 推理侧 / 服务侧依赖探针
+
+执行：
+
+- 在 `yolo_code` 环境中检查以下模块：
+  - `cv2`
+  - `numpy`
+  - `torch`
+  - `ultralytics`
+  - `flask`
+  - `sqlalchemy`
+  - `flask_sqlalchemy`
+  - `flask_marshmallow`
+  - `marshmallow_sqlalchemy`
+  - `apscheduler`
+  - `psycopg2`
+
+结果：
+
+- 已具备离线推理相关依赖：
+  - `cv2`
+  - `numpy`
+  - `torch`
+  - `ultralytics`
+- 缺失 Flask 服务相关依赖：
+  - `flask`
+  - `sqlalchemy`
+  - `flask_sqlalchemy`
+  - `flask_marshmallow`
+  - `marshmallow_sqlalchemy`
+  - `apscheduler`
+  - `psycopg2`
+
+结论：
+
+- 当前环境只具备“离线推理检查”的基础条件。
+- 当前环境 **不具备完整 Flask 服务启动条件**。
+
+#### 3. 离线 CLI 自检
+
+执行：
+
+- `D:\Miniconda3_python\envs\yolo_code\python.exe inspection-flask/main.py check`
+
+结果：
+
+- 命令可以进入自检逻辑。
+- 但最终因权重缺失退出：
+  - `inspection-flask/weights/person_detect_yolov8.pt`
+  - `inspection-flask/weights/workwear_detect_yolov8.pt`
+
+结论：
+
+- `main.py` 这条离线诊断链路本身已经可执行。
+- 当前阻断点不是 `opencv / torch / ultralytics`，而是 **权重文件未落地**。
+
+#### 4. Flask 应用入口自检
+
+执行：
+
+- 在 `inspection-flask` 目录下尝试导入并创建应用：
+  - `from applications import create_app`
+
+结果：
+
+- **失败**
+- 首个阻断错误：
+  - `ModuleNotFoundError: No module named 'apscheduler'`
+
+结论：
+
+- 当前机器上 **不能正常启动 Flask 服务**。
+- 即使数据库软降级逻辑已经补齐，服务侧依赖未安装前，应用工厂仍无法真正进入运行阶段。
+
+### 当前代码严谨性判断
+
+#### 正向判断
+
+- `inspection-flask/main.py` 已把离线验证默认口径收紧为与当前仓库数据文档一致的 `clothes-only`：
+  - 默认 `--gt-mode clothes-only`
+  - 默认 `--clothes-cls 0`
+  - 新增了标注类扫描警告与 `paired / clothes-only` 分流评估逻辑
+- `inspection-flask/settings.py`、`inspection-flask/applications/view/system/hk_camera.py`、`inspection-flask/applications/models/admin_violate_photo.py` 对违规名称的口径已统一为：
+  - `作业区人员疑似未穿工服`
+  - 这比直接写成“未穿工服”更严谨，避免过度宣称检测确定性
+- `inspection-flask/applications/__init__.py` 仍保留：
+  - `detection_pipeline_ready`
+  - 数据库软降级启动
+  - 调度器按数据库状态决定是否启动
+  - 这些工程保护措施是合理的
+- `inspection-flask/applications/common/hk_custom_threading_plus.py` 与 `inspection-flask/main.py` 继续复用统一的工服裁剪与合规判定逻辑，主链路口径没有再次分叉
+
+#### 仍需保守看待的点
+
+- `inspection-flask/applications/common/hk_custom_threading_plus.py` 的跟踪器仍是轻量 `SimpleIoUTracker`
+  - 适合固定机位、低密度、低遮挡场景
+  - 不能把它等价成“复杂场景下稳定身份跟踪”
+- 当前“疑似未穿工服”仍然依赖：
+  - ROI 约束
+  - `person` 检出
+  - `person crop` 内是否检出 `clothes`
+  - 这本质上仍是业务推断链，不是天然闭环的显式负类识别
+- `inspection-flask/pyproject.toml` 当前声明：
+  - `requires-python = ">=3.10"`
+  - 但仓库约束中的默认解释器是 `Python 3.9.25`
+- 这意味着：
+  - **代码静态上可在 3.9 下编译**
+  - 但 **依赖元数据与默认运行环境存在版本约束冲突**
+  - 如果严格按 `pyproject.toml` 安装，默认环境会有被拒绝安装的风险
+
+### 当前是否可以“正常运行”
+
+结论：
+
+- **不能直接说已经可以正常运行**
+
+更准确的分层结论应为：
+
+- **静态层面**：可以，语法可通过，主链路结构基本自洽
+- **离线 CLI 层面**：部分可以，命令可执行，但缺少当前版本权重
+- **完整 Flask 服务层面**：还不可以，当前环境缺少 `apscheduler`、`flask`、`sqlalchemy` 等依赖
+- **检测正确性层面**：仍不能宣称已经完成闭环验证
+
+### 当前最小阻断项
+
+1. `inspection-flask/weights` 目录不存在
+   - 缺少：
+     - `inspection-flask/weights/person_detect_yolov8.pt`
+     - `inspection-flask/weights/workwear_detect_yolov8.pt`
+2. `yolo_code` 环境缺少 Flask 服务依赖
+   - 至少缺：
+     - `flask`
+     - `apscheduler`
+     - `sqlalchemy`
+     - `flask_sqlalchemy`
+     - `flask_marshmallow`
+     - `marshmallow_sqlalchemy`
+     - `psycopg2-binary`
+3. `inspection-flask/pyproject.toml` 的 Python 版本要求与默认环境不一致
+   - 当前声明 `>=3.10`
+   - 当前仓库默认环境为 `3.9.25`
+
+### 本轮审慎结论
+
+- 可以说：
+  - `inspection-flask` 当前代码主链路已经比较成型
+  - 离线诊断链已经能进入真实自检流程
+  - 代码口径比之前更严谨，尤其是 `clothes-only` 默认验证口径和“疑似”命名
+- 不可以说：
+  - 已经可以在当前机器上直接正常启动
+  - 已经完成检测正确性验收
+
+### 建议的下一步
+
+1. 先解决 `inspection-flask/pyproject.toml` 与默认 Python 版本约束不一致的问题
+2. 再补齐 Flask 服务依赖
+3. 再补齐 `inspection-flask/weights/` 下的两套 YOLOv8 权重
+4. 最后重新验证：
+   - `python inspection-flask/main.py check`
+   - `from applications import create_app`
+   - `python inspection-flask/app.py`
+
 ## 2026-04-02 `inspection-flask` 代码严谨性 / 正确性闭环 / 最小运行缺口复核
 
 本轮复核目标不是继续改代码，而是回答三个问题：

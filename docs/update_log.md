@@ -1,5 +1,35 @@
 # Update Log
 
+## 2026-04-02 离线验证口径与告警措辞深度收敛
+
+变更来源：
+- 用户批准：基于 `docs/check_log.md` 最新问题分析结果，开始对离线验证链路做深度修改
+- 数据集文档：`docs/dataset.md` 明确当前仓库样例是单类 `clothes` 标注
+- 用户补充约束：以后代码修改只更新 `docs/update_log.md`，不再强制同步修改 `docs/check_log.md`
+
+变更总览：
+1. 收敛 `inspection-flask/main.py` 的 `validate` CLI 默认值、帮助文案和离线输出口径，默认改为 `--gt-mode clothes-only --clothes-cls 0`，与当前仓库数据集说明保持一致。
+2. 增强离线真值评估链路：兼容 mirrored / flat 两种标签目录结构，增加标签类别扫描告警，并改为基于 IoU 的实例级匹配统计，避免把当前单类 `clothes` 数据误当成 `person + clothes` 配对数据。
+3. 收紧离线与入库侧措辞，将绝对化“未穿工服”统一调整为“疑似未穿工服”或“作业区人员疑似未穿工服”，避免超出当前 ROI + 单帧判定能力边界。
+
+涉及文件：
+- `inspection-flask/main.py`
+- `inspection-flask/applications/view/system/hk_camera.py`
+- `inspection-flask/applications/models/admin_violate_photo.py`
+- `docs/update_log.md`
+
+新增 / 变更配置项：
+- 无新增配置项；继续沿用 `inspection-flask/settings.py` 中既有的 `WORKWEAR_VIOLATION_NAME` 等配置。
+
+不改动说明：
+- `inspection-flask/violation_module/vio_workwear_missing.py` 本轮仅复核，不改动；现有实现已支持多条触发轨迹并行处理。
+- `inspection-flask/applications/common/hk_recorder_threading.py` 本轮仅复核，不改动；现有实现已包含静态帧哈希去重，避免离线静态图重复累积时序计数。
+
+兼容性注意：
+- 离线 `validate` 在提供 `--labels` 时默认按单类 `clothes` 标注解释；如果你使用的是 `person + clothes` 配对标注，需显式传入 `--gt-mode paired --person-cls ... --clothes-cls ...`。
+- `paired` 模式仍然保留，但当 `person_cls == clothes_cls` 时会直接报错，避免错误配置静默通过。
+- 按当前用户维护约定，本次仅更新 `docs/update_log.md` 记录变更，不同步修改 `docs/check_log.md`。
+
 ## 2026-04-02 安装元数据与模板鉴权收尾
 
 变更来源：
@@ -36,7 +66,7 @@
 4. **必须列出新增/变更的配置项**：如果变更涉及 `settings.py` 中的配置项，必须单独列出配置项名称、默认值和用途说明。
 5. **必须标注兼容性影响**：如果变更修改了函数签名、数据结构、配置字段名等对外接口，必须在记录中标注"兼容性注意"。
 6. **禁止删除历史记录**：历史更新记录不可删除，只可追加新记录。
-7. **关联 check_log**：如果本次变更修复了 `check_log.md` 中的问题，必须在记录中注明对应问题编号和修复状态，并在后续复检时更新 `check_log.md` 中该问题的状态。
+7. **关联 check_log 但不强制回写**：如果本次变更源自 `check_log.md` 中的问题，必须在本日志注明对应问题编号或问题描述及修复状态；除非用户另行要求，否则不再强制同步修改 `docs/check_log.md`。
 8. **保持一致性**：`settings.py` 中的配置项名称与代码中 `getattr(settings, ...)` 的引用必须一致。新增配置项后需全文检索是否有遗漏引用点。
 9. **验证链路完整性**：涉及新文件创建（如 `utils/plots.py`）时，必须在记录中说明调用方、被调用签名以及已验证的兼容性。
 10. **不改动的部分必须声明**：如果某些模块/逻辑被评估后决定不改动，必须在记录中说明原因，防止后续重复评估。
