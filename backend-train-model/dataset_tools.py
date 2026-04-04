@@ -15,6 +15,7 @@ from __future__ import annotations
 import math
 import re
 import shutil
+import warnings
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, Iterable, List, Optional, Sequence, Tuple
@@ -219,6 +220,10 @@ class PrepareResult:
 # 如果能抽到，就优先按帧号排序；否则退化为按文件名排序。
 FRAME_INDEX_RE = re.compile(r"_frame_(\d+)$", re.IGNORECASE)
 
+# 允许标签里存在极小的浮点舍入误差；超出这个量级则视为真正的标注问题。
+LABEL_COORD_TOLERANCE = 1e-6
+LABEL_BOX_EDGE_TOLERANCE = 1e-6
+
 
 def collect_image_files(
     image_roots: Sequence[Path],
@@ -416,14 +421,68 @@ def read_label_entries(label_path: Path) -> List[LabelEntry]:
 
         # 当前项目显式约定使用归一化 YOLO 坐标，因此必须落在 [0, 1]。
         numeric_fields = [x_center, y_center, width, height]
-        if any(value < 0.0 or value > 1.0 for value in numeric_fields):
+        if any(
+            value < -LABEL_COORD_TOLERANCE or value > 1.0 + LABEL_COORD_TOLERANCE
+            for value in numeric_fields
+        ):
             raise DatasetToolError(
                 "{0}:{1} 坐标必须归一化到 [0,1]。".format(label_path, line_number)
             )
+
+        # 先把极小的数值误差裁回 [0, 1]，避免 1.0000001 这一类浮点抖动误判。
+        x_center = min(max(x_center, 0.0), 1.0)
+        y_center = min(max(y_center, 0.0), 1.0)
+        width = min(max(width, 0.0), 1.0)
+        height = min(max(height, 0.0), 1.0)
         if width <= 0.0 or height <= 0.0:
             raise DatasetToolError(
                 "{0}:{1} width/height 必须大于 0。".format(label_path, line_number)
             )
+
+        x1 = x_center - width / 2.0
+        y1 = y_center - height / 2.0
+        x2 = x_center + width / 2.0
+        y2 = y_center + height / 2.0
+        edge_overshoot = max(
+            0.0,
+            -x1,
+            -y1,
+            x2 - 1.0,
+            y2 - 1.0,
+        )
+        if edge_overshoot > LABEL_BOX_EDGE_TOLERANCE:
+            raise DatasetToolError(
+                "{0}:{1} 标注框越过图像边界，"
+                "要求满足 x_center±width/2 与 y_center±height/2 都落在 [0,1]。".format(
+                    label_path,
+                    line_number,
+                )
+            )
+        if edge_overshoot > 0.0:
+            # 对极小越界做容错裁剪，并在 prepare 时写回规范化后的标签。
+            clipped_x1 = min(max(x1, 0.0), 1.0)
+            clipped_y1 = min(max(y1, 0.0), 1.0)
+            clipped_x2 = min(max(x2, 0.0), 1.0)
+            clipped_y2 = min(max(y2, 0.0), 1.0)
+            if clipped_x2 <= clipped_x1 or clipped_y2 <= clipped_y1:
+                raise DatasetToolError(
+                    "{0}:{1} 标注框在边界裁剪后面积为 0，请检查原始标签。".format(
+                        label_path,
+                        line_number,
+                    )
+                )
+            warnings.warn(
+                "{0}:{1} 标注框存在极小越界，已自动裁剪到 [0,1]。".format(
+                    label_path,
+                    line_number,
+                ),
+                RuntimeWarning,
+                stacklevel=2,
+            )
+            x_center = (clipped_x1 + clipped_x2) / 2.0
+            y_center = (clipped_y1 + clipped_y2) / 2.0
+            width = clipped_x2 - clipped_x1
+            height = clipped_y2 - clipped_y1
 
         entries.append(
             LabelEntry(
@@ -659,9 +718,10 @@ def _prepare_fullframe_dataset(
         label_dir.mkdir(parents=True, exist_ok=True)
 
         for sample in samples:
-            # fullframe 模式下，图和标签都原样复制即可。
+            # fullframe 模式下保留原图，同时把标签按当前校验规则重写一遍。
             shutil.copy2(sample.image_path, image_dir / sample.image_path.name)
-            shutil.copy2(sample.label_path, label_dir / sample.label_path.name)
+            # 标签这里统一经过一次解析再写回，顺带吸收极小的浮点越界问题。
+            write_label_file(label_dir / sample.label_path.name, read_label_entries(sample.label_path))
             split_image_counts[split_name] += 1
             split_label_counts[split_name] += 1
 

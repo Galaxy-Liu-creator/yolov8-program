@@ -90,6 +90,10 @@ DEFAULT_FALLBACK_TO_FULLFRAME = True
 
 # 训练工具自己的产物根目录。
 ARTIFACTS_ROOT = SCRIPT_ROOT / "artifacts"
+# 仓库内维护的模型结构定义目录。
+MODEL_DEFS_ROOT = SCRIPT_ROOT / "model_defs"
+# 仓库内约定的本地权重目录。
+WEIGHTS_ROOT = SCRIPT_ROOT / "weights"
 # 准备好的 YOLO 数据集目录。
 PREPARED_ROOT = ARTIFACTS_ROOT / "prepared"
 # 训练 run 目录。
@@ -106,11 +110,16 @@ INSPECTION_WEIGHTS_ROOT = INSPECTION_ROOT / "weights"
 INSPECTION_PERSON_TARGET = INSPECTION_WEIGHTS_ROOT / "person_detect_yolov8.pt"
 INSPECTION_WORKWEAR_TARGET = INSPECTION_WEIGHTS_ROOT / "workwear_detect_yolov8.pt"
 
-# 默认微调基线模型：
+# 默认模型资产命名约定：
 # - `yolov8n.pt`：带预训练权重，适合直接微调；
 # - `yolov8n.yaml`：只有结构定义，适合从零训练或改结构。
-DEFAULT_BASE_MODEL_SPEC = "yolov8n.pt"
-DEFAULT_SCRATCH_MODEL_SPEC = "yolov8n.yaml"
+DEFAULT_BASE_MODEL_FILENAME = "yolov8n.pt"
+DEFAULT_BASE_MODEL_REMOTE_SPEC = DEFAULT_BASE_MODEL_FILENAME
+DEFAULT_SCRATCH_MODEL_FILENAME = "yolov8n.yaml"
+DEFAULT_SCRATCH_MODEL_REMOTE_SPEC = DEFAULT_SCRATCH_MODEL_FILENAME
+
+# 默认禁止隐式联网下载模型，优先保证离线训练行为可预期。
+DEFAULT_ALLOW_REMOTE_MODEL_DOWNLOAD = False
 
 # 默认的人体检测模型候选路径列表。
 # 目前留空，表示不假定仓库内一定已经提供人物检测权重。
@@ -154,24 +163,77 @@ def resolve_first_existing_path(candidates: Iterable[Path]) -> Optional[Path]:
     return None
 
 
-def resolve_default_base_model_spec() -> Union[str, Path]:
+def build_local_model_asset_path(filename: Union[str, Path]) -> Optional[Path]:
+    """按仓库约定推导模型资产文件名应对应的本地路径。"""
+
+    candidate_name = Path(filename).name
+    suffix = Path(candidate_name).suffix.lower()
+    if suffix == ".pt":
+        return WEIGHTS_ROOT / candidate_name
+    if suffix in (".yaml", ".yml"):
+        return MODEL_DEFS_ROOT / candidate_name
+    return None
+
+
+def resolve_local_model_asset(filename: Union[str, Path]) -> Optional[Path]:
+    """按仓库约定解析模型资产文件名对应的本地路径。
+
+    典型场景：
+
+    - `yolov8n.pt` -> `backend-train-model/weights/yolov8n.pt`
+    - `yolov8n.yaml` -> `backend-train-model/model_defs/yolov8n.yaml`
+    """
+
+    candidate_path = build_local_model_asset_path(filename)
+    if candidate_path is None:
+        return None
+    return resolve_first_existing_path([candidate_path])
+
+
+def resolve_default_base_model_path() -> Path:
+    """返回默认本地微调权重应当存放的位置。"""
+
+    return WEIGHTS_ROOT / DEFAULT_BASE_MODEL_FILENAME
+
+
+def resolve_default_scratch_model_path() -> Path:
+    """返回默认本地结构定义文件的位置。"""
+
+    return MODEL_DEFS_ROOT / DEFAULT_SCRATCH_MODEL_FILENAME
+
+
+def resolve_default_base_model_spec(
+    allow_remote_download: bool = DEFAULT_ALLOW_REMOTE_MODEL_DOWNLOAD,
+) -> Union[str, Path]:
     """返回默认的微调起点模型。
 
     正常项目训练时，通常优先使用带预训练权重的 `yolov8n.pt`，
     因为它对当前这种样本量不算大的检测任务更稳定。
     """
 
-    return DEFAULT_BASE_MODEL_SPEC
+    local_path = resolve_default_base_model_path()
+    if local_path.exists():
+        return local_path
+    if allow_remote_download:
+        return DEFAULT_BASE_MODEL_REMOTE_SPEC
+    return local_path
 
 
-def resolve_default_scratch_model_spec() -> Union[str, Path]:
+def resolve_default_scratch_model_spec(
+    allow_remote_download: bool = DEFAULT_ALLOW_REMOTE_MODEL_DOWNLOAD,
+) -> Union[str, Path]:
     """返回默认的从零训练模型结构定义。
 
     当用户显式传入 `--from-scratch` 时，训练脚本会优先使用这里的配置，
     也就是 `yolov8n.yaml`。
     """
 
-    return DEFAULT_SCRATCH_MODEL_SPEC
+    local_path = resolve_default_scratch_model_path()
+    if local_path.exists():
+        return local_path
+    if allow_remote_download:
+        return DEFAULT_SCRATCH_MODEL_REMOTE_SPEC
+    return local_path
 
 
 def resolve_default_person_model() -> Optional[Path]:

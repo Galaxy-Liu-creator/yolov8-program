@@ -99,10 +99,17 @@ def resolve_existing_path(
     return candidate
 
 
+def is_bare_model_reference(candidate_path: Path) -> bool:
+    """判断模型输入是否只是一个裸文件名。"""
+
+    return len(candidate_path.parts) == 1 and candidate_path.parent == Path(".")
+
+
 def resolve_model_spec(
     raw_spec: Optional[str],
     default_spec: Union[str, Path],
-) -> str:
+    allow_remote_download: bool,
+) -> Tuple[str, str]:
     """解析训练模型来源。
 
     允许的输入形式主要有两类：
@@ -117,24 +124,91 @@ def resolve_model_spec(
     if not candidate:
         raise DatasetToolError("训练模型结构未指定。")
 
-    candidate_path = Path(candidate)
+    candidate_path = Path(candidate).expanduser()
+    resolution_mode_prefix = "explicit" if raw_spec else "default"
+    local_named_asset = (
+        config.resolve_local_model_asset(candidate_path.name)
+        if is_bare_model_reference(candidate_path)
+        else None
+    )
+    if local_named_asset is not None:
+        return str(local_named_asset.resolve()), "{0}_local_named_asset".format(resolution_mode_prefix)
+
     if candidate_path.suffix.lower() == ".pt":
         if candidate_path.exists():
-            return str(candidate_path)
-        if candidate_path.parent == Path("."):
-            return candidate
-        if not candidate_path.exists():
-            raise DatasetToolError("预训练权重不存在: {0}".format(candidate_path))
-        return str(candidate_path)
+            return str(candidate_path.resolve()), "{0}_local_path".format(resolution_mode_prefix)
+        if is_bare_model_reference(candidate_path):
+            expected_local_path = config.build_local_model_asset_path(candidate_path.name)
+            if allow_remote_download:
+                return candidate, "{0}_remote_model_name".format(resolution_mode_prefix)
+            if raw_spec:
+                raise DatasetToolError(
+                    "未找到本地训练权重: {0}\n"
+                    "当前默认不会隐式联网下载模型。\n"
+                    "请把 `{1}` 放到 `{0}`，或显式传入其他本地 `--base-model` 路径；"
+                    "如确认允许 Ultralytics 自动下载，请追加 `--allow-remote-model-download`。".format(
+                        expected_local_path,
+                        candidate_path.name,
+                    )
+                )
+            raise DatasetToolError(
+                "默认微调模型不存在: {0}\n"
+                "当前脚本默认优先使用本地 `.pt` 权重，避免离线环境下隐式联网下载。\n"
+                "请把 `{1}` 放到 `{0}`，或显式传入本地 `--base-model`；"
+                "如确认允许 Ultralytics 自动下载，请追加 `--allow-remote-model-download`。".format(
+                    expected_local_path,
+                    candidate_path.name,
+                )
+            )
+        if not raw_spec and candidate_path == config.resolve_default_base_model_path():
+            raise DatasetToolError(
+                "默认微调模型不存在: {0}\n"
+                "当前脚本默认优先使用本地 `.pt` 权重，避免离线环境下隐式联网下载。\n"
+                "请把 `{1}` 放到 `{0}`，或显式传入本地 `--base-model`；"
+                "如确认允许 Ultralytics 自动下载，请追加 `--allow-remote-model-download`。".format(
+                    candidate_path,
+                    candidate_path.name,
+                )
+            )
+        raise DatasetToolError("预训练权重不存在: {0}".format(candidate_path))
 
     if candidate_path.suffix.lower() in (".yaml", ".yml"):
         if candidate_path.exists():
-            return str(candidate_path)
-        return candidate
+            return str(candidate_path.resolve()), "{0}_local_path".format(resolution_mode_prefix)
+        if is_bare_model_reference(candidate_path):
+            expected_local_path = config.build_local_model_asset_path(candidate_path.name)
+            if allow_remote_download:
+                return candidate, "{0}_remote_model_name".format(resolution_mode_prefix)
+            if raw_spec:
+                raise DatasetToolError(
+                    "未找到本地模型结构文件: {0}\n"
+                    "当前默认不会隐式联网下载模型结构。\n"
+                    "请把 `{1}` 放到 `{0}`，或显式传入其他本地 `--base-model` 路径；"
+                    "如确认允许 Ultralytics 自动下载，请追加 `--allow-remote-model-download`。".format(
+                        expected_local_path,
+                        candidate_path.name,
+                    )
+                )
+            raise DatasetToolError(
+                "默认 scratch 结构文件不存在: {0}\n"
+                "请确认仓库内的本地模型定义文件仍然存在，或显式传入本地 `--base-model`；"
+                "如确认允许 Ultralytics 自动下载，请追加 `--allow-remote-model-download`。".format(
+                    expected_local_path
+                )
+            )
+        if not raw_spec and candidate_path == config.resolve_default_scratch_model_path():
+            raise DatasetToolError(
+                "默认 scratch 结构文件不存在: {0}\n"
+                "请确认仓库内的本地模型定义文件仍然存在，或显式传入本地 `--base-model`；"
+                "如确认允许 Ultralytics 自动下载，请追加 `--allow-remote-model-download`。".format(
+                    candidate_path
+                )
+            )
+        raise DatasetToolError("模型结构文件不存在: {0}".format(candidate_path))
 
     if candidate_path.exists():
-        return str(candidate_path)
-    return candidate
+        return str(candidate_path.resolve()), "{0}_local_path".format(resolution_mode_prefix)
+    raise DatasetToolError("训练模型文件不存在: {0}".format(candidate_path))
 
 
 def is_pretrained_model_spec(model_spec: str) -> bool:
@@ -149,27 +223,49 @@ def is_yaml_model_spec(model_spec: str) -> bool:
     return Path(model_spec).suffix.lower() in (".yaml", ".yml")
 
 
-def resolve_init_weights(raw_spec: Optional[str]) -> Optional[str]:
+def resolve_init_weights(
+    raw_spec: Optional[str],
+    allow_remote_download: bool,
+) -> Tuple[Optional[str], Optional[str]]:
     """解析“结构文件 + 兼容初始化权重”中的初始化权重参数。"""
 
     if not raw_spec:
-        return None
+        return None, None
 
     candidate = str(raw_spec)
-    candidate_path = Path(candidate)
+    candidate_path = Path(candidate).expanduser()
     if candidate_path.suffix.lower() != ".pt":
         raise DatasetToolError(
-            "Initialization weights must be a .pt file or an Ultralytics weight name: {0}".format(
+            "初始化权重必须是 `.pt` 文件，或显式允许下载的 Ultralytics 权重名: {0}".format(
                 candidate
             )
         )
 
-    if candidate_path.exists():
-        return str(candidate_path)
-    if candidate_path.parent == Path("."):
-        return candidate
+    local_named_asset = (
+        config.resolve_local_model_asset(candidate_path.name)
+        if is_bare_model_reference(candidate_path)
+        else None
+    )
+    if local_named_asset is not None:
+        return str(local_named_asset.resolve()), "explicit_local_named_asset"
 
-    raise DatasetToolError("Initialization weights not found: {0}".format(candidate_path))
+    if candidate_path.exists():
+        return str(candidate_path.resolve()), "explicit_local_path"
+    if is_bare_model_reference(candidate_path):
+        expected_local_path = config.build_local_model_asset_path(candidate_path.name)
+        if allow_remote_download:
+            return candidate, "explicit_remote_model_name"
+        raise DatasetToolError(
+            "未找到本地初始化权重: {0}\n"
+            "当前默认不会隐式联网下载模型。\n"
+            "请把 `{1}` 放到 `{0}`，或显式传入其他本地 `--init-weights` 路径；"
+            "如确认允许 Ultralytics 自动下载，请追加 `--allow-remote-model-download`。".format(
+                expected_local_path,
+                candidate_path.name,
+            )
+        )
+
+    raise DatasetToolError("初始化权重不存在: {0}".format(candidate_path))
 
 
 def resolve_output_root(raw_path: Optional[str], default_path: Path) -> Path:
@@ -436,18 +532,61 @@ def resolve_run_name(explicit_name: Optional[str], prefix: str) -> str:
     return explicit_name or "{0}_{1}".format(prefix, timestamp_token())
 
 
-def resolve_best_weight_path(raw_path: Optional[str]) -> Path:
-    """解析要使用的 `best.pt`。
+def load_report_dict(report_path: Path) -> Optional[Dict[str, object]]:
+    """尽量以容错方式读取训练报告。"""
+
+    try:
+        payload = json.loads(report_path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+        return None
+    return payload if isinstance(payload, dict) else None
+
+
+def resolve_report_path_candidate(raw_value: object, report_path: Path) -> Optional[Path]:
+    """把报告中的路径字段解析成绝对路径。"""
+
+    if raw_value in (None, ""):
+        return None
+
+    candidate = Path(str(raw_value)).expanduser()
+    if candidate.is_absolute():
+        return candidate.resolve()
+    return (report_path.parent / candidate).resolve()
+
+
+def resolve_best_weight_path_and_source(raw_path: Optional[str]) -> Tuple[Path, str, Optional[Path]]:
+    """解析要使用的 `best.pt`，并同时返回解析来源。
 
     - 用户显式传 `--weights` 时，优先使用显式路径；
-    - 否则默认从 `artifacts/runs/` 中找最新的 `weights/best.pt`。
+    - 否则优先回看最近一次训练报告中的 `best_weight`；
+    - 再不行才回退到 `artifacts/runs/` 中找最新的 `weights/best.pt`。
     """
 
     if raw_path:
         best_weight = Path(raw_path).expanduser().resolve()
         if not best_weight.exists():
             raise DatasetToolError("权重文件不存在: {0}".format(best_weight))
-        return best_weight
+        return best_weight, "explicit_weights_path", None
+
+    report_candidates = sorted(
+        config.REPORTS_ROOT.glob("*_train.json"),
+        key=lambda path: path.stat().st_mtime,
+        reverse=True,
+    )
+    for report_path in report_candidates:
+        payload = load_report_dict(report_path)
+        if payload is None:
+            continue
+
+        best_weight = resolve_report_path_candidate(payload.get("best_weight"), report_path)
+        if best_weight is not None and best_weight.exists():
+            return best_weight, "latest_train_report", report_path.resolve()
+
+        run_dir = resolve_report_path_candidate(payload.get("run_dir"), report_path)
+        if run_dir is not None:
+            best_weight = (run_dir / "weights" / "best.pt").resolve()
+            if best_weight.exists():
+                return best_weight, "latest_train_report_run_dir", report_path.resolve()
 
     candidates = sorted(
         config.RUNS_ROOT.rglob("weights/best.pt"),
@@ -455,8 +594,17 @@ def resolve_best_weight_path(raw_path: Optional[str]) -> Path:
         reverse=True,
     )
     if not candidates:
-        raise DatasetToolError("未找到任何训练产物 best.pt，请先执行 train。")
-    return candidates[0]
+        raise DatasetToolError(
+            "未找到任何训练产物 best.pt，请先执行 train，或显式传入 `--weights`。\n"
+            "如果你曾使用自定义 `--project`，优先检查最近一次训练报告中的 `best_weight`。"
+        )
+    return candidates[0].resolve(), "runs_root_scan", None
+
+
+def resolve_best_weight_path(raw_path: Optional[str]) -> Path:
+    """仅返回 `best.pt` 路径本身，兼容旧调用方式。"""
+
+    return resolve_best_weight_path_and_source(raw_path)[0]
 
 
 def train_model(args) -> Dict[str, object]:
@@ -481,30 +629,45 @@ def train_model(args) -> Dict[str, object]:
             "验证集为空，当前训练命令无法运行。"
             "如使用 --limit-per-sequence 做 smoke test，请至少保证每个序列分到 2 张及以上图片。"
         )
+    allow_remote_download = bool(
+        getattr(
+            args,
+            "allow_remote_model_download",
+            config.DEFAULT_ALLOW_REMOTE_MODEL_DOWNLOAD,
+        )
+    )
     from_scratch = bool(getattr(args, "from_scratch", False))
-    init_weights = resolve_init_weights(getattr(args, "init_weights", None))
+    init_weights, init_weights_source = resolve_init_weights(
+        getattr(args, "init_weights", None),
+        allow_remote_download=allow_remote_download,
+    )
     if from_scratch and init_weights is not None:
-        raise DatasetToolError("--from-scratch cannot be used together with --init-weights.")
-    model_spec = resolve_model_spec(
+        raise DatasetToolError("`--from-scratch` 不能与 `--init-weights` 同时使用。")
+    model_spec, base_model_source = resolve_model_spec(
         raw_spec=getattr(args, "base_model", None),
         default_spec=(
-            config.resolve_default_scratch_model_spec()
+            config.resolve_default_scratch_model_spec(
+                allow_remote_download=allow_remote_download,
+            )
             if from_scratch
-            else config.resolve_default_base_model_spec()
+            else config.resolve_default_base_model_spec(
+                allow_remote_download=allow_remote_download,
+            )
         ),
+        allow_remote_download=allow_remote_download,
     )
     if from_scratch and is_pretrained_model_spec(model_spec):
         raise DatasetToolError(
-            "--from-scratch requires a .yaml/.yml model definition. "
-            "If you omit --base-model, yolov8n.yaml is used automatically."
+            "`--from-scratch` 只能配合 `.yaml/.yml` 模型结构文件使用。"
+            "如果你不传 `--base-model`，脚本会默认使用本地 `yolov8n.yaml`。"
         )
     if init_weights is not None and not is_yaml_model_spec(model_spec):
         raise DatasetToolError(
-            "--init-weights can only be used with a .yaml/.yml model definition. "
-            "Use --base-model xxx.pt if you want to fine-tune a pretrained checkpoint directly."
+            "`--init-weights` 只能与 `.yaml/.yml` 结构文件一起使用。"
+            "如果你想直接微调预训练 checkpoint，请改用 `--base-model xxx.pt`。"
         )
     use_pretrained = is_pretrained_model_spec(model_spec)
-    run_name = resolve_run_name(getattr(args, "name", None), "workwear")
+    requested_run_name = resolve_run_name(getattr(args, "name", None), "workwear")
     run_project = resolve_output_root(getattr(args, "project", None), config.RUNS_ROOT)
 
     # 先根据模型描述创建 YOLO 对象；如果是 `.yaml`，这里只会构建结构。
@@ -521,7 +684,7 @@ def train_model(args) -> Dict[str, object]:
         workers=args.workers,
         device=args.device,
         project=str(run_project),
-        name=run_name,
+        name=requested_run_name,
         pretrained=use_pretrained,
         seed=args.seed,
         deterministic=True,
@@ -532,7 +695,12 @@ def train_model(args) -> Dict[str, object]:
     # 优先读取 Ultralytics 真实 trainer 输出目录，避免相对路径造成推断错误。
     trainer = getattr(model, "trainer", None)
     trainer_save_dir = getattr(trainer, "save_dir", None)
-    run_dir = Path(trainer_save_dir).resolve() if trainer_save_dir else (run_project / run_name).resolve()
+    run_dir = (
+        Path(trainer_save_dir).resolve()
+        if trainer_save_dir
+        else (run_project / requested_run_name).resolve()
+    )
+    actual_run_name = run_dir.name
     best_weight = run_dir / "weights" / "best.pt"
     last_weight = run_dir / "weights" / "last.pt"
     if not best_weight.exists():
@@ -541,11 +709,16 @@ def train_model(args) -> Dict[str, object]:
     summary = {
         "dataset_yaml": str(dataset_yaml),
         "base_model": model_spec,
+        "base_model_source": base_model_source,
+        "allow_remote_model_download": allow_remote_download,
         "from_scratch": from_scratch,
         "pretrained": use_pretrained,
         "init_weights": init_weights,
+        "init_weights_source": init_weights_source,
         "run_project": str(run_project),
-        "run_name": run_name,
+        "requested_run_name": requested_run_name,
+        "actual_run_name": actual_run_name,
+        "run_name": actual_run_name,
         "run_dir": str(run_dir),
         "best_weight": str(best_weight),
         "last_weight": str(last_weight) if last_weight.exists() else None,
@@ -557,7 +730,9 @@ def train_model(args) -> Dict[str, object]:
         "device": args.device,
         "seed": args.seed,
     }
-    write_json(config.REPORTS_ROOT / "{0}_train.json".format(run_name), summary)
+    report_path = config.REPORTS_ROOT / "{0}_train.json".format(actual_run_name)
+    summary["report_path"] = str(report_path)
+    write_json(report_path, summary)
     return summary
 
 
@@ -572,7 +747,9 @@ def evaluate_model(args) -> Dict[str, object]:
 
     from ultralytics import YOLO
 
-    weight_path = resolve_best_weight_path(getattr(args, "weights", None))
+    weight_path, weights_resolution_mode, weights_report_source = resolve_best_weight_path_and_source(
+        getattr(args, "weights", None)
+    )
     dataset_yaml = resolve_dataset_yaml(args)
     split_counts = collect_dataset_split_counts(dataset_yaml)
     model = YOLO(str(weight_path))
@@ -590,6 +767,10 @@ def evaluate_model(args) -> Dict[str, object]:
 
     summary = {
         "weights": str(weight_path),
+        "weights_resolution_mode": weights_resolution_mode,
+        "weights_report_source": (
+            str(weights_report_source) if weights_report_source is not None else None
+        ),
         "dataset_yaml": str(dataset_yaml),
         "split_image_counts": split_counts,
         "evaluated_splits": evaluation_splits,
@@ -647,7 +828,9 @@ def evaluate_model(args) -> Dict[str, object]:
 def export_model(args) -> Dict[str, object]:
     """导出最终权重，并可选部署到 `inspection-flask`。"""
 
-    weight_path = resolve_best_weight_path(getattr(args, "weights", None))
+    weight_path, weights_resolution_mode, weights_report_source = resolve_best_weight_path_and_source(
+        getattr(args, "weights", None)
+    )
     export_root = resolve_output_root(getattr(args, "export_root", None), config.EXPORT_ROOT)
     export_root.mkdir(parents=True, exist_ok=True)
     export_target = export_root / "workwear_detect_yolov8.pt"
@@ -655,6 +838,10 @@ def export_model(args) -> Dict[str, object]:
 
     summary = {
         "source_weight": str(weight_path),
+        "weights_resolution_mode": weights_resolution_mode,
+        "weights_report_source": (
+            str(weights_report_source) if weights_report_source is not None else None
+        ),
         "export_target": str(export_target),
         "deployed_target": None,
     }
@@ -990,7 +1177,7 @@ def build_parser() -> argparse.ArgumentParser:
         "--split-strategy",
         choices=["sequence_contiguous", "sequence_holdout"],
         default=config.DEFAULT_SPLIT_STRATEGY,
-        help="Dataset split strategy used during preparation.",
+        help="prepare 阶段使用的数据切分策略。",
     )
     prepare_parser.set_defaults(func=cmd_prepare)
 
@@ -1001,7 +1188,7 @@ def build_parser() -> argparse.ArgumentParser:
         "--split-strategy",
         choices=["sequence_contiguous", "sequence_holdout"],
         default=config.DEFAULT_SPLIT_STRATEGY,
-        help="Dataset split strategy used during preparation.",
+        help="当 train 需要自动 prepare 数据集时所使用的数据切分策略。",
     )
     train_parser.set_defaults(func=cmd_train)
 
@@ -1012,7 +1199,7 @@ def build_parser() -> argparse.ArgumentParser:
         "--split-strategy",
         choices=["sequence_contiguous", "sequence_holdout"],
         default=config.DEFAULT_SPLIT_STRATEGY,
-        help="Dataset split strategy used when evaluate needs to prepare a dataset.",
+        help="当 evaluate 需要自动 prepare 数据集时所使用的数据切分策略。",
     )
     evaluate_parser.set_defaults(func=cmd_evaluate)
 
@@ -1032,7 +1219,7 @@ def build_parser() -> argparse.ArgumentParser:
         "--split-strategy",
         choices=["sequence_contiguous", "sequence_holdout"],
         default=config.DEFAULT_SPLIT_STRATEGY,
-        help="Dataset split strategy used during preparation.",
+        help="all 流程中 prepare 阶段使用的数据切分策略。",
     )
     all_parser.set_defaults(func=cmd_all)
 
@@ -1120,11 +1307,17 @@ def add_train_args(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(
         "--from-scratch",
         action="store_true",
-        help="Start from a YAML model definition instead of the default pretrained .pt checkpoint.",
+        help="从 `.yaml/.yml` 结构文件开始训练，而不是默认的本地 `.pt` 微调权重。",
     )
     parser.add_argument(
         "--init-weights",
-        help="Initialize a YAML model with compatible pretrained .pt weights, for example yolov8n.pt.",
+        help="为 `.yaml/.yml` 结构文件额外加载兼容的 `.pt` 初始化权重，例如 `yolov8n.pt`。",
+    )
+    parser.add_argument(
+        "--allow-remote-model-download",
+        action="store_true",
+        default=config.DEFAULT_ALLOW_REMOTE_MODEL_DOWNLOAD,
+        help="显式允许 Ultralytics 在本地模型缺失时自动下载默认模型；默认关闭，优先保证离线可复现。",
     )
 
 
@@ -1189,11 +1382,17 @@ def add_all_args(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(
         "--from-scratch",
         action="store_true",
-        help="Start from a YAML model definition instead of the default pretrained .pt checkpoint.",
+        help="从 `.yaml/.yml` 结构文件开始训练，而不是默认的本地 `.pt` 微调权重。",
     )
     parser.add_argument(
         "--init-weights",
-        help="Initialize a YAML model with compatible pretrained .pt weights, for example yolov8n.pt.",
+        help="为 `.yaml/.yml` 结构文件额外加载兼容的 `.pt` 初始化权重，例如 `yolov8n.pt`。",
+    )
+    parser.add_argument(
+        "--allow-remote-model-download",
+        action="store_true",
+        default=config.DEFAULT_ALLOW_REMOTE_MODEL_DOWNLOAD,
+        help="显式允许 Ultralytics 在本地模型缺失时自动下载默认模型；默认关闭，优先保证离线可复现。",
     )
     parser.add_argument(
         "--keep-inspection-weights",

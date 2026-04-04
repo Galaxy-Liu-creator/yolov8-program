@@ -7,6 +7,13 @@
 - 类别 ID：`0`
 - 类别名称：`clothes`
 
+注意：
+
+- 当前训练出来的是 **`clothes` 单类检测模型**
+- 它可以作为后续“未穿工服检测”系统里的工服子模型
+- 但它本身**不直接等于**“疑似未穿工服告警器”
+- 如果后续接真实摄像头，仍然需要再叠加 `person` 检测、ROI 和时序规则
+
 主入口脚本：
 
 - `backend-train-model/train_workwear.py`
@@ -46,11 +53,30 @@ cd E:\University_competition\Innovation_Entrepreneurship\MyProgram\yolov8-progra
 - `opencv-python`
 - `PyYAML`
 
+### 4. 本地模型资产约定
+
+当前仓库已经固定了两类默认模型资产位置：
+
+- 本地结构文件：`backend-train-model/model_defs/yolov8n.yaml`
+- 本地微调权重：`backend-train-model/weights/yolov8n.pt`
+
+推荐做法：
+
+- 日常训练优先准备本地 `yolov8n.pt`
+- 想改结构时再编辑 `backend-train-model/model_defs/yolov8n.yaml`
+- 默认**不**隐式联网下载模型，避免离线环境下行为不可控
+
+如果你明确允许 Ultralytics 自动下载默认模型，需要显式加：
+
+```powershell
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\train_workwear.py train --allow-remote-model-download
+```
+
 ## 默认训练策略
 
 当前脚本已经调整为：
 
-- **默认使用 `yolov8n.pt` 做微调**
+- **默认使用本地 `backend-train-model/weights/yolov8n.pt` 做微调**
 - 如需从零开始训练，再显式加 `--from-scratch`
 
 这样更适合当前项目这种样本量不算大的检测任务，通常比默认从 `yolov8n.yaml` 随机初始化起训更稳定。
@@ -62,6 +88,7 @@ D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\train_workwea
 ```
 
 这条命令现在等价于：以 `yolov8n.pt` 为默认起点继续训练。
+如果本地权重缺失，脚本会直接报中文提示，而不会默认静默联网下载。
 
 ### 从零开始训练
 
@@ -70,6 +97,7 @@ D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\train_workwea
 ```
 
 这条命令会默认改为从 `yolov8n.yaml` 结构开始训练，而不是加载 `yolov8n.pt`。
+默认使用的本地结构文件路径为：`backend-train-model/model_defs/yolov8n.yaml`
 
 ## 数据划分策略
 
@@ -240,7 +268,7 @@ D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\train_workwea
 当前脚本已经支持这种方式：
 
 ```powershell
-D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\train_workwear.py train --base-model your_model.yaml --init-weights yolov8n.pt
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\train_workwear.py train --base-model your_model.yaml --init-weights backend-train-model\weights\yolov8n.pt
 ```
 
 这个模式适合：
@@ -267,7 +295,8 @@ D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\train_workwea
 
 默认行为：
 
-- 不传 `--weights` 时，会自动选择 `backend-train-model/artifacts/runs/` 下**最新生成**的 `best.pt`
+- 不传 `--weights` 时，会优先读取最近一次训练报告里的 `best_weight`
+- 如果训练报告不可用，才回退到 `backend-train-model/artifacts/runs/` 下扫描最新的 `best.pt`
 - 原生评估会在 `val / test` 中自动跳过空 split，只评估非空 split
 
 默认会输出：
@@ -276,6 +305,11 @@ D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\train_workwea
 - Precision
 - mAP50
 - mAP50-95
+
+补充说明：
+
+- 上述指标评估的是 `clothes` 检测效果
+- 它不直接代表最终“疑似未穿工服”业务告警准确率
 
 ### 9. 使用 `inspection-flask` 额外复核
 
@@ -300,7 +334,8 @@ D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\train_workwea
 
 默认行为：
 
-- 不传 `--weights` 时，会自动选择 `backend-train-model/artifacts/runs/` 下**最新生成**的 `best.pt`
+- 不传 `--weights` 时，会优先读取最近一次训练报告里的 `best_weight`
+- 如果训练报告不可用，才回退到 `backend-train-model/artifacts/runs/` 下扫描最新的 `best.pt`
 
 导出结果默认位于：
 
@@ -427,5 +462,6 @@ D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\train_workwea
 - `personcrop` 模式依赖可用的人体检测权重；没有时建议先使用 `fullframe`
 - `evaluate --inspection-validate` 与默认 `all` 复核链路，都需要可用的人体检测权重
 - 自定义 `--project` / `--output-root` / `--export-root` 时，当前脚本会自动解析为绝对路径，避免产物落到意外目录
+- 自定义 `--project` 后，`evaluate` / `export` 默认也会优先回看训练报告，不再只盯 `artifacts/runs/`
 - 本仓库默认以 `Python 3.9` / `yolo_code` 环境为基准
 - 当前默认参数面向 CPU 环境，若后续切到 GPU，可再单独调整批大小与输入尺寸
