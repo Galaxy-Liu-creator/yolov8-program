@@ -1,5 +1,126 @@
 # Update Log
 
+## 2026-04-05 backend-train-model 运行方法文档新增
+
+变更来源：
+- 用户要求：新增一份更详细的运行说明文档，文件名指定为 `run_mathod.md`，要求把当前最稳妥的运行方式、自定义数据集方式、未来阶段扩展方式，以及命令和参数意义系统展开说明。
+- 场景收敛：用户当前准备先把 `clothes` 模型训练好，因此文档需要明确区分“现阶段最稳妥方案”和“未来扩展方案”。
+
+变更总览：
+1. 新增 `backend-train-model/docs/run_mathod.md`，系统整理当前阶段的推荐运行方式。
+2. 在新文档中明确：
+   - 为什么 baseline 阶段更推荐显式使用 `--mode fullframe`
+   - 为什么当前不建议一上来直接用 `all --deploy`
+   - 当前最推荐的 `audit -> prepare -> train -> evaluate -> export` 顺序
+3. 在新文档中补充了命令级说明：
+   - 每条推荐命令的作用
+   - 常用参数的意义
+   - 现阶段哪些参数建议先不要乱改
+4. 在新文档中补充了“如何自己指定数据集”的两种方式：
+   - 直接使用 `--dataset-yaml`
+   - 使用 `--project-config` 切换原始数据入口，再显式指定 prepare 产出的 `dataset.yaml`
+5. 在新文档中补充了未来阶段的命令变化，包括：
+   - 何时引入 `personcrop`
+   - 何时使用 `auto`
+   - 何时做 `inspection-flask` 链路级复核
+
+涉及文件：
+- `backend-train-model/docs/run_mathod.md`
+- `backend-train-model/docs/update_log.md`
+
+新增 / 变更配置项：
+- 无。
+- 本轮只新增运行说明文档，不改动配置入口、CLI 参数定义和训练逻辑。
+
+兼容性注意：
+- 本轮属于纯文档增量，不影响现有 `backend-train-model` 的任何命令行为。
+- 新文档中的“当前最稳妥方式”是基于当前项目状态给出的推荐执行路径，不代表代码自动强制改成该默认行为；例如文档推荐 baseline 阶段显式写 `--mode fullframe`，这是为了稳妥起见，而不是 CLI 默认值被修改。
+
+不改动说明：
+- 本轮不修改 `backend-train-model/config.py`、`backend-train-model/dataset_tools.py`、`backend-train-model/train_workwear.py`。
+- 本轮不修改 `inspection-flask/` 下任何代码。
+- 本轮不改变当前默认单类 `clothes` 训练口径，也不改变 `auto` 的现有判定逻辑。
+
+## 2026-04-05 backend-train-model 可执行 TODO 清单文档新增
+
+变更来源：
+- 用户要求：在已有分阶段路线文档基础上，再补一份更“可执行”的清单文档，文件名明确指定为 `todo_list.md`。
+- 目标收敛：把“分几个阶段、训几个模型、怎样搭链路”的高层建议，进一步落成按阶段推进的待办项、产物和完成标准。
+
+变更总览：
+1. 新增 `backend-train-model/docs/todo_list.md`，把当前推荐路线拆解成可执行的阶段性 TODO。
+2. 在新文档中把任务分为：
+   - `P0`：先固定 `clothes` baseline
+   - `P1`：补 `person` 数据资产
+   - `P2`：训练并固化 `person` 模型
+   - `P3`：启用 `personcrop` 重训 `clothes`
+   - `P4`：离线搭建完整链路
+   - `P5`：接实时摄像头上线
+3. 在新文档中补充了每一阶段的：
+   - 目标
+   - 待办项
+   - 推荐命令
+   - 产物
+   - 完成标准
+4. 在新文档中单独列出“哪些事情现在不要做”和“近期最推荐执行顺序”，便于后续直接按 checklist 推进。
+
+涉及文件：
+- `backend-train-model/docs/todo_list.md`
+- `backend-train-model/docs/update_log.md`
+
+新增 / 变更配置项：
+- 无。
+- 本轮只新增执行清单文档，不修改任何配置入口、CLI 默认值和训练逻辑。
+
+兼容性注意：
+- 本轮属于纯文档增量，不改变现有 `backend-train-model` 的代码行为。
+- `todo_list.md` 中的命令和阶段建议是当前推荐执行顺序，不代表仓库已经自动具备全部后续阶段能力；例如 `person` 训练任务仍需后续按阶段补齐数据资产与脚本。
+
+不改动说明：
+- 本轮不修改 `backend-train-model/config.py`、`backend-train-model/dataset_tools.py`、`backend-train-model/train_workwear.py`。
+- 本轮不修改 `inspection-flask/` 下任何代码。
+- 本轮不改变当前默认单类 `clothes` 训练口径。
+
+## 2026-04-05 backend-train-model 分阶段链路规划文档新增
+
+变更来源：
+- 用户要求：允许调整既有后端训练思路，并在 `backend-train-model/docs/` 下补一份更明确的阶段规划文档，回答“该分几阶段、该训几个模型、如何搭完整链路”。
+- 现状澄清：当前仓库文档和代码不是不可变真理，需要结合当前数据、当前业务目标和现有工程边界，给出更稳妥的推荐路线。
+
+变更总览：
+1. 新增 `backend-train-model/docs/pipeline_roadmap.md`，明确说明当前项目不建议一开始追求“一个模型吃掉整条业务链路”。
+2. 在新文档中分开说明：
+   - 真实生产目标
+   - 当前阶段实现
+   - 当前能力边界
+   - 升级触发条件
+   - 后续演进路线
+3. 在新文档中给出推荐的阶段划分：
+   - 阶段 0：数据资产分层
+   - 阶段 1：先训 `clothes` baseline
+   - 阶段 2：补 `person` 数据并训练 `person` 模型
+   - 阶段 3：在 `personcrop` 方案上重训 `clothes`
+   - 阶段 4：离线搭建完整链路
+   - 阶段 5：接实时摄像头上线
+4. 在新文档中明确说明：补 `person` 标签是有价值的，但 `auto` 模式真正依赖的是“是否已有可用 `person` 权重”，不是“标注里是否存在 `person` 类别”。
+
+涉及文件：
+- `backend-train-model/docs/pipeline_roadmap.md`
+- `backend-train-model/docs/update_log.md`
+
+新增 / 变更配置项：
+- 无。
+- 本轮只新增方案文档，不修改 `project_config.json`、`config.py`、CLI 默认值和导出结构。
+
+兼容性注意：
+- 本轮不改动任何训练逻辑、评估逻辑、导出逻辑和配置入口；属于纯文档增量，不影响现有命令行为。
+- 新文档中的推荐路线是“当前更优实践建议”，不是对现有代码行为的自动变更；若后续要按该路线推进，仍需要在未来分阶段落代码与数据资产。
+
+不改动说明：
+- 本轮不修改 `backend-train-model/config.py`、`backend-train-model/dataset_tools.py`、`backend-train-model/train_workwear.py`。
+- 本轮不修改 `inspection-flask/` 下任何代码。
+- 本轮不把当前默认单类 `clothes` 训练任务直接改成多类混标任务。
+
 ## 2026-04-05 backend-train-model 项目化配置、personcrop 对齐与训练报告增强
 
 变更来源：
