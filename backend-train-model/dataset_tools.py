@@ -190,6 +190,7 @@ class PrepareResult:
     dataset_yaml: Path
     split_image_counts: Dict[str, int]
     split_label_counts: Dict[str, int]
+    split_box_counts: Dict[str, int]
     positive_crops: int
     negative_crops: int
     fallback_fullframes: int
@@ -207,6 +208,7 @@ class PrepareResult:
             "dataset_yaml": str(self.dataset_yaml),
             "split_image_counts": self.split_image_counts,
             "split_label_counts": self.split_label_counts,
+            "split_box_counts": self.split_box_counts,
             "positive_crops": self.positive_crops,
             "negative_crops": self.negative_crops,
             "fallback_fullframes": self.fallback_fullframes,
@@ -710,6 +712,7 @@ def _prepare_fullframe_dataset(
 
     split_image_counts = {"train": 0, "val": 0, "test": 0}
     split_label_counts = {"train": 0, "val": 0, "test": 0}
+    split_box_counts = {"train": 0, "val": 0, "test": 0}
 
     for split_name, samples in split_map.items():
         image_dir = output_root / "images" / split_name
@@ -721,9 +724,11 @@ def _prepare_fullframe_dataset(
             # fullframe 模式下保留原图，同时把标签按当前校验规则重写一遍。
             shutil.copy2(sample.image_path, image_dir / sample.image_path.name)
             # 标签这里统一经过一次解析再写回，顺带吸收极小的浮点越界问题。
-            write_label_file(label_dir / sample.label_path.name, read_label_entries(sample.label_path))
+            label_entries = read_label_entries(sample.label_path)
+            write_label_file(label_dir / sample.label_path.name, label_entries)
             split_image_counts[split_name] += 1
             split_label_counts[split_name] += 1
+            split_box_counts[split_name] += len(label_entries)
 
     dataset_yaml = write_dataset_yaml(output_root)
     report_path = output_root / "prepare_report.json"
@@ -734,6 +739,7 @@ def _prepare_fullframe_dataset(
         dataset_yaml=dataset_yaml,
         split_image_counts=split_image_counts,
         split_label_counts=split_label_counts,
+        split_box_counts=split_box_counts,
         positive_crops=sum(split_image_counts.values()),
         negative_crops=0,
         fallback_fullframes=0,
@@ -783,6 +789,7 @@ def _prepare_personcrop_dataset(
 
     split_image_counts = {"train": 0, "val": 0, "test": 0}
     split_label_counts = {"train": 0, "val": 0, "test": 0}
+    split_box_counts = {"train": 0, "val": 0, "test": 0}
     positive_crops = 0
     negative_crops = 0
     fallback_fullframes = 0
@@ -852,6 +859,7 @@ def _prepare_personcrop_dataset(
 
                 split_image_counts[split_name] += 1
                 split_label_counts[split_name] += 1
+                split_box_counts[split_name] += len(local_entries)
                 if local_entries:
                     positive_crops += 1
                 else:
@@ -876,6 +884,7 @@ def _prepare_personcrop_dataset(
                 )
                 split_image_counts[split_name] += 1
                 split_label_counts[split_name] += 1
+                split_box_counts[split_name] += len(unmatched)
                 fallback_fullframes += 1
 
             if not person_detections and gt_entries and not fallback_to_fullframe:
@@ -893,6 +902,7 @@ def _prepare_personcrop_dataset(
         dataset_yaml=dataset_yaml,
         split_image_counts=split_image_counts,
         split_label_counts=split_label_counts,
+        split_box_counts=split_box_counts,
         positive_crops=positive_crops,
         negative_crops=negative_crops,
         fallback_fullframes=fallback_fullframes,
@@ -1091,14 +1101,18 @@ def write_dataset_yaml(dataset_root: Path) -> Path:
     """在准备好的数据集根目录下写出 `dataset.yaml`。"""
 
     dataset_yaml = dataset_root / "dataset.yaml"
+    names_yaml = "".join(
+        "  {0}: {1}\n".format(class_id, class_name)
+        for class_id, class_name in sorted(config.CLASS_NAMES.items())
+    )
     yaml_text = (
         "path: {0}\n"
         "train: images/train\n"
         "val: images/val\n"
         "test: images/test\n"
         "names:\n"
-        "  0: clothes\n"
-    ).format(dataset_root.as_posix())
+        "{1}"
+    ).format(dataset_root.as_posix(), names_yaml)
     dataset_yaml.write_text(yaml_text, encoding="utf-8")
     return dataset_yaml
 

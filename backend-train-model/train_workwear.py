@@ -54,6 +54,52 @@ def timestamp_token() -> str:
     return datetime.now().strftime("%Y%m%d_%H%M%S")
 
 
+def bootstrap_project_config(argv: Optional[List[str]] = None) -> Optional[Path]:
+    """在正式构建完整 CLI 前，先解析并应用项目配置。"""
+
+    bootstrap_parser = argparse.ArgumentParser(add_help=False)
+    bootstrap_parser.add_argument(
+        "--project-config",
+        help="项目化 JSON 配置文件；默认尝试读取 backend-train-model/project_config.json。",
+    )
+    bootstrap_args, _ = bootstrap_parser.parse_known_args(argv)
+    return config.apply_project_config(
+        getattr(bootstrap_args, "project_config", None),
+        allow_missing=getattr(bootstrap_args, "project_config", None) is None,
+    )
+
+
+def build_runtime_context(command_name: str) -> Dict[str, object]:
+    """构建当前命令的运行时上下文，便于报告追溯。"""
+
+    return {
+        "command": command_name,
+        "argv": list(sys.argv[1:]),
+        "generated_at": datetime.now().isoformat(timespec="seconds"),
+        "config": config.get_runtime_config_snapshot(),
+    }
+
+
+def normalize_names_mapping(raw_value: object) -> Dict[int, str]:
+    """把 dataset.yaml 中的 `names` 字段规范化为 `Dict[int, str]`。"""
+
+    if isinstance(raw_value, dict):
+        items = raw_value.items()
+    elif isinstance(raw_value, list):
+        items = enumerate(raw_value)
+    else:
+        return {}
+
+    names: Dict[int, str] = {}
+    for raw_key, raw_name in items:
+        try:
+            class_id = int(raw_key)
+        except (TypeError, ValueError):
+            continue
+        names[class_id] = str(raw_name)
+    return dict(sorted(names.items()))
+
+
 def resolve_mode(mode: str, person_model_path: Optional[Path]) -> str:
     """根据用户输入和人物模型可用性，解析最终 prepare 模式。
 
@@ -300,6 +346,32 @@ def load_dataset_config(dataset_yaml: Path) -> Dict[str, object]:
     return payload
 
 
+def resolve_dataset_base_path(
+    dataset_yaml: Path,
+    config_payload: Optional[Dict[str, object]] = None,
+) -> Path:
+    """解析 `dataset.yaml` 中的基础数据根目录。"""
+
+    dataset_yaml = dataset_yaml.expanduser().resolve()
+    payload = config_payload or load_dataset_config(dataset_yaml)
+    base_path_value = payload.get("path")
+    if not base_path_value:
+        return dataset_yaml.parent
+
+    base_path = Path(str(base_path_value))
+    if base_path.is_absolute():
+        return base_path
+
+    candidate_paths = [
+        (dataset_yaml.parent / base_path).resolve(),
+        base_path.expanduser().resolve(),
+    ]
+    return next(
+        (candidate for candidate in candidate_paths if candidate.exists()),
+        candidate_paths[0],
+    )
+
+
 def resolve_dataset_split_paths(dataset_yaml: Path) -> Dict[str, Optional[Path]]:
     """把 `dataset.yaml` 里的 train/val/test 条目解析成绝对路径。
 
@@ -311,21 +383,7 @@ def resolve_dataset_split_paths(dataset_yaml: Path) -> Dict[str, Optional[Path]]
 
     dataset_yaml = dataset_yaml.expanduser().resolve()
     config_payload = load_dataset_config(dataset_yaml)
-    base_path_value = config_payload.get("path")
-    if base_path_value:
-        base_path = Path(str(base_path_value))
-        if not base_path.is_absolute():
-            candidate_paths = [
-                (dataset_yaml.parent / base_path).resolve(),
-                base_path.expanduser().resolve(),
-            ]
-            # 优先选真实存在的候选路径，尽量兼容历史生成的 dataset.yaml。
-            base_path = next(
-                (candidate for candidate in candidate_paths if candidate.exists()),
-                candidate_paths[0],
-            )
-    else:
-        base_path = dataset_yaml.parent
+    base_path = resolve_dataset_base_path(dataset_yaml, config_payload)
 
     split_paths: Dict[str, Optional[Path]] = {}
     for split_name in ("train", "val", "test"):
@@ -371,6 +429,26 @@ def collect_dataset_split_counts(dataset_yaml: Path) -> Dict[str, int]:
     return {
         split_name: count_dataset_images(split_path)
         for split_name, split_path in split_paths.items()
+    }
+
+
+def collect_dataset_metadata(dataset_yaml: Path) -> Dict[str, object]:
+    """汇总与训练/评估直接相关的数据集元信息。"""
+
+    config_payload = load_dataset_config(dataset_yaml)
+    class_names = normalize_names_mapping(config_payload.get("names", {}))
+    prepare_report_path = dataset_yaml.parent / "prepare_report.json"
+    prepare_report = load_report_dict(prepare_report_path) if prepare_report_path.exists() else None
+    prepare_payload = prepare_report.get("prepare", {}) if isinstance(prepare_report, dict) else {}
+    return {
+        "dataset_yaml": str(dataset_yaml),
+        "dataset_root": str(resolve_dataset_base_path(dataset_yaml, config_payload)),
+        "class_names": class_names,
+        "class_count": len(class_names),
+        "split_image_counts": collect_dataset_split_counts(dataset_yaml),
+        "prepare_report_path": str(prepare_report_path) if prepare_report_path.exists() else None,
+        "prepare_mode": prepare_payload.get("mode"),
+        "prepare_split_strategy": prepare_payload.get("split_strategy"),
     }
 
 
@@ -439,9 +517,48 @@ def ensure_prepared_dataset(args) -> Tuple[AuditResult, PrepareResult]:
 
     # 把“原始审计 + prepare 输出”合并写入一个报告，方便后续追溯。
     prepare_payload = {
+        "runtime": build_runtime_context("prepare"),
+        "prepare_request": {
+            "requested_mode": getattr(args, "mode", None),
+            "resolved_mode": mode,
+            "split_strategy": split_strategy,
+            "output_root": str(output_root),
+            "limit_per_sequence": getattr(args, "limit_per_sequence", None),
+            "person_model": str(person_model_path) if person_model_path else None,
+            "person_conf": getattr(args, "person_conf", config.DEFAULT_PERSON_CONF),
+            "person_imgsz": getattr(args, "person_imgsz", config.DEFAULT_PERSON_IMGSZ),
+            "assignment_min_ioa": getattr(
+                args,
+                "assignment_min_ioa",
+                config.DEFAULT_ASSIGNMENT_MIN_IOA,
+            ),
+            "monitored_person_labels": list(
+                getattr(
+                    args,
+                    "monitored_person_labels",
+                    list(config.DEFAULT_MONITORED_PERSON_LABELS),
+                )
+            ),
+            "include_empty_person_crops": getattr(
+                args,
+                "include_empty_person_crops",
+                config.DEFAULT_INCLUDE_EMPTY_PERSON_CROPS,
+            ),
+            "fallback_to_fullframe": getattr(
+                args,
+                "fallback_to_fullframe",
+                config.DEFAULT_FALLBACK_TO_FULLFRAME,
+            ),
+        },
         "audit": audit_result.to_report_dict(),
         "prepare": prepare_result.to_report_dict(),
         "resolved_person_model": str(person_model_path) if person_model_path else None,
+        "project_fit": {
+            "pipeline_target": "person -> crop -> clothes",
+            "person_model_available": person_model_path is not None,
+            "personcrop_active": mode == "personcrop",
+            "class_names": {str(class_id): name for class_id, name in config.CLASS_NAMES.items()},
+        },
     }
     write_json(prepare_result.report_path, prepare_payload)
     return audit_result, prepare_result
@@ -483,10 +600,11 @@ def print_prepare_summary(prepare_result: PrepareResult) -> None:
     print("无 person 检出图片 : {0}".format(prepare_result.images_without_person_detection))
     for split_name in ("train", "val", "test"):
         print(
-            "  - {0}: images={1}, labels={2}".format(
+            "  - {0}: images={1}, labels={2}, boxes={3}".format(
                 split_name,
                 prepare_result.split_image_counts.get(split_name, 0),
                 prepare_result.split_label_counts.get(split_name, 0),
+                prepare_result.split_box_counts.get(split_name, 0),
             )
         )
 
@@ -620,7 +738,8 @@ def train_model(args) -> Dict[str, object]:
     from ultralytics import YOLO
 
     dataset_yaml = resolve_dataset_yaml(args)
-    split_counts = collect_dataset_split_counts(dataset_yaml)
+    dataset_metadata = collect_dataset_metadata(dataset_yaml)
+    split_counts = dataset_metadata["split_image_counts"]
     if split_counts.get("train", 0) <= 0:
         raise DatasetToolError("训练集为空，无法启动训练: {0}".format(dataset_yaml))
     if split_counts.get("val", 0) <= 0:
@@ -667,6 +786,11 @@ def train_model(args) -> Dict[str, object]:
             "如果你想直接微调预训练 checkpoint，请改用 `--base-model xxx.pt`。"
         )
     use_pretrained = is_pretrained_model_spec(model_spec)
+    single_cls = (
+        dataset_metadata["class_count"] <= 1
+        if dataset_metadata["class_count"]
+        else len(config.CLASS_NAMES) <= 1
+    )
     requested_run_name = resolve_run_name(getattr(args, "name", None), "workwear")
     run_project = resolve_output_root(getattr(args, "project", None), config.RUNS_ROOT)
 
@@ -688,7 +812,7 @@ def train_model(args) -> Dict[str, object]:
         pretrained=use_pretrained,
         seed=args.seed,
         deterministic=True,
-        single_cls=True,
+        single_cls=single_cls,
         verbose=False,
     )
 
@@ -707,7 +831,9 @@ def train_model(args) -> Dict[str, object]:
         raise DatasetToolError("训练完成后未找到 best.pt: {0}".format(best_weight))
 
     summary = {
+        "runtime": build_runtime_context("train"),
         "dataset_yaml": str(dataset_yaml),
+        "dataset_metadata": dataset_metadata,
         "base_model": model_spec,
         "base_model_source": base_model_source,
         "allow_remote_model_download": allow_remote_download,
@@ -729,6 +855,7 @@ def train_model(args) -> Dict[str, object]:
         "workers": args.workers,
         "device": args.device,
         "seed": args.seed,
+        "single_cls": single_cls,
     }
     report_path = config.REPORTS_ROOT / "{0}_train.json".format(actual_run_name)
     summary["report_path"] = str(report_path)
@@ -751,7 +878,8 @@ def evaluate_model(args) -> Dict[str, object]:
         getattr(args, "weights", None)
     )
     dataset_yaml = resolve_dataset_yaml(args)
-    split_counts = collect_dataset_split_counts(dataset_yaml)
+    dataset_metadata = collect_dataset_metadata(dataset_yaml)
+    split_counts = dataset_metadata["split_image_counts"]
     model = YOLO(str(weight_path))
     # 对于极小 smoke 数据集，`test` 可能为空；这里只评估非空 split。
     evaluation_splits = [
@@ -766,13 +894,14 @@ def evaluate_model(args) -> Dict[str, object]:
         )
 
     summary = {
+        "runtime": build_runtime_context("evaluate"),
         "weights": str(weight_path),
         "weights_resolution_mode": weights_resolution_mode,
         "weights_report_source": (
             str(weights_report_source) if weights_report_source is not None else None
         ),
         "dataset_yaml": str(dataset_yaml),
-        "split_image_counts": split_counts,
+        "dataset_metadata": dataset_metadata,
         "evaluated_splits": evaluation_splits,
         "skipped_splits": skipped_splits,
         "native_eval": {},
@@ -837,6 +966,7 @@ def export_model(args) -> Dict[str, object]:
     safe_copy(weight_path, export_target, overwrite=args.overwrite)
 
     summary = {
+        "runtime": build_runtime_context("export"),
         "source_weight": str(weight_path),
         "weights_resolution_mode": weights_resolution_mode,
         "weights_report_source": (
@@ -851,6 +981,20 @@ def export_model(args) -> Dict[str, object]:
         config.INSPECTION_WEIGHTS_ROOT.mkdir(parents=True, exist_ok=True)
         safe_copy(weight_path, config.INSPECTION_WORKWEAR_TARGET, overwrite=args.overwrite)
         summary["deployed_target"] = str(config.INSPECTION_WORKWEAR_TARGET)
+
+    metadata_path = export_root / "workwear_detect_yolov8.metadata.json"
+    export_metadata = {
+        "runtime": build_runtime_context("export_metadata"),
+        "source_weight": str(weight_path),
+        "weights_resolution_mode": weights_resolution_mode,
+        "weights_report_source": (
+            str(weights_report_source) if weights_report_source is not None else None
+        ),
+        "export_target": str(export_target),
+        "deployed_target": summary["deployed_target"],
+    }
+    write_json(metadata_path, export_metadata)
+    summary["metadata_path"] = str(metadata_path)
 
     report_name = "{0}_export.json".format(weight_path.parent.parent.name)
     write_json(config.REPORTS_ROOT / report_name, summary)
@@ -947,6 +1091,11 @@ def run_inspection_validation(
     aggregate_tp = 0
     aggregate_fp = 0
     aggregate_fn = 0
+    clothes_class_id = config.resolve_class_id_by_name("clothes")
+    if clothes_class_id is None:
+        raise DatasetToolError(
+            "当前 backend-train-model 配置中未找到 `clothes` 类别，无法执行 inspection-flask clothes-only 复核。"
+        )
 
     with temporary_inspection_weights(
         workwear_weight=weights_path,
@@ -966,7 +1115,7 @@ def run_inspection_validation(
                 "--gt-mode",
                 "clothes-only",
                 "--clothes-cls",
-                "0",
+                str(clothes_class_id),
             ]
             completed = subprocess.run(
                 command,
@@ -1050,7 +1199,13 @@ def cmd_audit(args) -> int:
 
     audit_result = run_audit(limit_per_sequence=None)
     print_audit_summary(audit_result)
-    write_json(config.REPORTS_ROOT / "dataset_audit.json", audit_result.to_report_dict())
+    write_json(
+        config.REPORTS_ROOT / "dataset_audit.json",
+        {
+            "runtime": build_runtime_context("audit"),
+            "audit": audit_result.to_report_dict(),
+        },
+    )
     return 0
 
 
@@ -1115,6 +1270,7 @@ def cmd_export(args) -> int:
     print("导出文件 : {0}".format(summary["export_target"]))
     if summary["deployed_target"]:
         print("部署文件 : {0}".format(summary["deployed_target"]))
+    print("元数据   : {0}".format(summary["metadata_path"]))
     return 0
 
 
@@ -1149,6 +1305,7 @@ def cmd_all(args) -> int:
 
     # 把四个阶段的结果合并成一个总报告，便于一次回看全链路。
     final_summary = {
+        "runtime": build_runtime_context("all"),
         "prepare": prepare_result.to_report_dict(),
         "train": train_summary,
         "evaluate": evaluate_summary,
@@ -1160,18 +1317,30 @@ def cmd_all(args) -> int:
     return 0
 
 
+def add_global_args(parser: argparse.ArgumentParser) -> None:
+    """挂载所有命令共用的全局参数。"""
+
+    parser.add_argument(
+        "--project-config",
+        help="项目化 JSON 配置文件；默认尝试读取 backend-train-model/project_config.json。",
+    )
+
+
 def build_parser() -> argparse.ArgumentParser:
     """构建顶层命令行解析器及所有子命令。"""
 
     parser = argparse.ArgumentParser(
         description="YOLOv8 工服检测训练工具链（对齐当前 inspection-flask 两阶段链路）",
     )
+    add_global_args(parser)
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     audit_parser = subparsers.add_parser("audit", help="只做数据审计，不写训练集")
+    add_global_args(audit_parser)
     audit_parser.set_defaults(func=cmd_audit)
 
     prepare_parser = subparsers.add_parser("prepare", help="生成训练数据集")
+    add_global_args(prepare_parser)
     add_prepare_args(prepare_parser)
     prepare_parser.add_argument(
         "--split-strategy",
@@ -1182,6 +1351,7 @@ def build_parser() -> argparse.ArgumentParser:
     prepare_parser.set_defaults(func=cmd_prepare)
 
     train_parser = subparsers.add_parser("train", help="训练 clothes 单类检测器")
+    add_global_args(train_parser)
     add_prepare_args(train_parser)
     add_train_args(train_parser)
     train_parser.add_argument(
@@ -1193,6 +1363,7 @@ def build_parser() -> argparse.ArgumentParser:
     train_parser.set_defaults(func=cmd_train)
 
     evaluate_parser = subparsers.add_parser("evaluate", help="评估已训练权重")
+    add_global_args(evaluate_parser)
     add_prepare_args(evaluate_parser)
     add_eval_args(evaluate_parser)
     evaluate_parser.add_argument(
@@ -1204,10 +1375,12 @@ def build_parser() -> argparse.ArgumentParser:
     evaluate_parser.set_defaults(func=cmd_evaluate)
 
     export_parser = subparsers.add_parser("export", help="导出或部署训练结果")
+    add_global_args(export_parser)
     add_export_args(export_parser)
     export_parser.set_defaults(func=cmd_export)
 
     all_parser = subparsers.add_parser("all", help="串行执行 prepare -> train -> evaluate -> export")
+    add_global_args(all_parser)
     add_prepare_args(all_parser)
     add_all_args(all_parser)
     all_parser.add_argument(
@@ -1233,7 +1406,7 @@ def add_prepare_args(parser: argparse.ArgumentParser) -> None:
         "--mode",
         choices=["auto", "personcrop", "fullframe"],
         default=config.DEFAULT_PREPARE_MODE,
-        help="auto=未显式提供 --person-model 时使用 fullframe；提供后可切到 personcrop。",
+        help="auto=有可用 person 模型时优先 personcrop，否则使用 fullframe。",
     )
     parser.add_argument("--output-root", help="prepare 输出目录。")
     parser.add_argument(
@@ -1427,12 +1600,13 @@ def normalize_args(args) -> None:
 def main() -> int:
     """程序主入口：解析命令行并分发到对应子命令。"""
 
-    parser = build_parser()
-    args = parser.parse_args()
-    normalize_args(args)
     try:
+        bootstrap_project_config()
+        parser = build_parser()
+        args = parser.parse_args()
+        normalize_args(args)
         return int(args.func(args))
-    except DatasetToolError as exc:
+    except (DatasetToolError, config.ConfigError) as exc:
         # 对业务异常统一输出简洁中文提示，避免给用户完整 traceback。
         print("[ERROR] {0}".format(exc))
         return 1
