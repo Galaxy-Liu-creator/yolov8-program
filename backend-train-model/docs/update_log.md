@@ -1,5 +1,97 @@
 # Update Log
 
+## 2026-04-06 backend-train-model merged 数据构建脚本与 All-train-model 训练目录落地
+
+变更来源：
+- 用户要求把前面已经确认的“三套 clothes 数据合并训练方案”真正落地为可执行脚本。
+- 用户新增约束：新脚本放在 `backend-train-model/` 根目录下，且这次 merged 训练的产物尽量统一落到 `backend-train-model/All-train-model/` 下。
+
+变更总览：
+1. 新增 `backend-train-model/build_merged_clothes_dataset.py`，用于把三套 `clothes` 数据按预设 split 构建为标准 YOLO 数据集。
+2. 新增 `backend-train-model/All-train-model/` 下的运行模板文件：
+   - `README.md`
+   - `merged_train_project_config.json`
+   - `merged_clothes_v1.build.json`
+   - `merged_clothes_v2.build.json`
+   - `.gitignore`
+3. 为运行时项目配置新增 `artifacts.root` 配置入口，使 `train_workwear.py` 的默认 `prepared / runs / reports / export` 根目录可以整体切到 `All-train-model/artifacts/`。
+4. merged 构建脚本当前固定服务于单类 `clothes` 总数据集建设，支持：
+   - `merged_v1_positive_only`：只纳入当前已有同名标注的样本
+   - `merged_v2_full_reviewed`：对缺标样本从 review 目录读取补标结果后再构建
+5. merged 构建脚本会输出：
+   - `dataset.yaml`
+   - `manifest.csv`
+   - `build_report.json`
+   - `missing_review.csv`
+
+涉及文件：
+- `backend-train-model/config.py`
+- `backend-train-model/build_merged_clothes_dataset.py`
+- `backend-train-model/All-train-model/.gitignore`
+- `backend-train-model/All-train-model/README.md`
+- `backend-train-model/All-train-model/merged_train_project_config.json`
+- `backend-train-model/All-train-model/merged_clothes_v1.build.json`
+- `backend-train-model/All-train-model/merged_clothes_v2.build.json`
+- `backend-train-model/docs/update_log.md`
+
+新增 / 变更配置项：
+- `artifacts.root`
+  - 放在项目化 JSON 配置文件里
+  - 用于整体覆盖默认产物根目录
+  - 派生影响：
+    - `prepared_root`
+    - `runs_root`
+    - `reports_root`
+    - `export_root`
+- `backend-train-model/All-train-model/merged_train_project_config.json`
+  - 当前把运行产物统一切到 `backend-train-model/All-train-model/artifacts/`
+
+兼容性注意：
+- 旧的 `backend-train-model/project_config.json` 不受影响；如果不传新的 project config，现有默认产物目录仍然是 `backend-train-model/artifacts/`。
+- 新增的 merged 构建脚本不会自动并入 `train_workwear.py` 主 CLI，仍然保持“先构建数据集，再用 `--dataset-yaml` 训练”的方式，避免直接改乱现有训练主流程。
+- `All-train-model/.gitignore` 默认忽略 `datasets/`、`review/`、`artifacts/` 下的运行期产物，避免把大体量训练数据与模型产物误纳入版本控制。
+
+不改动说明：
+- 本轮不修改 `backend-train-model/train_workwear.py` 的训练、评估、导出主流程。
+- 本轮不修改 `backend-train-model/dataset_tools.py` 的既有 `audit/prepare` 逻辑。
+- 本轮不修改 `inspection-flask/` 下任何代码。
+- 本轮仍然维持当前默认单类 `clothes` 训练口径，不把 `person`、`auto`、`personcrop` 强行并入 merged 基线阶段。
+
+## 2026-04-06 backend-train-model 三套数据合并方案文档新增
+
+变更来源：
+- 用户要求：把“三套数据合并成一个总数据集的稳妥方案”整理成正式文档，并放到 `backend-train-model/docs/` 下。
+- 范围明确：本轮采用“写文档”的方式落地，同时要求文档中包含前面口头方案里的目录规范和 `manifest` 设计。
+
+变更总览：
+1. 新增 `backend-train-model/docs/merged_dataset_plan.md`，系统说明三套 `clothes` 数据合并成总数据集的推荐路线。
+2. 在新文档中明确说明：
+   - 为什么不推荐直接采用 A -> B -> C 串行继续训练作为正式主路线
+   - 为什么更推荐“先合并数据，再统一训练总模型”
+3. 在新文档中补充了方案一的具体内容：
+   - merged 数据集目录规范
+   - `canonical / manifest / prepared` 三层结构职责
+   - `samples.csv / source_stats.json / class_mapping.json / split_summary.json` 的设计建议
+4. 在新文档中补充了合并前必须完成的数据清洗、按序列切分策略、以及 `merged_v1_all` 与 `merged_v1_balanced` 双版本方案。
+5. 在新文档中给出了基于 merged 数据集的训练建议，明确当前阶段更推荐用 `--dataset-yaml` 直接训练，而不是先修改主训练代码。
+
+涉及文件：
+- `backend-train-model/docs/merged_dataset_plan.md`
+- `backend-train-model/docs/update_log.md`
+
+新增 / 变更配置项：
+- 无。
+- 本轮只新增合并方案文档，不修改 `project_config.json`、`config.py`、训练 CLI 和默认参数。
+
+兼容性注意：
+- 本轮属于纯文档增量，不影响现有训练命令行为。
+- 新文档描述的是当前推荐的 merged 数据建设方案，不代表仓库已经自动具备“三套数据自动合并脚本”；如果后续决定把合并流程工具化，仍需再单独补代码。
+
+不改动说明：
+- 本轮不修改 `backend-train-model/config.py`、`backend-train-model/dataset_tools.py`、`backend-train-model/train_workwear.py`。
+- 本轮不修改 `inspection-flask/` 下任何代码。
+- 本轮不改变当前默认单类 `clothes` 训练口径，也不把 merged 流程直接并入现有主训练流程。
+
 ## 2026-04-05 backend-train-model 运行方法文档新增
 
 变更来源：

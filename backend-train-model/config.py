@@ -45,6 +45,22 @@ REPORTS_ROOT = ARTIFACTS_ROOT / "reports"
 # 最终导出权重目录。
 EXPORT_ROOT = ARTIFACTS_ROOT / "export"
 
+
+def _set_artifacts_root(root: Union[str, Path]) -> None:
+    """统一更新训练产物根目录及其派生子目录。"""
+
+    global ARTIFACTS_ROOT
+    global PREPARED_ROOT
+    global RUNS_ROOT
+    global REPORTS_ROOT
+    global EXPORT_ROOT
+
+    ARTIFACTS_ROOT = Path(root)
+    PREPARED_ROOT = ARTIFACTS_ROOT / "prepared"
+    RUNS_ROOT = ARTIFACTS_ROOT / "runs"
+    REPORTS_ROOT = ARTIFACTS_ROOT / "reports"
+    EXPORT_ROOT = ARTIFACTS_ROOT / "export"
+
 # `inspection-flask` 项目位置及其关键文件位置。
 INSPECTION_ROOT = PROJECT_ROOT / "inspection-flask"
 INSPECTION_MAIN = INSPECTION_ROOT / "main.py"
@@ -151,6 +167,7 @@ DEFAULT_TRAIN_ARGS = {
 }
 
 _CODE_DEFAULTS = {
+    "ARTIFACTS_ROOT": ARTIFACTS_ROOT,
     "IMAGE_ROOTS": list(IMAGE_ROOTS),
     "LABEL_ROOT": LABEL_ROOT,
     "IMAGE_EXTENSIONS": tuple(IMAGE_EXTENSIONS),
@@ -188,6 +205,11 @@ def _clone_path_list(paths: Sequence[Path]) -> list[Path]:
 def reset_runtime_config() -> None:
     """把运行时配置重置回代码内置默认值。"""
 
+    global ARTIFACTS_ROOT
+    global PREPARED_ROOT
+    global RUNS_ROOT
+    global REPORTS_ROOT
+    global EXPORT_ROOT
     global IMAGE_ROOTS
     global LABEL_ROOT
     global IMAGE_EXTENSIONS
@@ -209,6 +231,7 @@ def reset_runtime_config() -> None:
     global DEFAULT_TRAIN_ARGS
     global ACTIVE_PROJECT_CONFIG_PATH
 
+    _set_artifacts_root(Path(_CODE_DEFAULTS["ARTIFACTS_ROOT"]))
     IMAGE_ROOTS = _clone_path_list(_CODE_DEFAULTS["IMAGE_ROOTS"])
     LABEL_ROOT = Path(_CODE_DEFAULTS["LABEL_ROOT"])
     IMAGE_EXTENSIONS = tuple(_CODE_DEFAULTS["IMAGE_EXTENSIONS"])
@@ -259,6 +282,15 @@ def _coerce_path_list(values: Sequence[object], base_dir: Path, field_name: str)
     if not paths:
         raise ConfigError("{0} 不能为空。".format(field_name))
     return paths
+
+
+def _coerce_single_path(value: object, base_dir: Path, field_name: str) -> Path:
+    """把单一路径配置标准化为 `Path`。"""
+
+    text = str(value).strip()
+    if not text:
+        raise ConfigError("{0} 不能为空。".format(field_name))
+    return _resolve_config_path(text, base_dir)
 
 
 def _coerce_string_list(values: Sequence[object], field_name: str) -> list[str]:
@@ -380,6 +412,11 @@ def apply_project_config(
     - 如果显式传入路径但文件不存在，则抛出 `ConfigError`。
     """
 
+    global ARTIFACTS_ROOT
+    global PREPARED_ROOT
+    global RUNS_ROOT
+    global REPORTS_ROOT
+    global EXPORT_ROOT
     global IMAGE_ROOTS
     global LABEL_ROOT
     global IMAGE_EXTENSIONS
@@ -416,6 +453,19 @@ def apply_project_config(
 
     payload = _load_project_config_payload(resolved_path)
     config_dir = resolved_path.parent
+
+    artifacts_section = payload.get("artifacts")
+    if artifacts_section is not None:
+        if not isinstance(artifacts_section, Mapping):
+            raise ConfigError("artifacts 段必须是对象。")
+        if "root" in artifacts_section:
+            _set_artifacts_root(
+                _coerce_single_path(
+                    artifacts_section["root"],
+                    config_dir,
+                    "artifacts.root",
+                )
+            )
 
     data_section = payload.get("data")
     if data_section is not None:
