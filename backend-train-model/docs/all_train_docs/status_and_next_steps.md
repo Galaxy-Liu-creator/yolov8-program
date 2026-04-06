@@ -383,7 +383,7 @@ D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\train_workwea
 
 - `backend-train-model/backend-train-model/All-train-model/...`
 
-所以当前最稳妥的规避方法就是：
+所以当前最稳妥的规避方法就是
 
 - 先 `Set-Location .\backend-train-model`
 - 再执行文档里的短路径命令
