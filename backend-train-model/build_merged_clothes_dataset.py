@@ -411,7 +411,7 @@ def ensure_output_root(output_root: Path, overwrite: bool) -> None:
 def write_dataset_yaml(output_root: Path, class_names: Mapping[int, str]) -> Path:
     dataset_yaml = output_root / "dataset.yaml"
     lines = [
-        "path: .",
+        "path: {0}".format(output_root.as_posix()),
         "train: images/train",
         "val: images/val",
         "test: images/test",

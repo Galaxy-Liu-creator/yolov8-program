@@ -1,4 +1,5 @@
 inspection-flask_old/
 backend-train-model/weights/yolov8n.pt
 docs/工服检测预定方案/
-backend-train-model/First-train/
+backend-train-model/first-train/
+__pycache__/

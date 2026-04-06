@@ -1,5 +1,75 @@
 # Update Log
 
+## 2026-04-06 merged dataset.yaml 路径修复，解决 All-train-model 训练找不到 images 目录
+
+变更来源：
+- 用户在 `backend-train-model/` 目录下按文档执行 merged 训练命令时，Ultralytics 报错找不到 `images/val`。
+- 需要区分是命令问题、工作目录问题，还是 `dataset.yaml` 本身写法存在兼容性缺陷。
+
+变更总览：
+1. 修复 `backend-train-model/build_merged_clothes_dataset.py` 生成 `dataset.yaml` 时的 `path` 字段写法。
+2. 将 merged builder 生成的 `path: .` 改为数据集根目录的绝对路径，避免 Ultralytics 把 `images/train|val|test` 错误解析到当前工作目录下。
+3. 同步修正现有 `backend-train-model/All-train-model/datasets/merged_clothes_v1_positive_only/dataset.yaml`，让当前这份 `merged_v1` 数据集无需重建即可继续训练。
+
+涉及文件：
+- `backend-train-model/build_merged_clothes_dataset.py`
+- `backend-train-model/All-train-model/datasets/merged_clothes_v1_positive_only/dataset.yaml`
+- `backend-train-model/docs/update_log.md`
+
+新增 / 变更配置项：
+- 无。
+- 本轮只修复 merged `dataset.yaml` 的 `path` 输出内容，不修改训练参数、项目配置或 CLI 参数定义。
+
+兼容性注意：
+- `backend-train-model/dataset_tools.py` 原有 `prepare` 流程生成的 `dataset.yaml` 本来就写的是绝对路径，本轮问题只存在于 merged 数据构建脚本。
+- 修复后，新生成的 merged `dataset.yaml` 会显式指向真实数据集根目录，不再依赖运行命令时的当前工作目录。
+- 现有 `merged_v1_positive_only` 已直接修正，可继续使用，无需因为这个问题重新构建整个 merged 数据集。
+
+不改动说明：
+- 本轮不修改 `backend-train-model/train_workwear.py`。
+- 本轮不修改 `inspection-flask/` 下任何代码。
+- 本轮不改动 merged 数据集的图片、标签、split 结果，仅修复 `dataset.yaml` 的路径解析问题。
+
+## 2026-04-06 All-train-model README 路径修正与现状说明文档补充
+
+变更来源：
+- 用户要求“直接补好”当前 `backend-train-model/All-train-model` 的使用说明。
+- 用户进一步要求新增一份文档，明确当前已经完成哪些步骤、接下来该做什么、需要哪些命令，以及每个参数的意义。
+
+变更总览：
+1. 修正 `backend-train-model/All-train-model/README.md` 中 merged 训练流程的推荐命令写法与文档跳转说明。
+2. 在 README 中补充关键注意事项：
+   - 推荐先切到 `backend-train-model/` 目录再执行命令
+   - 不建议对 merged 流程使用 `train_workwear.py all`
+   - `build_report.json` 中保存了可直接复制的绝对路径命令
+   - 当前 `merged_v1` 已构建完成，但 `artifacts/` 尚不存在，因此训练 / 评估 / 导出尚未执行
+3. 新增 `backend-train-model/All-train-model/status_and_next_steps.md`，系统说明：
+   - 当前 `All-train-model` 已完成的步骤
+   - merged 流程与原始 `audit / prepare` 的关系
+   - 当前最稳妥的执行顺序
+   - 每条关键命令的作用与参数意义
+   - `merged_v2` 的后续补标与重建方式
+   - `evaluate --inspection-validate` 与 `export --deploy` 这类后续扩展参数的使用时机
+
+涉及文件：
+- `backend-train-model/All-train-model/README.md`
+- `backend-train-model/All-train-model/status_and_next_steps.md`
+- `backend-train-model/docs/update_log.md`
+
+新增 / 变更配置项：
+- 无。
+- 本轮只修正文档与命令说明，不修改 `config.py`、`train_workwear.py`、`build_merged_clothes_dataset.py` 的实际行为。
+
+兼容性注意：
+- 本轮不改变任何 CLI 参数定义和默认值。
+- 本轮主要修正“如何安全传入 `--project-config`”的文档描述，避免用户在仓库根目录直接执行时踩到相对路径解析问题。
+- 本轮明确标注：merged 数据集训练不建议使用 `train_workwear.py all`，而应走 `train -> evaluate -> export` 的分步方式。
+
+不改动说明：
+- 本轮不修改 `backend-train-model/config.py`、`backend-train-model/train_workwear.py`、`backend-train-model/build_merged_clothes_dataset.py`。
+- 本轮不修改 merged 数据集内容，不重新构建 `merged_v1` 或 `merged_v2`。
+- 本轮不修改 `inspection-flask/` 下任何代码。
+
 ## 2026-04-06 backend-train-model merged 数据构建脚本与 All-train-model 训练目录落地
 
 变更来源：
