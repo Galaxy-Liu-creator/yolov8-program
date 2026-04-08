@@ -1,5 +1,105 @@
 # Update Log
 
+## 2026-04-06 all_train_docs 新增 run_method，明确 merged_v2 当前推荐训练方式
+
+变更来源：
+- 用户在 `merged_v2_full_reviewed` 已构建完成后，进一步追问“训练命令是不是和原来一样”，并指出此前已经明确过“更推荐使用 `first-train` 的 `best.pt` 作为初始化权重”。
+- 用户要求在 `backend-train-model/docs/all_train_docs/` 下新增一份新的 `run_method.md`，把当前 `All-train-model` 的实际运行方式重新梳理清楚。
+
+变更总览：
+1. 新增 `backend-train-model/docs/all_train_docs/run_method.md`。
+2. 在新文档中明确区分了两层含义：
+   - “训练命令框架没有变，仍然是 `train_workwear.py train/evaluate/export`”
+   - “当前更推荐的正式训练方案，是在 `merged_clothes_v2_full_reviewed` 上显式传入 `first-train` 的 `best.pt` 作为 `--base-model`”
+3. 在文档中补充了两套命令：
+   - 方案 A：不显式传 `--base-model`，直接基于默认本地 `yolov8n.pt` 训练 `merged_v2`
+   - 方案 B：显式用 `first-train/artifacts/runs/clothes_fullframe_baseline/weights/best.pt` 初始化后继续训练 `merged_v2`
+4. 在文档中补充了每条命令的作用、关键参数含义、推荐 run 名称、预期输出位置、当前不推荐的做法和最短执行清单。
+
+涉及文件：
+- `backend-train-model/docs/all_train_docs/run_method.md`
+- `backend-train-model/docs/update_log.md`
+
+新增 / 变更配置项：
+- 无。
+- 本轮不修改 `train_workwear.py`、`config.py`、`merged_train_project_config.json` 或任何训练默认参数，仅补充当前推荐运行方式的说明文档。
+
+兼容性注意：
+- 本轮只是把“默认可运行方案”和“当前更推荐方案”区分写清楚，不改变脚本现有行为。
+- 不传 `--base-model` 的旧命令依然可以运行；新增文档只是明确：如果要做当前阶段更正式的 merged 训练，优先建议显式传 `first-train` 的 `best.pt`。
+
+不改动说明：
+- 本轮不重建数据集。
+- 本轮不启动新的训练、评估或导出命令。
+- 本轮不修改 `backend-train-model/All-train-model/` 下已有训练产物。
+
+## 2026-04-06 merged_v2_full_reviewed 负样本空白标签补齐
+
+变更来源：
+- 用户已人工确认 `backend-train-model/All-train-model/review/merged_clothes_v1_positive_only/missing_review.csv` 中列出的 `48` 张缺失源标注图片均不存在需要保留的 `clothes` 目标。
+- 用户要求先检查已复制到 `backend-train-model/All-train-model/review/merged_clothes_v2_full_reviewed/images/` 的图片是否与 `missing_review.csv` 对齐，再批量创建对应的空白 review 标签文件。
+
+变更总览：
+1. 校验 `backend-train-model/All-train-model/review/merged_clothes_v2_full_reviewed/images/` 中的图片文件名与 `missing_review.csv` 的 `merged_stem` 一一对应。
+2. 校验结果为：`expected_count=48`、`actual_count=48`、`missing_count=0`、`extra_count=0`，说明这批 review 图片已全部放对。
+3. 在 `backend-train-model/All-train-model/review/merged_clothes_v2_full_reviewed/labels/` 下批量创建 `48` 个同名空白 `.txt` 文件，作为明确的负样本 review 标签。
+4. 创建完成后再次核对，`labels/` 中的 `.txt` 文件与 `missing_review.csv` 完全对齐，可直接用于后续 `merged_v2_full_reviewed` 构建。
+
+涉及文件：
+- `backend-train-model/All-train-model/review/merged_clothes_v2_full_reviewed/images/`（已由用户预先放入 `48` 张 review 图片，本轮仅完成一致性校验）
+- `backend-train-model/All-train-model/review/merged_clothes_v2_full_reviewed/labels/*.txt`（新增 `48` 个空白负样本标签文件）
+- `backend-train-model/docs/update_log.md`
+
+新增 / 变更配置项：
+- 无。
+- 本轮不修改 `merged_clothes_v2.build.json`、训练参数、数据切分策略或任何训练代码逻辑。
+
+兼容性注意：
+- 这些空白 `.txt` 文件会被 `build_merged_clothes_dataset.py` 识别为 `resolved_negative`，并作为“确认无 `clothes` 目标”的负样本纳入 `merged_v2_full_reviewed`。
+- 空白标签文件名必须继续保持与 `missing_review.csv` 中的 `merged_stem` 完全一致；若后续人工复核发现某张图其实存在 `clothes`，只需把对应空白文件改写为正常 YOLO 标注即可。
+
+不改动说明：
+- 本轮不回写原始 `label_clothes` / `labels` 目录。
+- 本轮不修改 `backend-train-model/All-train-model/review/merged_clothes_v2_full_reviewed/images/` 中的图片内容，仅做文件名和数量校验。
+- 本轮不启动 `merged_v2` 重建、训练、评估或导出命令。
+
+## 2026-04-06 All-train-model 精度提升 TODO 清单补充到 all_train_docs
+
+变更来源：
+- 用户基于 `backend-train-model/docs/all_vs_first_train_review_2026-04-06.md` 的比较结论，要求把“`All-train-model` 还能做哪些改进来提升准确性”整理成一份新的 `todo_list.md`。
+- 目标明确：把前面口头给出的优化方向落成可执行清单，并放入 `backend-train-model/docs/all_train_docs/`。
+
+变更总览：
+1. 新增 `backend-train-model/docs/all_train_docs/todo_list.md`。
+2. 在新文档中把 `All-train-model` 当前最值得做的精度提升动作拆成分阶段 TODO，重点包括：
+   - 先补齐缺标，构建 `merged_v2_full_reviewed`
+   - 重做更合理的 balanced split
+   - 使用 `first-train` 的 `best.pt` 作为 merged 训练初始化权重
+   - 最后再考虑模型规模、输入尺寸和 patience 等训练策略增强
+3. 在新文档中补充了每一阶段的：
+   - 目标
+   - TODO 清单
+   - 推荐命令
+   - 完成标准
+   - 预期收益
+
+涉及文件：
+- `backend-train-model/docs/all_train_docs/todo_list.md`
+- `backend-train-model/docs/update_log.md`
+
+新增 / 变更配置项：
+- 无。
+- 本轮只新增执行清单文档，不修改 `build_merged_clothes_dataset.py`、`train_workwear.py`、`config.py` 或任何训练默认参数。
+
+兼容性注意：
+- 新文档基于当前仓库内已经存在的 `All-train-model`、`first-train` 产物与评审结论整理，不改变现有命令行为。
+- 文档中提到的 `merged_v2_balanced`、`merged_v2_from_first` 属于下一步建议路线，当前仓库尚未自动具备这些新 build config 或训练产物。
+
+不改动说明：
+- 本轮不修改 `backend-train-model/All-train-model/` 下现有数据集内容与训练产物。
+- 本轮不修改 `inspection-flask/` 下任何代码。
+- 本轮不重写已有评审文档，只在其结论基础上新增可执行 TODO。
+
 ## 2026-04-06 merged dataset.yaml 路径修复，解决 All-train-model 训练找不到 images 目录
 
 变更来源：
