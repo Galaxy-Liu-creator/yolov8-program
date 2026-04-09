@@ -423,6 +423,19 @@ D:\Miniconda3_python\envs\yolo_code\python.exe train_workwear.py evaluate --proj
 D:\Miniconda3_python\envs\yolo_code\python.exe train_workwear.py export --project-config All-train-model\merged_train_project_config.json --weights All-train-model\artifacts\runs\clothes_merged_v2_from_first\weights\best.pt --overwrite
 ```
 
+### 10.4 如果训练中断，严格断点续训
+
+```powershell
+cd backend-train-model
+D:\Miniconda3_python\envs\yolo_code\python.exe train_workwear.py train --project-config All-train-model\merged_train_project_config.json --resume All-train-model\artifacts\runs\clothes_merged_v2_from_first\weights\last.pt
+```
+
+补充说明：
+
+- 这会严格沿用 `last.pt` 内保存的训练状态继续跑，不是重新从 `best.pt` 开一轮新微调
+- 如果你当前机器上“最近一次中断训练”就是目标 run，也可以直接写成 `train_workwear.py train --project-config All-train-model\merged_train_project_config.json --resume`
+- 严格断点续训时，不要再同时传 `--base-model`、`--dataset-yaml`、`--name`、`--epochs` 等训练起点参数
+
 ---
 
 ## 11. 一句话结论

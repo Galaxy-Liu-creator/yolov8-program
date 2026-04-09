@@ -1,4 +1,77 @@
-# Update Log
+﻿# Update Log
+
+## 2026-04-09 训练脚本新增严格断点续训 `train --resume`
+
+变更来源：
+- 用户在训练跑到中途后，明确要求支持“严格断点续训”，并强调不能改变现有其他训练逻辑。
+- 当前脚本只有“基于 `.pt` 继续微调”的能力，还没有显式暴露原生 resume 入口，因此需要在保持原有非续训路径不变的前提下，补齐 `train --resume`。
+
+变更总览：
+1. 修改 `backend-train-model/train_workwear.py`，为 `train` 子命令新增 `--resume` 参数。
+2. 新增严格断点续训路径解析逻辑：
+   - `--resume` 不带值时，自动优先从最近训练报告中的 `last_weight` 恢复；
+   - 如果报告不可用，再回退扫描最近的 `weights/last.pt`；
+   - 也支持显式传入某个 `last.pt`。
+3. 在训练入口中新增严格 resume 分支，调用 Ultralytics 原生 `model.train(resume=True)`，从而继续沿用 checkpoint 内保存的训练状态，而不是重新开启一轮新的微调。
+4. 新增 resume 模式下的参数冲突校验，避免与 `--base-model`、`--from-scratch`、`--init-weights`、`--name`、`--project`、`--dataset-yaml`、`--epochs` 等训练起点参数混用，确保“严格断点续训”的语义不被破坏。
+5. 更新 `backend-train-model/docs/README.md`、`backend-train-model/docs/all_train_docs/run_method.md` 与 `backend-train-model/docs/后端训练完成进度.md`，补充新的 resume 用法与当前能力状态。
+
+涉及文件：
+- `backend-train-model/train_workwear.py`
+- `backend-train-model/docs/README.md`
+- `backend-train-model/docs/all_train_docs/run_method.md`
+- `backend-train-model/docs/后端训练完成进度.md`
+- `backend-train-model/docs/update_log.md`
+
+新增 / 变更配置项：
+- 新增训练参数：`train --resume [last.pt]`
+- 本轮不修改默认 `epochs`、`batch`、`imgsz`、`patience`、`device` 等训练默认值。
+
+兼容性注意：
+- 原有 `train`、`evaluate`、`export`、`all` 的非 resume 路径保持不变。
+- 严格断点续训只支持 `last.pt`，不支持把 `best.pt` 当作 resume checkpoint 使用。
+- `train --resume` 当前仅挂载在 `train` 子命令，不扩展到 `all`，避免改变现有一键全流程命令的既有语义。
+
+不改动说明：
+- 本轮不修改数据集构建逻辑。
+- 本轮不改动评估与导出逻辑。
+- 本轮不改变 `first-train`、`All-train-model` 下任何已有训练产物。
+
+## 2026-04-09 新增后端训练完成进度文档，固化当前训练阶段完成度口径
+
+变更来源：
+- 用户要求在 `backend-train-model/docs/` 下新增一份名为 `后端训练完成进度.md` 的进度文档，用于持续记录后端训练“已经完成什么、还需要做什么、下一步做什么”。
+- 用户明确说明后续每次完成部分内容后，都需要继续迭代这份进度文档，因此需要先把当前真实训练状态固化为可持续维护的基线版本。
+
+变更总览：
+1. 新增 `backend-train-model/docs/后端训练完成进度.md`。
+2. 在新文档中按 `P0 ~ P5` 阶段整理当前后端训练完成度，并明确区分：
+   - 已形成真实训练 / 评估 / 导出产物的部分；
+   - 仅完成数据集构建、但尚未形成新模型产物的部分；
+   - 仍未开始或前置条件不足的部分。
+3. 在新文档中固化当前阶段的关键结论：
+   - `first-train` 的 `clothes` `best.pt` 仍是当前更稳的基线；
+   - `All-train-model` 已完成 `merged_v1` 一轮闭环；
+   - `merged_v2_full_reviewed` 已吸收 `48` 张负样本，但尚未产生对应训练 / 评估 / 导出结果；
+   - `person`、`personcrop`、链路级离线复盘与实时摄像头阶段尚未闭环。
+4. 在新文档中加入后续维护要求，约束每次训练进度推进后都要同步更新该进度文档。
+
+涉及文件：
+- `backend-train-model/docs/后端训练完成进度.md`
+- `backend-train-model/docs/update_log.md`
+
+新增 / 变更配置项：
+- 无。
+- 本轮只新增进度文档与更新日志，不修改任何训练脚本、配置文件、默认参数或数据集内容。
+
+兼容性注意：
+- 本轮新增的是“状态汇总文档”，不改变 `train_workwear.py`、`config.py`、`project_config.json`、`All-train-model/` 或 `first-train/` 下任何现有训练产物的行为。
+- 文档中的完成度判断以当前仓库中已存在的真实产物为准；若后续新增了新的权重、评估报告或误报 / 漏报清单，需要同步迭代本文档，避免文档状态落后于真实项目进展。
+
+不改动说明：
+- 本轮不启动新的训练、评估或导出命令。
+- 本轮不重建任何数据集。
+- 本轮不修改 `backend-train-model/weights/` 下的模型文件。
 
 ## 2026-04-06 all_train_docs 新增 run_method，明确 merged_v2 当前推荐训练方式
 
@@ -448,3 +521,5 @@
 8. **代码改动必须同步日志**：只要修改了 `backend-train-model/` 下的代码或配置，就必须在同一轮提交中同步更新本文件。
 9. **优先改配置入口，不要回退到硬编码**：新增路径、默认阈值、候选模型路径时，优先落到 `project_config.json` 或 `config.py` 的统一入口。
 10. **训练报告要可追溯**：涉及 `prepare`、`train`、`evaluate`、`export` 输出结构改动时，要在日志里说明新增字段或新增文件的用途。
+
+

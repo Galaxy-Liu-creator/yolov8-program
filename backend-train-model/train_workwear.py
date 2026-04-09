@@ -37,6 +37,8 @@ if str(SCRIPT_ROOT) not in sys.path:
 import config
 from dataset_tools import AuditResult, DatasetToolError, PrepareResult, audit_dataset, prepare_dataset
 
+AUTO_RESUME_TOKEN = "__AUTO_RESUME__"
+
 
 def write_json(path: Path, data: Dict[str, object]) -> None:
     """把结构化数据写成 UTF-8 JSON 文件。"""
@@ -78,6 +80,13 @@ def build_runtime_context(command_name: str) -> Dict[str, object]:
         "generated_at": datetime.now().isoformat(timespec="seconds"),
         "config": config.get_runtime_config_snapshot(),
     }
+
+
+def cli_flag_present(flag: str) -> bool:
+    """判断命令行中是否显式传入了某个 flag。"""
+
+    normalized = flag.strip()
+    return any(arg == normalized or arg.startswith("{0}=".format(normalized)) for arg in sys.argv[1:])
 
 
 def normalize_names_mapping(raw_value: object) -> Dict[int, str]:
@@ -725,6 +734,93 @@ def resolve_best_weight_path(raw_path: Optional[str]) -> Path:
     return resolve_best_weight_path_and_source(raw_path)[0]
 
 
+def resolve_resume_checkpoint_path_and_source(raw_path: Optional[str]) -> Tuple[Path, str, Optional[Path]]:
+    """解析严格断点续训使用的 `last.pt`，并返回解析来源。"""
+
+    if raw_path and raw_path != AUTO_RESUME_TOKEN:
+        resume_checkpoint = Path(raw_path).expanduser().resolve()
+        if not resume_checkpoint.exists():
+            raise DatasetToolError("断点续训 checkpoint 不存在: {0}".format(resume_checkpoint))
+        if resume_checkpoint.name.lower() != "last.pt":
+            raise DatasetToolError("严格断点续训只支持 `last.pt`，请显式传入上一次训练生成的 `last.pt`。")
+        return resume_checkpoint, "explicit_resume_path", None
+
+    report_candidates = sorted(
+        config.REPORTS_ROOT.glob("*_train.json"),
+        key=lambda path: path.stat().st_mtime,
+        reverse=True,
+    )
+    for report_path in report_candidates:
+        payload = load_report_dict(report_path)
+        if payload is None:
+            continue
+
+        last_weight = resolve_report_path_candidate(payload.get("last_weight"), report_path)
+        if last_weight is not None and last_weight.exists():
+            return last_weight, "latest_train_report", report_path.resolve()
+
+        run_dir = resolve_report_path_candidate(payload.get("run_dir"), report_path)
+        if run_dir is not None:
+            last_weight = (run_dir / "weights" / "last.pt").resolve()
+            if last_weight.exists():
+                return last_weight, "latest_train_report_run_dir", report_path.resolve()
+
+    candidates = sorted(
+        config.RUNS_ROOT.rglob("weights/last.pt"),
+        key=lambda path: path.stat().st_mtime,
+        reverse=True,
+    )
+    if not candidates:
+        raise DatasetToolError(
+            "未找到可用于严格断点续训的 `last.pt`，请先确认已有中断训练的 run，"
+            "或显式传入 `--resume path\\to\\weights\\last.pt`。"
+        )
+    return candidates[0].resolve(), "runs_root_scan", None
+
+
+def validate_resume_train_args() -> None:
+    """校验 `--resume` 模式下不允许同时传入的训练起点参数。"""
+
+    forbidden_flags = [
+        "--dataset-yaml",
+        "--mode",
+        "--output-root",
+        "--limit-per-sequence",
+        "--person-model",
+        "--person-imgsz",
+        "--assignment-min-ioa",
+        "--monitored-person-labels",
+        "--include-empty-person-crops",
+        "--no-fallback-to-fullframe",
+        "--split-strategy",
+        "--base-model",
+        "--project",
+        "--name",
+        "--export-root",
+        "--python-exe",
+        "--imgsz",
+        "--epochs",
+        "--batch",
+        "--patience",
+        "--workers",
+        "--device",
+        "--seed",
+        "--from-scratch",
+        "--init-weights",
+        "--allow-remote-model-download",
+        "--keep-inspection-weights",
+        "--deploy",
+        "--overwrite",
+    ]
+    conflicts = [flag for flag in forbidden_flags if cli_flag_present(flag)]
+    if conflicts:
+        raise DatasetToolError(
+            "`--resume` 会严格沿用 checkpoint 内保存的训练配置，不能与以下参数同时使用: {0}".format(
+                ", ".join(conflicts)
+            )
+        )
+
+
 def train_model(args) -> Dict[str, object]:
     """执行一次完整训练，并返回训练摘要。
 
@@ -736,6 +832,83 @@ def train_model(args) -> Dict[str, object]:
     """
 
     from ultralytics import YOLO
+
+    if getattr(args, "resume", None):
+        validate_resume_train_args()
+        resume_checkpoint, resume_source, resume_report_source = resolve_resume_checkpoint_path_and_source(
+            getattr(args, "resume", None)
+        )
+        model = YOLO(str(resume_checkpoint))
+        model.train(resume=True)
+
+        trainer = getattr(model, "trainer", None)
+        trainer_save_dir = getattr(trainer, "save_dir", None)
+        run_dir = (
+            Path(trainer_save_dir).resolve()
+            if trainer_save_dir
+            else resume_checkpoint.parent.parent.resolve()
+        )
+        actual_run_name = run_dir.name
+        best_weight = run_dir / "weights" / "best.pt"
+        last_weight = run_dir / "weights" / "last.pt"
+        if not best_weight.exists():
+            raise DatasetToolError("断点续训完成后未找到 best.pt: {0}".format(best_weight))
+
+        trainer_args = getattr(trainer, "args", None)
+        trainer_data = getattr(trainer_args, "data", None) if trainer_args is not None else None
+        dataset_yaml = (
+            Path(str(trainer_data)).expanduser().resolve()
+            if trainer_data
+            else None
+        )
+        dataset_metadata = (
+            collect_dataset_metadata(dataset_yaml)
+            if dataset_yaml is not None and dataset_yaml.exists()
+            else {}
+        )
+        single_cls = (
+            dataset_metadata["class_count"] <= 1
+            if dataset_metadata and dataset_metadata.get("class_count")
+            else len(config.CLASS_NAMES) <= 1
+        )
+
+        summary = {
+            "runtime": build_runtime_context("train"),
+            "dataset_yaml": str(dataset_yaml) if dataset_yaml is not None else None,
+            "dataset_metadata": dataset_metadata,
+            "base_model": str(resume_checkpoint),
+            "base_model_source": "resume_checkpoint",
+            "allow_remote_model_download": False,
+            "from_scratch": False,
+            "pretrained": True,
+            "init_weights": None,
+            "init_weights_source": None,
+            "resume": True,
+            "resume_checkpoint": str(resume_checkpoint),
+            "resume_source": resume_source,
+            "resume_report_source": (
+                str(resume_report_source) if resume_report_source is not None else None
+            ),
+            "run_project": str(run_dir.parent),
+            "requested_run_name": actual_run_name,
+            "actual_run_name": actual_run_name,
+            "run_name": actual_run_name,
+            "run_dir": str(run_dir),
+            "best_weight": str(best_weight),
+            "last_weight": str(last_weight) if last_weight.exists() else None,
+            "imgsz": getattr(trainer_args, "imgsz", None) if trainer_args is not None else None,
+            "epochs": getattr(trainer_args, "epochs", None) if trainer_args is not None else None,
+            "batch": getattr(trainer_args, "batch", None) if trainer_args is not None else None,
+            "patience": getattr(trainer_args, "patience", None) if trainer_args is not None else None,
+            "workers": getattr(trainer_args, "workers", None) if trainer_args is not None else None,
+            "device": getattr(trainer_args, "device", None) if trainer_args is not None else None,
+            "seed": getattr(trainer_args, "seed", None) if trainer_args is not None else None,
+            "single_cls": single_cls,
+        }
+        report_path = config.REPORTS_ROOT / "{0}_train.json".format(actual_run_name)
+        summary["report_path"] = str(report_path)
+        write_json(report_path, summary)
+        return summary
 
     dataset_yaml = resolve_dataset_yaml(args)
     dataset_metadata = collect_dataset_metadata(dataset_yaml)
@@ -1464,6 +1637,12 @@ def add_train_args(parser: argparse.ArgumentParser) -> None:
     """挂载训练阶段专用参数。"""
 
     parser.add_argument("--dataset-yaml", help="显式指定 dataset.yaml。")
+    parser.add_argument(
+        "--resume",
+        nargs="?",
+        const=AUTO_RESUME_TOKEN,
+        help="严格断点续训；不带值时自动续训最近一次训练的 `last.pt`，也可显式传入某个 `last.pt`。",
+    )
     parser.add_argument(
         "--base-model",
         help="训练模型结构或预训练权重，例如 yolov8n.yaml（从零训练）或自有 .pt。",

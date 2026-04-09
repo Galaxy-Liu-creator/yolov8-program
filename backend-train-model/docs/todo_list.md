@@ -58,12 +58,12 @@
 
 ### 1.3 待办项
 
-- [ ] 确认 `docs/dataset.md` 与真实数据路径仍一致
-- [ ] 保持当前 `clothes` 标签体系不变，不急着混入 `person`
-- [ ] 先跑一次 `audit`，确认数据质量
-- [ ] 跑一次 `fullframe` baseline 训练
-- [ ] 跑一次 baseline 评估
-- [ ] 导出 baseline 权重和报告
+- [X] 确认 `docs/dataset.md` 与真实数据路径仍一致
+- [X] 保持当前 `clothes` 标签体系不变，不急着混入 `person`
+- [X] 先跑一次 `audit`，确认数据质量
+- [X] 跑一次 `fullframe` baseline 训练
+- [X] 跑一次 baseline 评估
+- [X] 导出 baseline 权重和报告
 - [ ] 单独整理一份 baseline 误报 / 漏报样本清单
 
 ### 1.4 推荐命令
@@ -470,4 +470,3 @@ D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\train_workwea
 如果要把整份清单压缩成一句话，那就是：
 
 > **先把 `clothes` 训练做成稳定 baseline，再独立补齐 `person` 数据并训练 `person` 模型，随后用两模型加规则层搭建完整链路；在没有实时视频接入时，优先完成离线链路回放，而不是一开始就试图训练一个吃掉全部业务逻辑的大模型。**
-

@@ -287,6 +287,27 @@ D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\train_workwea
 D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\train_workwear.py train --epochs 120 --batch 2 --imgsz 640
 ```
 
+### 7.1 严格断点续训
+
+如果训练中途被你手动终止，或因为环境原因中断，现在可以直接基于上一次 run 的 `last.pt` 做**严格断点续训**：
+
+```powershell
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\train_workwear.py train --resume
+```
+
+如果你想显式指定某一次 run 的 checkpoint，也可以直接传入对应的 `last.pt`：
+
+```powershell
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\train_workwear.py train --resume path\to\weights\last.pt
+```
+
+补充说明：
+
+- `--resume` 不带值时，会自动尝试续训最近一次训练留下的 `last.pt`
+- 严格断点续训只支持 `last.pt`，不支持拿 `best.pt` 伪装成断点续训
+- `--resume` 会严格沿用 checkpoint 内保存的训练状态，不应再同时传 `--base-model`、`--from-scratch`、`--init-weights`、`--name`、`--project`、`--dataset-yaml`、`--epochs` 等训练起点参数
+- 当前严格断点续训入口是 `train` 子命令
+
 ### 8. 评估模型
 
 ```powershell
