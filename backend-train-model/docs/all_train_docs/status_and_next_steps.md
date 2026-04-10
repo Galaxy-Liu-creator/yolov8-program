@@ -12,19 +12,19 @@
 
 - 三套 `clothes` 数据的合并配置已经落地
 - merged 数据集构建脚本已经落地
-- `merged_v1_positive_only` 已经成功构建
-- 缺标清单已经导出，方便后续补标做 `merged_v2`
+- `merged_v1_positive_only` 已经成功构建，并完成过一轮 `train / evaluate / export`
+- `merged_v2_full_reviewed` 已经吸收 48 张 review 空标签样本并成功构建
+- `clothes_merged_v2_from_first` 已经完成至少一轮训练、评估与导出；该 run 的真实历史是先用 `first-train` 的 `best.pt` 启动，后因中断再通过 `last.pt` resume
 - merged 训练专用的产物目录切换方案已经落地
 
 当前 `All-train-model/` 还没完成的是：
 
-- merged 总模型正式训练
-- merged 总模型评估
-- merged 总模型导出
-- 缺标图片的人工复核与补标
-- `merged_v2_full_reviewed` 的重建与再训练
+- 证明 `merged_v2_from_first` 能稳定优于 `first-train`
+- 建立统一 holdout / 分源评估口径，减少 `first-train` 与 merged 路线比较时的 split 噪声
+- 复核 48 张 review 空标签样本是否全部是真负样本
+- 重做 source-balanced split，并在同一口径下重新比较 `first-train`、`merged_v1` 与 `merged_v2`
 
-换句话说，你现在已经站在“可以直接开训 merged_v1 总模型”的节点上。
+换句话说，你现在已经从“可以直接开训 merged_v1”推进到“merged_v2 已有训练闭环，但还不足以替代 `first-train` 基线”的节点上。
 
 ## 2. 截止当前已完成的具体步骤
 
@@ -89,21 +89,27 @@ split 结果如下：
 
 ## 3. 现在还没有完成的步骤
 
-从当前目录实际产物看，以下阶段还没有正式执行：
+从当前目录实际产物看，merged 训练闭环已经不再是“完全没跑”的状态。
 
-- `train`
-- `evaluate`
-- `export`
+当前已经能看到两套 merged run：
 
-也就是说，当前还没有看到 merged 模型自己的：
+- `All-train-model/artifacts/runs/clothes_merged_v1_fullframe/`
+- `All-train-model/artifacts/runs/clothes_merged_v2_from_first/`
 
-- `best.pt`
-- 评估 JSON 报告
-- 导出权重
+也已经能看到对应报告：
 
-更直接地说：
+- `All-train-model/artifacts/reports/clothes_merged_v1_fullframe_train.json`
+- `All-train-model/artifacts/reports/clothes_merged_v1_fullframe_eval.json`
+- `All-train-model/artifacts/reports/clothes_merged_v2_from_first_train.json`
+- `All-train-model/artifacts/reports/clothes_merged_v2_from_first_eval.json`
+- `All-train-model/artifacts/reports/clothes_merged_v2_from_first_export.json`
 
-- `All-train-model/artifacts/` 当前还不存在
+当前真正还没完成的是：
+
+- `merged_v2_from_first` 尚未证明整体优于 `first-train`
+- 当前比较口径还没有统一 holdout / 分源评估闭环
+- 48 张 review 空标签样本尚未按“真负样本 / 难负样本 / 疑似漏标 / 边界样本”分层复核
+- 下一版 source-balanced merged 数据集尚未落地
 
 ## 4. merged 流程和原始 `audit / prepare` 的关系
 

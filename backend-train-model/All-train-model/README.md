@@ -4,7 +4,7 @@
 
 如果你要先看“现在已经做到哪一步、下一步该跑什么”，直接打开：
 
-- `backend-train-model/All-train-model/status_and_next_steps.md`
+- `backend-train-model/docs/all_train_docs/status_and_next_steps.md`
 
 ## 固定文件
 
@@ -17,12 +17,14 @@
 
 ## 当前状态
 
-- `merged_v1_positive_only` 已经构建完成
-- 关键产物已经生成：
-  - `backend-train-model\All-train-model\datasets\merged_clothes_v1_positive_only\dataset.yaml`
-  - `backend-train-model\All-train-model\datasets\merged_clothes_v1_positive_only\build_report.json`
-  - `backend-train-model\All-train-model\review\merged_clothes_v1_positive_only\missing_review.csv`
-- 当前 `backend-train-model\All-train-model\artifacts\` 还不存在，说明 `train / evaluate / export` 还没正式开始
+- `merged_v1_positive_only` 已经构建完成，并完成过一轮 `train / evaluate / export`
+- `merged_v2_full_reviewed` 已经构建完成，48 张 review 空标签样本已经并入数据集
+- `clothes_merged_v2_from_first` 已经形成训练、评估与导出产物；真实历史是先用 `first-train` 的 `best.pt` 启动，后因中断再 resume
+- 当前结论仍是：`merged_v2_from_first` 尚未稳定优于 `first-train`，不能直接替代当前更稳的基线
+- 关键产物包括：
+  - `backend-train-model\All-train-model\datasets\merged_clothes_v2_full_reviewed\dataset.yaml`
+  - `backend-train-model\All-train-model\artifacts\runs\clothes_merged_v2_from_first\weights\best.pt`
+  - `backend-train-model\All-train-model\artifacts\reports\clothes_merged_v2_from_first_eval.json`
 
 ## 当前推荐流程
 
