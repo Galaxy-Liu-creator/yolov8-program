@@ -734,6 +734,42 @@ def resolve_best_weight_path(raw_path: Optional[str]) -> Path:
     return resolve_best_weight_path_and_source(raw_path)[0]
 
 
+def inspect_resume_checkpoint_state(resume_checkpoint: Path, *, strict: bool) -> Tuple[int, bool]:
+    """检查 `last.pt` 是否仍保留严格断点续训所需的训练状态。"""
+
+    try:
+        import torch
+    except ImportError as exc:
+        raise DatasetToolError("未安装 PyTorch，无法检查断点续训 checkpoint。") from exc
+
+    try:
+        checkpoint = torch.load(resume_checkpoint, map_location="cpu", weights_only=False)
+    except Exception as exc:
+        if strict:
+            raise DatasetToolError("读取断点续训 checkpoint 失败: {0}".format(resume_checkpoint)) from exc
+        return -1, False
+
+    if not isinstance(checkpoint, dict):
+        if strict:
+            raise DatasetToolError("断点续训 checkpoint 内容格式无效: {0}".format(resume_checkpoint))
+        return -1, False
+
+    raw_epoch = checkpoint.get("epoch")
+    try:
+        epoch = int(raw_epoch)
+    except (TypeError, ValueError):
+        epoch = -1
+    has_optimizer_state = checkpoint.get("optimizer") is not None
+    return epoch, has_optimizer_state
+
+
+def is_resumable_checkpoint(resume_checkpoint: Path, *, strict: bool) -> bool:
+    """判断 `last.pt` 是否可用于严格断点续训。"""
+
+    epoch, has_optimizer_state = inspect_resume_checkpoint_state(resume_checkpoint, strict=strict)
+    return epoch >= 0 and has_optimizer_state
+
+
 def resolve_resume_checkpoint_path_and_source(raw_path: Optional[str]) -> Tuple[Path, str, Optional[Path]]:
     """解析严格断点续训使用的 `last.pt`，并返回解析来源。"""
 
@@ -743,8 +779,15 @@ def resolve_resume_checkpoint_path_and_source(raw_path: Optional[str]) -> Tuple[
             raise DatasetToolError("断点续训 checkpoint 不存在: {0}".format(resume_checkpoint))
         if resume_checkpoint.name.lower() != "last.pt":
             raise DatasetToolError("严格断点续训只支持 `last.pt`，请显式传入上一次训练生成的 `last.pt`。")
+        if not is_resumable_checkpoint(resume_checkpoint, strict=True):
+            raise DatasetToolError(
+                "指定的 `last.pt` 不包含可续训状态，通常表示该 run 已训练完成或 checkpoint 已被精简: {0}".format(
+                    resume_checkpoint
+                )
+            )
         return resume_checkpoint, "explicit_resume_path", None
 
+    latest_non_resumable_candidate: Optional[Path] = None
     report_candidates = sorted(
         config.REPORTS_ROOT.glob("*_train.json"),
         key=lambda path: path.stat().st_mtime,
@@ -757,25 +800,37 @@ def resolve_resume_checkpoint_path_and_source(raw_path: Optional[str]) -> Tuple[
 
         last_weight = resolve_report_path_candidate(payload.get("last_weight"), report_path)
         if last_weight is not None and last_weight.exists():
-            return last_weight, "latest_train_report", report_path.resolve()
+            last_weight = last_weight.resolve()
+            if is_resumable_checkpoint(last_weight, strict=False):
+                return last_weight, "latest_train_report", report_path.resolve()
+            latest_non_resumable_candidate = latest_non_resumable_candidate or last_weight
 
         run_dir = resolve_report_path_candidate(payload.get("run_dir"), report_path)
         if run_dir is not None:
             last_weight = (run_dir / "weights" / "last.pt").resolve()
             if last_weight.exists():
-                return last_weight, "latest_train_report_run_dir", report_path.resolve()
+                if is_resumable_checkpoint(last_weight, strict=False):
+                    return last_weight, "latest_train_report_run_dir", report_path.resolve()
+                latest_non_resumable_candidate = latest_non_resumable_candidate or last_weight
 
     candidates = sorted(
         config.RUNS_ROOT.rglob("weights/last.pt"),
         key=lambda path: path.stat().st_mtime,
         reverse=True,
     )
-    if not candidates:
-        raise DatasetToolError(
-            "未找到可用于严格断点续训的 `last.pt`，请先确认已有中断训练的 run，"
-            "或显式传入 `--resume path\\to\\weights\\last.pt`。"
-        )
-    return candidates[0].resolve(), "runs_root_scan", None
+    for candidate in candidates:
+        candidate = candidate.resolve()
+        if is_resumable_checkpoint(candidate, strict=False):
+            return candidate, "runs_root_scan", None
+        latest_non_resumable_candidate = latest_non_resumable_candidate or candidate
+
+    error_message = (
+        "未找到可用于严格断点续训的 `last.pt`；自动续训只会选择仍保留优化器和 epoch 状态的中断 run。"
+        "请先确认已有中断训练的 run，或显式传入 `--resume path\\to\\weights\\last.pt`。"
+    )
+    if latest_non_resumable_candidate is not None:
+        error_message += "\n最近找到的 `last.pt` 已经训练完成或不可续训: {0}".format(latest_non_resumable_candidate)
+    raise DatasetToolError(error_message)
 
 
 def validate_resume_train_args() -> None:
@@ -838,6 +893,13 @@ def train_model(args) -> Dict[str, object]:
         resume_checkpoint, resume_source, resume_report_source = resolve_resume_checkpoint_path_and_source(
             getattr(args, "resume", None)
         )
+        print("=" * 60)
+        print("严格断点续训")
+        print("=" * 60)
+        print("resume_checkpoint : {0}".format(resume_checkpoint))
+        print("resume_source     : {0}".format(resume_source))
+        if resume_report_source is not None:
+            print("resume_report     : {0}".format(resume_report_source))
         model = YOLO(str(resume_checkpoint))
         model.train(resume=True)
 

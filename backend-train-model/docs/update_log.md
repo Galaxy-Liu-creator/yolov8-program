@@ -1,5 +1,101 @@
 ﻿# Update Log
 
+## 2026-04-10 续训前打印自动选中的 checkpoint 与来源
+
+变更来源：
+- 用户在自动续训逻辑修复完成后，进一步要求“补充一个”更直观的控制台提示，用于在真正开始续训前确认本次命中的 checkpoint。
+
+变更总览：
+1. 修改 `backend-train-model/train_workwear.py` 的 resume 分支。
+2. 在调用 `model.train(resume=True)` 之前，增加控制台输出：
+   - `resume_checkpoint`
+   - `resume_source`
+   - `resume_report`（如有）
+3. 该输出只用于帮助用户确认 bare `--resume` 实际选中了哪个 run，不改变现有续训逻辑和训练参数。
+
+涉及文件：
+- `backend-train-model/train_workwear.py`
+- `backend-train-model/docs/update_log.md`
+
+新增 / 变更配置项：
+- 无。
+- 本轮仅增加 resume 启动前的控制台提示信息。
+
+兼容性注意：
+- 不改变自动续训候选筛选规则。
+- 不改变显式 `--resume some\\weights\\last.pt` 的行为。
+- 不改变非 resume 的 `train`、`evaluate`、`export`、`all` 流程。
+
+不改动说明：
+- 本轮不修改数据集构建逻辑。
+- 本轮不改动评估与导出逻辑。
+- 本轮不启动新的训练，也不改动任何已有权重文件内容。
+
+## 2026-04-10 自动续训跳过已完成 run，修复 bare `--resume` 误选旧 checkpoint
+
+变更来源：
+- 用户在执行 `python train_workwear.py train --project-config All-train-model\\merged_train_project_config.json --resume` 时，自动续训命中了历史已完成的 `clothes_merged_v1_fullframe/weights/last.pt`，随后被 Ultralytics 判定为“training is finished, nothing to resume”。
+- 用户要求只修复自动续训逻辑，不改动其他训练流程。
+
+变更总览：
+1. 修改 `backend-train-model/train_workwear.py` 中的自动续训候选解析逻辑。
+2. 为 `last.pt` 新增“是否仍保留严格断点续训状态”的检查：
+   - 仅当 checkpoint 仍保留可续训的 `epoch` 与 `optimizer` 状态时，才会被 bare `--resume` 自动选中；
+   - 已训练完成、或已被精简为不可续训状态的历史 `last.pt` 会被自动跳过。
+3. 对显式传入的 `--resume path\\to\\weights\\last.pt` 也增加了前置校验，避免再次落到 Ultralytics 内部后才抛出较难读的断言错误。
+4. 同步更新续训文档与进度文档，明确 bare `--resume` 现在会自动跳过已完成 run。
+
+涉及文件：
+- `backend-train-model/train_workwear.py`
+- `backend-train-model/docs/README.md`
+- `backend-train-model/docs/all_train_docs/run_method.md`
+- `backend-train-model/docs/后端训练完成进度.md`
+- `backend-train-model/docs/update_log.md`
+
+新增 / 变更配置项：
+- 无新增 CLI 参数。
+- 本轮仅修正 `train --resume` 不带值时的候选 `last.pt` 筛选规则。
+
+兼容性注意：
+- 原有显式 `--resume some\\weights\\last.pt` 的使用方式保持不变，但现在会更早提示“该 checkpoint 已不可续训”。
+- 非 resume 的 `train`、`evaluate`、`export`、`all` 流程保持不变。
+- 自动续训仍然只支持 `last.pt`，不会改成使用 `best.pt`。
+
+不改动说明：
+- 本轮不修改数据集构建逻辑。
+- 本轮不改动评估与导出逻辑。
+- 本轮不启动新的训练，也不改动任何已有权重文件内容。
+
+## 2026-04-10 run_method 补充断点续训命令的直接可复制写法
+
+变更来源：
+- 用户要求把当前可用的断点续训命令明确补到 `backend-train-model/docs/all_train_docs/run_method.md` 中，方便后续直接复制执行。
+- 现有文档虽然已经包含一条显式 `last.pt` 续训命令，但用户当前需求更偏向“直接看到就能用”的操作指引，因此需要进一步整理为自动续训与显式续训两种写法。
+
+变更总览：
+1. 修改 `backend-train-model/docs/all_train_docs/run_method.md` 的“如果训练中断，严格断点续训”小节。
+2. 将续训命令明确拆分为两种：
+   - 自动续训最近一次中断训练；
+   - 显式续训当前推荐 run 的 `last.pt`。
+3. 同步调整补充说明的表述，使“自动续训”和“显式指定 `last.pt`”的使用场景更清晰。
+
+涉及文件：
+- `backend-train-model/docs/all_train_docs/run_method.md`
+- `backend-train-model/docs/update_log.md`
+
+新增 / 变更配置项：
+- 无。
+- 本轮仅补充文档中的命令展示方式，不修改训练脚本和 CLI 参数定义。
+
+兼容性注意：
+- 本轮不改变 `train --resume` 的实际行为。
+- 本轮不改变 `All-train-model` 当前推荐训练主线，只增强文档可操作性。
+
+不改动说明：
+- 本轮不修改 `backend-train-model/train_workwear.py`。
+- 本轮不启动新的训练、评估或导出命令。
+- 本轮不修改任何已有训练产物。
+
 ## 2026-04-09 训练脚本新增严格断点续训 `train --resume`
 
 变更来源：
@@ -521,5 +617,6 @@
 8. **代码改动必须同步日志**：只要修改了 `backend-train-model/` 下的代码或配置，就必须在同一轮提交中同步更新本文件。
 9. **优先改配置入口，不要回退到硬编码**：新增路径、默认阈值、候选模型路径时，优先落到 `project_config.json` 或 `config.py` 的统一入口。
 10. **训练报告要可追溯**：涉及 `prepare`、`train`、`evaluate`、`export` 输出结构改动时，要在日志里说明新增字段或新增文件的用途。
+
 
 

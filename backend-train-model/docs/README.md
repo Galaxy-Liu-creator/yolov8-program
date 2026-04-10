@@ -304,6 +304,7 @@ D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\train_workwea
 补充说明：
 
 - `--resume` 不带值时，会自动尝试续训最近一次训练留下的 `last.pt`
+- 自动续训会跳过已经训练完成、或已被精简为不可续训状态的旧 `last.pt`
 - 严格断点续训只支持 `last.pt`，不支持拿 `best.pt` 伪装成断点续训
 - `--resume` 会严格沿用 checkpoint 内保存的训练状态，不应再同时传 `--base-model`、`--from-scratch`、`--init-weights`、`--name`、`--project`、`--dataset-yaml`、`--epochs` 等训练起点参数
 - 当前严格断点续训入口是 `train` 子命令
