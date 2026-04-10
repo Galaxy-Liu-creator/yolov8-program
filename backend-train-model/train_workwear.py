@@ -89,6 +89,22 @@ def cli_flag_present(flag: str) -> bool:
     return any(arg == normalized or arg.startswith("{0}=".format(normalized)) for arg in sys.argv[1:])
 
 
+def resolve_report_filename(raw_value: Optional[str], default_filename: str) -> str:
+    """解析报告文件名，禁止把报告写到 `reports/` 目录之外。"""
+
+    if raw_value in (None, ""):
+        return default_filename
+
+    candidate = Path(str(raw_value).strip())
+    if not str(candidate):
+        raise DatasetToolError("`--report-name` 不能为空。")
+    if candidate.name != str(candidate):
+        raise DatasetToolError("`--report-name` 只能是文件名，不能包含目录。")
+    if candidate.suffix.lower() != ".json":
+        return "{0}.json".format(candidate.name)
+    return candidate.name
+
+
 def normalize_names_mapping(raw_value: object) -> Dict[int, str]:
     """把 dataset.yaml 中的 `names` 字段规范化为 `Dict[int, str]`。"""
 
@@ -450,6 +466,7 @@ def collect_dataset_metadata(dataset_yaml: Path) -> Dict[str, object]:
     prepare_report = load_report_dict(prepare_report_path) if prepare_report_path.exists() else None
     prepare_payload = prepare_report.get("prepare", {}) if isinstance(prepare_report, dict) else {}
     return {
+        "dataset_name": dataset_yaml.parent.name,
         "dataset_yaml": str(dataset_yaml),
         "dataset_root": str(resolve_dataset_base_path(dataset_yaml, config_payload)),
         "class_names": class_names,
@@ -667,6 +684,35 @@ def load_report_dict(report_path: Path) -> Optional[Dict[str, object]]:
     except (OSError, UnicodeDecodeError, json.JSONDecodeError):
         return None
     return payload if isinstance(payload, dict) else None
+
+
+def inherit_train_lineage(
+    report_path: Optional[Path],
+) -> Tuple[Optional[str], Optional[str], List[Dict[str, object]]]:
+    """从既有 train report 中继承首次启动信息和 lineage。"""
+
+    if report_path is None:
+        return None, None, []
+
+    payload = load_report_dict(report_path)
+    if payload is None:
+        return None, None, []
+
+    initial_base_model = payload.get("initial_base_model") or payload.get("base_model")
+    initial_base_model_source = payload.get("initial_base_model_source") or payload.get("base_model_source")
+    training_lineage = payload.get("training_lineage")
+    if not isinstance(training_lineage, list):
+        training_lineage = []
+
+    normalized_lineage: List[Dict[str, object]] = []
+    for item in training_lineage:
+        if isinstance(item, dict):
+            normalized_lineage.append(dict(item))
+    return (
+        str(initial_base_model) if initial_base_model not in (None, "") else None,
+        str(initial_base_model_source) if initial_base_model_source not in (None, "") else None,
+        normalized_lineage,
+    )
 
 
 def resolve_report_path_candidate(raw_value: object, report_path: Path) -> Optional[Path]:
@@ -893,6 +939,24 @@ def train_model(args) -> Dict[str, object]:
         resume_checkpoint, resume_source, resume_report_source = resolve_resume_checkpoint_path_and_source(
             getattr(args, "resume", None)
         )
+        initial_base_model, initial_base_model_source, training_lineage = inherit_train_lineage(
+            resume_report_source
+        )
+        if initial_base_model is None:
+            initial_base_model = str(resume_checkpoint)
+        if initial_base_model_source is None:
+            initial_base_model_source = "resume_checkpoint"
+        training_lineage.append(
+            {
+                "event": "resume",
+                "generated_at": datetime.now().isoformat(timespec="seconds"),
+                "resume_checkpoint": str(resume_checkpoint),
+                "resume_source": resume_source,
+                "resume_report_source": (
+                    str(resume_report_source) if resume_report_source is not None else None
+                ),
+            }
+        )
         print("=" * 60)
         print("严格断点续训")
         print("=" * 60)
@@ -940,11 +1004,14 @@ def train_model(args) -> Dict[str, object]:
             "dataset_metadata": dataset_metadata,
             "base_model": str(resume_checkpoint),
             "base_model_source": "resume_checkpoint",
+            "initial_base_model": initial_base_model,
+            "initial_base_model_source": initial_base_model_source,
             "allow_remote_model_download": False,
             "from_scratch": False,
             "pretrained": True,
             "init_weights": None,
             "init_weights_source": None,
+            "training_lineage": training_lineage,
             "resume": True,
             "resume_checkpoint": str(resume_checkpoint),
             "resume_source": resume_source,
@@ -1071,11 +1138,24 @@ def train_model(args) -> Dict[str, object]:
         "dataset_metadata": dataset_metadata,
         "base_model": model_spec,
         "base_model_source": base_model_source,
+        "initial_base_model": model_spec,
+        "initial_base_model_source": base_model_source,
         "allow_remote_model_download": allow_remote_download,
         "from_scratch": from_scratch,
         "pretrained": use_pretrained,
         "init_weights": init_weights,
         "init_weights_source": init_weights_source,
+        "training_lineage": [
+            {
+                "event": "start",
+                "generated_at": datetime.now().isoformat(timespec="seconds"),
+                "base_model": model_spec,
+                "base_model_source": base_model_source,
+                "from_scratch": from_scratch,
+                "init_weights": init_weights,
+                "init_weights_source": init_weights_source,
+            }
+        ],
         "run_project": str(run_project),
         "requested_run_name": requested_run_name,
         "actual_run_name": actual_run_name,
@@ -1130,12 +1210,14 @@ def evaluate_model(args) -> Dict[str, object]:
 
     summary = {
         "runtime": build_runtime_context("evaluate"),
+        "report_name": None,
         "weights": str(weight_path),
         "weights_resolution_mode": weights_resolution_mode,
         "weights_report_source": (
             str(weights_report_source) if weights_report_source is not None else None
         ),
         "dataset_yaml": str(dataset_yaml),
+        "comparison_dataset_name": dataset_metadata.get("dataset_name"),
         "dataset_metadata": dataset_metadata,
         "evaluated_splits": evaluation_splits,
         "skipped_splits": skipped_splits,
@@ -1184,8 +1266,14 @@ def evaluate_model(args) -> Dict[str, object]:
         )
         summary["inspection_validate"] = inspection_result
 
-    report_name = "{0}_eval.json".format(weight_path.parent.parent.name)
-    write_json(config.REPORTS_ROOT / report_name, summary)
+    report_name = resolve_report_filename(
+        getattr(args, "report_name", None),
+        "{0}_eval.json".format(weight_path.parent.parent.name),
+    )
+    report_path = config.REPORTS_ROOT / report_name
+    summary["report_name"] = report_name
+    summary["report_path"] = str(report_path)
+    write_json(report_path, summary)
     return summary
 
 
@@ -1755,6 +1843,10 @@ def add_eval_args(parser: argparse.ArgumentParser) -> None:
         help="执行 inspection 验证后保留临时复制进去的权重。",
     )
     parser.add_argument("--python-exe", help="运行 inspection-flask/main.py 的 Python 解释器。")
+    parser.add_argument(
+        "--report-name",
+        help="评估报告文件名；默认按权重 run 名生成。可用于统一 holdout 下的 cross-eval/strict-eval 对比。",
+    )
 
 
 def add_export_args(parser: argparse.ArgumentParser) -> None:

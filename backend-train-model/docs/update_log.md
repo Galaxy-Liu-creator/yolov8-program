@@ -1,5 +1,48 @@
 ﻿# Update Log
 
+## 2026-04-10 同步数据集新路径到训练配置与文档入口
+
+变更来源：
+- 用户反馈数据集目录已从旧的 `E:\University_competition\...` 迁移到新的 `D:\University-Competition\...`，并明确给出了当前 `group3_1 / group3_2 / group3_3` 的图片根目录和标注根目录。
+- 用户要求不仅更新 `backend-train-model/`，还要同步修改仓库内相关文档入口，避免后续继续沿用旧路径。
+
+变更总览：
+1. 更新 `backend-train-model/config.py` 与 `backend-train-model/project_config.json` 的默认单源数据入口，使其指向新的 `D:\University-Competition\...` 下的 `group3_1` 路径。
+2. 更新 `backend-train-model/All-train-model/` 下与 merged / holdout 相关的构建配置，使 `group3_1 / group3_2 / group3_3` 的图片根目录与标注根目录全部切换到新的磁盘位置。
+3. 更新 `docs/dataset.md`，明确区分：
+   - 默认单源训练入口；
+   - `All-train-model` 多源 merged 入口；
+   - 两种入口各自对应的图片 / 标注配对方式。
+4. 更新 `backend-train-model/docs/README.md` 中的项目根目录示例命令，避免继续提示旧盘符。
+
+涉及文件：
+- `backend-train-model/config.py`
+- `backend-train-model/project_config.json`
+- `backend-train-model/All-train-model/first_train_holdout_v1.build.json`
+- `backend-train-model/All-train-model/merged_clothes_v1.build.json`
+- `backend-train-model/All-train-model/merged_clothes_v2.build.json`
+- `backend-train-model/All-train-model/merged_clothes_v2_balanced.build.json`
+- `backend-train-model/All-train-model/unified_holdout_v1.build.json`
+- `backend-train-model/docs/README.md`
+- `backend-train-model/docs/update_log.md`
+- `docs/dataset.md`
+
+新增 / 变更配置项：
+- 无新增字段。
+- 本轮仅更新已有路径配置值：
+  - `config.py` 中的 `IMAGE_ROOTS`、`LABEL_ROOT`
+  - `project_config.json` 中的 `data.image_roots`、`data.label_root`
+  - 各 `*.build.json` 中每个 `sequence` 的 `image_root`、`label_root`
+
+兼容性注意：
+- 本轮不改变训练、评估、导出或 merged 数据集构建逻辑，只更新默认路径指向。
+- `train_workwear.py` 的默认入口仍然是单源 `group3_1` 基线配置；多源 merged 训练仍通过 `All-train-model/*.build.json` 驱动。
+- 如果历史运行报告、历史命令记录或旧文档仍保留 `E:\University_competition\...`，它们只代表旧环境，不会影响当前代码读取的新路径。
+
+不改动说明：
+- 本轮不修改 `inspection-flask/` 源码；排查后未发现其中存在这批数据集路径的硬编码引用。
+- 本轮不调整训练超参数、split 策略、holdout 逻辑或权重加载逻辑。
+- 本轮不重建任何数据集，也不启动新的训练 / 评估任务。
 ## 2026-04-10 ?? `All-train-model` ???????? personcrop ????????????
 
 ?????
@@ -683,3 +726,77 @@
 8. **代码改动必须同步日志**：只要修改了 `backend-train-model/` 下的代码或配置，就必须在同一轮提交中同步更新本文件。
 9. **优先改配置入口，不要回退到硬编码**：新增路径、默认阈值、候选模型路径时，优先落到 `project_config.json` 或 `config.py` 的统一入口。
 10. **训练报告要可追溯**：涉及 `prepare`、`train`、`evaluate`、`export` 输出结构改动时，要在日志里说明新增字段或新增文件的用途。
+## 2026-04-10 落地 unified holdout / source-balanced split，并补齐评估报告追溯能力
+
+变更来源：
+- 用户要求根据 `backend-train-model/docs/all_train_docs/merged_v2_improvement_plan.md` 直接落地代码改造，优先解决两件事：
+  1. 短期内怎样提升 `merged_v2` 的训练效果；
+  2. 怎样让 `first-train` 与 `All-train-model` 在统一 holdout 下做同口径比较。
+
+变更总览：
+1. 扩展 `backend-train-model/build_merged_clothes_dataset.py`，新增样本级 split manifest 能力：
+   - 支持 `split_manifest_csv`
+   - 支持 `strict_split_manifest`
+   - 支持样本级 `split=train / val / test / skip`
+   - 输出 manifest 时同步记录 `assignment_source`、`assignment_note`、`holdout_group`、`sample_role`
+   - 在 `build_report.json` 中补充 split/source/role 分布统计
+2. 新增 `backend-train-model/generate_split_manifests.py`，可从 canonical `manifest.csv` 生成：
+   - `trainval_balanced_v1.split.csv`
+   - `unified_holdout_v1.split.csv`
+   - `source_balanced_v1_summary.json`
+3. 新增 unified holdout / balanced merged / first baseline 的构建配置：
+   - `backend-train-model/All-train-model/merged_clothes_v2_balanced.build.json`
+   - `backend-train-model/All-train-model/unified_holdout_v1.build.json`
+   - `backend-train-model/All-train-model/first_train_holdout_v1.build.json`
+4. 扩展 `backend-train-model/train_workwear.py`：
+   - `evaluate` 新增 `--report-name`
+   - 评估报告新增 `comparison_dataset_name`、`report_name`、`report_path`
+   - train report 新增 `initial_base_model` / `initial_base_model_source`
+   - `resume` 时继承首次启动信息与 `training_lineage`，避免只剩下 `last.pt` 断点信息
+5. 新增统一 holdout 使用文档，并在 `All-train-model/README.md` 中补充新入口。
+
+涉及文件：
+- `backend-train-model/build_merged_clothes_dataset.py`
+- `backend-train-model/generate_split_manifests.py`
+- `backend-train-model/train_workwear.py`
+- `backend-train-model/All-train-model/merged_clothes_v2_balanced.build.json`
+- `backend-train-model/All-train-model/unified_holdout_v1.build.json`
+- `backend-train-model/All-train-model/first_train_holdout_v1.build.json`
+- `backend-train-model/All-train-model/splits/trainval_balanced_v1.split.csv`
+- `backend-train-model/All-train-model/splits/unified_holdout_v1.split.csv`
+- `backend-train-model/All-train-model/splits/source_balanced_v1_summary.json`
+- `backend-train-model/All-train-model/README.md`
+- `backend-train-model/docs/all_train_docs/unified_holdout_compare_method.md`
+- `backend-train-model/docs/update_log.md`
+
+新增 / 变更配置项：
+- `build_merged_clothes_dataset.py` 配置新增：
+  - `split_manifest_csv`
+  - `strict_split_manifest`
+- `train_workwear.py evaluate` CLI 新增：
+  - `--report-name`
+- `manifest.csv` 新增列：
+  - `assignment_source`
+  - `assignment_note`
+  - `holdout_group`
+  - `sample_role`
+- train report 新增字段：
+  - `initial_base_model`
+  - `initial_base_model_source`
+  - `training_lineage`
+- eval report 新增字段：
+  - `comparison_dataset_name`
+  - `report_name`
+  - `report_path`
+
+兼容性注意：
+- 未传 `split_manifest_csv` 时，`build_merged_clothes_dataset.py` 仍按原来的 `sequences[].split` 行为工作。
+- 未传 `--report-name` 时，`evaluate` 仍默认写入 `{run_name}_eval.json`。
+- 现有 `merged_v1_positive_only`、`merged_v2_full_reviewed`、`first-train` 的既有权重与报告文件不会被自动改写。
+- `resume` 流程本身没有改成新逻辑，只是把首次启动来源和后续 resume 链补记进 train report。
+
+不改动说明：
+- 本轮不修改 `dataset_tools.py`、`config.py`、`project_config.json` 的默认 prepare 行为。
+- 本轮不改动 `inspection-flask/` 的在线推理链路。
+- 本轮不直接启动新的长时间训练；真正的 `strict holdout` 训练仍由用户按新增文档中的命令触发。
+

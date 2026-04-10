@@ -32,7 +32,7 @@
 ### 1. 进入项目根目录
 
 ```powershell
-cd E:\University_competition\Innovation_Entrepreneurship\MyProgram\yolov8-program
+cd D:\University-Competition\Innovation_Entrepreneurship\MyProgram\yolov8-program
 ```
 
 ### 2. 使用约定的 Python 环境

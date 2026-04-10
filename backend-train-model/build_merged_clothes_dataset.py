@@ -6,13 +6,14 @@ import json
 import shutil
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, Iterable, List, Mapping, Optional, Sequence
+from typing import Dict, Iterable, List, Mapping, Optional, Sequence, Set, Tuple
 
 import cv2
 
 COORD_TOLERANCE = 1e-6
 BOX_EDGE_TOLERANCE = 1e-6
 SUPPORTED_SPLITS = ("train", "val", "test")
+SUPPORTED_ASSIGNMENT_SPLITS = SUPPORTED_SPLITS + ("skip",)
 SUPPORTED_POLICIES = {"skip", "use_review_labels"}
 IGNORED_LABEL_FILENAMES = {"classes.txt", "classed.txt"}
 
@@ -34,16 +35,28 @@ class SequenceConfig:
     split: str
 
 
+@dataclass(frozen=True)
+class SplitAssignment:
+    split: str
+    note: str
+    holdout_group: Optional[str]
+    merged_stem: Optional[str]
+
+
 @dataclass
 class IncludedSample:
     source_id: str
     sequence_name: str
     split: str
+    assignment_source: str
+    assignment_note: str
+    holdout_group: Optional[str]
     original_stem: str
     merged_stem: str
     image_path: Path
     label_source_path: Path
     label_origin: str
+    sample_role: str
     label_lines: List[str]
     box_count: int
     image_width: int
@@ -156,6 +169,74 @@ def coerce_extensions(raw_value: object) -> List[str]:
     return normalized
 
 
+def determine_sample_role(*, label_origin: str, box_count: int) -> str:
+    if box_count > 0:
+        return "positive"
+    if label_origin == "review":
+        return "review_empty"
+    return "source_empty"
+
+
+def load_split_assignments(split_manifest_path: Path) -> Dict[Tuple[str, str, str], SplitAssignment]:
+    try:
+        with split_manifest_path.open("r", encoding="utf-8-sig", newline="") as handle:
+            reader = csv.DictReader(handle)
+            fieldnames = set(reader.fieldnames or [])
+            required_fields = {"source_id", "sequence_name", "original_stem", "split"}
+            missing_fields = sorted(required_fields - fieldnames)
+            if missing_fields:
+                raise BuildConfigError(
+                    "split_manifest_csv 缺少字段 {0}: {1}".format(
+                        missing_fields,
+                        split_manifest_path,
+                    )
+                )
+
+            assignments: Dict[Tuple[str, str, str], SplitAssignment] = {}
+            for row_index, row in enumerate(reader, start=2):
+                source_id = coerce_string(row.get("source_id"), "split_manifest_csv[{0}].source_id".format(row_index))
+                sequence_name = coerce_string(
+                    row.get("sequence_name"),
+                    "split_manifest_csv[{0}].sequence_name".format(row_index),
+                )
+                original_stem = coerce_string(
+                    row.get("original_stem"),
+                    "split_manifest_csv[{0}].original_stem".format(row_index),
+                )
+                split = coerce_string(row.get("split"), "split_manifest_csv[{0}].split".format(row_index))
+                if split not in SUPPORTED_ASSIGNMENT_SPLITS:
+                    raise BuildConfigError(
+                        "split_manifest_csv[{0}].split 仅支持 {1}。".format(
+                            row_index,
+                            list(SUPPORTED_ASSIGNMENT_SPLITS),
+                        )
+                    )
+                assignment_key = (source_id, sequence_name, original_stem)
+                if assignment_key in assignments:
+                    raise BuildConfigError(
+                        "split_manifest_csv 中存在重复样本: {0}/{1}/{2}".format(
+                            source_id,
+                            sequence_name,
+                            original_stem,
+                        )
+                    )
+                merged_stem = str(row.get("merged_stem", "") or "").strip() or None
+                holdout_group = str(row.get("holdout_group", "") or "").strip() or None
+                note = str(row.get("note", "") or "").strip()
+                assignments[assignment_key] = SplitAssignment(
+                    split=split,
+                    note=note,
+                    holdout_group=holdout_group,
+                    merged_stem=merged_stem,
+                )
+    except OSError as exc:
+        raise BuildConfigError("读取 split_manifest_csv 失败: {0}".format(split_manifest_path)) from exc
+
+    if not assignments:
+        raise BuildConfigError("split_manifest_csv 不能为空: {0}".format(split_manifest_path))
+    return assignments
+
+
 def load_build_config(config_path: Path) -> Dict[str, object]:
     payload = load_json(config_path)
     base_dir = config_path.parent
@@ -194,6 +275,15 @@ def load_build_config(config_path: Path) -> Dict[str, object]:
         )
     if missing_label_policy == "use_review_labels" and review_labels_root is None:
         raise BuildConfigError("missing_label_policy=use_review_labels 时必须提供 review_labels_root。")
+
+    split_manifest_csv = None
+    if payload.get("split_manifest_csv") not in (None, ""):
+        split_manifest_csv = resolve_value_path(
+            payload.get("split_manifest_csv"),
+            base_dir,
+            "split_manifest_csv",
+        )
+    strict_split_manifest = bool(payload.get("strict_split_manifest", False))
 
     raw_sequences = payload.get("sequences")
     if not isinstance(raw_sequences, Sequence) or isinstance(raw_sequences, (str, bytes)):
@@ -244,6 +334,8 @@ def load_build_config(config_path: Path) -> Dict[str, object]:
         "output_root": output_root,
         "review_root": review_root,
         "review_labels_root": review_labels_root,
+        "split_manifest_csv": split_manifest_csv,
+        "strict_split_manifest": strict_split_manifest,
         "train_project_config": train_project_config,
         "recommended_run_name": recommended_run_name,
         "class_names": class_names,
@@ -429,11 +521,15 @@ def write_manifest(output_root: Path, samples: Sequence[IncludedSample]) -> Path
         "source_id",
         "sequence_name",
         "split",
+        "assignment_source",
+        "assignment_note",
+        "holdout_group",
         "original_stem",
         "merged_stem",
         "original_image_path",
         "label_source_path",
         "label_origin",
+        "sample_role",
         "merged_image_relpath",
         "merged_label_relpath",
         "box_count",
@@ -449,11 +545,15 @@ def write_manifest(output_root: Path, samples: Sequence[IncludedSample]) -> Path
                     "source_id": sample.source_id,
                     "sequence_name": sample.sequence_name,
                     "split": sample.split,
+                    "assignment_source": sample.assignment_source,
+                    "assignment_note": sample.assignment_note,
+                    "holdout_group": sample.holdout_group or "",
                     "original_stem": sample.original_stem,
                     "merged_stem": sample.merged_stem,
                     "original_image_path": str(sample.image_path),
                     "label_source_path": str(sample.label_source_path),
                     "label_origin": sample.label_origin,
+                    "sample_role": sample.sample_role,
                     "merged_image_relpath": "images/{0}/{1}.jpg".format(
                         sample.split,
                         sample.merged_stem,
@@ -557,6 +657,8 @@ def build_dataset(config_payload: Dict[str, object], overwrite: bool) -> Dict[st
     output_root = config_payload["output_root"]
     review_root = config_payload["review_root"]
     review_labels_root = config_payload["review_labels_root"]
+    split_manifest_csv = config_payload["split_manifest_csv"]
+    strict_split_manifest = config_payload["strict_split_manifest"]
     train_project_config = config_payload["train_project_config"]
     recommended_run_name = config_payload["recommended_run_name"]
     class_names = config_payload["class_names"]
@@ -565,14 +667,23 @@ def build_dataset(config_payload: Dict[str, object], overwrite: bool) -> Dict[st
     missing_label_policy = config_payload["missing_label_policy"]
     require_review_completion = config_payload["require_review_completion"]
     sequences: List[SequenceConfig] = config_payload["sequences"]
+    split_assignments = (
+        load_split_assignments(split_manifest_csv) if split_manifest_csv is not None else {}
+    )
+    used_split_assignment_keys: Set[Tuple[str, str, str]] = set()
 
     label_lookup_cache: Dict[Path, Dict[str, Path]] = {}
     included_samples: List[IncludedSample] = []
     missing_review_items: List[MissingReviewItem] = []
     sequence_summaries: List[Dict[str, object]] = []
     total_source_images = 0
+    skipped_by_split_manifest = 0
     split_image_counts = {split: 0 for split in SUPPORTED_SPLITS}
     split_box_counts = {split: 0 for split in SUPPORTED_SPLITS}
+    split_source_counts = {split: {} for split in SUPPORTED_SPLITS}
+    split_role_counts = {split: {} for split in SUPPORTED_SPLITS}
+    split_source_role_counts = {split: {} for split in SUPPORTED_SPLITS}
+    assignment_source_counts = {"sequence_default": 0, "split_manifest": 0}
 
     for sequence in sequences:
         label_lookup = label_lookup_cache.get(sequence.label_root)
@@ -583,12 +694,36 @@ def build_dataset(config_payload: Dict[str, object], overwrite: bool) -> Dict[st
         image_paths = iter_image_paths(sequence.image_root, image_extensions)
         total_source_images += len(image_paths)
         matched_count = 0
+        included_count = 0
         missing_count = 0
         sequence_box_count = 0
+        sequence_split_counts = {split: 0 for split in SUPPORTED_SPLITS}
+        sequence_assignment_source_counts = {"sequence_default": 0, "split_manifest": 0}
+        sequence_skipped_by_split_manifest = 0
 
         for image_path in image_paths:
             original_stem = image_path.stem
             merged_stem = "{0}__{1}".format(sequence.source_id, original_stem)
+            sample_key = (sequence.source_id, sequence.sequence_name, original_stem)
+            split_assignment = split_assignments.get(sample_key)
+            resolved_split = sequence.split
+            assignment_source = "sequence_default"
+            assignment_note = ""
+            holdout_group = None
+            if split_assignment is not None:
+                if split_assignment.merged_stem is not None and split_assignment.merged_stem != merged_stem:
+                    raise DatasetBuildError(
+                        "split_manifest_csv 中的 merged_stem 与实际样本不一致: {0}/{1}/{2}".format(
+                            sequence.source_id,
+                            sequence.sequence_name,
+                            original_stem,
+                        )
+                    )
+                resolved_split = split_assignment.split
+                assignment_source = "split_manifest"
+                assignment_note = split_assignment.note
+                holdout_group = split_assignment.holdout_group
+                used_split_assignment_keys.add(sample_key)
             label_path = label_lookup.get(original_stem)
             label_origin = "source"
 
@@ -618,7 +753,7 @@ def build_dataset(config_payload: Dict[str, object], overwrite: bool) -> Dict[st
                     MissingReviewItem(
                         source_id=sequence.source_id,
                         sequence_name=sequence.sequence_name,
-                        split=sequence.split,
+                        split=resolved_split,
                         original_stem=original_stem,
                         merged_stem=merged_stem,
                         original_image_path=image_path,
@@ -635,21 +770,53 @@ def build_dataset(config_payload: Dict[str, object], overwrite: bool) -> Dict[st
                         "不支持的 missing_label_policy: {0}".format(missing_label_policy)
                     )
 
+            if split_assignments and split_assignment is None and strict_split_manifest:
+                raise DatasetBuildError(
+                    "split_manifest_csv 未覆盖样本: {0}/{1}/{2}".format(
+                        sequence.source_id,
+                        sequence.sequence_name,
+                        original_stem,
+                    )
+                )
+            if resolved_split == "skip":
+                skipped_by_split_manifest += 1
+                sequence_skipped_by_split_manifest += 1
+                continue
+
             width, height = load_image_size(image_path)
             box_count = len(normalized_lines)
+            sample_role = determine_sample_role(label_origin=label_origin, box_count=box_count)
             sequence_box_count += box_count
-            split_image_counts[sequence.split] += 1
-            split_box_counts[sequence.split] += box_count
+            included_count += 1
+            split_image_counts[resolved_split] += 1
+            split_box_counts[resolved_split] += box_count
+            split_source_counts[resolved_split][sequence.source_id] = (
+                split_source_counts[resolved_split].get(sequence.source_id, 0) + 1
+            )
+            split_role_counts[resolved_split][sample_role] = (
+                split_role_counts[resolved_split].get(sample_role, 0) + 1
+            )
+            source_role_counts = split_source_role_counts[resolved_split].setdefault(sequence.source_id, {})
+            source_role_counts[sample_role] = source_role_counts.get(sample_role, 0) + 1
+            assignment_source_counts[assignment_source] = assignment_source_counts.get(assignment_source, 0) + 1
+            sequence_split_counts[resolved_split] += 1
+            sequence_assignment_source_counts[assignment_source] = (
+                sequence_assignment_source_counts.get(assignment_source, 0) + 1
+            )
             included_samples.append(
                 IncludedSample(
                     source_id=sequence.source_id,
                     sequence_name=sequence.sequence_name,
-                    split=sequence.split,
+                    split=resolved_split,
+                    assignment_source=assignment_source,
+                    assignment_note=assignment_note,
+                    holdout_group=holdout_group,
                     original_stem=original_stem,
                     merged_stem=merged_stem,
                     image_path=image_path,
                     label_source_path=label_path,
                     label_origin=label_origin,
+                    sample_role=sample_role,
                     label_lines=normalized_lines,
                     box_count=box_count,
                     image_width=width,
@@ -661,13 +828,17 @@ def build_dataset(config_payload: Dict[str, object], overwrite: bool) -> Dict[st
             {
                 "source_id": sequence.source_id,
                 "sequence_name": sequence.sequence_name,
-                "split": sequence.split,
+                "configured_split": sequence.split,
                 "image_root": str(sequence.image_root),
                 "label_root": str(sequence.label_root),
                 "source_images": len(image_paths),
-                "included_images": matched_count,
+                "included_images": included_count,
+                "matched_images": matched_count,
                 "missing_source_labels": missing_count,
                 "included_boxes": sequence_box_count,
+                "actual_split_counts": sequence_split_counts,
+                "assignment_source_counts": sequence_assignment_source_counts,
+                "skipped_by_split_manifest": sequence_skipped_by_split_manifest,
             }
         )
 
@@ -726,13 +897,25 @@ def build_dataset(config_payload: Dict[str, object], overwrite: bool) -> Dict[st
             "resolved_review_items": len(
                 [item for item in missing_review_items if item.review_status != "pending"]
             ),
+            "skipped_by_split_manifest": skipped_by_split_manifest,
             "split_image_counts": split_image_counts,
             "split_box_counts": split_box_counts,
+            "split_source_counts": split_source_counts,
+            "split_role_counts": split_role_counts,
+            "split_source_role_counts": split_source_role_counts,
+            "assignment_source_counts": assignment_source_counts,
         },
         "files": {
             "dataset_yaml": str(dataset_yaml),
             "manifest_csv": str(manifest_csv),
             "missing_review_csv": str(review_csv),
+        },
+        "split_manifest": {
+            "path": str(split_manifest_csv) if split_manifest_csv is not None else None,
+            "strict": strict_split_manifest,
+            "loaded_rows": len(split_assignments),
+            "used_rows": len(used_split_assignment_keys),
+            "unused_rows": len(split_assignments) - len(used_split_assignment_keys),
         },
         "sequences": sequence_summaries,
         "commands": commands,
@@ -766,6 +949,7 @@ def main() -> int:
     print("included_images   : {0}".format(counts["included_images"]))
     print("included_boxes    : {0}".format(counts["included_boxes"]))
     print("missing_labels    : {0}".format(counts["missing_source_labels"]))
+    print("skipped_by_split  : {0}".format(counts["skipped_by_split_manifest"]))
     print("split_images      : {0}".format(counts["split_image_counts"]))
     return 0
 

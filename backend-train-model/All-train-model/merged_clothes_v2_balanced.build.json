@@ -1,10 +1,12 @@
 {
-  "dataset_name": "merged_clothes_v2_full_reviewed",
-  "output_root": "datasets/merged_clothes_v2_full_reviewed",
-  "review_root": "review/merged_clothes_v2_full_reviewed",
+  "dataset_name": "merged_clothes_v2_balanced",
+  "output_root": "datasets/merged_clothes_v2_balanced",
+  "review_root": "review/merged_clothes_v2_balanced",
   "review_labels_root": "review/merged_clothes_v2_full_reviewed/labels",
+  "split_manifest_csv": "splits/trainval_balanced_v1.split.csv",
+  "strict_split_manifest": true,
   "train_project_config": "merged_train_project_config.json",
-  "recommended_run_name": "clothes_merged_v2_full_reviewed",
+  "recommended_run_name": "clothes_merged_v2_balanced",
   "class_names": {
     "0": "clothes"
   },
@@ -21,7 +23,7 @@
       "sequence_name": "D04_20260123074846",
       "image_root": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\clothes\\group3_1\\clo\\D04_20260123074846",
       "label_root": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\clothes\\group3_1\\clo\\label-clo",
-      "split": "test"
+      "split": "train"
     },
     {
       "source_id": "g31",
@@ -35,7 +37,7 @@
       "sequence_name": "D15_20260123074848",
       "image_root": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\clothes\\group3_1\\clo\\D15_20260123074848",
       "label_root": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\clothes\\group3_1\\clo\\label-clo",
-      "split": "test"
+      "split": "train"
     },
     {
       "source_id": "g32",
@@ -56,7 +58,7 @@
       "sequence_name": "D02_20260123070624",
       "image_root": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\clothes\\group3_3\\clo\\D02_20260123070624",
       "label_root": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\clothes\\group3_3\\clo\\labels",
-      "split": "val"
+      "split": "train"
     },
     {
       "source_id": "g33",

@@ -1,0 +1,72 @@
+{
+  "holdout_ratio": 0.15,
+  "val_ratio": 0.15,
+  "seed": 42,
+  "min_eval_sources": 2,
+  "trainval": {
+    "split_counts": {
+      "train": 352,
+      "val": 75,
+      "skip": 75
+    },
+    "split_source_counts": {
+      "train": {
+        "g31": 67,
+        "g32": 209,
+        "g33": 76
+      },
+      "val": {
+        "g31": 14,
+        "g32": 45,
+        "g33": 16
+      },
+      "skip": {
+        "g31": 14,
+        "g32": 45,
+        "g33": 16
+      }
+    },
+    "split_role_counts": {
+      "train": {
+        "positive": 318,
+        "review_empty": 34
+      },
+      "val": {
+        "positive": 68,
+        "review_empty": 7
+      },
+      "skip": {
+        "positive": 68,
+        "review_empty": 7
+      }
+    }
+  },
+  "holdout": {
+    "split_counts": {
+      "skip": 427,
+      "test": 75
+    },
+    "split_source_counts": {
+      "skip": {
+        "g31": 81,
+        "g32": 254,
+        "g33": 92
+      },
+      "test": {
+        "g31": 14,
+        "g32": 45,
+        "g33": 16
+      }
+    },
+    "split_role_counts": {
+      "skip": {
+        "positive": 386,
+        "review_empty": 41
+      },
+      "test": {
+        "positive": 68,
+        "review_empty": 7
+      }
+    }
+  }
+}

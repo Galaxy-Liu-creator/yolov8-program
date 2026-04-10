@@ -1,4 +1,4 @@
-# Check Log
+﻿# Check Log
 
 ## 2026-04-02 `inspection-flask` 当前严谨性与可运行性复核（仅限项目内）
 
@@ -441,10 +441,10 @@
 标题：`validate --labels` 的真值读取逻辑与当前 `clothes` 单正类标注格式不兼容
 
 定位文件
-- [main.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/main.py#L358)
-- [main.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/main.py#L400)
-- [main.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/main.py#L488)
-- [main.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/main.py#L530)
+- [main.py](/D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/main.py#L358)
+- [main.py](/D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/main.py#L400)
+- [main.py](/D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/main.py#L488)
+- [main.py](/D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/main.py#L530)
 
 问题说明
 - 当前 `_load_ground_truth()` 的标注口径是：同时读取 `person` 框和 `clothes` 框，再通过“person 与 clothes 是否相交”推导真值合规/违规人数。
@@ -461,10 +461,10 @@
 标题：在线主链路监管对象仍然是 ROI 内所有 `person`，不是“已知工人”
 
 定位文件
-- [settings.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/settings.py#L45)
-- [models.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/utils/models.py#L95)
-- [hk_custom_threading_plus.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/applications/common/hk_custom_threading_plus.py#L186)
-- [vio_workwear_missing.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/violation_module/vio_workwear_missing.py#L49)
+- [settings.py](/D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/settings.py#L45)
+- [models.py](/D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/utils/models.py#L95)
+- [hk_custom_threading_plus.py](/D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/applications/common/hk_custom_threading_plus.py#L186)
+- [vio_workwear_missing.py](/D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/violation_module/vio_workwear_missing.py#L49)
 
 问题说明
 - 当前一级检测器按 `MONITORED_PERSON_LABELS = ["person"]` 过滤，后续所有进入 ROI 的 `person` 都会进入工服判定链路。
@@ -481,11 +481,11 @@
 标题：违规判定本质上是“未检出 `clothes` 即违规”，对正类召回率高度敏感
 
 定位文件
-- [main.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/main.py#L153)
-- [main.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/main.py#L159)
-- [hk_custom_threading_plus.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/applications/common/hk_custom_threading_plus.py#L214)
-- [workwear_policy.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/utils/workwear_policy.py#L70)
-- [vio_workwear_missing.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/violation_module/vio_workwear_missing.py#L70)
+- [main.py](/D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/main.py#L153)
+- [main.py](/D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/main.py#L159)
+- [hk_custom_threading_plus.py](/D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/applications/common/hk_custom_threading_plus.py#L214)
+- [workwear_policy.py](/D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/utils/workwear_policy.py#L70)
+- [vio_workwear_missing.py](/D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/violation_module/vio_workwear_missing.py#L70)
 
 问题说明
 - 在当前数据集口径下，`clothes` 是“正常穿戴工服工人”的正类，因此代码里的 `has_workwear = evaluate_workwear_compliance(workwear_items)` 实际等价于“是否成功检出 `clothes` 正类”。
@@ -502,10 +502,10 @@
 标题：离线 `image/validate` 结果不能直接代表在线告警效果
 
 定位文件
-- [main.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/main.py#L15)
-- [main.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/main.py#L45)
-- [hk_custom_threading_plus.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/applications/common/hk_custom_threading_plus.py#L301)
-- [vio_workwear_missing.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/violation_module/vio_workwear_missing.py#L81)
+- [main.py](/D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/main.py#L15)
+- [main.py](/D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/main.py#L45)
+- [hk_custom_threading_plus.py](/D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/applications/common/hk_custom_threading_plus.py#L301)
+- [vio_workwear_missing.py](/D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/violation_module/vio_workwear_missing.py#L81)
 
 问题说明
 - 离线工具顶部 docstring 和 `_OFFLINE_NOTE` 已明确说明：离线模式不包含 `MIN_TRACK_APPEAR_FRAMES`、`TEMPORAL_TRIGGER_RATIO` 和 track 跟踪。
@@ -521,10 +521,10 @@
 标题：在线时序窗口的真实时间尺度仍然不稳定
 
 定位文件
-- [settings.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/settings.py#L82)
-- [settings.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/settings.py#L110)
-- [applications/__init__.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/applications/__init__.py#L111)
-- [hk_custom_threading_plus.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/applications/common/hk_custom_threading_plus.py#L292)
+- [settings.py](/D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/settings.py#L82)
+- [settings.py](/D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/settings.py#L110)
+- [applications/__init__.py](/D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/applications/__init__.py#L111)
+- [hk_custom_threading_plus.py](/D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/applications/common/hk_custom_threading_plus.py#L292)
 
 问题说明
 - 调度器层面按 `get_image_interval = 110` 秒定时抓图。
@@ -541,9 +541,9 @@
 标题：递归数据集验证时，可视化输出文件仍然会覆盖同名图片
 
 定位文件
-- [main.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/main.py#L230)
-- [main.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/main.py#L447)
-- [main.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/main.py#L483)
+- [main.py](/D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/main.py#L230)
+- [main.py](/D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/main.py#L447)
+- [main.py](/D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/main.py#L483)
 
 问题说明
 - 当前 `validate` 已经支持递归遍历数据集，也已经按相对目录定位标注文件。
@@ -625,9 +625,9 @@
 标题：`validate --roi --labels` 的 GT 口径仍然错误，预测过滤了 ROI，GT 却没有过滤 ROI
 
 定位文件
-- [main.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/main.py#L200)
-- [main.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/main.py#L358)
-- [main.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/main.py#L482)
+- [main.py](/D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/main.py#L200)
+- [main.py](/D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/main.py#L358)
+- [main.py](/D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/main.py#L482)
 
 问题说明
 - `_process_single_image()` 在传入 `roi` 时，已经只对 `in_roi=True` 的人员做 `valid_persons / compliant / violations` 统计。
@@ -643,8 +643,8 @@
 标题：递归数据集的标注文件查找方式仍然不稳，子目录数据集和同名文件会被错误对齐
 
 定位文件
-- [main.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/main.py#L443)
-- [main.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/main.py#L478)
+- [main.py](/D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/main.py#L443)
+- [main.py](/D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/main.py#L478)
 
 问题说明
 - 图片是通过 `dataset_dir.rglob("*")` 递归扫描的，说明代码允许多级子目录数据集。
@@ -660,9 +660,9 @@
 标题：`validate` 里的 Precision / Recall / F1 仍然只是“按数量对账”，不是真正的检测评估
 
 定位文件
-- [main.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/main.py#L523)
-- [main.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/main.py#L524)
-- [main.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/main.py#L527)
+- [main.py](/D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/main.py#L523)
+- [main.py](/D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/main.py#L524)
+- [main.py](/D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/main.py#L527)
 
 问题说明
 - 当前 `tp / fp / fn` 是通过 `min(pred_violations, gt_violation)` 和数量差直接算出来的。
@@ -678,11 +678,11 @@
 标题：在线告警仍然只保留第一个触发 track，多个同时违规人员会被压掉
 
 定位文件
-- [vio_workwear_missing.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/violation_module/vio_workwear_missing.py#L68)
-- [vio_workwear_missing.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/violation_module/vio_workwear_missing.py#L76)
-- [vio_workwear_missing.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/violation_module/vio_workwear_missing.py#L83)
-- [hk_custom_threading_plus.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/applications/common/hk_custom_threading_plus.py#L315)
-- [hk_custom_threading_plus.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/applications/common/hk_custom_threading_plus.py#L323)
+- [vio_workwear_missing.py](/D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/violation_module/vio_workwear_missing.py#L68)
+- [vio_workwear_missing.py](/D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/violation_module/vio_workwear_missing.py#L76)
+- [vio_workwear_missing.py](/D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/violation_module/vio_workwear_missing.py#L83)
+- [hk_custom_threading_plus.py](/D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/applications/common/hk_custom_threading_plus.py#L315)
+- [hk_custom_threading_plus.py](/D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/applications/common/hk_custom_threading_plus.py#L323)
 
 问题说明
 - `WorkwearMissingViolation.run()` 遍历 `track_stats` 时，只要遇到第一个满足阈值的 `track_id` 就 `break`。
@@ -772,9 +772,9 @@
 标题：离线 `--roi` 统计口径仍然错误，ROI 外人员会被计入合规/违规数量
 
 定位文件
-- [main.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/main.py#L151)
-- [main.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/main.py#L161)
-- [main.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/main.py#L199)
+- [main.py](/D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/main.py#L151)
+- [main.py](/D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/main.py#L161)
+- [main.py](/D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/main.py#L199)
 
 问题说明
 - `_build_person_contexts()` 已经给每个人写入了 `in_roi` 字段。
@@ -790,9 +790,9 @@
 标题：带标注的 `validate` 默认参数是错误的，默认就会把 GT 统计算偏
 
 定位文件
-- [main.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/main.py#L352)
-- [main.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/main.py#L427)
-- [main.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/main.py#L563)
+- [main.py](/D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/main.py#L352)
+- [main.py](/D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/main.py#L427)
+- [main.py](/D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/main.py#L563)
 
 问题说明
 - `cmd_validate()` 默认 `--person-cls=0`、`--clothes-cls=0`。
@@ -808,10 +808,10 @@
 标题：当前 track 逻辑过于脆弱，单帧漏检就可能把同一人切成新 track，导致时序规则失效
 
 定位文件
-- [hk_custom_threading_plus.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/applications/common/hk_custom_threading_plus.py#L48)
-- [hk_custom_threading_plus.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/applications/common/hk_custom_threading_plus.py#L53)
-- [hk_custom_threading_plus.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/applications/common/hk_custom_threading_plus.py#L81)
-- [vio_workwear_missing.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/violation_module/vio_workwear_missing.py#L68)
+- [hk_custom_threading_plus.py](/D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/applications/common/hk_custom_threading_plus.py#L48)
+- [hk_custom_threading_plus.py](/D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/applications/common/hk_custom_threading_plus.py#L53)
+- [hk_custom_threading_plus.py](/D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/applications/common/hk_custom_threading_plus.py#L81)
+- [vio_workwear_missing.py](/D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/violation_module/vio_workwear_missing.py#L68)
 
 问题说明
 - `SimpleIoUTracker` 只和“上一帧”做 IoU 匹配，没有 `max_age`、没有丢失容忍、也没有更稳的外观/速度信息。
@@ -827,8 +827,8 @@
 标题：帧去重 hash 过于粗糙，细小但真实的画面变化可能被当成“同一帧”跳过
 
 定位文件
-- [hk_recorder_threading.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/applications/common/hk_recorder_threading.py#L18)
-- [hk_recorder_threading.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/applications/common/hk_recorder_threading.py#L72)
+- [hk_recorder_threading.py](/D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/applications/common/hk_recorder_threading.py#L18)
+- [hk_recorder_threading.py](/D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/applications/common/hk_recorder_threading.py#L72)
 
 问题说明
 - 当前 `_compute_frame_hash()` 只是把整帧缩到 `8x8` 后做均值二值化。
@@ -849,7 +849,7 @@
 ## 2026-03-31 `Analysis_For_yolov8.md` 一致性复核记录
 
 检查范围：
-- [Analysis_For_yolov8.md](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/docs/Analysis_For_yolov8.md)
+- [Analysis_For_yolov8.md](/D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/docs/Analysis_For_yolov8.md)
 - `inspection-flask/main.py`
 - `inspection-flask/applications/common/hk_custom_threading_plus.py`
 - `inspection-flask/applications/common/hk_recorder_threading.py`
@@ -869,9 +869,9 @@
 标题：`main.py` 的离线验证口径与在线规则口径仍不一致
 
 涉及文件：
-- [main.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/main.py#L80)
-- [hk_custom_threading_plus.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/applications/common/hk_custom_threading_plus.py#L146)
-- [vio_workwear_missing.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/violation_module/vio_workwear_missing.py#L68)
+- [main.py](/D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/main.py#L80)
+- [hk_custom_threading_plus.py](/D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/applications/common/hk_custom_threading_plus.py#L146)
+- [vio_workwear_missing.py](/D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/violation_module/vio_workwear_missing.py#L68)
 
 问题描述：
 - 在线规则已使用 ROI 重叠比例 `ROI_MIN_OVERLAP_RATIO` 做有效区域判定。
@@ -889,8 +889,8 @@
 标题：`validate` 模式目前不是“准确率验证”，只能算无标注统计
 
 涉及文件：
-- [main.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/main.py#L290)
-- [Analysis_For_yolov8.md](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/docs/Analysis_For_yolov8.md)
+- [main.py](/D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/main.py#L290)
+- [Analysis_For_yolov8.md](/D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/docs/Analysis_For_yolov8.md)
 
 问题描述：
 - 文档把 `main.py` 定位为“确保 YOLOv8 切换后检测正确性”的关键验证脚本。
@@ -908,9 +908,9 @@
 标题：`logic_judge.py` 的调试统计逻辑已经落后于当前在线规则
 
 涉及文件：
-- [logic_judge.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/applications/common/logic_judge.py#L61)
-- [hk_custom_threading_plus.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/applications/common/hk_custom_threading_plus.py#L169)
-- [vio_workwear_missing.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/violation_module/vio_workwear_missing.py#L121)
+- [logic_judge.py](/D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/applications/common/logic_judge.py#L61)
+- [hk_custom_threading_plus.py](/D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/applications/common/hk_custom_threading_plus.py#L169)
+- [vio_workwear_missing.py](/D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/violation_module/vio_workwear_missing.py#L121)
 
 问题描述：
 - `logic_judge.count_violation_frames()` 仍按“窗口内任意一帧出现未合规人员即记一帧违规”的旧思路统计。
@@ -928,9 +928,9 @@
 标题：`Analysis_For_yolov8.md` 存在已过时描述，容易误导后续检查
 
 涉及文件：
-- [Analysis_For_yolov8.md](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/docs/Analysis_For_yolov8.md)
-- [hk_custom_threading_plus.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/applications/common/hk_custom_threading_plus.py#L146)
-- [hk_recorder_threading.py](/E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/applications/common/hk_recorder_threading.py#L18)
+- [Analysis_For_yolov8.md](/D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/docs/Analysis_For_yolov8.md)
+- [hk_custom_threading_plus.py](/D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/applications/common/hk_custom_threading_plus.py#L146)
+- [hk_recorder_threading.py](/D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/applications/common/hk_recorder_threading.py#L18)
 
 问题描述：
 - 文档中仍有“继续保留 ROI 中心点判定”的表述，但代码已改为 ROI 重叠比例判定。
@@ -971,10 +971,10 @@
 标题：采集层仍然只读取 `frame_path` 图片，同一静态图会被重复当成新帧
 
 涉及文件：
-- [hk_recorder_threading.py](E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/applications/common/hk_recorder_threading.py#L18)
-- [hk_recorder_threading.py](E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/applications/common/hk_recorder_threading.py#L60)
-- [hk_custom_threading_plus.py](E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/applications/common/hk_custom_threading_plus.py#L108)
-- [hk_camera.py](E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/applications/view/system/hk_camera.py#L361)
+- [hk_recorder_threading.py](D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/applications/common/hk_recorder_threading.py#L18)
+- [hk_recorder_threading.py](D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/applications/common/hk_recorder_threading.py#L60)
+- [hk_custom_threading_plus.py](D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/applications/common/hk_custom_threading_plus.py#L108)
+- [hk_camera.py](D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/applications/view/system/hk_camera.py#L361)
 
 问题描述：
 - 当前采集函数 `_read_frame_from_camera()` 仍然只尝试读取 `frame_path` 对应的图片。
@@ -995,10 +995,10 @@
 标题：规则对象仍然是所有 `person`，不是“加油站工人”
 
 涉及文件：
-- [settings.py](E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/settings.py#L45)
-- [settings.py](E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/settings.py#L47)
-- [utils/models.py](E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/utils/models.py)
-- [vio_workwear_missing.py](E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/violation_module/vio_workwear_missing.py#L38)
+- [settings.py](D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/settings.py#L45)
+- [settings.py](D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/settings.py#L47)
+- [utils/models.py](D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/utils/models.py)
+- [vio_workwear_missing.py](D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/violation_module/vio_workwear_missing.py#L38)
 
 问题描述：
 - 当前代码仍然以 `person` 作为监控对象。
@@ -1019,10 +1019,10 @@
 标题：触发违规的 track 与最终保存的证据图目标仍未严格绑定
 
 涉及文件：
-- [vio_workwear_missing.py](E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/violation_module/vio_workwear_missing.py#L68)
-- [vio_workwear_missing.py](E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/violation_module/vio_workwear_missing.py#L81)
-- [base.py](E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/violation_module/base.py#L136)
-- [base.py](E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/violation_module/base.py#L151)
+- [vio_workwear_missing.py](D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/violation_module/vio_workwear_missing.py#L68)
+- [vio_workwear_missing.py](D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/violation_module/vio_workwear_missing.py#L81)
+- [base.py](D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/violation_module/base.py#L136)
+- [base.py](D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/violation_module/base.py#L151)
 
 问题描述：
 - 规则层仍只算出一个 `triggered_track`，但没有把 `plot_targets` 过滤到该 track。
@@ -1042,9 +1042,9 @@
 标题：`track_id` 仍依赖简化版 IoU 贪心关联，时序判定基础不稳
 
 涉及文件：
-- [hk_custom_threading_plus.py](E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/applications/common/hk_custom_threading_plus.py#L15)
-- [hk_custom_threading_plus.py](E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/applications/common/hk_custom_threading_plus.py#L48)
-- [vio_workwear_missing.py](E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/violation_module/vio_workwear_missing.py#L44)
+- [hk_custom_threading_plus.py](D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/applications/common/hk_custom_threading_plus.py#L15)
+- [hk_custom_threading_plus.py](D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/applications/common/hk_custom_threading_plus.py#L48)
+- [vio_workwear_missing.py](D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/violation_module/vio_workwear_missing.py#L44)
 
 问题描述：
 - 当前 `SimpleIoUTracker` 依然只基于相邻帧人框 IoU 做贪心匹配。
@@ -1064,9 +1064,9 @@
 标题：本地模块 `utils.plots` 仍不存在，证据图保存路径存在代码级缺口
 
 涉及文件：
-- [base.py](E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/violation_module/base.py#L7)
-- [base.py](E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/violation_module/base.py#L191)
-- [base.py](E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/violation_module/base.py#L199)
+- [base.py](D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/violation_module/base.py#L7)
+- [base.py](D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/violation_module/base.py#L191)
+- [base.py](D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/violation_module/base.py#L199)
 
 问题描述：
 - `BaseVio` 仍然依赖 `from utils.plots import plot_one_box, plot_txt_PIL`。
@@ -1087,8 +1087,8 @@
 标题：仍缺少验证集评估与回归测试，无法证明改动后的检测质量
 
 涉及文件：
-- [main.py](E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/main.py)
-- [settings.py](E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/settings.py)
+- [main.py](D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/main.py)
+- [settings.py](D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/settings.py)
 
 问题描述：
 - 目录内仍未看到针对误报、漏报、阈值回归、模型切换结果的自动化验证模块。
@@ -1124,9 +1124,9 @@
 标题：时序检测并不建立在真实视频流上，静态图片会被重复当成新帧
 
 涉及文件：
-- [hk_recorder_threading.py](E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/applications/common/hk_recorder_threading.py#L18)
-- [hk_custom_threading_plus.py](E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/applications/common/hk_custom_threading_plus.py#L108)
-- [hk_camera.py](E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/applications/view/system/hk_camera.py#L361)
+- [hk_recorder_threading.py](D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/applications/common/hk_recorder_threading.py#L18)
+- [hk_custom_threading_plus.py](D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/applications/common/hk_custom_threading_plus.py#L108)
+- [hk_camera.py](D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/applications/view/system/hk_camera.py#L361)
 
 问题描述：
 - 采集层当前只读取 `frame_path` 指向的图片文件。
@@ -1145,9 +1145,9 @@
 标题：检测对象是所有 `person`，不是“加油站工人”
 
 涉及文件：
-- [settings.py](E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/settings.py#L45)
-- [models.py](E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/utils/models.py#L95)
-- [vio_workwear_missing.py](E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/violation_module/vio_workwear_missing.py#L38)
+- [settings.py](D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/settings.py#L45)
+- [models.py](D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/utils/models.py#L95)
+- [vio_workwear_missing.py](D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/violation_module/vio_workwear_missing.py#L38)
 
 问题描述：
 - 当前第一阶段只筛选 `person`。
@@ -1165,8 +1165,8 @@
 标题：同一人跟踪依赖简化版 IoU 贪心匹配，无法严格保证 track_id 稳定
 
 涉及文件：
-- [hk_custom_threading_plus.py](E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/applications/common/hk_custom_threading_plus.py#L15)
-- [vio_workwear_missing.py](E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/violation_module/vio_workwear_missing.py#L44)
+- [hk_custom_threading_plus.py](D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/applications/common/hk_custom_threading_plus.py#L15)
+- [vio_workwear_missing.py](D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/violation_module/vio_workwear_missing.py#L44)
 
 问题描述：
 - `SimpleIoUTracker` 只用上一帧与当前帧做人框 IoU 贪心匹配。
@@ -1184,8 +1184,8 @@
 标题：触发违规的目标与最终保存的证据图目标不一定一致
 
 涉及文件：
-- [vio_workwear_missing.py](E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/violation_module/vio_workwear_missing.py#L57)
-- [base.py](E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/violation_module/base.py#L136)
+- [vio_workwear_missing.py](D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/violation_module/vio_workwear_missing.py#L57)
+- [base.py](D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/violation_module/base.py#L136)
 
 问题描述：
 - 规则触发时，只判断某个 `triggered_track` 的违规比例是否达标。
@@ -1203,9 +1203,9 @@
 标题：面积阈值在前处理和规则层存在口径不一致
 
 涉及文件：
-- [hk_custom_threading_plus.py](E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/applications/common/hk_custom_threading_plus.py#L169)
-- [vio_workwear_missing.py](E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/violation_module/vio_workwear_missing.py#L107)
-- [settings.py](E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/settings.py#L64)
+- [hk_custom_threading_plus.py](D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/applications/common/hk_custom_threading_plus.py#L169)
+- [vio_workwear_missing.py](D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/violation_module/vio_workwear_missing.py#L107)
+- [settings.py](D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/settings.py#L64)
 
 问题描述：
 - 人员上下文构建阶段支持 `absolute` 和 `relative` 两种面积过滤模式。
@@ -1223,8 +1223,8 @@
 标题：工服合规判断过粗，不能严格等价于“正确穿戴工服”
 
 涉及文件：
-- [settings.py](E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/settings.py#L49)
-- [workwear_policy.py](E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/utils/workwear_policy.py#L70)
+- [settings.py](D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/settings.py#L49)
+- [workwear_policy.py](D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/utils/workwear_policy.py#L70)
 
 问题描述：
 - 当前默认规则是：只要检测结果中命中一个 `clothes` 标签，就视为合规。
@@ -1242,7 +1242,7 @@
 标题：ROI 判定只看人框中心点，边界场景不够严谨
 
 涉及文件：
-- [hk_custom_threading_plus.py](E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/applications/common/hk_custom_threading_plus.py#L146)
+- [hk_custom_threading_plus.py](D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/applications/common/hk_custom_threading_plus.py#L146)
 
 问题描述：
 - 当前仅用人框中心点是否落入 ROI 作为有效性判断。
@@ -1259,8 +1259,8 @@
 标题：缺少验证集评估、回归测试和阈值校准闭环
 
 涉及文件：
-- [main.py](E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/main.py)
-- [settings.py](E:/University_competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/settings.py)
+- [main.py](D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/main.py)
+- [settings.py](D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/inspection-flask/settings.py)
 
 问题描述：
 - 代码中没有看到与准确率验证、误报漏报统计、阈值回归测试相关的测试或评估模块。
@@ -1279,3 +1279,4 @@
 3. 每个问题至少包含：严重级别、标题、涉及文件、问题描述、影响。
 4. 如果某个旧问题已修复，新的检查记录中必须明确标注“已修复”或“已关闭”，不能直接删除历史记录。
 5. 除非明确说明，本日志默认优先记录代码逻辑问题、规则问题、数据流问题、时序问题和工程验证缺口。
+

@@ -17,18 +17,31 @@
 
 以下路径请按你的真实项目结构修改。
 
-- 图片根目录 1：`E:\University_competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes\group3_1\clo\D04_20260123074846`
-- 图片根目录 2：`E:\University_competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes\group3_1\clo\D05_20260123074841`
-- 图片根目录 3：`E:\University_competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes\group3_1\clo\D15_20260123074848`
-- 标注根目录：`E:\University_competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes\group3_1\clo\label-clo`
+### 默认单源训练入口（`backend-train-model/config.py` / `backend-train-model/project_config.json`）
+
+- 图片根目录 1：`D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes\group3_1\clo\D04_20260123074846`
+- 图片根目录 2：`D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes\group3_1\clo\D05_20260123074841`
+- 图片根目录 3：`D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes\group3_1\clo\D15_20260123074848`
+- 标注根目录：`D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes\group3_1\clo\label-clo`
+
+### 多源 merged / All-train-model 入口（`backend-train-model/All-train-model/*.build.json`）
+
+- 图片根目录 4：`D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes\group3_2\clo\1`
+- 图片根目录 5：`D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes\group3_2\clo\D15_20260119203927`
+- 图片根目录 6：`D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes\group3_3\clo\D02_20260123070624`
+- 图片根目录 7：`D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes\group3_3\clo\D02_20260123074836`
+- `group3_1` 标注根目录：`D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes\group3_1\clo\label-clo`
+- `group3_2` 标注根目录：`D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes\group3_2\clo\label_clothes`
+- `group3_3` 标注根目录：`D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes\group3_3\clo\labels`
 - 数据集配置文件：`当前尚未创建`
 - 示例图片：`docs/dataset_examples/sample_001.jpg`
 - 示例标注：`docs/dataset_examples/sample_001.txt`
 
 补充说明：
 
-- 当前数据集由 `3` 个图片根目录共同组成。
-- 当前只有 `1` 个统一标注根目录，包含上述 `3` 个图片根目录对应的全部标注文件。
+- 当前仓库同时保留两种数据入口：
+  - 默认单源入口：`group3_1` 的 `3` 个图片根目录 + `1` 个统一标注根目录；
+  - merged 多源入口：`7` 个图片根目录，按 `group3_1 / group3_2 / group3_3` 映射到 `3` 个标注根目录。
 - 在尚未创建 `dataset.yaml` 前，训练、校验、转换脚本都必须以本文档中的路径约定和配对规则为准。
 - 如果后续创建数据集配置文件，需要保证其内容与本文档保持一致。
 
@@ -38,14 +51,16 @@
 
 - 图片扩展名：`.jpg`
 - 标注扩展名：`.txt`
-- 三个图片根目录下的所有图片共同组成同一个数据集
-- 所有标注文件统一存放在同一个标注根目录中
+- 默认单源入口中，`group3_1` 的三个图片根目录共同组成同一个数据集
+- 默认单源入口中，所有标注文件统一存放在同一个标注根目录中
+- merged 多源入口中，每个 `sequence` 通过各自配置里的 `image_root + label_root` 进行配对
 - 图片与标注按“文件名（不含扩展名）相同”进行配对
 - 示例：`sample_001.jpg` 对应 `sample_001.txt`
 
 特别说明：
 
-- 由于标注根目录是统一的，因此默认要求三个图片根目录中的图片文件名全局唯一。
+- 对默认单源入口，由于标注根目录是统一的，因此要求 `group3_1` 的三个图片根目录中的图片文件名全局唯一。
+- 对 merged 多源入口，共用同一个 `label_root` 的多个图片根目录，也要求在该 `label_root` 的覆盖范围内避免同名冲突。
 - 如果不同图片根目录中存在同名图片，则当前结构无法仅靠文件名唯一匹配标注。
 - 如存在重名样本，应优先采用以下任一方式修正：
   - 重命名图片及对应标注，确保全局唯一

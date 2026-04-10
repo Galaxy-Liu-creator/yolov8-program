@@ -14,6 +14,18 @@
   - 当前可直接构建的 `merged_v1_positive_only` 配置
 - `merged_clothes_v2.build.json`
   - 预留给后续补标后的 `merged_v2_full_reviewed` 配置
+- `merged_clothes_v2_balanced.build.json`
+  - 用于构建短期提效版 `merged_clothes_v2_balanced`
+- `unified_holdout_v1.build.json`
+  - 用于构建统一复评数据集 `unified_holdout_v1`
+- `first_train_holdout_v1.build.json`
+  - 用于构建 `g31` 基线重训数据集
+- `splits/trainval_balanced_v1.split.csv`
+  - balanced `train / val / skip` 分配表
+- `splits/unified_holdout_v1.split.csv`
+  - 统一 holdout 的 `test / skip` 分配表
+- `splits/source_balanced_v1_summary.json`
+  - 当前 split 统计摘要
 
 ## 当前状态
 
@@ -21,10 +33,20 @@
 - `merged_v2_full_reviewed` 已经构建完成，48 张 review 空标签样本已经并入数据集
 - `clothes_merged_v2_from_first` 已经形成训练、评估与导出产物；真实历史是先用 `first-train` 的 `best.pt` 启动，后因中断再 resume
 - 当前结论仍是：`merged_v2_from_first` 尚未稳定优于 `first-train`，不能直接替代当前更稳的基线
+- 现在已经补上“统一 holdout + source-balanced split + 可命名评估报告”的代码与配置入口
 - 关键产物包括：
   - `backend-train-model\All-train-model\datasets\merged_clothes_v2_full_reviewed\dataset.yaml`
   - `backend-train-model\All-train-model\artifacts\runs\clothes_merged_v2_from_first\weights\best.pt`
   - `backend-train-model\All-train-model\artifacts\reports\clothes_merged_v2_from_first_eval.json`
+
+如果你现在要做：
+
+- `merged_v2` 短期提效
+- `first-train` 和 merged 在统一 holdout 下比较
+
+直接看：
+
+- `backend-train-model/docs/all_train_docs/unified_holdout_compare_method.md`
 
 ## 当前推荐流程
 
@@ -108,5 +130,7 @@ D:\Miniconda3_python\envs\yolo_code\python.exe build_merged_clothes_dataset.py -
   - merged 后的数据集目录
 - `review/`
   - 缺标清单与后续补标文件
+- `splits/`
+  - source-balanced split manifest 与摘要文件
 - `artifacts/`
   - `train_workwear.py` 的训练、评估、导出产物
