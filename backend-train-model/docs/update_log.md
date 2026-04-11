@@ -1,5 +1,64 @@
 ﻿# Update Log
 
+## 2026-04-11 微调统一 holdout 审查文档，新增总运行手册，并实际构建三套对比数据集
+
+变更来源：
+- 用户要求对 `backend-train-model/docs/Problem-Solution.md` 做可信度与表述微调。
+- 用户要求把统一 holdout 的完整训练 / 评估命令单独整理成一份 `total-run-method.md`。
+- 用户同时要求直接执行构建命令，先生成三套数据集的 `dataset.yaml`，确保后续训练可以正常进行。
+
+变更总览：
+1. 微调 `backend-train-model/docs/Problem-Solution.md`：
+   - 把模糊的 `datasets/` 改为明确的 `backend-train-model/All-train-model/datasets/`；
+   - 把“502 行”改成“502 条样本记录，CSV 含表头为 503 行”；
+   - 把“配置正确”收敛为“关键配置项已就绪，待构建验证”；
+   - 把 `--report-name` 的描述改成稳定表述；
+   - 构建完成后新增一条审查记录，明确 `[P0]` 已解决。
+2. 新增 `backend-train-model/docs/total-run-method.md`，集中给出：
+   - build 三套数据集命令；
+   - cross-eval 命令；
+   - strict holdout 重训命令；
+   - strict eval 命令；
+   - 显式训练参数与结果判断顺序。
+3. 实际执行三条 `build_merged_clothes_dataset.py` 命令，成功生成：
+   - `All-train-model/datasets/merged_clothes_v2_balanced/`
+   - `All-train-model/datasets/unified_holdout_v1/`
+   - `All-train-model/datasets/first_train_holdout_v1/`
+4. 构建后校验三套目录下的 `dataset.yaml`、`manifest.csv`、`build_report.json` 均存在。
+
+涉及文件：
+- `backend-train-model/docs/Problem-Solution.md`
+- `backend-train-model/docs/total-run-method.md`
+- `backend-train-model/docs/update_log.md`
+- `backend-train-model/All-train-model/datasets/merged_clothes_v2_balanced/dataset.yaml`
+- `backend-train-model/All-train-model/datasets/merged_clothes_v2_balanced/manifest.csv`
+- `backend-train-model/All-train-model/datasets/merged_clothes_v2_balanced/build_report.json`
+- `backend-train-model/All-train-model/datasets/unified_holdout_v1/dataset.yaml`
+- `backend-train-model/All-train-model/datasets/unified_holdout_v1/manifest.csv`
+- `backend-train-model/All-train-model/datasets/unified_holdout_v1/build_report.json`
+- `backend-train-model/All-train-model/datasets/first_train_holdout_v1/dataset.yaml`
+- `backend-train-model/All-train-model/datasets/first_train_holdout_v1/manifest.csv`
+- `backend-train-model/All-train-model/datasets/first_train_holdout_v1/build_report.json`
+
+新增 / 变更配置项：
+- 无新增代码配置项。
+- 本轮新增文档入口：
+  - `backend-train-model/docs/total-run-method.md`
+- 本轮新增数据集工件：
+  - 三套统一 holdout 对比数据集的 `dataset.yaml`
+  - 三套对应的 `manifest.csv`
+  - 三套对应的 `build_report.json`
+
+兼容性注意：
+- 本轮不修改 `train_workwear.py`、`build_merged_clothes_dataset.py`、`config.py` 或 `project_config.json` 的逻辑。
+- `unified_holdout_v1` 只有 `test` split，用于评估，不应用作训练数据集。
+- `train_workwear.py train` 若使用相同 `--name` 且 run 已存在，Ultralytics 可能自动追加后缀；最终应以 train report 中的 `actual_run_name` 和 `best_weight` 为准。
+
+不改动说明：
+- 本轮不执行 cross-eval、strict holdout 重训或 strict eval。
+- 本轮不重新生成 split manifest。
+- 本轮不修改 `inspection-flask/` 代码与在线链路。
+
 ## 2026-04-10 同步数据集新路径到训练配置与文档入口
 
 变更来源：
@@ -799,4 +858,94 @@
 - 本轮不修改 `dataset_tools.py`、`config.py`、`project_config.json` 的默认 prepare 行为。
 - 本轮不改动 `inspection-flask/` 的在线推理链路。
 - 本轮不直接启动新的长时间训练；真正的 `strict holdout` 训练仍由用户按新增文档中的命令触发。
+
+## 2026-04-11 修复 `--project` / `--project-config` 前缀冲突，打通 strict holdout 训练命令
+
+变更来源：
+- 用户在执行 strict holdout 训练命令时反馈：
+  - `python train_workwear.py train --project-config All-train-model\merged_train_project_config.json ... --project All-train-model\artifacts\runs ...`
+  - 实际报错却变成“读取项目配置失败: ...\All-train-model\artifacts\runs”。
+- 本轮目标是把相关代码和文档一起改正确，确保后续训练命令能顺利执行。
+
+变更总览：
+1. 在 `backend-train-model/train_workwear.py` 中引入禁用长参数缩写的 CLI 解析器，彻底避免 `--project` 被 bootstrap 阶段误识别为 `--project-config`。
+2. 顶层 parser 与所有子命令 parser 同步禁用长参数缩写，统一 CLI 行为，减少后续新增长参数时再次出现前缀冲突的风险。
+3. 更新 `backend-train-model/docs/total-run-method.md`，明确说明该问题已修复，保留并确认 strict holdout 命令中的 `--project` 写法现在可直接使用。
+4. 更新 `backend-train-model/All-train-model/README.md`，补充“`--project` 不再误判、但 `--project-config` 仍按 `backend-train-model/` 相对解析”的说明，避免再次混淆。
+
+涉及文件：
+- `backend-train-model/train_workwear.py`
+- `backend-train-model/docs/total-run-method.md`
+- `backend-train-model/All-train-model/README.md`
+- `backend-train-model/docs/update_log.md`
+
+新增 / 变更配置项：
+- 无新增业务配置项。
+- CLI 行为变更：
+  - `train_workwear.py` 现在禁用长参数缩写匹配。
+
+兼容性注意：
+- 之后请使用完整长参数名，例如：
+  - `--project-config`
+  - `--project`
+  - `--report-name`
+- 之前如果有人依赖 `--proj`、`--project-conf` 这类缩写写法，现在将不再被接受；这是有意收紧，目的是消除歧义并提升训练命令稳定性。
+- `--project-config` 的路径解析规则没有改：仍然建议先进入 `backend-train-model/`，再使用 `All-train-model\...` 相对路径运行命令。
+
+不改动说明：
+- 本轮不调整 `group3_1 / group3_2 / group3_3` 的数据集内容与 split 规则。
+- 本轮不修改 `inspection-flask/` 代码，因为扫描后未发现与本次训练报错直接相关的训练入口或路径配置。
+- 本轮不直接启动长时间训练，只修复入口和命令口径，并在本地做轻量解析验证。
+
+## 2026-04-11 细化 unified holdout 实验设计，拆分“公平主对照”和“业务路线验证”
+
+变更来源：
+- 用户继续追问 unified holdout 训练方案时指出：
+  - `clothes_first_train_holdout_v1` 的新权重输出在 `All-train-model/artifacts/runs/...`；
+  - 但文档里 `All-train-model` 的 strict holdout 训练仍读取历史 `first-train/artifacts/runs/clothes_fullframe_baseline/weights/best.pt`。
+- 因此需要把文档中的实验目标拆清楚：哪些命令是在做严格公平对照，哪些命令是在验证“先 first-train 再 merged”的业务路线。
+
+变更总览：
+1. 重写 `backend-train-model/docs/total-run-method.md`：
+   - 保留 `cross-eval` 历史复评；
+   - 将 strict holdout 主对照改为：
+     - `first-train` 从 `weights/yolov8n.pt` 起跑；
+     - `merged_v2_balanced` 也从 `weights/yolov8n.pt` 起跑；
+   - 新增单独的 `route verification` 阶段，明确 warm-start merged 应读取本轮新生成的 `All-train-model/artifacts/runs/clothes_first_train_holdout_v1/weights/best.pt`。
+2. 重写 `backend-train-model/docs/all_train_docs/unified_holdout_compare_method.md`：
+   - 明确区分三层比较：
+     - 历史复评；
+     - strict holdout / fair compare；
+     - route verification；
+   - 明确说明 strict 主对照不再使用历史 `first-train/.../best.pt` 作为 merged 初始化。
+3. 文档中补充并行性说明：
+   - fair compare 两条重训命令可并行；
+   - route verification 依赖本轮 `clothes_first_train_holdout_v1` 的新权重，不能并行。
+
+涉及文件：
+- `backend-train-model/docs/total-run-method.md`
+- `backend-train-model/docs/all_train_docs/unified_holdout_compare_method.md`
+- `backend-train-model/docs/update_log.md`
+
+新增 / 变更配置项：
+- 无新增代码配置项。
+- 文档口径变更：
+  - strict holdout 主对照的 merged 初始化权重改为 `weights/yolov8n.pt`
+  - route verification 的 merged 初始化权重改为本轮生成的 `All-train-model/artifacts/runs/clothes_first_train_holdout_v1/weights/best.pt`
+- 新增推荐 run 名称：
+  - `clothes_merged_v2_balanced_holdout_v1`
+  - `clothes_merged_v2_balanced_from_first_holdout_v1`
+
+兼容性注意：
+- 历史 `cross-eval` 命令仍然保留 `first-train/artifacts/runs/clothes_fullframe_baseline/weights/best.pt`，因为它们复评的是历史产物，不是新的 strict 主对照。
+- 如果你已经按旧文档跑过 `clothes_merged_v2_balanced_from_first`，它仍可作为历史参考，但不再建议把它当作当前 unified holdout 主结论。
+- 从本轮起，更推荐按以下顺序解读结果：
+  1. `cross-eval`
+  2. `strict holdout / fair compare`
+  3. `route verification`
+
+不改动说明：
+- 本轮不修改 `train_workwear.py`、`build_merged_clothes_dataset.py` 或任何数据集构建配置文件。
+- 本轮不新增新的 holdout split 规则，只调整文档中的实验设计口径与命令组织方式。
+- 本轮不直接启动训练，只更新推荐运行方法，方便用户后续自行执行。
 

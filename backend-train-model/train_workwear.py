@@ -40,6 +40,14 @@ from dataset_tools import AuditResult, DatasetToolError, PrepareResult, audit_da
 AUTO_RESUME_TOKEN = "__AUTO_RESUME__"
 
 
+class StrictArgumentParser(argparse.ArgumentParser):
+    """禁用长参数缩写，避免 `--project` / `--project-config` 这类前缀冲突。"""
+
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault("allow_abbrev", False)
+        super().__init__(*args, **kwargs)
+
+
 def write_json(path: Path, data: Dict[str, object]) -> None:
     """把结构化数据写成 UTF-8 JSON 文件。"""
 
@@ -59,7 +67,7 @@ def timestamp_token() -> str:
 def bootstrap_project_config(argv: Optional[List[str]] = None) -> Optional[Path]:
     """在正式构建完整 CLI 前，先解析并应用项目配置。"""
 
-    bootstrap_parser = argparse.ArgumentParser(add_help=False)
+    bootstrap_parser = StrictArgumentParser(add_help=False)
     bootstrap_parser.add_argument(
         "--project-config",
         help="项目化 JSON 配置文件；默认尝试读取 backend-train-model/project_config.json。",
@@ -1652,11 +1660,15 @@ def add_global_args(parser: argparse.ArgumentParser) -> None:
 def build_parser() -> argparse.ArgumentParser:
     """构建顶层命令行解析器及所有子命令。"""
 
-    parser = argparse.ArgumentParser(
+    parser = StrictArgumentParser(
         description="YOLOv8 工服检测训练工具链（对齐当前 inspection-flask 两阶段链路）",
     )
     add_global_args(parser)
-    subparsers = parser.add_subparsers(dest="command", required=True)
+    subparsers = parser.add_subparsers(
+        dest="command",
+        required=True,
+        parser_class=StrictArgumentParser,
+    )
 
     audit_parser = subparsers.add_parser("audit", help="只做数据审计，不写训练集")
     add_global_args(audit_parser)

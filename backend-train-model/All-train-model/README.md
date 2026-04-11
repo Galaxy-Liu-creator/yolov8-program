@@ -56,7 +56,13 @@
 Set-Location .\backend-train-model
 ```
 
-这样下面所有命令都统一使用 `All-train-model\...` 相对路径，不容易再踩 `--project-config` 的解析坑。
+这样下面所有命令都统一使用 `All-train-model\...` 相对路径，路径书写会更直观。
+
+补充说明：
+
+- 2026-04-11 起，`train_workwear.py` 已禁用长参数缩写；
+- 因此 `--project` 不会再被错误匹配成 `--project-config`；
+- 但 `--project-config` 自身仍然是相对 `backend-train-model/` 解析，所以继续建议先进入该目录再执行命令。
 
 如果你不想切目录，也可以直接复制：
 

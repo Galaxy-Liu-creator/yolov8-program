@@ -1,9 +1,10 @@
 # unified holdout 与 balanced merged 的使用说明
 
-这份说明文档只回答两个问题：
+这份说明文档回答三个问题：
 
 1. 现在仓库里新增了哪些文件，可以直接用于 `merged_v2` 短期提效；
-2. 怎样让 `first-train`、现有 merged 权重、以及下一轮 balanced merged 在统一口径下比较。
+2. 怎样让 `first-train`、现有 merged 历史权重以及下一轮 balanced merged 在统一口径下比较；
+3. 严格主对照和“先 first 再 merged”的业务路线验证，应该怎样拆开看。
 
 ## 1. 本轮新增的核心文件
 
@@ -65,7 +66,7 @@ D:\Miniconda3_python\envs\yolo_code\python.exe generate_split_manifests.py --sou
 
 - 以 `merged_clothes_v2_full_reviewed/manifest.csv` 作为 canonical sample pool；
 - 按 `source_id + sample_role` 做 deterministic split；
-- 把 `review_empty` 负样本同步分配进 `val` / `holdout`；
+- 把 `review_empty` 负样本同步分配进 `val / holdout`；
 - 输出两份可复用 CSV，而不是把 split 写死在代码里。
 
 ## 4. 构建三套对比数据集
@@ -117,19 +118,19 @@ D:\Miniconda3_python\envs\yolo_code\python.exe build_merged_clothes_dataset.py -
 
 这套数据集只保留 `g31` 样本，但 `val` 的选取规则和 merged 版使用同一份 split manifest。
 
-## 5. 两阶段比较方式
+## 5. 三层比较方式
 
-### 5.1 第一阶段：先做 cross-eval
+### 5.1 第一层：cross-eval 历史复评
 
 这一步不要求历史权重“没见过 holdout”，目的只是先把评估口径统一。
 
-#### 现有 `first-train` 权重复评
+#### 现有 `first-train` 历史权重复评
 
 ```powershell
 D:\Miniconda3_python\envs\yolo_code\python.exe train_workwear.py evaluate --project-config All-train-model\merged_train_project_config.json --dataset-yaml All-train-model\datasets\unified_holdout_v1\dataset.yaml --weights first-train\artifacts\runs\clothes_fullframe_baseline\weights\best.pt --report-name first_train_on_unified_holdout_v1_cross_eval
 ```
 
-#### 现有 `merged_v2_from_first` 权重复评
+#### 现有 `merged_v2_from_first` 历史权重复评
 
 ```powershell
 D:\Miniconda3_python\envs\yolo_code\python.exe train_workwear.py evaluate --project-config All-train-model\merged_train_project_config.json --dataset-yaml All-train-model\datasets\unified_holdout_v1\dataset.yaml --weights All-train-model\artifacts\runs\clothes_merged_v2_from_first\weights\best.pt --report-name merged_v2_from_first_on_unified_holdout_v1_cross_eval
@@ -140,20 +141,25 @@ D:\Miniconda3_python\envs\yolo_code\python.exe train_workwear.py evaluate --proj
 - `train_workwear.py evaluate` 现在支持 `--report-name`
 - 这样不同评估口径不会再覆盖同一个 `*_eval.json`
 
-### 5.2 第二阶段：做 strict holdout 重训比较
+### 5.2 第二层：strict holdout / fair compare 主对照
 
-这一步才是严格意义上的统一 holdout。
+这一步才是严格意义上的统一 holdout 主实验。
+
+原则：
+
+- `first-train` 与 `merged_v2_balanced` 都从 `weights\yolov8n.pt` 起跑；
+- 这样主要比较的是数据集与 holdout 口径，而不是历史初始化权重差异。
 
 #### 重训 `first-train` 基线
 
 ```powershell
-D:\Miniconda3_python\envs\yolo_code\python.exe train_workwear.py train --project-config All-train-model\merged_train_project_config.json --dataset-yaml All-train-model\datasets\first_train_holdout_v1\dataset.yaml --name clothes_first_train_holdout_v1
+D:\Miniconda3_python\envs\yolo_code\python.exe train_workwear.py train --project-config All-train-model\merged_train_project_config.json --dataset-yaml All-train-model\datasets\first_train_holdout_v1\dataset.yaml --base-model weights\yolov8n.pt --project All-train-model\artifacts\runs --name clothes_first_train_holdout_v1 --imgsz 640 --epochs 180 --batch 4 --patience 40 --workers 0 --device cpu --seed 42
 ```
 
-#### 重训 balanced merged
+#### 重训 balanced merged 公平对照模型
 
 ```powershell
-D:\Miniconda3_python\envs\yolo_code\python.exe train_workwear.py train --project-config All-train-model\merged_train_project_config.json --dataset-yaml All-train-model\datasets\merged_clothes_v2_balanced\dataset.yaml --base-model first-train\artifacts\runs\clothes_fullframe_baseline\weights\best.pt --name clothes_merged_v2_balanced_from_first
+D:\Miniconda3_python\envs\yolo_code\python.exe train_workwear.py train --project-config All-train-model\merged_train_project_config.json --dataset-yaml All-train-model\datasets\merged_clothes_v2_balanced\dataset.yaml --base-model weights\yolov8n.pt --project All-train-model\artifacts\runs --name clothes_merged_v2_balanced_holdout_v1 --imgsz 640 --epochs 180 --batch 4 --patience 40 --workers 0 --device cpu --seed 42
 ```
 
 #### strict eval：`first-train`
@@ -165,8 +171,34 @@ D:\Miniconda3_python\envs\yolo_code\python.exe train_workwear.py evaluate --proj
 #### strict eval：balanced merged
 
 ```powershell
-D:\Miniconda3_python\envs\yolo_code\python.exe train_workwear.py evaluate --project-config All-train-model\merged_train_project_config.json --dataset-yaml All-train-model\datasets\unified_holdout_v1\dataset.yaml --weights All-train-model\artifacts\runs\clothes_merged_v2_balanced_from_first\weights\best.pt --report-name merged_v2_balanced_from_first_holdout_v1_strict_eval
+D:\Miniconda3_python\envs\yolo_code\python.exe train_workwear.py evaluate --project-config All-train-model\merged_train_project_config.json --dataset-yaml All-train-model\datasets\unified_holdout_v1\dataset.yaml --weights All-train-model\artifacts\runs\clothes_merged_v2_balanced_holdout_v1\weights\best.pt --report-name merged_v2_balanced_holdout_v1_strict_eval
 ```
+
+说明：
+
+- 这一步可以并行跑。
+- 不再把历史 `first-train\artifacts\runs\clothes_fullframe_baseline\weights\best.pt` 作为当前主对照的 merged 初始化。
+
+### 5.3 第三层：route verification 业务路线验证
+
+如果你要验证“先做 g31 基线，再把 merged 接到后面”是否有价值，就单独做这一层。
+
+#### 用本轮 `clothes_first_train_holdout_v1` warm-start merged
+
+```powershell
+D:\Miniconda3_python\envs\yolo_code\python.exe train_workwear.py train --project-config All-train-model\merged_train_project_config.json --dataset-yaml All-train-model\datasets\merged_clothes_v2_balanced\dataset.yaml --base-model All-train-model\artifacts\runs\clothes_first_train_holdout_v1\weights\best.pt --project All-train-model\artifacts\runs --name clothes_merged_v2_balanced_from_first_holdout_v1 --imgsz 640 --epochs 180 --batch 4 --patience 40 --workers 0 --device cpu --seed 42
+```
+
+#### route eval：warm-start merged
+
+```powershell
+D:\Miniconda3_python\envs\yolo_code\python.exe train_workwear.py evaluate --project-config All-train-model\merged_train_project_config.json --dataset-yaml All-train-model\datasets\unified_holdout_v1\dataset.yaml --weights All-train-model\artifacts\runs\clothes_merged_v2_balanced_from_first_holdout_v1\weights\best.pt --report-name merged_v2_balanced_from_first_holdout_v1_route_eval
+```
+
+说明：
+
+- 这一步不能和 `clothes_first_train_holdout_v1` 并行，因为它依赖本轮新生成的 `best.pt`。
+- 这一层回答的是“业务路线是否成立”，不是“数据集是否公平胜出”。
 
 ## 6. 本轮 short-term improvement 的判断方式
 
@@ -174,15 +206,16 @@ D:\Miniconda3_python\envs\yolo_code\python.exe train_workwear.py evaluate --proj
 
 1. `cross-eval`
    - 现有 `first-train` 和现有 `merged_v2_from_first` 在同一 `unified_holdout_v1` 上的对比
-2. `strict holdout`
+2. `strict holdout / fair compare`
    - `clothes_first_train_holdout_v1`
-   - `clothes_merged_v2_balanced_from_first`
-3. split 分布
-   - `source_balanced_v1_summary.json`
+   - `clothes_merged_v2_balanced_holdout_v1`
+3. `route verification`
+   - `clothes_merged_v2_balanced_from_first_holdout_v1`
 
 如果在统一 holdout 下仍然是：
 
-- `merged_v2_balanced_from_first` 没有明显改善；
+- `clothes_merged_v2_balanced_holdout_v1` 没有明显改善；
+- 或者 `route verification` 也没有明显收益；
 - 或者 precision / recall 仍然被 `review_empty` 拖得很厉害；
 
 那么下一步就不应该先调模型，而应继续回到：
