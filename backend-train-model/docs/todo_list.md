@@ -16,7 +16,7 @@
 当前最推荐的执行顺序是：
 
 ```text
-阶段 1：先训稳 clothes baseline
+阶段 1：固定 merged fullframe clothes baseline
 阶段 2：补 person 数据资产
 阶段 3：训练 / 固化 person 模型
 阶段 4：启用 personcrop，重训 clothes
@@ -45,7 +45,9 @@
 
 ### 1.1 目标
 
-先用当前已有数据，得到一个可复现、可对比的 `clothes` 基线模型。
+先用当前已有数据，得到一个可复现、可对比、可作为后续 personcrop 前置基线的 `clothes` fullframe 模型。
+
+截至当前统一 holdout 对照结果，`merged_v2_balanced_holdout_v1` 已经明显优于 `first_train_holdout_v1`；随后 `route verification` 也已经完成，并且 `merged_v2_balanced_from_first_holdout_v1` 在同一 `unified_holdout_v1` 上略优于 `merged_v2_balanced_holdout_v1`。因此当前不再建议把旧 `first-train` 作为后续训练主基线，现阶段可先将 `merged_v2_balanced_from_first_holdout_v1` 固定为**暂定 fullframe baseline**，同时保留 `merged_v2_balanced_holdout_v1` 作为回滚候选。
 
 ### 1.2 当前状态
 
@@ -55,6 +57,8 @@
 - 数据审计命令可运行
 - `fullframe` / `personcrop` 两种 prepare 模式已具备
 - 训练 / 评估 / 导出流程已具备
+- unified holdout / balanced split 已经落地
+- 当前 strict holdout 主对照显示：`merged_v2_balanced_holdout_v1` 优于 `first_train_holdout_v1`
 
 ### 1.3 待办项
 
@@ -64,9 +68,17 @@
 - [X] 跑一次 `fullframe` baseline 训练
 - [X] 跑一次 baseline 评估
 - [X] 导出 baseline 权重和报告
+- [X] 构建 `first_train_holdout_v1` / `merged_clothes_v2_balanced` / `unified_holdout_v1`
+- [X] 完成 `first-train` 与 `merged` 的 strict holdout / fair compare 主对照
+- [X] 确认 `merged_v2_balanced_holdout_v1` 当前优于 `first_train_holdout_v1`
+- [X] 执行 `total-run-method.md` 第五阶段 `route verification`
+- [X] 在 `merged_v2_balanced_holdout_v1` 与 `merged_v2_balanced_from_first_holdout_v1` 之间选出当前暂定 fullframe baseline
+- [X] 将当前 baseline 的 `best.pt` 路径和评估报告路径固定到文档中
 - [ ] 单独整理一份 baseline 误报 / 漏报样本清单
 
 ### 1.4 推荐命令
+
+当前统一 holdout 对照与 route verification 以 `backend-train-model/docs/total-run-method.md` 为准。下面保留的是早期单源 / 默认入口命令，只作为理解 `train_workwear.py` 基础流程的参考，不再作为当前主线 baseline 的首选命令。
 
 #### 数据审计
 
@@ -105,14 +117,20 @@ D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\train_workwea
 - `backend-train-model/artifacts/reports/*_train.json`
 - `backend-train-model/artifacts/reports/*_evaluate.json`
 - `backend-train-model/artifacts/export/workwear_detect_yolov8.pt`
+- 当前暂定 baseline 入口：`backend-train-model/All-train-model/00_CURRENT_BASELINE/README.md`
+- 当前暂定 baseline 权重：`backend-train-model/All-train-model/artifacts/runs/clothes_merged_v2_balanced_from_first_holdout_v1/weights/best.pt`
+- 当前暂定 baseline 评估：`backend-train-model/All-train-model/artifacts/reports/merged_v2_balanced_from_first_holdout_v1_route_eval.json`
+- 当前回滚候选权重：`backend-train-model/All-train-model/artifacts/runs/clothes_merged_v2_balanced_holdout_v1/weights/best.pt`
+- 当前回滚候选评估：`backend-train-model/All-train-model/artifacts/reports/merged_v2_balanced_holdout_v1_strict_eval.json`
 
 ### 1.6 完成标准
 
 只有当下面几个问题都能回答时，才算完成本阶段：
 
-- 当前 `clothes` 模型最容易漏掉哪些姿态
-- 当前 `clothes` 模型最容易误报哪些目标
-- `fullframe` 方案在你现场图像上是否能先跑通
+- 当前最终 fullframe baseline 选 `merged_v2_balanced_holdout_v1` 还是 `merged_v2_balanced_from_first_holdout_v1`
+- 当前 merged `clothes` 模型最容易漏掉哪些姿态
+- 当前 merged `clothes` 模型最容易误报哪些目标
+- `fullframe` 方案在统一 holdout 和现场图像上是否都能先跑通
 - 当前 baseline 是否已经可复现
 
 ---
@@ -153,10 +171,10 @@ D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\train_workwea
 
 ### 2.4 待办项
 
-- [ ] 为当前三段序列补全 `person` 框
+- [ ] 为当前 `g31 / g32 / g33` merged 主数据补全 `person` 框
 - [ ] 确认 `person` 的标注规则统一
 - [ ] 确认图片与 `person` 标签仍按同名配对
-- [ ] 确认三段序列之间图片命名无冲突
+- [ ] 确认各来源 / 序列之间图片命名无冲突
 - [ ] 确认 `person` 标签不覆盖 / 不污染现有 `clothes` 主标签
 - [ ] 选定未来 `person` 数据的存放目录
 - [ ] 为 `person` 数据补 1 组示例文件与标注说明
@@ -401,7 +419,10 @@ D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\train_workwea
 
 ### 第一优先级
 
-- [ ] 跑通并固定 `fullframe clothes` baseline
+- [X] 跑通 `fullframe clothes` strict holdout 主对照
+- [X] 初步确认 `merged_v2_balanced_holdout_v1` 优于 `first_train_holdout_v1`
+- [X] 执行 `total-run-method.md` 第五阶段 `route verification`
+- [X] 固定当前 merged fullframe baseline
 - [ ] 整理 baseline 的误报 / 漏报样本
 
 ### 第二优先级
@@ -430,8 +451,9 @@ D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\train_workwea
 
 ### 里程碑 A：`clothes` baseline 完成
 
-- [ ] 有稳定可复现的 `clothes` best 权重
-- [ ] 有评估报告
+- [X] 有稳定可复现的 `clothes` fullframe 候选 best 权重
+- [X] 有 strict holdout 评估报告
+- [X] 完成 route verification 后固定当前暂定 baseline
 - [ ] 有误报 / 漏报清单
 
 ### 里程碑 B：`person` 数据资产完成
@@ -469,4 +491,4 @@ D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\train_workwea
 
 如果要把整份清单压缩成一句话，那就是：
 
-> **先把 `clothes` 训练做成稳定 baseline，再独立补齐 `person` 数据并训练 `person` 模型，随后用两模型加规则层搭建完整链路；在没有实时视频接入时，优先完成离线链路回放，而不是一开始就试图训练一个吃掉全部业务逻辑的大模型。**
+> **先完成 `route verification` 并把 merged fullframe `clothes` baseline 固定下来，再独立补齐 `person` 数据并训练 `person` 模型，随后用 `personcrop` 重训 `clothes`，最后再用两模型加 ROI / temporal 规则层搭建完整链路。**

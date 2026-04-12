@@ -5,6 +5,7 @@
 如果你要先看“现在已经做到哪一步、下一步该跑什么”，直接打开：
 
 - `backend-train-model/docs/all_train_docs/status_and_next_steps.md`
+- `backend-train-model/All-train-model/00_CURRENT_BASELINE/README.md`
 
 ## 固定文件
 
@@ -31,13 +32,18 @@
 
 - `merged_v1_positive_only` 已经构建完成，并完成过一轮 `train / evaluate / export`
 - `merged_v2_full_reviewed` 已经构建完成，48 张 review 空标签样本已经并入数据集
-- `clothes_merged_v2_from_first` 已经形成训练、评估与导出产物；真实历史是先用 `first-train` 的 `best.pt` 启动，后因中断再 resume
-- 当前结论仍是：`merged_v2_from_first` 尚未稳定优于 `first-train`，不能直接替代当前更稳的基线
+- `clothes_merged_v2_balanced_holdout_v1` 已完成 strict holdout / fair compare，并在统一 `unified_holdout_v1` 上明显优于 `first_train_holdout_v1`
+- `clothes_merged_v2_balanced_from_first_holdout_v1` 已完成 `route verification`；真实历史是先用本轮统一 holdout 的 `first-train` 权重起跑，再沿链路继续训练
+- 当前最新结论是：`clothes_merged_v2_balanced_from_first_holdout_v1` 在同一 holdout 上比 `clothes_merged_v2_balanced_holdout_v1` 略优，可先作为**暂定 baseline**
+- 当前暂定 baseline 入口已固定到：`backend-train-model/All-train-model/00_CURRENT_BASELINE/README.md`
 - 现在已经补上“统一 holdout + source-balanced split + 可命名评估报告”的代码与配置入口
 - 关键产物包括：
-  - `backend-train-model\All-train-model\datasets\merged_clothes_v2_full_reviewed\dataset.yaml`
-  - `backend-train-model\All-train-model\artifacts\runs\clothes_merged_v2_from_first\weights\best.pt`
-  - `backend-train-model\All-train-model\artifacts\reports\clothes_merged_v2_from_first_eval.json`
+  - `backend-train-model\All-train-model\00_CURRENT_BASELINE\README.md`
+  - `backend-train-model\All-train-model\00_CURRENT_BASELINE\current_clothes_fullframe_baseline.json`
+  - `backend-train-model\All-train-model\artifacts\runs\clothes_merged_v2_balanced_from_first_holdout_v1\weights\best.pt`
+  - `backend-train-model\All-train-model\artifacts\reports\merged_v2_balanced_from_first_holdout_v1_route_eval.json`
+  - `backend-train-model\All-train-model\artifacts\runs\clothes_merged_v2_balanced_holdout_v1\weights\best.pt`
+  - `backend-train-model\All-train-model\artifacts\reports\merged_v2_balanced_holdout_v1_strict_eval.json`
 
 如果你现在要做：
 

@@ -1,5 +1,47 @@
 ﻿# Update Log
 
+## 2026-04-12 固定当前 merged clothes fullframe 暂定 baseline，并新增醒目入口目录
+
+变更来源：
+- 用户确认当前可以先把最新 `merged` 结果暂定为 baseline，并进一步要求“明显标注出来”，最好能“拿一个文件夹醒目地放起来”。
+- 本轮目标是把当前 baseline 决策固化到仓库里，避免后续继续在多个 run / report 之间来回辨认。
+
+变更总览：
+1. 在 `backend-train-model/All-train-model/` 顶层新增醒目的 `00_CURRENT_BASELINE/` 目录，专门作为当前 clothes fullframe baseline 入口。
+2. 在新目录中新增：
+   - `README.md`：用于面向人快速确认当前暂定 baseline、回滚候选、关键指标和下一步；
+   - `current_clothes_fullframe_baseline.json`：用于结构化记录当前 baseline 的 run、权重、评估报告和指标。
+3. 同步更新 `backend-train-model/All-train-model/README.md`，把旧的状态表述切换到当前统一 holdout 结论，并显式指向新的 baseline 入口目录。
+4. 同步更新 `backend-train-model/docs/todo_list.md`：
+   - 标记 `route verification` 已完成；
+   - 标记当前 merged fullframe baseline 已暂定固定；
+   - 把当前 baseline 与 rollback 候选的真实权重 / 报告路径写入文档。
+
+涉及文件：
+- `backend-train-model/All-train-model/00_CURRENT_BASELINE/README.md`
+- `backend-train-model/All-train-model/00_CURRENT_BASELINE/current_clothes_fullframe_baseline.json`
+- `backend-train-model/All-train-model/README.md`
+- `backend-train-model/docs/todo_list.md`
+- `backend-train-model/docs/update_log.md`
+
+新增 / 变更配置项：
+- 无新的训练代码配置项。
+- 本轮新增的是“baseline 固化入口”：
+  - `backend-train-model/All-train-model/00_CURRENT_BASELINE/`
+
+兼容性注意：
+- 本轮**不复制** `best.pt` 到新目录中，避免生成第二份物理权重副本而导致后续误用。
+- 当前暂定 baseline 仍然使用原始 run 目录中的真实权重：
+  - `backend-train-model/All-train-model/artifacts/runs/clothes_merged_v2_balanced_from_first_holdout_v1/weights/best.pt`
+- 当前保留的回滚候选仍然是：
+  - `backend-train-model/All-train-model/artifacts/runs/clothes_merged_v2_balanced_holdout_v1/weights/best.pt`
+- “暂定 baseline” 不等于最终永久结论；如果后续 `personcrop` 对照、离线链路复核或现场样本复核出现反转，应回到该目录更新结论。
+
+不改动说明：
+- 本轮不修改 `train_workwear.py`、`build_merged_clothes_dataset.py`、`config.py`、`project_config.json` 或任何训练 / 评估逻辑。
+- 本轮不重新训练、不重新评估，也不重建任何数据集。
+- 本轮不修改 `inspection-flask/` 在线链路代码。
+
 ## 2026-04-11 微调统一 holdout 审查文档，新增总运行手册，并实际构建三套对比数据集
 
 变更来源：
@@ -948,4 +990,45 @@
 - 本轮不修改 `train_workwear.py`、`build_merged_clothes_dataset.py` 或任何数据集构建配置文件。
 - 本轮不新增新的 holdout split 规则，只调整文档中的实验设计口径与命令组织方式。
 - 本轮不直接启动训练，只更新推荐运行方法，方便用户后续自行执行。
+
+## 2026-04-11 根据 strict holdout 结果更新 `todo_list.md` 阶段状态
+
+变更来源：
+- 用户已完成 `backend-train-model/docs/total-run-method.md` 中的第二、三、四阶段，并要求依据当前 `merged_v2_balanced_holdout_v1` 明显优于 `first_train_holdout_v1` 的结果，微调 `backend-train-model/docs/todo_list.md`。
+- 用户同时确认后续是否应以 merged 作为 fullframe baseline，再进入 `person` / `personcrop` 路线。
+
+变更总览：
+1. 更新 `backend-train-model/docs/todo_list.md` 的总路线：
+   - 将阶段 1 从泛化的“先训稳 clothes baseline”调整为“固定 merged fullframe clothes baseline”。
+2. 更新 P0 阶段状态：
+   - 标记 unified holdout / balanced split / strict holdout 主对照已完成；
+   - 标记 `merged_v2_balanced_holdout_v1` 当前优于 `first_train_holdout_v1`；
+   - 新增待办：继续执行 `total-run-method.md` 第五阶段 `route verification`；
+   - 新增待办：在 `merged_v2_balanced_holdout_v1` 与 `merged_v2_balanced_from_first_holdout_v1` 之间选择最终 fullframe baseline。
+3. 调整 `person` 数据阶段描述：
+   - 将“当前三段序列”改为面向当前 merged 主数据的 `g31 / g32 / g33` 来源；
+   - 继续保留“person 标签独立目录、不要污染 clothes 标签”的原则。
+4. 更新近期执行顺序与里程碑：
+   - 将 strict holdout 主对照标记为已完成；
+   - 将 route verification、固定最终 merged baseline、整理误报 / 漏报样本作为近期第一优先级剩余任务；
+   - 说明进入 personcrop 前仍需先补 person 数据并训练 / 固化 person 模型。
+
+涉及文件：
+- `backend-train-model/docs/todo_list.md`
+- `backend-train-model/docs/update_log.md`
+
+新增 / 变更配置项：
+- 无新增代码配置项。
+- 文档路线口径变更：
+  - 当前 clothes fullframe 主线候选从旧 `first-train` 转为 `merged_v2_balanced_holdout_v1`。
+  - route verification 结果出来后，再最终固定 `clothes` fullframe baseline。
+
+兼容性注意：
+- 本轮只更新 TODO 状态与执行路线，不修改训练脚本、数据集构建脚本或现有权重文件。
+- `personcrop` 仍不是当前可直接跳入的下一步；它依赖独立 `person` 标注数据和可用的 `person_detect_yolov8.pt`。
+
+不改动说明：
+- 本轮不创建新的 `person` 数据目录或标签规范文档。
+- 本轮不执行 route verification 训练命令，只把它标为当前下一步。
+- 本轮不导出或复制最终 baseline 权重，需等第五阶段结果后再确定最终权重。
 
