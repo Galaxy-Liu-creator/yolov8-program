@@ -23,6 +23,8 @@
 - 当前暂定 baseline 评估：`backend-train-model/All-train-model/artifacts/reports/merged_v2_balanced_from_first_holdout_v1_route_eval.json`
 - 回滚候选权重：`backend-train-model/All-train-model/artifacts/runs/clothes_merged_v2_balanced_holdout_v1/weights/best.pt`
 - 回滚候选评估：`backend-train-model/All-train-model/artifacts/reports/merged_v2_balanced_holdout_v1_strict_eval.json`
+- 当前 baseline 逐图误报 / 漏报明细：`backend-train-model/All-train-model/00_CURRENT_BASELINE/baseline_fpfn_per_image.json`
+- 当前 baseline 误报 / 漏报摘要：`backend-train-model/All-train-model/00_CURRENT_BASELINE/baseline_fpfn_summary.md`
 
 ## 关键指标
 
@@ -50,9 +52,27 @@
 - 提升幅度不大，但方向为正。
 - 因此当前建议：**先用它作为暂定 baseline 继续往后推进**，同时保留回滚路径，不把旧 `first-train` 再当主线基线。
 
+## 误报 / 漏报清单
+
+- 清单口径：`unified_holdout_v1` 的 `test` split 单帧 GT 对照。
+- 预测阈值：`conf=0.45`，对齐当前 `inspection-flask` 中 workwear 推理默认置信度；不是 `mAP` 曲线用的低阈值候选清单。
+- 匹配规则：同类框 `IoU >= 0.5` 计为 TP；未匹配预测计 FP；未匹配 GT 计 FN。
+- 逐图明细：`baseline_fpfn_per_image.json`
+- 人类摘要：`baseline_fpfn_summary.md`
+- 本轮统计：
+  - 图片数：`75`
+  - GT 框数：`150`
+  - 预测框数：`147`
+  - TP：`144`
+  - FP：`3`
+  - FN：`6`
+  - Precision：`0.9795918367346939`
+  - Recall：`0.96`
+  - 有误报图片数：`3`
+  - 有漏报图片数：`5`
+
 ## 下一步
 
-- 优先整理当前 baseline 的误报 / 漏报样本清单
-- 补齐 `person` 标注资产
+- 使用当前 baseline 的误报 / 漏报清单作为后续 `fullframe` 对照参考
 - 训练并固定 `person` 模型
 - 再进入 `personcrop clothes` 对照训练

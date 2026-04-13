@@ -33,6 +33,35 @@
       "map50_95": 0.8040445872853204
     }
   },
+  "single_frame_fpfn_analysis": {
+    "status": "generated",
+    "generated_at": "2026-04-13T21:49:33",
+    "scope": "single_frame_gt_match_on_unified_holdout_v1_test",
+    "analysis_script": "backend-train-model/All-train-model/analyze_baseline_fpfn.py",
+    "detail_json": "backend-train-model/All-train-model/00_CURRENT_BASELINE/baseline_fpfn_per_image.json",
+    "summary_markdown": "backend-train-model/All-train-model/00_CURRENT_BASELINE/baseline_fpfn_summary.md",
+    "prediction": {
+      "imgsz": 640,
+      "conf_threshold": 0.45,
+      "nms_iou": 0.7,
+      "device": "cpu"
+    },
+    "matching": {
+      "iou_threshold": 0.5
+    },
+    "totals": {
+      "images": 75,
+      "gt_boxes": 150,
+      "pred_boxes": 147,
+      "tp": 144,
+      "fp": 3,
+      "fn": 6,
+      "precision": 0.9795918367346939,
+      "recall": 0.96,
+      "fp_images": 3,
+      "fn_images": 5
+    }
+  },
   "selection_reason": "On the same unified_holdout_v1, the route verification run is slightly better across precision, recall, mAP50, mAP75, and mAP50-95, so it is currently kept as the tentative production-facing fullframe baseline while preserving the strict-holdout merged model as rollback.",
-  "next_step": "Collect baseline false positives/false negatives, then move to person labeling, person model training, and personcrop comparison."
+  "next_step": "Use the generated baseline false-positive/false-negative list as the fullframe reference, then move to person model training and personcrop comparison."
 }

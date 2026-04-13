@@ -1,5 +1,113 @@
 ﻿# Update Log
 
+## 2026-04-13 补充 person CPU 训练运行文档，并更新 P1 数据资产状态
+
+变更来源：
+- 用户确认当前训练设备没有独立显卡，只使用 CPU 训练，要求为 `person` 检测整理专用运行命令。
+- 用户要求删除前面微小测试生成且无用的内容，只保留本次 `person` 检测会用到的文件。
+- 用户要求在 `backend-train-model/docs/todo_list.md` 中把第二阶段已经完成的部分打勾。
+
+变更总览：
+1. 新增 `backend-train-model/person-train-model/train-docs/person_run_method.md`：
+   - 明确当前使用 CPU 训练，集成显卡不作为 CUDA 训练设备；
+   - 给出推荐 CPU 训练命令、保守 CPU 命令、完整 `all` 流程、单独 prepare、续训、评估与导出命令；
+   - 记录当前 `person` 数据集路径、类别定义、split 数量、空标注负样本数量和结果检查重点。
+2. 更新 `backend-train-model/docs/todo_list.md`：
+   - 将 P1 / 第二阶段中已经完成的 `person` 标签补全、标注规则确认、图片标签同名配对、跨来源命名无冲突、标签隔离、数据目录选定、数据说明 / 运行文档等条目标记为完成；
+   - 将近期执行顺序中的“补 person 标签”和“建立独立 person 数据资产”标记为完成；
+   - 将里程碑 B 中“有独立 person 标签”“有统一标注规则”标记为完成；
+   - 保留“person 示例图片 / 示例标注”未完成状态，避免把尚未落地的独立示例文件误标为完成。
+3. 清理检查：
+   - 已确认本轮没有残留 `__pycache__`；
+   - 未发现 `person-train-model` 下有 smoke / tmp / test 类无用测试产物；
+   - 保留 `person` 训练实际会使用的 prepared 数据集、聚合标签、summary 与配置文件。
+
+涉及文件：
+- `backend-train-model/docs/todo_list.md`
+- `backend-train-model/docs/update_log.md`
+- `backend-train-model/person-train-model/train-docs/person_run_method.md`
+
+新增 / 变更配置项：
+- 无新增训练代码配置项。
+- 新增运行文档中的推荐 CPU 参数：
+  - `--device cpu`
+  - `--workers 0`
+  - `--batch 4`，内存压力大时改为 `--batch 2`
+  - `--imgsz 640`
+  - `--epochs 180`
+  - `--patience 40`
+
+兼容性注意：
+- person CPU 训练命令继续使用 `backend-train-model/person-train-model/train-code/run_person_flow.py` 包装现有训练链路，不修改 `train_workwear.py` 主逻辑。
+- `person_run_method.md` 中的 `export` 只生成 person 目录内的 `person_detect_yolov8.pt` alias，不会覆盖 `inspection-flask/weights/workwear_detect_yolov8.pt`。
+- 集成显卡不按 CUDA 设备处理；如果后续更换独立 NVIDIA 显卡，再把 `--device cpu` 改为 `--device 0`。
+
+不改动说明：
+- 本轮不启动正式 `person` 训练。
+- 本轮不删除 `person` prepared 数据集、聚合标签和统计摘要，因为它们是当前 `person` 检测训练会直接使用的产物。
+- 本轮不补独立 person 示例图片 / 示例标注文件，因此 TODO 中对应条目仍保持未完成。
+- 本轮不修改 `inspection-flask/`，不写入线上权重目录。
+
+## 2026-04-13 生成 baseline 误报漏报清单，并落地 person 独立训练数据入口
+
+变更来源：
+- 用户要求完成第一阶段最后一步，整理当前暂定 `clothes fullframe` baseline 的误报 / 漏报清单。
+- 用户已完成 `person` 标注并选择方案 B（独立 person 数据集），要求基于 7 个图片根目录与 3 个标签根目录整理出可训练 `dataset.yaml`。
+- 用户要求在不修改现有训练主逻辑的前提下，为后续 person 检测训练补齐必要脚本；如新增 Python 文件，统一放在 `backend-train-model/person-train-model/train-code/`。
+
+变更总览：
+1. 新增 `analyze_baseline_fpfn.py`，对当前 `00_CURRENT_BASELINE` 指向的权重在 `unified_holdout_v1` test split 上执行单帧 GT 对照，生成逐图 FP/FN 明细和 Markdown 摘要。
+2. 将 baseline 清单产物落到 `00_CURRENT_BASELINE/`：
+   - `baseline_fpfn_per_image.json`
+   - `baseline_fpfn_summary.md`
+3. 更新 baseline 入口文档与结构化 JSON，记录清单口径、阈值、TP/FP/FN 与输出路径。
+4. 新增 `person_project_config.json`，把 person 任务的图片根目录、汇总标签根目录、类别表、切分比例和隔离产物目录收口到独立配置。
+5. 新增 person 训练辅助脚本：
+   - `prepare_person_dataset.py`：汇总三组 person 标签，并把 7 张缺失标签图片创建为空白负样本；
+   - `run_person_flow.py`：封装现有 `train_workwear.py` 的 `audit / prepare / train / evaluate / export`，避免直接改动主训练逻辑。
+6. 实际执行 person `prepare`，生成标准 YOLO 数据集：
+   - `backend-train-model/person-train-model/train-result/prepared/person_fullframe/sequence_contiguous/dataset.yaml`
+   - 切分结果：train `350` 张 / val `77` 张 / test `75` 张。
+
+涉及文件：
+- `backend-train-model/All-train-model/analyze_baseline_fpfn.py`
+- `backend-train-model/All-train-model/00_CURRENT_BASELINE/README.md`
+- `backend-train-model/All-train-model/00_CURRENT_BASELINE/current_clothes_fullframe_baseline.json`
+- `backend-train-model/All-train-model/00_CURRENT_BASELINE/baseline_fpfn_per_image.json`
+- `backend-train-model/All-train-model/00_CURRENT_BASELINE/baseline_fpfn_summary.md`
+- `backend-train-model/person-train-model/person_project_config.json`
+- `backend-train-model/person-train-model/train-code/prepare_person_dataset.py`
+- `backend-train-model/person-train-model/train-code/run_person_flow.py`
+- `backend-train-model/person-train-model/train-result/person_source_dataset_summary.json`
+- `backend-train-model/person-train-model/train-result/prepared/person_fullframe/sequence_contiguous/`
+- `backend-train-model/docs/todo_list.md`
+- `backend-train-model/docs/update_log.md`
+
+新增 / 变更配置项：
+- 新增 person 专用项目配置 `backend-train-model/person-train-model/person_project_config.json`：
+  - `data.class_names`：`{"0": "person"}`
+  - `data.image_roots`：7 个 person 图片根目录；
+  - `data.label_root`：`train-result/working/aggregated_labels`；
+  - `data.split_ratios`：`0.7 / 0.15 / 0.15`；
+  - `artifacts.root`：`train-result/artifacts`，与 `clothes/workwear` 产物隔离；
+  - `person_dataset.*`：person 数据汇总、prepare 输出、导出 alias 与推荐 run 名。
+- baseline FP/FN 清单脚本默认使用 `conf=0.45`、`IoU=0.5`，该阈值用于人工复盘清单，不改变既有评估报告。
+
+兼容性注意：
+- 本轮不修改 `train_workwear.py`、`dataset_tools.py`、`config.py` 的现有训练 / 评估 / 导出逻辑。
+- person wrapper 默认不执行 `--deploy`，避免覆盖 `inspection-flask/weights/workwear_detect_yolov8.pt`。
+- 现有 `export` 仍会生成 `workwear_detect_yolov8.pt` 原始文件名；person wrapper 只在 person 结果目录中额外复制 alias 为 `person_detect_yolov8.pt`。
+- person prepare 过程中发现部分标注存在极小越界，现有 `dataset_tools.py` 已按既有逻辑自动裁剪到 `[0, 1]`，未改动源标签目录。
+- 7 张无对应 person `.txt` 的图片已按用户最终口径创建空白标签并纳入训练集/验证集/测试集。
+- 额外发现 `D15_20260119061405_frame_0262` 的源 `.txt` 本身为空，因此最终 prepared 数据集中空标注负样本合计为 8 个；`person_source_dataset_summary.json` 已区分 `created_empty_labels` 与 `existing_empty_source_labels`。
+- person wrapper 对 `all/export` 阶段做了编排修正：`export` 不再要求先存在 `dataset.yaml`，`all` 不再在正式流水线前重复触发一次 prepare。
+
+不改动说明：
+- 本轮不启动完整 person 训练，不生成最终 `person_detect_yolov8.pt`。
+- 本轮不修改 `inspection-flask/` 代码，也不写入线上权重目录。
+- 本轮不把 person 标签混入现有 clothes 标签目录，不改变当前 clothes baseline 权重。
+- 本轮 baseline 清单是单帧 GT 对照，不代表完整 ROI / track / temporal 链路级误报漏报复盘。
+
 ## 2026-04-12 固定当前 merged clothes fullframe 暂定 baseline，并新增醒目入口目录
 
 变更来源：

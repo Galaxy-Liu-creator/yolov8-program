@@ -6,3 +6,8 @@ datasets/
 review/
 __pycache__/
 tmp_review_overlays/
+
+# person
+images/
+labels/
+working/

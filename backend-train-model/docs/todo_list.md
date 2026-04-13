@@ -74,7 +74,7 @@
 - [X] 执行 `total-run-method.md` 第五阶段 `route verification`
 - [X] 在 `merged_v2_balanced_holdout_v1` 与 `merged_v2_balanced_from_first_holdout_v1` 之间选出当前暂定 fullframe baseline
 - [X] 将当前 baseline 的 `best.pt` 路径和评估报告路径固定到文档中
-- [ ] 单独整理一份 baseline 误报 / 漏报样本清单
+- [X] 单独整理一份 baseline 误报 / 漏报样本清单
 
 ### 1.4 推荐命令
 
@@ -171,17 +171,17 @@ D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\train_workwea
 
 ### 2.4 待办项
 
-- [ ] 为当前 `g31 / g32 / g33` merged 主数据补全 `person` 框
-- [ ] 确认 `person` 的标注规则统一
-- [ ] 确认图片与 `person` 标签仍按同名配对
-- [ ] 确认各来源 / 序列之间图片命名无冲突
-- [ ] 确认 `person` 标签不覆盖 / 不污染现有 `clothes` 主标签
-- [ ] 选定未来 `person` 数据的存放目录
+- [X] 为当前 `g31 / g32 / g33` merged 主数据补全 `person` 框
+- [X] 确认 `person` 的标注规则统一
+- [X] 确认图片与 `person` 标签仍按同名配对
+- [X] 确认各来源 / 序列之间图片命名无冲突
+- [X] 确认 `person` 标签不覆盖 / 不污染现有 `clothes` 主标签
+- [X] 选定未来 `person` 数据的存放目录
 - [ ] 为 `person` 数据补 1 组示例文件与标注说明
 
 ### 2.5 本阶段建议新增的文档 / 资产
 
-- [ ] 新增 `person` 数据说明文档
+- [X] 新增 `person` 数据说明 / 运行方法文档
 - [ ] 新增 `person` 示例图片
 - [ ] 新增 `person` 示例标注
 
@@ -423,12 +423,12 @@ D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\train_workwea
 - [X] 初步确认 `merged_v2_balanced_holdout_v1` 优于 `first_train_holdout_v1`
 - [X] 执行 `total-run-method.md` 第五阶段 `route verification`
 - [X] 固定当前 merged fullframe baseline
-- [ ] 整理 baseline 的误报 / 漏报样本
+- [X] 整理 baseline 的误报 / 漏报样本
 
 ### 第二优先级
 
-- [ ] 补 `person` 标签
-- [ ] 建立独立 `person` 数据资产
+- [X] 补 `person` 标签
+- [X] 建立独立 `person` 数据资产
 
 ### 第三优先级
 
@@ -454,12 +454,12 @@ D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\train_workwea
 - [X] 有稳定可复现的 `clothes` fullframe 候选 best 权重
 - [X] 有 strict holdout 评估报告
 - [X] 完成 route verification 后固定当前暂定 baseline
-- [ ] 有误报 / 漏报清单
+- [X] 有误报 / 漏报清单
 
 ### 里程碑 B：`person` 数据资产完成
 
-- [ ] 有独立 `person` 标签
-- [ ] 有统一标注规则
+- [X] 有独立 `person` 标签
+- [X] 有统一标注规则
 - [ ] 有示例文件
 
 ### 里程碑 C：`person` 模型完成
