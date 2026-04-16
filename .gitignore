@@ -11,3 +11,6 @@ tmp_review_overlays/
 images/
 labels/
 working/
+
+# 学姐call训练模型
+call_runs/

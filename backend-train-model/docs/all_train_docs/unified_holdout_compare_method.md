@@ -1,4 +1,9 @@
-# unified holdout 与 balanced merged 的使用说明
+# [归档] unified holdout 与 balanced merged 的使用说明
+
+> 归档说明（2026-04-15）：
+> - 本文是 unified holdout 方案刚落地时的说明文档。
+> - 当前项目已经将正式复现实验入口统一到 `backend-train-model/docs/total-run-method.md`。
+> - 若只是要按当前口径重跑，请直接看 `total-run-method.md`；本文仅保留为历史背景说明。
 
 这份说明文档回答三个问题：
 

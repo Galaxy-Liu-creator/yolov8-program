@@ -1,6 +1,90 @@
 ﻿# Update Log
 
-## 2026-04-13 补充 person CPU 训练运行文档，并更新 P1 数据资产状态
+## 2026-04-15 新增根 README，并同步文档体系到 unified holdout / merged baseline 当前状态
+
+变更来源：
+- 用户要求在 `backend-train-model/` 下新增一份根 `README.md`，集中说明当前训练进度、`docs/` 阅读顺序，以及当前 clothes merged baseline 与其指标。
+- 用户同时要求审查 `backend-train-model/docs/` 中哪些文档不再符合当前进度，并做同步修正。
+
+变更总览：
+1. 新增 `backend-train-model/README.md`：
+   - 汇总当前主线进度；
+   - 固化当前 clothes fullframe baseline；
+   - 给出 unified holdout 下 `first-train` / `merged strict holdout` / `route verification` 三组关键指标；
+   - 明确 `docs/` 当前主线文档与历史文档的阅读顺序。
+2. 重写 `backend-train-model/docs/后端训练完成进度.md`：
+   - 改为当前真实进度口径；
+   - 明确当前 baseline 已固定为 `clothes_merged_v2_balanced_from_first_holdout_v1`；
+   - 同步 `person` 数据入口、`person` 权重缺失、`personcrop` 未开始等现状。
+3. 重写 `backend-train-model/docs/Problem-Solution.md`：
+   - 新增一次 `2026-04-15` 审查记录；
+   - 说明历史文档与当前文档混杂导致的阅读歧义；
+   - 记录本轮修正动作与当前主线结论。
+4. 更新 `backend-train-model/docs/README.md`、`backend-train-model/docs/total-run-method.md`、`backend-train-model/docs/all_vs_first_train_review.md`：
+   - 为当前主线入口增加说明；
+   - 为统一 holdout 命令文档补充当前状态说明；
+   - 将 `all_vs_first_train_review.md` 显式标记为历史报告。
+5. 新增子目录说明：
+   - `backend-train-model/docs/all_train_docs/README.md`
+   - `backend-train-model/docs/first_train_docs/README.md`
+   用于显式区分“历史阶段资料”和“当前主线文档”。
+
+涉及文件：
+- `backend-train-model/README.md`
+- `backend-train-model/docs/README.md`
+- `backend-train-model/docs/Problem-Solution.md`
+- `backend-train-model/docs/total-run-method.md`
+- `backend-train-model/docs/all_vs_first_train_review.md`
+- `backend-train-model/docs/后端训练完成进度.md`
+- `backend-train-model/docs/all_train_docs/README.md`
+- `backend-train-model/docs/first_train_docs/README.md`
+- `backend-train-model/docs/update_log.md`
+
+兼容性注意：
+- 本轮只更新文档，不修改训练代码、训练参数、模型权重路径或数据集构建逻辑。
+- 当前 baseline 仍以 `backend-train-model/All-train-model/00_CURRENT_BASELINE/README.md` 指向的 run 为准。
+- 历史文档不会删除，只会补充“历史说明”，避免丢失早期决策上下文。
+
+不改动说明：
+- 本轮不重新训练模型；
+- 本轮不重跑 unified holdout；
+- 本轮不修改 `person-train-model/` 训练逻辑与 `inspection-flask/` 代码。
+
+## 2026-04-15 规整 `docs/all_train_docs` 为历史归档区
+
+变更来源：
+- 用户同意继续整理 `backend-train-model/docs/all_train_docs/`，希望把明显过时的旧文档规整成更清晰的归档区。
+
+变更总览：
+1. 为以下历史文档统一加上 `[归档]` 标题和“归档说明”头部：
+   - `merged_dataset_plan.md`
+   - `merged_v2_improvement_plan.md`
+   - `run_method.md`
+   - `status_and_next_steps.md`
+   - `todo_list.md`
+   - `unified_holdout_compare_method.md`
+2. 更新 `backend-train-model/docs/all_train_docs/README.md`：
+   - 增加“文件索引”表；
+   - 为每份历史文档标注当前替代入口；
+   - 明确本目录用于历史回溯，不直接作为当前主线执行依据。
+
+涉及文件：
+- `backend-train-model/docs/all_train_docs/README.md`
+- `backend-train-model/docs/all_train_docs/merged_dataset_plan.md`
+- `backend-train-model/docs/all_train_docs/merged_v2_improvement_plan.md`
+- `backend-train-model/docs/all_train_docs/run_method.md`
+- `backend-train-model/docs/all_train_docs/status_and_next_steps.md`
+- `backend-train-model/docs/all_train_docs/todo_list.md`
+- `backend-train-model/docs/all_train_docs/unified_holdout_compare_method.md`
+- `backend-train-model/docs/update_log.md`
+
+兼容性注意：
+- 本轮只增加归档提示和索引，不改动这些历史文档的主体论证内容。
+- 旧文档仍可用于回溯 merged 路线的历史决策，但不再建议直接照其结论执行当前训练。
+
+不改动说明：
+- 本轮不删除历史文档；
+- 本轮不修改训练代码、模型权重或数据集。`r`n`r`n## 2026-04-13 补充 person CPU 训练运行文档，并更新 P1 数据资产状态
 
 变更来源：
 - 用户确认当前训练设备没有独立显卡，只使用 CPU 训练，要求为 `person` 检测整理专用运行命令。
@@ -48,7 +132,41 @@
 - 本轮不补独立 person 示例图片 / 示例标注文件，因此 TODO 中对应条目仍保持未完成。
 - 本轮不修改 `inspection-flask/`，不写入线上权重目录。
 
-## 2026-04-13 生成 baseline 误报漏报清单，并落地 person 独立训练数据入口
+## 2026-04-15 规整 `docs/all_train_docs` 为历史归档区
+
+变更来源：
+- 用户同意继续整理 `backend-train-model/docs/all_train_docs/`，希望把明显过时的旧文档规整成更清晰的归档区。
+
+变更总览：
+1. 为以下历史文档统一加上 `[归档]` 标题和“归档说明”头部：
+   - `merged_dataset_plan.md`
+   - `merged_v2_improvement_plan.md`
+   - `run_method.md`
+   - `status_and_next_steps.md`
+   - `todo_list.md`
+   - `unified_holdout_compare_method.md`
+2. 更新 `backend-train-model/docs/all_train_docs/README.md`：
+   - 增加“文件索引”表；
+   - 为每份历史文档标注当前替代入口；
+   - 明确本目录用于历史回溯，不直接作为当前主线执行依据。
+
+涉及文件：
+- `backend-train-model/docs/all_train_docs/README.md`
+- `backend-train-model/docs/all_train_docs/merged_dataset_plan.md`
+- `backend-train-model/docs/all_train_docs/merged_v2_improvement_plan.md`
+- `backend-train-model/docs/all_train_docs/run_method.md`
+- `backend-train-model/docs/all_train_docs/status_and_next_steps.md`
+- `backend-train-model/docs/all_train_docs/todo_list.md`
+- `backend-train-model/docs/all_train_docs/unified_holdout_compare_method.md`
+- `backend-train-model/docs/update_log.md`
+
+兼容性注意：
+- 本轮只增加归档提示和索引，不改动这些历史文档的主体论证内容。
+- 旧文档仍可用于回溯 merged 路线的历史决策，但不再建议直接照其结论执行当前训练。
+
+不改动说明：
+- 本轮不删除历史文档；
+- 本轮不修改训练代码、模型权重或数据集。`r`n`r`n## 2026-04-13 生成 baseline 误报漏报清单，并落地 person 独立训练数据入口
 
 变更来源：
 - 用户要求完成第一阶段最后一步，整理当前暂定 `clothes fullframe` baseline 的误报 / 漏报清单。
@@ -1139,4 +1257,7 @@
 - 本轮不创建新的 `person` 数据目录或标签规范文档。
 - 本轮不执行 route verification 训练命令，只把它标为当前下一步。
 - 本轮不导出或复制最终 baseline 权重，需等第五阶段结果后再确定最终权重。
+
+
+
 

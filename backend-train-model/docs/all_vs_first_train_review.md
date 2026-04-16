@@ -1,5 +1,12 @@
 # `All-train-model` 与 `first-train` 训练结果对比审查报告
 
+> 历史说明（2026-04-15）：
+> - 本文只对应 `2026-04-06` 时点的 `merged_v1` 对比结论。
+> - 它不再代表当前 unified holdout 主线下的 baseline 判断。
+> - 当前请改看：
+>   - `backend-train-model/docs/total-run-method.md`
+>   - `backend-train-model/All-train-model/00_CURRENT_BASELINE/README.md`
+
 审查日期：`2026-04-06`
 
 ## 1. 审查目标

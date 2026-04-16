@@ -1,4 +1,9 @@
-# `All-train-model` 精度提升 TODO 清单
+# [归档] `All-train-model` 精度提升 TODO 清单
+
+> 归档说明（2026-04-15）：
+> - 本文是 merged 早期阶段的专项 TODO，主要服务于 `merged_v1 / merged_v2` 提升分析。
+> - 当前项目级 TODO 已切换到 `backend-train-model/docs/todo_list.md`，请优先使用后者。
+> - 本文仅保留为历史归档，不再作为当前执行清单。
 
 本文档基于以下审查结论整理：
 

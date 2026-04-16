@@ -1,5 +1,13 @@
 # backend-train-model
 
+> 当前如果只想了解“现在该跑什么、哪个模型是 baseline、文档先看什么”，请先读：
+> - `backend-train-model/README.md`
+> - `backend-train-model/docs/todo_list.md`
+> - `backend-train-model/docs/total-run-method.md`
+> - `backend-train-model/All-train-model/00_CURRENT_BASELINE/README.md`
+>
+> 本文件主要保留 `train_workwear.py` 的命令与 CLI 说明。
+
 本目录提供一套面向当前项目的 YOLOv8 训练工具链，目标是让训练流程尽量与 `inspection-flask` 的双阶段推理链路保持一致。
 
 当前训练目标为单类别检测：

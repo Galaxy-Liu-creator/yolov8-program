@@ -1,4 +1,9 @@
-# All-train-model 运行方法
+# [归档] All-train-model 运行方法
+
+> 归档说明（2026-04-15）：
+> - 本文保留的是 `All-train-model` 早期阶段的运行口径，其中仍包含“以旧 `first-train` baseline 初始化 merged”的历史表述。
+> - 当前 unified holdout 主线下，正式重跑口径已经收敛到 `backend-train-model/docs/total-run-method.md`。
+> - 因此本文仅用于回溯历史，不再作为当前训练命令的首选说明。
 
 ## 1. 这份文档解决什么问题
 

@@ -1,4 +1,13 @@
-# `backend-train-model` 三套数据合并为总数据集方案
+# [归档] `backend-train-model` 三套数据合并为总数据集方案
+
+> 归档说明（2026-04-15）：
+> - 本文形成于 unified holdout 主线落地之前，主要用于回溯 merged 数据集最初的规划思路。
+> - 它不再直接代表当前 baseline 或当前训练入口。
+> - 当前主线请优先查看：
+>   - `backend-train-model/README.md`
+>   - `backend-train-model/docs/todo_list.md`
+>   - `backend-train-model/docs/total-run-method.md`
+>   - `backend-train-model/All-train-model/00_CURRENT_BASELINE/README.md`
 
 本文档用于回答下面这个问题：
 

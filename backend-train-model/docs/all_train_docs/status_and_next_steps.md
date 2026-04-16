@@ -1,4 +1,11 @@
-# All-train-model 当前状态与下一步
+# [归档] All-train-model 当前状态与下一步
+
+> 归档说明（2026-04-15）：
+> - 本文描述的是 merged 早期阶段“尚未证明优于 `first-train`”时的状态快照。
+> - 当前主线状态已经更新，现阶段请优先查看：
+>   - `backend-train-model/docs/后端训练完成进度.md`
+>   - `backend-train-model/docs/todo_list.md`
+>   - `backend-train-model/All-train-model/00_CURRENT_BASELINE/README.md`
 
 本文档专门回答三个问题：
 

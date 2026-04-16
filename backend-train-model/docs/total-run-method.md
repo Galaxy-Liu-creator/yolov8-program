@@ -1,5 +1,10 @@
 # first-train 与 All-train-model 统一 holdout 全流程命令
 
+> 状态更新（2026-04-15）：
+> - 本文中的数据集构建、strict holdout、strict eval、route verification 已经完整执行过至少一轮。
+> - 当前选中的 clothes fullframe baseline 为 `clothes_merged_v2_balanced_from_first_holdout_v1`。
+> - 本文继续保留为“统一 holdout 重跑手册”；如果后续要复现实验，仍按本文命令执行。
+
 本文档记录当前推荐的统一 holdout 对比流程，目标是让 `first-train` 与 `All-train-model` 在同一个 `unified_holdout_v1` 上得到可比较的结果。
 
 ## 0. 执行前提

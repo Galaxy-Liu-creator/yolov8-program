@@ -1,4 +1,11 @@
-# `merged_v2` 提升方案与实验优先级
+# [归档] `merged_v2` 提升方案与实验优先级
+
+> 归档说明（2026-04-15）：
+> - 本文对应的是 unified holdout 对照完成之前，对 `merged_v2` 问题来源的阶段性拆解。
+> - 其中不少判断已经被后续 strict holdout 与 route verification 结果更新。
+> - 当前结论请优先查看：
+>   - `backend-train-model/docs/total-run-method.md`
+>   - `backend-train-model/All-train-model/00_CURRENT_BASELINE/README.md`
 
 本文档专门回答 4 个问题：
 
