@@ -1,5 +1,52 @@
 ﻿# Update Log
 
+## 2026-04-17 修正 person 文档中的严格断点续训命令
+
+变更来源：
+- 用户在实际训练 `person` 时发现前一版文档里的续训命令仍然附带了 `--dataset-yaml`、`--device`、`--workers` 等参数，希望改成当前代码真实支持的写法。
+
+变更总览：
+1. 更新 `backend-train-model/person-train-model/train-docs/person_run_method.md` 的续训说明。
+2. 将续训命令改为仅保留：
+   - `train`
+   - `--project-config`
+   - `--resume path\\to\\last.pt`
+3. 补充说明当前 `train_workwear.py --resume` 的行为：
+   - 会严格沿用 checkpoint 内保存的训练配置；
+   - 不能再同时传入 `--dataset-yaml`、`--base-model`、`--imgsz`、`--epochs`、`--batch`、`--patience`、`--workers`、`--device` 等参数。
+
+涉及文件：
+- `backend-train-model/person-train-model/train-docs/person_run_method.md`
+- `backend-train-model/docs/update_log.md`
+
+兼容性注意：
+- 本轮只修正文档，不修改任何续训代码逻辑。
+- 当前 person 推荐续训方式仍然是显式指向本次 run 的 `weights\\last.pt`。
+
+## 2026-04-16 同步 person 训练文档命令，显式固定本地基模
+
+变更来源：
+- 用户确认准备进入 `person` 模型训练阶段，希望把 `backend-train-model/person-train-model/train-docs/person_run_method.md` 中的运行命令调整为当前推荐写法。
+
+变更总览：
+1. 更新 `backend-train-model/person-train-model/train-docs/person_run_method.md` 中的首次训练命令：
+   - 推荐 CPU 训练命令；
+   - 慢速保守命令；
+   - fastcheck 命令；
+   - `all` 全流程命令。
+2. 以上命令统一显式增加 `--base-model backend-train-model\weights\yolov8n.pt`。
+3. 补充说明：
+   - 当前 `person` 首次训练建议从本地 `yolov8n.pt` 微调；
+   - 不建议默认省略基模来源，也不建议直接复用 `clothes` 的 best 权重作为 person 起点。
+
+涉及文件：
+- `backend-train-model/person-train-model/train-docs/person_run_method.md`
+- `backend-train-model/docs/update_log.md`
+
+兼容性注意：
+- 本轮只更新文档，不修改 `person` 训练脚本逻辑。
+- 中断续训命令仍沿用 `--resume last.pt` 方式，不额外追加 `--base-model`。
+
 ## 2026-04-15 新增根 README，并同步文档体系到 unified holdout / merged baseline 当前状态
 
 变更来源：

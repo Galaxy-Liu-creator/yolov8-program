@@ -42,12 +42,14 @@ Test-Path backend-train-model\weights\yolov8n.pt
 
 如果返回 `True`，即可离线训练；当前配置默认不允许远程下载模型。
 
+建议正式训练命令显式传入 `--base-model backend-train-model\weights\yolov8n.pt`。不传时脚本也会尝试使用本地默认 `yolov8n.pt`，但显式传入更便于日志追溯和后续复现。
+
 ## 3. 推荐 CPU 训练命令
 
 CPU 训练会比较慢，但最稳妥。建议先用默认 `imgsz=640` 保证检测精度，`batch=4` 如果内存压力大再降到 `batch=2`。
 
 ```powershell
-D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py train --device cpu --workers 0 --batch 4 --imgsz 640 --epochs 180 --patience 40
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py train --device cpu --workers 0 --batch 4 --imgsz 640 --epochs 180 --patience 40 --base-model backend-train-model\weights\yolov8n.pt
 ```
 
 说明：
@@ -58,19 +60,20 @@ D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-
 - `--imgsz 640`：优先保证 person 检测精度。
 - `--epochs 180`：给小数据集足够收敛轮数。
 - `--patience 40`：连续 40 轮无明显提升后自动早停。
+- `--base-model backend-train-model\weights\yolov8n.pt`：显式使用本地 YOLOv8n 预训练权重进行 person 微调，避免误用 clothes 权重或触发远程下载。
 
 ## 4. 慢速但更稳的 CPU 命令
 
 如果电脑训练过程中明显卡顿、内存压力大或温度过高，使用下面的保守命令：
 
 ```powershell
-D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py train --device cpu --workers 0 --batch 2 --imgsz 640 --epochs 180 --patience 40
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py train --device cpu --workers 0 --batch 2 --imgsz 640 --epochs 180 --patience 40 --base-model backend-train-model\weights\yolov8n.pt
 ```
 
 如果仍然太慢，可以临时降低输入尺寸做快速可用性训练，但最终正式权重仍建议回到 `imgsz=640`：
 
 ```powershell
-D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py train --device cpu --workers 0 --batch 2 --imgsz 512 --epochs 120 --patience 30 --run-name person_fullframe_cpu_fastcheck
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py train --device cpu --workers 0 --batch 2 --imgsz 512 --epochs 120 --patience 30 --run-name person_fullframe_cpu_fastcheck --base-model backend-train-model\weights\yolov8n.pt
 ```
 
 ## 5. 从头执行完整流程
@@ -78,7 +81,7 @@ D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-
 如果需要重新汇总标签、重新生成 `dataset.yaml`、训练、评估并导出 person 权重 alias，使用：
 
 ```powershell
-D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py all --overwrite --device cpu --workers 0 --batch 4 --imgsz 640 --epochs 180 --patience 40
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py all --overwrite --device cpu --workers 0 --batch 4 --imgsz 640 --epochs 180 --patience 40 --base-model backend-train-model\weights\yolov8n.pt
 ```
 
 注意：`all` 会覆盖 person prepared 数据集和 person 导出 alias，但不会执行 `--deploy`，不会覆盖 `inspection-flask/weights/workwear_detect_yolov8.pt`。
@@ -99,7 +102,9 @@ backend-train-model/person-train-model/train-result/prepared/person_fullframe/se
 
 ## 7. 训练中断后续训
 
-当前 person wrapper 没有额外封装 `resume` 参数。若训练中断，需要直接调用现有训练入口续训，并使用 person 项目配置。
+当前 person wrapper 没有额外封装 `resume` 参数。若训练中断，需要直接调用现有训练入口做**严格断点续训**，并使用 person 项目配置。
+
+注意：当前 `train_workwear.py` 的 `--resume` 会严格沿用 checkpoint 内保存的训练配置，因此不要再同时传入 `--dataset-yaml`、`--base-model`、`--imgsz`、`--epochs`、`--batch`、`--patience`、`--workers`、`--device` 等训练参数。
 
 先确认 `last.pt` 是否存在：
 
@@ -110,8 +115,10 @@ Test-Path backend-train-model\person-train-model\train-result\artifacts\runs\per
 续训命令：
 
 ```powershell
-D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\train_workwear.py train --project-config D:\University-Competition\Innovation_Entrepreneurship\MyProgram\yolov8-program\backend-train-model\person-train-model\person_project_config.json --dataset-yaml D:\University-Competition\Innovation_Entrepreneurship\MyProgram\yolov8-program\backend-train-model\person-train-model\train-result\prepared\person_fullframe\sequence_contiguous\dataset.yaml --resume D:\University-Competition\Innovation_Entrepreneurship\MyProgram\yolov8-program\backend-train-model\person-train-model\train-result\artifacts\runs\person_fullframe_baseline\weights\last.pt --device cpu --workers 0
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\train_workwear.py train --project-config D:\University-Competition\Innovation_Entrepreneurship\MyProgram\yolov8-program\backend-train-model\person-train-model\person_project_config.json --resume D:\University-Competition\Innovation_Entrepreneurship\MyProgram\yolov8-program\backend-train-model\person-train-model\train-result\artifacts\runs\person_fullframe_baseline\weights\last.pt
 ```
+
+如果只想让脚本自动选择当前项目最近一个仍可续训的 `last.pt`，也可以后续再单独补一条 bare `--resume` 版本；但对当前 person baseline，优先推荐显式指定这次训练的 `last.pt`，更稳妥。
 
 ## 8. 单独评估
 
