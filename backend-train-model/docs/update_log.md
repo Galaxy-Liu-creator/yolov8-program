@@ -1,5 +1,77 @@
 ﻿# Update Log
 
+## 2026-04-17 新增 Labelme ROI 标注使用说明
+
+变更来源：
+- 用户在确认采用 `Labelme` 进行离线 ROI 标注后，进一步要求单独补一份详细文档，明确说明：`Labelme` 怎么安装、需要什么环境、如何创建环境、当前最稳妥的 Python 版本建议，以及如何实际使用该软件进行 ROI 标注。
+
+变更总览：
+1. 新增 `backend-train-model/person-train-model/train-docs/ROI_Labelme.md`。
+2. 文档补充了：
+   - `Labelme` 的适用场景与当前项目中的定位；
+   - 当前最新稳定版与官方 Python 支持范围；
+   - 为什么不建议直接安装到仓库默认 `yolo_code` 环境；
+   - 推荐的 `Conda` 独立环境创建命令；
+   - 官方 `uv` 安装路线；
+   - 使用 `Labelme` 进行 polygon ROI 标注的逐步操作说明；
+   - 当前项目下 ROI 应如何画、如何组织代表帧与输出 `json`。
+
+涉及文件：
+- `backend-train-model/person-train-model/train-docs/ROI_Labelme.md`
+- `backend-train-model/docs/update_log.md`
+
+新增 / 变更配置项：
+- 本轮不修改任何训练代码、推理代码或项目配置文件。
+- 仅新增一份面向 ROI 标注阶段的使用文档。
+
+兼容性注意：
+- 本轮仅新增文档，不改变当前 `person` 训练、评估、导出和数据准备流程。
+- 当前仓库默认训练环境 `yolo_code` 仍保持 `Python 3.9.25` 约定不变；文档只是额外建议为 `Labelme` 单独创建 `Python 3.10` 环境。
+
+不改动说明：
+- 本轮不实现 `Labelme json -> ROI 配置` 的自动转换脚本。
+- 本轮不新增 ROI 预处理代码，不重训模型，不改现有数据集结构。
+
+## 2026-04-17 新增 ROI-aware person 数据集方案文档
+
+变更来源：
+- 用户在复盘 `person` 首轮检测效果后，明确提出希望为“面向业务 ROI 的 person 数据集方案”单独落一份文档，放到 `backend-train-model/person-train-model/train-docs/` 下，指导下一阶段数据准备与训练方向。
+
+变更总览：
+1. 新增 `backend-train-model/person-train-model/train-docs/roi_aware_person_dataset_plan.md`。
+2. 文档明确区分：
+   - 当前 `fullframe + 全图所有人标注` 母数据集；
+   - 后续面向业务 ROI 的派生 `person` 数据集。
+3. 文档给出 ROI-aware 推荐路线：
+   - 不在完整原图里对 ROI 外可见人员故意漏标；
+   - 优先采用“ROI 外遮罩 + ROI 最小外接矩形裁剪 + ROI 内人框保留”的生成方式；
+   - 保留 fullframe baseline，新增 ROI-aware person 作为平行对照分支。
+4. 文档补充了：
+   - 标注与样本保留规则；
+   - 建议的数据准备流程；
+   - 建议的 ROI 配置方式；
+   - 训练与评估对照口径；
+   - 当前阶段明确不做的事情。
+
+涉及文件：
+- `backend-train-model/person-train-model/train-docs/roi_aware_person_dataset_plan.md`
+- `backend-train-model/docs/update_log.md`
+
+新增 / 变更配置项：
+- 本轮不修改任何现有代码配置。
+- 仅在方案文档中提出后续实现建议：
+  - 可在 `backend-train-model/person-train-model/person_project_config.json` 中新增 `roi` 配置段；
+  - 由实现阶段再决定是否正式落地。
+
+兼容性注意：
+- 本轮只新增方案文档，不修改 `person` 训练脚本、数据准备脚本、默认训练命令或当前数据集产物。
+- 当前 `person_fullframe_baseline` 仍是现有 `person` 训练结果的唯一已落地产物；新增文档不会改变当前链路默认行为。
+
+不改动说明：
+- 本轮不修改 `backend-train-model/person-train-model/train-code/` 下的任何脚本。
+- 本轮不重新生成 `person` 数据集，不重训模型，不导出新权重。
+- 本轮不修改 `inspection-flask/`、`All-train-model/` 或根 `docs/dataset.md` 的现有内容。
+
 ## 2026-04-17 修正 person 文档中的严格断点续训命令
 
 变更来源：
@@ -1304,7 +1376,3 @@
 - 本轮不创建新的 `person` 数据目录或标签规范文档。
 - 本轮不执行 route verification 训练命令，只把它标为当前下一步。
 - 本轮不导出或复制最终 baseline 权重，需等第五阶段结果后再确定最终权重。
-
-
-
-
