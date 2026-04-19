@@ -12,5 +12,11 @@ images/
 labels/
 working/
 
-# 学姐call训练模型
-call_runs/
+# 学姐、师姐训练模型
+otherMonitor/ 
+#打电话检测
+call_runs/ 
+#障碍杆检测
+BarrierMonitor/ 
+#吸烟检测
+smoke/ 
