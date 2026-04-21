@@ -233,10 +233,11 @@ def collect_image_files(
 ) -> Dict[str, List[Path]]:
     """收集每个原始序列目录中的图片文件，并按时序尽量排序。
 
-    返回值的 key 是“序列目录名”，value 是该序列下的图片路径列表。
+    返回值的 key 是“规范化后的序列名”，value 是该序列下的图片路径列表。
     """
 
     sequence_files: Dict[str, List[Path]] = {}
+    sequence_root_map: Dict[str, Path] = {}
     normalized_exts = {suffix.lower() for suffix in image_extensions}
 
     for image_root in image_roots:
@@ -256,7 +257,18 @@ def collect_image_files(
         # 如果文件名里带 `_frame_xxx`，会优先按帧号排序；
         # 否则退化到按文件名排序，尽量保持确定性。
         files.sort(key=_image_sort_key)
-        sequence_files[image_root.name] = files
+        sequence_name = config.resolve_sequence_name_from_image_root(image_root)
+        existing_root = sequence_root_map.get(sequence_name)
+        if existing_root is not None:
+            raise DatasetToolError(
+                "图片目录映射后的序列名重复：{0} -> {1} <-> {2}".format(
+                    sequence_name,
+                    existing_root,
+                    image_root,
+                )
+            )
+        sequence_root_map[sequence_name] = image_root
+        sequence_files[sequence_name] = files
 
     return sequence_files
 

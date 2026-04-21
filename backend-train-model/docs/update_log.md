@@ -1,5 +1,239 @@
 ﻿# Update Log
 
+## 2026-04-21 支持逐图 ROI JSON 并生成 ROI-aware person 数据集
+
+变更来源：
+- 用户澄清已经为每张图片导出了 Labelme ROI JSON，位置在 `D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes\...\roi-json`，不需要使用代表帧重新标注。
+- 本轮检查发现当前共有 `502` 个 ROI JSON，和 person 原图 stem 一一对应；同一序列内 ROI polygon 多数不完全一致，因此需要支持 per-image ROI，而不能强制每序列一个 canonical polygon。
+
+变更总览：
+1. 扩展 `labelme_roi_to_config.py`：
+   - 支持读取逐图 ROI JSON；
+   - 输出 `per_image` ROI 配置；
+   - 当同一序列 ROI 完全一致时才额外写入 `per_sequence` fallback；
+   - 对 Labelme 浮点误差导致的 `-0.0`、`width + 极小误差` 等边界点做容差裁剪。
+2. 扩展 `prepare_roi_aware_person_dataset.py`：
+   - 优先按 `sequence_name + image_stem` 读取逐图 ROI；
+   - 缺少逐图 ROI 时再回退到 `per_sequence`；
+   - `prepare_report.json` 记录 `roi_scope`。
+3. 更新 `run_person_flow.py` 与 `labelme_roi_to_config.py` 的提取结果打印：
+   - 同时显示“序列级 ROI 数”和“逐图 ROI 数”。
+4. 已使用现有 clothes ROI JSON 生成统一 ROI 配置：
+   - `backend-train-model/person-train-model/train-result/working/roi/roi_config.generated.json`
+   - `scope=per_image`
+   - `per_image_total=502`
+5. 已生成 ROI-aware person 数据集：
+   - `backend-train-model/person-train-model/train-result/prepared/person_roi_aware/sequence_contiguous/dataset.yaml`
+   - 输入图片 `502`；
+   - 输出图片 `502`；
+   - 保留 person 框 `1343`；
+   - 丢弃 person 框 `315`；
+   - 边界裁剪框 `49`；
+   - 空 ROI 负样本 `12`。
+6. 更新 `person_run_method.md` 与 `ROI_Labelme.md`：
+   - 明确代表帧脚手架只服务于“尚未标 ROI”的情况；
+   - 当前已逐图标注时，直接传 `--roi-json-root D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes`。
+
+涉及文件：
+- `backend-train-model/person-train-model/train-code/labelme_roi_to_config.py`
+- `backend-train-model/person-train-model/train-code/prepare_roi_aware_person_dataset.py`
+- `backend-train-model/person-train-model/train-code/run_person_flow.py`
+- `backend-train-model/person-train-model/train-docs/person_run_method.md`
+- `backend-train-model/person-train-model/train-docs/ROI_Labelme.md`
+- `backend-train-model/person-train-model/train-docs/roi_aware_person_dataset_plan.md`
+- `backend-train-model/docs/update_log.md`
+- `backend-train-model/person-train-model/train-result/working/roi/roi_config.generated.json`
+- `backend-train-model/person-train-model/train-result/prepared/person_roi_aware/sequence_contiguous/dataset.yaml`
+- `backend-train-model/person-train-model/train-result/prepared/person_roi_aware/sequence_contiguous/prepare_report.json`
+
+新增 / 变更配置项：
+- 无新增 JSON 配置项。
+- ROI 配置文件结构扩展：
+  - 新增 `scope=per_image`
+  - 新增 `per_image`
+  - 新增 `summary.sequence_image_counts`
+  - 新增 `summary.sequence_unique_polygon_counts`
+- `prepare_report.json` 新增 `roi_scope`。
+
+兼容性注意：
+- 旧的每序列单 ROI 配置仍可通过 `per_sequence` 读取。
+- 新的逐图 ROI 配置优先级更高，适合当前每张图片都已标 ROI 的数据。
+- 当前 `backend-train-model/person-train-model/roi-work/` 仍可保留为后续新序列标注脚手架，但本轮生成 ROI-aware 数据集不依赖它。
+
+不改动说明：
+- 本轮不修改已有 Labelme JSON 原文件。
+- 本轮不启动训练，不导出或部署权重。
+- 本轮不修改 `inspection-flask/` 或线上权重路径。
+
+## 2026-04-21 新增 ROI 标注工作区自动脚手架
+
+变更来源：
+- 用户已新建 ROI 相关目录，并要求继续实现“如果没有文件夹可以自行新建，确保正确且层次清晰易于管理”的 ROI 标注工作区准备步骤。
+
+变更总览：
+1. 新增 `setup_roi_workdir.py`：
+   - 读取 `person_project_config.json` 中的 7 条 person 序列；
+   - 自动创建 `roi-work/<sequence_name>/frames/` 与 `roi-work/<sequence_name>/roi-json/`；
+   - 每条序列按时间顺序抽取默认 `3` 张代表帧复制到 `frames/`；
+   - 为根目录和每条序列生成 `README.md`，写入 Labelme 启动命令与标注规则；
+   - 生成 `roi_work_manifest.json`，记录源目录、抽帧结果、输出目录和后续命令；
+   - 自动创建 `train-result/working/roi/README.md`，说明 `roi_config.generated.json` 的生成方式。
+2. 扩展 `run_person_flow.py`：
+   - 新增 `setup-roi-workdir` 命令；
+   - 新增 `--roi-frames-per-sequence`；
+   - 新增 `--overwrite-roi-frames`；
+   - 复用 `--roi-json-root` 作为 ROI 工作区根目录。
+3. 已在本地执行默认工作区生成：
+   - `backend-train-model/person-train-model/roi-work/`；
+   - 7 个序列子目录；
+   - 每个序列 `3` 张代表帧；
+   - 每个序列独立 `roi-json/` 目录。
+4. 更新 `person_run_method.md` 与 `ROI_Labelme.md`，把自动工作区生成作为 ROI-aware 流程的第一步。
+
+涉及文件：
+- `backend-train-model/person-train-model/train-code/setup_roi_workdir.py`
+- `backend-train-model/person-train-model/train-code/run_person_flow.py`
+- `backend-train-model/person-train-model/train-docs/person_run_method.md`
+- `backend-train-model/person-train-model/train-docs/ROI_Labelme.md`
+- `backend-train-model/docs/update_log.md`
+- `backend-train-model/person-train-model/roi-work/README.md`
+- `backend-train-model/person-train-model/roi-work/roi_work_manifest.json`
+- `backend-train-model/person-train-model/roi-work/<sequence_name>/README.md`
+- `backend-train-model/person-train-model/roi-work/<sequence_name>/frames/*.jpg`
+- `backend-train-model/person-train-model/roi-work/<sequence_name>/roi-json/`
+- `backend-train-model/person-train-model/train-result/working/roi/README.md`
+
+新增 / 变更配置项：
+- 无新增 JSON 配置项。
+- 新增 CLI：
+  - `run_person_flow.py setup-roi-workdir`
+  - `--roi-frames-per-sequence`
+  - `--overwrite-roi-frames`
+
+兼容性注意：
+- `setup-roi-workdir` 只准备 Labelme 标注工作区，不会生成假的 ROI polygon，也不会修改 person 标签。
+- 当前 `roi-json/` 目录仍需人工用 Labelme 保存真实 `.json` 后，才能运行 `extract-roi-config --overwrite`。
+- 当前已存在的 `roi_config.generated.json` 如为空文件，后续使用 `extract-roi-config --overwrite` 覆盖即可。
+
+不改动说明：
+- 本轮不启动 Labelme GUI，不伪造 ROI JSON。
+- 本轮不生成 ROI-aware YOLO 数据集，不训练模型。
+- 本轮不修改 `inspection-flask/` 或线上权重路径。
+
+## 2026-04-21 落地 ROI-aware person 数据集生成链路
+
+变更来源：
+- 用户已完成第一版 ROI polygon 标注，并确认负样本图片中本身没有 person；本轮按既定方案实现 `Labelme ROI json -> ROI 配置 -> ROI-aware person 数据集` 的最小可用链路。
+
+变更总览：
+1. 扩展 `person_project_config.json`：
+   - 新增 `roi` 配置段；
+   - 新增 ROI-aware 数据集输出目录与推荐 run 名。
+2. 扩展 person 项目配置加载逻辑：
+   - 读取 `roi.enabled`、`roi.mode`、`roi.keep_rule.center_inside`、`roi.config_path`；
+   - 读取 `person_dataset.roi_aware_prepared_output_root` 与 `person_dataset.roi_aware_recommended_run_name`；
+   - 将 split 配置纳入 person 上下文，供 ROI-aware prepare 复用同一切分口径。
+3. 新增 `Labelme ROI json -> ROI config` 脚本：
+   - 递归读取 `roi-work` 下的 Labelme JSON；
+   - 只接受 `label == "roi"` 且 `shape_type == "polygon"` 的 ROI；
+   - 支持通过 `sequence_name` 或唯一的图片根目录末级名识别序列；
+   - 同一序列 polygon 不一致、缺少 ROI、多 ROI、未知序列或点越界时直接报错。
+4. 新增 ROI-aware person 数据集生成脚本：
+   - 对 ROI 外区域置黑；
+   - 裁剪到 ROI polygon 最小外接矩形；
+   - 只保留中心点落在 ROI 内的 person 框；
+   - 对保留框做裁剪与 YOLO 坐标重映射；
+   - ROI 内无人时保留为空标注负样本；
+   - 输出 `dataset.yaml` 与 `prepare_report.json`；
+   - `--overwrite` 时同步刷新汇总 person 标签，避免原图片根目录修正后复用旧标签目录。
+5. 扩展 `run_person_flow.py`：
+   - 新增 `extract-roi-config`；
+   - 新增 `prepare-roi-aware`；
+   - 保持原 `prepare/train/evaluate/export/all` 默认行为不变。
+6. 更新 person ROI 相关文档，补充 ROI-aware 数据集生成、训练与评估命令，并标记方案已进入第一版代码落地状态。
+
+涉及文件：
+- `backend-train-model/person-train-model/person_project_config.json`
+- `backend-train-model/person-train-model/train-code/prepare_person_dataset.py`
+- `backend-train-model/person-train-model/train-code/labelme_roi_to_config.py`
+- `backend-train-model/person-train-model/train-code/prepare_roi_aware_person_dataset.py`
+- `backend-train-model/person-train-model/train-code/run_person_flow.py`
+- `backend-train-model/person-train-model/train-docs/person_run_method.md`
+- `backend-train-model/person-train-model/train-docs/ROI_Labelme.md`
+- `backend-train-model/person-train-model/train-docs/roi_aware_person_dataset_plan.md`
+- `backend-train-model/docs/update_log.md`
+
+新增 / 变更配置项：
+- `roi.enabled`
+- `roi.mode`
+- `roi.keep_rule.center_inside`
+- `roi.config_path`
+- `person_dataset.roi_aware_prepared_output_root`
+- `person_dataset.roi_aware_recommended_run_name`
+
+兼容性注意：
+- 当前 ROI-aware v1 仅支持 `mask_then_crop + center_inside`。
+- 现有 `person_fullframe_baseline` 母数据集、默认 `prepare`、训练、评估、导出命令保持不变。
+- 本轮没有修改 `backend-train-model/dataset_tools.py` 的 `fullframe/personcrop` 公共 prepare mode，也没有改变 clothes baseline 与 shared personcrop 行为。
+
+不改动说明：
+- 本轮不重新生成任何真实数据集产物；
+- 本轮不启动训练；
+- 本轮不导出或部署 person 权重；
+- 本轮不修改 `inspection-flask/`、`All-train-model/` 或线上权重路径。
+
+## 2026-04-21 适配 clothes 图片下沉到 `frames` 子目录
+
+变更来源：
+- 用户反馈当前 clothes 原始图片已不再直接放在各序列外层目录，而是统一下沉到对应序列的 `frames/` 子目录。
+- 用户要求同步修正 `backend-train-model` 当前默认入口、`All-train-model` 构建配置，以及仓库里仍在直接使用的 `dataset.yaml` / 数据说明文档。
+
+变更总览：
+1. 更新 `backend-train-model/config.py` 与 `backend-train-model/project_config.json`，把默认单源 `group3_1` 的 `image_roots` 统一切到 `frames/` 子目录。
+2. 更新 `backend-train-model/All-train-model/*.build.json`，把 `group3_1 / group3_2 / group3_3` 的全部 `image_root` 同步切到新的 `frames/` 子目录。
+3. 在 `backend-train-model/config.py` 新增 `resolve_sequence_name_from_image_root(...)`，并让 `dataset_tools.py`、`train_workwear.py` 统一使用，避免多个 `frames` 目录被错误识别成同一个序列名。
+4. 修正仍在使用的 clothes `dataset.yaml`：
+   - `backend-train-model/All-train-model/datasets/merged_clothes_v1_positive_only/dataset.yaml`
+   - `backend-train-model/All-train-model/datasets/merged_clothes_v2_full_reviewed/dataset.yaml`
+   - `backend-train-model/first-train/artifacts/prepared/fullframe/sequence_contiguous/dataset.yaml`
+   使其 `path` 指向当前 `D:\University-Competition\...` 仓库位置；其中 `first-train` 版本同时补回缺失的 `first-train/` 目录层级。
+5. 更新 `docs/dataset.md`，明确 clothes 图片现位于各序列目录下的 `frames/` 子目录，而标注根目录保持不变。
+
+涉及文件：
+- `backend-train-model/config.py`
+- `backend-train-model/dataset_tools.py`
+- `backend-train-model/train_workwear.py`
+- `backend-train-model/project_config.json`
+- `backend-train-model/All-train-model/first_train_holdout_v1.build.json`
+- `backend-train-model/All-train-model/merged_clothes_v1.build.json`
+- `backend-train-model/All-train-model/merged_clothes_v2.build.json`
+- `backend-train-model/All-train-model/merged_clothes_v2_balanced.build.json`
+- `backend-train-model/All-train-model/unified_holdout_v1.build.json`
+- `backend-train-model/All-train-model/datasets/merged_clothes_v1_positive_only/dataset.yaml`
+- `backend-train-model/All-train-model/datasets/merged_clothes_v2_full_reviewed/dataset.yaml`
+- `backend-train-model/first-train/artifacts/prepared/fullframe/sequence_contiguous/dataset.yaml`
+- `backend-train-model/docs/update_log.md`
+- `docs/dataset.md`
+
+新增 / 变更配置项：
+- 无新增 JSON 字段或 CLI 参数。
+- 更新已有路径配置值：
+  - `config.py` 中的 `IMAGE_ROOTS`
+  - `project_config.json` 中的 `data.image_roots`
+  - 各 `*.build.json` 中 `sequences[].image_root`
+- 新增运行时辅助函数：
+  - `config.resolve_sequence_name_from_image_root(...)`
+
+兼容性注意：
+- 默认单源 `audit / prepare / inspection validate` 现在支持 `image_roots` 直接指向 `frames/` 子目录，不再把多个目录都归并成重复的 `frames` 序列名。
+- `All-train-model` 的 merged / holdout 构建逻辑不变，仍以各 `*.build.json` 中显式配置的 `sequence_name + image_root` 为准。
+- 本轮只修正当前配置入口与可直接消费的 `dataset.yaml`；历史 build / eval 产物中的旧路径字符串仍代表旧运行现场，不作为当前训练入口。
+
+不改动说明：
+- 本轮不修改 `inspection-flask/` 代码。
+- 本轮不调整 labels 根目录、类别定义、split manifest、训练超参数或权重加载逻辑。
+- 本轮不重建 merged 数据集，也不重跑训练 / 评估任务。
+
 ## 2026-04-17 新增 Labelme ROI 标注使用说明
 
 变更来源：

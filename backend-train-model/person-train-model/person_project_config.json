@@ -41,6 +41,14 @@
     "assignment_min_ioa": 0.35,
     "fallback_to_fullframe": true
   },
+  "roi": {
+    "enabled": true,
+    "mode": "mask_then_crop",
+    "keep_rule": {
+      "center_inside": true
+    },
+    "config_path": "train-result/working/roi/roi_config.generated.json"
+  },
   "models": {
     "allow_remote_model_download": false,
     "python_candidates": [
@@ -63,6 +71,8 @@
     "aggregated_label_root": "train-result/working/aggregated_labels",
     "summary_path": "train-result/person_source_dataset_summary.json",
     "prepared_output_root": "train-result/prepared/person_fullframe/sequence_contiguous",
+    "roi_aware_prepared_output_root": "train-result/prepared/person_roi_aware/sequence_contiguous",
+    "roi_aware_recommended_run_name": "person_roi_aware_baseline",
     "export_alias_path": "train-result/export/person_detect_yolov8.pt",
     "export_alias_metadata_path": "train-result/export/person_detect_yolov8.metadata.json",
     "sequences": [

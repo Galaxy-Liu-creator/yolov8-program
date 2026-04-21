@@ -173,7 +173,146 @@ backend-train-model/person-train-model/train-result/export/person_detect_yolov8.
 
 如果 recall 明显偏低，后续应优先检查 person 漏标、遮挡样本、小目标和边缘目标；如果 precision 明显偏低，后续应优先检查空标注负样本、背景误检和阈值设置。
 
-## 11. 当前不做的事情
+## 11. ROI-aware person 数据集生成
+
+当已经使用 Labelme 为每条序列标好 `roi` polygon 后，可以新增一条 ROI-aware person 平行分支。该分支不会覆盖当前 fullframe person baseline。
+
+### 11.1 创建 ROI 标注工作区
+
+如果已经像当前数据这样为每张图片都导出了 Labelme ROI JSON，可以跳过本步骤，直接进入 `11.2`，用现有 `roi-json` 目录作为 `--roi-json-root`。
+
+如果还没有整理 Labelme ROI JSON，才需要先自动创建清晰的 ROI 工作区，并为每条序列抽取代表帧：
+
+```powershell
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py setup-roi-workdir
+```
+
+默认输出结构：
+
+```text
+backend-train-model/person-train-model/roi-work/
+├─ <sequence_name>/
+│  ├─ frames/
+│  ├─ roi-json/
+│  └─ README.md
+├─ README.md
+└─ roi_work_manifest.json
+```
+
+默认每条序列抽取 `3` 张代表帧。如果想覆盖已经抽过的同名代表帧，可以使用：
+
+```powershell
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py setup-roi-workdir --overwrite-roi-frames
+```
+
+如果想每条序列抽更多代表帧，例如 `5` 张：
+
+```powershell
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py setup-roi-workdir --roi-frames-per-sequence 5
+```
+
+生成后，进入每个序列的 `README.md` 查看对应 Labelme 启动命令。Labelme 保存的 `.json` 应放到对应序列的 `roi-json/` 目录。
+
+### 11.2 提取 ROI 配置
+
+当前已有逐图 ROI JSON，可直接从 clothes 数据目录的公共根递归读取：
+
+```powershell
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py extract-roi-config --roi-json-root D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes --overwrite
+```
+
+这会读取以下现有目录中的 `.json`：
+
+```text
+D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes\group3_1\clo\D04_20260123074846\roi-json
+D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes\group3_1\clo\D05_20260123074841\roi-json
+D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes\group3_1\clo\D15_20260123074848\roi-json
+D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes\group3_2\clo\1\roi-json
+D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes\group3_2\clo\D15_20260119203927\roi-json
+D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes\group3_3\clo\D02_20260123070624\roi-json
+D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes\group3_3\clo\D02_20260123074836\roi-json
+```
+
+如果使用自动创建的工作区，则默认从以下目录递归读取 Labelme JSON：
+
+```text
+backend-train-model/person-train-model/roi-work/
+```
+
+推荐目录结构仍为：
+
+```text
+backend-train-model/person-train-model/roi-work/<sequence_name>/roi-json/*.json
+```
+
+如果某条序列的图片根目录末级名与 `sequence_name` 不同，例如 `group3_2\1`，脚本也会尝试把图片根目录末级名作为路径别名识别；但更推荐目录名仍使用 `person_project_config.json` 里的 `sequence_name`，便于后续追溯。
+
+对应提取命令：
+
+```powershell
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py extract-roi-config --overwrite
+```
+
+输出位置来自 `person_project_config.json`：
+
+```text
+backend-train-model/person-train-model/train-result/working/roi/roi_config.generated.json
+```
+
+规则：
+
+- 只读取 `label == "roi"` 且 `shape_type == "polygon"` 的 shape；
+- 支持每张图片一个 ROI polygon，并写入 `per_image`；
+- 如果同一序列所有图片 ROI 完全一致，也会额外写入可回退的 `per_sequence`；
+- 同一张图片出现多个不一致 JSON 时会直接报错；
+- 缺少 ROI、存在多个 ROI、未知序列名或点越界时会直接报错。
+
+### 11.3 生成 ROI-aware 数据集
+
+生成命令：
+
+```powershell
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py prepare-roi-aware --overwrite
+```
+
+建议在修正过原图片根目录或 person 标签后使用 `--overwrite`，这样会同步刷新汇总 person 标签目录与 ROI-aware 输出目录；不带 `--overwrite` 时会尽量复用既有汇总标签。
+
+默认输出：
+
+```text
+backend-train-model/person-train-model/train-result/prepared/person_roi_aware/sequence_contiguous/dataset.yaml
+```
+
+处理规则：
+
+- 读取原图、原 person 标签和每张图片对应的 ROI polygon；
+- 对 ROI 外区域置黑；
+- 裁剪到 ROI polygon 的最小外接矩形；
+- 只保留中心点落在 ROI polygon 内的 person 框；
+- 对保留框做裁剪和坐标重映射；
+- ROI 内无人时保留为空标注负样本。
+
+### 11.4 训练 ROI-aware person baseline
+
+训练命令示例：
+
+```powershell
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py train --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_roi_aware\sequence_contiguous\dataset.yaml --run-name person_roi_aware_baseline --device cpu --workers 0 --batch 4 --imgsz 640 --epochs 180 --patience 40 --base-model backend-train-model\weights\yolov8n.pt
+```
+
+评估命令示例：
+
+```powershell
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py evaluate --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_roi_aware\sequence_contiguous\dataset.yaml --run-name person_roi_aware_baseline --device cpu --workers 0
+```
+
+对照重点：
+
+- 与 `person_fullframe_baseline` 保持同样训练参数；
+- 重点比较 `recall`、`mAP50`、`mAP50-95`；
+- 不要在 ROI-aware 结果未验证前替换当前 fullframe baseline。
+
+## 12. 当前不做的事情
 
 - 不使用 GPU / CUDA 训练。
 - 不把 person 标签混入 clothes 标签目录。

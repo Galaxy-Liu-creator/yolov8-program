@@ -1434,7 +1434,7 @@ def run_inspection_validation(
         keep_deployed=keep_deployed,
     ):
         for image_root in config.IMAGE_ROOTS:
-            sequence_name = image_root.name
+            sequence_name = config.resolve_sequence_name_from_image_root(image_root)
             # 这里明确使用当前项目数据口径：单类 clothes-only，类别 ID 为 0。
             command = [
                 str(python_executable),

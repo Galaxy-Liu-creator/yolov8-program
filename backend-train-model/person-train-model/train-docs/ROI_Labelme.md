@@ -255,16 +255,34 @@ pip install labelme
 
 ### 8.3 建议的临时目录组织
 
-你可以单独整理一个 ROI 标注工作目录，例如：
+当前仓库已经提供自动创建 ROI 标注工作区的命令。推荐先在仓库根目录执行：
+
+```powershell
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py setup-roi-workdir
+```
+
+该命令会按 `person_project_config.json` 中的序列自动创建目录，并为每条序列抽取代表帧：
+
+```text
+backend-train-model/person-train-model/roi-work/
+├─ <sequence_name>/
+│  ├─ frames/
+│  │  ├─ 自动抽取的代表帧 1.jpg
+│  │  ├─ 自动抽取的代表帧 2.jpg
+│  │  └─ 自动抽取的代表帧 3.jpg
+│  ├─ roi-json/
+│  └─ README.md
+├─ README.md
+└─ roi_work_manifest.json
+```
+
+如果你希望手工整理，也可以保持同样结构，例如：
 
 ```text
 backend-train-model/person-train-model/roi-work/
 ├─ D15_20260119203927/
-│  ├─ frames/
-│  │  ├─ 0001.jpg
-│  │  ├─ 0030.jpg
-│  │  └─ 0060.jpg
-│  └─ roi-json/
+   ├─ frames/
+   └─ roi-json/
 └─ D02_20260123074836/
    ├─ frames/
    └─ roi-json/
@@ -525,19 +543,45 @@ ROI 多边形通常会以这样的结构出现在 `shapes` 里：
 
 ### 步骤 1：每条序列先抽 3～5 张代表帧
 
+如果你已经为每张图片都导出了 ROI JSON，就不需要再抽代表帧；代表帧只用于“还没开始画 ROI、且固定机位 ROI 基本稳定”的场景。
+
 例如：
 
 - `D15_20260119203927`
 - `D02_20260123074836`
 
-每条序列先抽几张就够。
+每条序列先抽几张就够。若采用逐图 ROI，则直接使用每张图片对应的 Labelme JSON。
 
 ### 步骤 2：每条序列单独建一个 ROI 标注目录
+
+推荐直接运行：
+
+```powershell
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py setup-roi-workdir
+```
 
 把：
 
 - 图片放到 `frames/`
 - `json` 输出到 `roi-json/`
+
+如果已经有现成目录，也可以直接复用。例如当前逐图 ROI JSON 可直接放在 / 读取自：
+
+```text
+D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes\group3_1\clo\D04_20260123074846\roi-json
+D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes\group3_1\clo\D05_20260123074841\roi-json
+D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes\group3_1\clo\D15_20260123074848\roi-json
+D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes\group3_2\clo\1\roi-json
+D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes\group3_2\clo\D15_20260119203927\roi-json
+D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes\group3_3\clo\D02_20260123070624\roi-json
+D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes\group3_3\clo\D02_20260123074836\roi-json
+```
+
+此时不用复制到 `backend-train-model/person-train-model/roi-work/`，直接在提取命令里传公共根目录即可：
+
+```powershell
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py extract-roi-config --roi-json-root D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes --overwrite
+```
 
 ### 步骤 3：用 `Labelme` 只画一个标签：`roi`
 
@@ -553,11 +597,17 @@ ROI 多边形通常会以这样的结构出现在 `shapes` 里：
 
 ### 步骤 6：后续再把 ROI json 转成项目配置
 
-等你这一批 `json` 有了，我再帮你做下一步也不迟：
+当前仓库已经提供转换与数据集生成脚本。完成 `json` 标注后，在仓库根目录执行：
 
-- 把 `Labelme json` 提取成 ROI 顶点配置；
-- 接入 `backend-train-model/person-train-model` 的数据准备流程；
-- 生成 ROI-aware person 派生数据集。
+```powershell
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py extract-roi-config --roi-json-root D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes --overwrite
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py prepare-roi-aware --overwrite
+```
+
+默认会生成：
+
+- ROI 配置：`backend-train-model/person-train-model/train-result/working/roi/roi_config.generated.json`
+- ROI-aware 数据集：`backend-train-model/person-train-model/train-result/prepared/person_roi_aware/sequence_contiguous/dataset.yaml`
 
 ---
 

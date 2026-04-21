@@ -12,6 +12,9 @@ images/
 labels/
 working/
 
+# ROI
+roi-work/
+
 # 学姐、师姐训练模型
 otherMonitor/ 
 #打电话检测

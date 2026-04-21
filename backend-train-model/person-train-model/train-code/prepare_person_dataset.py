@@ -6,7 +6,7 @@ import shutil
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Mapping, Sequence, Set
+from typing import Dict, List, Mapping, Optional, Sequence, Set
 
 
 SCRIPT_ROOT = Path(__file__).resolve().parent
@@ -24,6 +24,14 @@ class PersonSequence:
 
 
 @dataclass(frozen=True)
+class RoiSettings:
+    enabled: bool
+    mode: str
+    center_inside: bool
+    config_path: Path
+
+
+@dataclass(frozen=True)
 class PersonProjectContext:
     config_path: Path
     config_dir: Path
@@ -31,13 +39,18 @@ class PersonProjectContext:
     image_roots: List[Path]
     image_extensions: List[str]
     class_names: Dict[int, str]
+    split_ratios: Dict[str, float]
+    default_split_strategy: str
     sequences: List[PersonSequence]
     aggregated_label_root: Path
     summary_path: Path
     prepared_output_root: Path
+    roi_aware_prepared_output_root: Path
     export_alias_path: Path
     export_alias_metadata_path: Path
     recommended_run_name: str
+    roi_aware_recommended_run_name: str
+    roi: RoiSettings
 
 
 def parse_args() -> argparse.Namespace:
@@ -86,6 +99,18 @@ def coerce_string(raw_value: object, field_name: str) -> str:
     return text
 
 
+def coerce_bool(raw_value: object, field_name: str) -> bool:
+    if isinstance(raw_value, bool):
+        return raw_value
+    if isinstance(raw_value, str):
+        normalized = raw_value.strip().lower()
+        if normalized in ("1", "true", "yes", "y", "on"):
+            return True
+        if normalized in ("0", "false", "no", "n", "off"):
+            return False
+    raise RuntimeError("{0} 必须是布尔值。".format(field_name))
+
+
 def coerce_class_names(raw_value: object) -> Dict[int, str]:
     if not isinstance(raw_value, Mapping):
         raise RuntimeError("data.class_names 必须是对象。")
@@ -117,6 +142,23 @@ def coerce_image_extensions(raw_value: object) -> List[str]:
     return normalized
 
 
+def coerce_split_ratios(raw_value: object) -> Dict[str, float]:
+    if not isinstance(raw_value, Mapping):
+        raise RuntimeError("data.split_ratios 必须是对象。")
+    normalized: Dict[str, float] = {}
+    for split_name in ("train", "val", "test"):
+        try:
+            ratio = float(raw_value.get(split_name, 0.0))
+        except (TypeError, ValueError) as exc:
+            raise RuntimeError("data.split_ratios.{0} 必须是数字。".format(split_name)) from exc
+        if ratio < 0:
+            raise RuntimeError("data.split_ratios.{0} 不能为负数。".format(split_name))
+        normalized[split_name] = ratio
+    if sum(normalized.values()) <= 0:
+        raise RuntimeError("data.split_ratios 至少需要一个正数比例。")
+    return normalized
+
+
 def load_person_project_context(config_path: Path) -> PersonProjectContext:
     resolved_path = Path(config_path).expanduser().resolve()
     payload = load_json(resolved_path)
@@ -136,6 +178,17 @@ def load_person_project_context(config_path: Path) -> PersonProjectContext:
     ]
     image_extensions = coerce_image_extensions(data_section.get("image_extensions", [".jpg"]))
     class_names = coerce_class_names(data_section.get("class_names", {0: "person"}))
+    split_ratios = coerce_split_ratios(
+        data_section.get("split_ratios", {"train": 0.7, "val": 0.15, "test": 0.15})
+    )
+    default_split_strategy = coerce_string(
+        data_section.get("default_split_strategy", "sequence_contiguous"),
+        "data.default_split_strategy",
+    )
+    if default_split_strategy not in ("sequence_contiguous", "sequence_holdout"):
+        raise RuntimeError(
+            "data.default_split_strategy 仅支持 sequence_contiguous 或 sequence_holdout。"
+        )
 
     person_dataset_section = payload.get("person_dataset")
     if not isinstance(person_dataset_section, Mapping):
@@ -181,6 +234,21 @@ def load_person_project_context(config_path: Path) -> PersonProjectContext:
             "`data.image_roots` 与 `person_dataset.sequences[*].image_root` 不一致，请统一配置。"
         )
 
+    roi_section = payload.get("roi", {})
+    if roi_section is None:
+        roi_section = {}
+    if not isinstance(roi_section, Mapping):
+        raise RuntimeError("配置中的 `roi` 段必须是对象。")
+    keep_rule_section = roi_section.get("keep_rule", {})
+    if keep_rule_section is None:
+        keep_rule_section = {}
+    if not isinstance(keep_rule_section, Mapping):
+        raise RuntimeError("配置中的 `roi.keep_rule` 段必须是对象。")
+
+    roi_mode = coerce_string(roi_section.get("mode", "mask_then_crop"), "roi.mode")
+    if roi_mode != "mask_then_crop":
+        raise RuntimeError("当前 ROI-aware v1 仅支持 roi.mode=mask_then_crop。")
+
     return PersonProjectContext(
         config_path=resolved_path,
         config_dir=config_dir,
@@ -188,6 +256,8 @@ def load_person_project_context(config_path: Path) -> PersonProjectContext:
         image_roots=sequence_image_roots,
         image_extensions=image_extensions,
         class_names=class_names,
+        split_ratios=split_ratios,
+        default_split_strategy=default_split_strategy,
         sequences=sequences,
         aggregated_label_root=resolve_path(
             person_dataset_section.get("aggregated_label_root"),
@@ -204,6 +274,14 @@ def load_person_project_context(config_path: Path) -> PersonProjectContext:
             config_dir,
             "person_dataset.prepared_output_root",
         ),
+        roi_aware_prepared_output_root=resolve_path(
+            person_dataset_section.get(
+                "roi_aware_prepared_output_root",
+                "train-result/prepared/person_roi_aware/sequence_contiguous",
+            ),
+            config_dir,
+            "person_dataset.roi_aware_prepared_output_root",
+        ),
         export_alias_path=resolve_path(
             person_dataset_section.get("export_alias_path"),
             config_dir,
@@ -217,6 +295,29 @@ def load_person_project_context(config_path: Path) -> PersonProjectContext:
         recommended_run_name=coerce_string(
             person_dataset_section.get("recommended_run_name", "person_fullframe_baseline"),
             "person_dataset.recommended_run_name",
+        ),
+        roi_aware_recommended_run_name=coerce_string(
+            person_dataset_section.get(
+                "roi_aware_recommended_run_name",
+                "person_roi_aware_baseline",
+            ),
+            "person_dataset.roi_aware_recommended_run_name",
+        ),
+        roi=RoiSettings(
+            enabled=coerce_bool(roi_section.get("enabled", False), "roi.enabled"),
+            mode=roi_mode,
+            center_inside=coerce_bool(
+                keep_rule_section.get("center_inside", True),
+                "roi.keep_rule.center_inside",
+            ),
+            config_path=resolve_path(
+                roi_section.get(
+                    "config_path",
+                    "train-result/working/roi/roi_config.generated.json",
+                ),
+                config_dir,
+                "roi.config_path",
+            ),
         ),
     )
 

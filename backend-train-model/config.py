@@ -69,13 +69,13 @@ INSPECTION_PERSON_TARGET = INSPECTION_WEIGHTS_ROOT / "person_detect_yolov8.pt"
 INSPECTION_WORKWEAR_TARGET = INSPECTION_WEIGHTS_ROOT / "workwear_detect_yolov8.pt"
 
 # 原始图片目录列表。
-# 当前默认项目化配置仍对应 `first-train / group3_1` 单源基线，
-# 因此这里保留为 3 个 `group3_1` 原始序列。
+# 当前 clothes 原图已经下沉到各序列目录下的 `frames` 子目录，
+# 因此默认单源入口也直接指向这些 `frames` 目录。
 # 如需多源 merged 训练，请改用 `backend-train-model/All-train-model/*.build.json`。
 IMAGE_ROOTS = [
-    Path(r"D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes\group3_1\clo\D04_20260123074846"),
-    Path(r"D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes\group3_1\clo\D05_20260123074841"),
-    Path(r"D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes\group3_1\clo\D15_20260123074848"),
+    Path(r"D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes\group3_1\clo\D04_20260123074846\frames"),
+    Path(r"D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes\group3_1\clo\D05_20260123074841\frames"),
+    Path(r"D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes\group3_1\clo\D15_20260123074848\frames"),
 ]
 
 # 当前项目使用统一标签目录，标签文件通过“同名 stem”与图片配对。
@@ -202,6 +202,20 @@ def _clone_path_list(paths: Sequence[Path]) -> list[Path]:
     """复制一个路径列表，避免原地修改默认值快照。"""
 
     return [Path(path) for path in paths]
+
+
+def resolve_sequence_name_from_image_root(image_root: Union[str, Path]) -> str:
+    """从图片根目录路径解析稳定的序列名。
+
+    当前 clothes 数据的图片实际位于各序列目录下的 `frames/` 子目录，
+    因此不能再直接把最后一级目录名当成 sequence_name。
+    """
+
+    candidate = Path(image_root)
+    sequence_name = candidate.name
+    if sequence_name.lower() == "frames" and candidate.parent.name:
+        return candidate.parent.name
+    return sequence_name
 
 
 def reset_runtime_config() -> None:

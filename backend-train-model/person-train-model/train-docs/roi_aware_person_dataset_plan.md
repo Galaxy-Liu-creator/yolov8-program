@@ -283,7 +283,34 @@ ROI 边缘的人最容易出现：
 
 ---
 
-## 11. 当前明确不做的事情
+## 11. 当前代码落地状态
+
+截至 `2026-04-21`，当前仓库已落地 ROI-aware person 的第一版最小可用链路：
+
+- `person_project_config.json` 中新增 `roi` 配置段，默认使用 `mask_then_crop + center_inside`；
+- `labelme_roi_to_config.py` 负责把 Labelme `roi` polygon 提取为统一 ROI 配置；
+- `prepare_roi_aware_person_dataset.py` 负责生成遮罩、裁剪、坐标重映射后的 ROI-aware YOLO 数据集；
+- `run_person_flow.py` 新增 `extract-roi-config` 与 `prepare-roi-aware` 两个入口；
+- 默认 ROI 配置输出为 `train-result/working/roi/roi_config.generated.json`，不把每条序列的 polygon 直接写死在脚本里；
+- 默认 ROI-aware 数据集输出为 `train-result/prepared/person_roi_aware/sequence_contiguous/`。
+
+当前第一版仍刻意保持简单，但已支持两种 ROI 配置粒度：
+
+- 优先支持每张图片一个 ROI polygon，即 `per_image`；
+- 兼容每个序列一个 canonical ROI polygon，即 `per_sequence` fallback；
+- 只支持单 polygon，不支持多块不连通 ROI 合并；
+- 只支持按框中心点是否落在 ROI 内决定保留或丢弃；
+- 不直接修改 fullframe 母数据集，也不自动替换现有 person baseline。
+
+当前真实数据已采用逐图 ROI JSON：
+
+- ROI JSON 来源：`D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes\...\roi-json`
+- 已生成逐图 ROI 配置：`train-result/working/roi/roi_config.generated.json`
+- 已生成 ROI-aware 数据集：`train-result/prepared/person_roi_aware/sequence_contiguous/`
+
+---
+
+## 12. 当前明确不做的事情
 
 - 不直接废弃当前全图 person 标注；
 - 不在完整原图上通过“故意漏标 ROI 外的人”来构造数据集；
@@ -292,7 +319,7 @@ ROI 边缘的人最容易出现：
 
 ---
 
-## 12. 一句话结论
+## 13. 一句话结论
 
 当前 person 标注“图中有人就标”本身没有错，问题不在标注过多，而在于：
 

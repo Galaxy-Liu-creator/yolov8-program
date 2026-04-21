@@ -28,7 +28,18 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "command",
-        choices=["prepare-labels", "audit", "prepare", "train", "evaluate", "export", "all"],
+        choices=[
+            "prepare-labels",
+            "setup-roi-workdir",
+            "extract-roi-config",
+            "audit",
+            "prepare",
+            "prepare-roi-aware",
+            "train",
+            "evaluate",
+            "export",
+            "all",
+        ],
         help="要执行的阶段。",
     )
     parser.add_argument(
@@ -57,6 +68,35 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--device", default="cpu")
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--limit-per-sequence", type=int, help="仅用于快速烟雾验证。")
+    parser.add_argument(
+        "--roi-json-root",
+        default=str(PERSON_ROOT / "roi-work"),
+        help="Labelme ROI 工作区 / JSON 根目录，用于 setup-roi-workdir 与 extract-roi-config。",
+    )
+    parser.add_argument(
+        "--roi-config",
+        help="统一 ROI 配置 JSON；默认使用 project_config.json 中的 roi.config_path。",
+    )
+    parser.add_argument(
+        "--roi-label",
+        default="roi",
+        help="Labelme 中用于 ROI polygon 的标签名。",
+    )
+    parser.add_argument(
+        "--roi-frames-per-sequence",
+        type=int,
+        default=3,
+        help="setup-roi-workdir 每条序列抽取的代表帧数量。",
+    )
+    parser.add_argument(
+        "--overwrite-roi-frames",
+        action="store_true",
+        help="setup-roi-workdir 允许覆盖已抽取的同名代表帧。",
+    )
+    parser.add_argument(
+        "--output-root",
+        help="prepare-roi-aware 的输出目录；默认使用 person_dataset.roi_aware_prepared_output_root。",
+    )
     parser.add_argument("--base-model", help="显式指定训练基模。")
     parser.add_argument(
         "--from-scratch",
@@ -94,10 +134,33 @@ def ensure_person_labels(
     )
 
 
+def ensure_person_labels_available(
+    context: PersonProjectContext,
+    *,
+    overwrite: bool,
+) -> None:
+    if context.aggregated_label_root.exists() and not overwrite:
+        print("复用既有汇总标签目录 : {0}".format(context.aggregated_label_root))
+        return
+    ensure_person_labels(context, overwrite=overwrite)
+
+
 def dataset_yaml_path_for(context: PersonProjectContext, raw_dataset_yaml: Optional[str]) -> Path:
     if raw_dataset_yaml:
         return Path(raw_dataset_yaml).expanduser().resolve()
     return (context.prepared_output_root / "dataset.yaml").resolve()
+
+
+def roi_config_path_for(context: PersonProjectContext, raw_roi_config: Optional[str]) -> Path:
+    if raw_roi_config:
+        return Path(raw_roi_config).expanduser().resolve()
+    return context.roi.config_path
+
+
+def roi_output_root_for(context: PersonProjectContext, raw_output_root: Optional[str]) -> Path:
+    if raw_output_root:
+        return Path(raw_output_root).expanduser().resolve()
+    return context.roi_aware_prepared_output_root
 
 
 def best_weight_path_for(context: PersonProjectContext, run_name: str, raw_weights: Optional[str]) -> Path:
@@ -290,6 +353,37 @@ def main() -> int:
         ensure_person_labels(context, overwrite=args.overwrite)
         return 0
 
+    if args.command == "setup-roi-workdir":
+        from setup_roi_workdir import setup_roi_workdir
+
+        report = setup_roi_workdir(
+            context,
+            roi_work_root=Path(args.roi_json_root),
+            frames_per_sequence=args.roi_frames_per_sequence,
+            overwrite_frames=args.overwrite_roi_frames,
+        )
+        print("ROI 工作区 : {0}".format(report["roi_work_root"]))
+        print("序列数量   : {0}".format(len(report["sequences"])))
+        print("manifest   : {0}".format(report["manifest_path"]))
+        return 0
+
+    if args.command == "extract-roi-config":
+        from labelme_roi_to_config import extract_roi_config
+
+        output_path = roi_config_path_for(context, args.roi_config)
+        result = extract_roi_config(
+            context,
+            roi_json_root=Path(args.roi_json_root),
+            output_path=output_path,
+            label_name=args.roi_label,
+            overwrite=args.overwrite,
+        )
+        print("ROI 配置文件 : {0}".format(output_path))
+        per_image_total = sum(len(images) for images in result.get("per_image", {}).values())
+        print("序列级 ROI 数 : {0}".format(len(result["per_sequence"])))
+        print("逐图 ROI 数   : {0}".format(per_image_total))
+        return 0
+
     if args.command == "audit":
         ensure_person_labels(context, overwrite=args.overwrite)
         run_command(audit_command(context=context, args=args))
@@ -298,6 +392,29 @@ def main() -> int:
     if args.command == "prepare":
         ensure_person_labels(context, overwrite=args.overwrite)
         run_command(prepare_command(context=context, args=args))
+        return 0
+
+    if args.command == "prepare-roi-aware":
+        from prepare_roi_aware_person_dataset import prepare_roi_aware_dataset
+
+        report = prepare_roi_aware_dataset(
+            context,
+            roi_config_path=roi_config_path_for(context, args.roi_config),
+            output_root=roi_output_root_for(context, args.output_root),
+            overwrite=args.overwrite,
+            limit_per_sequence=args.limit_per_sequence,
+        )
+        print("ROI-aware 数据集 : {0}".format(report["dataset_root"]))
+        print("dataset.yaml    : {0}".format(report["dataset_yaml"]))
+        print(
+            "输入图片={0}, 输出图片={1}, 保留框={2}, 丢弃框={3}, 空负样本={4}".format(
+                report["input_image_count"],
+                report["output_image_count"],
+                report["kept_boxes"],
+                report["dropped_boxes"],
+                report["empty_roi_negative_images"],
+            )
+        )
         return 0
 
     if args.command == "train":
