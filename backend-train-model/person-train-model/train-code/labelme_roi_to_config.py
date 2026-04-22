@@ -8,13 +8,11 @@ from typing import Dict, List, Mapping, Optional, Sequence, Set, Tuple
 
 from prepare_person_dataset import (
     DEFAULT_PROJECT_CONFIG,
-    PERSON_ROOT,
     PersonProjectContext,
     load_person_project_context,
 )
 
 
-DEFAULT_ROI_WORK_ROOT = PERSON_ROOT / "roi-work"
 DEFAULT_ROI_LABEL = "roi"
 COORD_EPS = 1e-6
 
@@ -30,8 +28,7 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--roi-json-root",
-        default=str(DEFAULT_ROI_WORK_ROOT),
-        help="Labelme ROI JSON 根目录，默认读取 person-train-model/roi-work。",
+        help="Labelme ROI JSON 根目录；默认读取 project_config.json 中的 roi.json_root。",
     )
     parser.add_argument(
         "--output",
@@ -317,7 +314,11 @@ def main() -> int:
     output_path = Path(args.output).expanduser().resolve() if args.output else context.roi.config_path
     result = extract_roi_config(
         context,
-        roi_json_root=Path(args.roi_json_root),
+        roi_json_root=(
+            Path(args.roi_json_root).expanduser().resolve()
+            if args.roi_json_root
+            else context.roi.json_root
+        ),
         output_path=output_path,
         label_name=args.label,
         overwrite=args.overwrite,

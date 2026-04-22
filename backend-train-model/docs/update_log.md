@@ -1,5 +1,216 @@
 ﻿# Update Log
 
+## 2026-04-21 修正 clothes / person / ROI 默认路径并清理旧 ROI 工作区
+
+变更来源：
+- 用户提供了最新的 clothes、person 与 ROI 标注根目录，并要求统一检查项目内相关路径配置，重点修正 YAML / JSON，同时确认 `backend-train-model/person-train-model/roi-work/` 中旧工作区是否仍有价值。
+
+变更总览：
+1. 修正 clothes 默认入口与 merged 构建配置：
+   - `backend-train-model/config.py`
+   - `backend-train-model/project_config.json`
+   - `backend-train-model/All-train-model/*.build.json`
+   全部改为新的 `all_labels\clothes_labels\...` 根目录；
+   同时确认图片现在直接位于各序列目录本身，不再额外拼接 `frames/`。
+2. 扩展 person ROI 配置入口：
+   - `person_project_config.json` 新增 `roi.json_root`，默认指向 `D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\roi-json`
+   - 新增 `roi.work_root`，保留手工抽帧标注工作区的可选路径。
+3. 调整 ROI 相关脚本默认值：
+   - `run_person_flow.py extract-roi-config` 默认读取 `roi.json_root`
+   - `run_person_flow.py setup-roi-workdir` 默认写入 `roi.work_root`
+   - `labelme_roi_to_config.py` / `setup_roi_workdir.py` 同步改为配置驱动，不再把 `roi-work` 硬编码为唯一默认源。
+4. 同步更新数据说明与 person ROI 操作文档，明确当前公共 ROI 根目录为 `all_labels\roi-json`。
+5. 旧的本地 `roi-work/` 仅包含历史代表帧与说明文件，不再被当前默认 ROI 提取流程依赖；本轮将其删除，后续若需要可用 `setup-roi-workdir` 重新生成。
+
+涉及文件：
+- `backend-train-model/config.py`
+- `backend-train-model/project_config.json`
+- `backend-train-model/All-train-model/first_train_holdout_v1.build.json`
+- `backend-train-model/All-train-model/merged_clothes_v1.build.json`
+- `backend-train-model/All-train-model/merged_clothes_v2.build.json`
+- `backend-train-model/All-train-model/merged_clothes_v2_balanced.build.json`
+- `backend-train-model/All-train-model/unified_holdout_v1.build.json`
+- `backend-train-model/person-train-model/person_project_config.json`
+- `backend-train-model/person-train-model/train-code/prepare_person_dataset.py`
+- `backend-train-model/person-train-model/train-code/run_person_flow.py`
+- `backend-train-model/person-train-model/train-code/labelme_roi_to_config.py`
+- `backend-train-model/person-train-model/train-code/setup_roi_workdir.py`
+- `backend-train-model/person-train-model/train-docs/person_run_method.md`
+- `backend-train-model/person-train-model/train-docs/ROI_Labelme.md`
+- `backend-train-model/person-train-model/train-docs/roi_aware_person_dataset_plan.md`
+- `backend-train-model/docs/update_log.md`
+- `docs/dataset.md`
+
+新增 / 变更配置项：
+- `person_project_config.json` 新增：
+  - `roi.json_root`
+  - `roi.work_root`
+- 更新已有路径配置值：
+  - `config.py` 中的 `IMAGE_ROOTS` / `LABEL_ROOT`
+  - `project_config.json` 中的 `data.image_roots` / `data.label_root`
+  - 各 `*.build.json` 中的 `sequences[].image_root` / `sequences[].label_root`
+- ROI CLI 默认行为调整：
+  - `extract-roi-config` 默认取 `roi.json_root`
+  - `setup-roi-workdir` 默认取 `roi.work_root`
+
+兼容性注意：
+- 旧配置如果未提供 `roi.json_root`，代码仍会回退到 `roi.work_root`，保持向后兼容。
+- 当前删除的是本地旧 `roi-work/` 产物目录，不影响后续再次执行 `setup-roi-workdir` 重新生成。
+- 历史日志中保留的旧路径仅用于追溯，不代表当前有效配置。
+
+不改动说明：
+- 本轮不修改 person / clothes 的类别定义与标注格式。
+- 本轮不重新训练 clothes 或 person 模型。
+- 本轮不改动 `inspection-flask/` 或线上权重路径。
+
+## 2026-04-21 新增 ROI 边界保留规则解决方案文档
+
+变更来源：
+- 用户确认希望 ROI 外的人被去掉，但认为 `center_inside` 对“部分 person 框在 ROI 内”的边界样本过硬，并要求把讨论中的解决思路写入 `backend-train-model/person-train-model/train-docs/roi_problem_solution.md`。
+
+变更总览：
+1. 新增 `roi_problem_solution.md`。
+2. 文档明确指出：
+   - 不建议使用 `any overlap` 作为保留规则；
+   - `center_inside` 对边界人偏硬；
+   - ROI 表达的是地面业务区域，因此更适合使用底边中心点 / 脚点语义；
+   - 使用 `box_ioa = area(person_box ∩ ROI) / area(person_box)`，而不是 IoU。
+3. 文档提出下一版推荐规则：
+   - `bottom_center_inside == true`
+   - 或 `box_ioa_with_roi >= 0.25`
+   - 并建议配合 `crop_margin_px = 64`。
+4. 文档给出推荐配置字段、落地顺序与后续训练命令建议。
+
+涉及文件：
+- `backend-train-model/person-train-model/train-docs/roi_problem_solution.md`
+- `backend-train-model/docs/update_log.md`
+
+新增 / 变更配置项：
+- 无代码配置变更。
+- 文档中建议后续扩展：
+  - `roi.keep_rule.bottom_center_inside`
+  - `roi.keep_rule.min_box_ioa`
+  - `roi.crop_margin_px`
+
+兼容性注意：
+- 本轮只新增方案文档，不修改现有 ROI-aware prepare 逻辑。
+- 当前实际生成数据仍使用 `center_inside` 规则，直到后续单独实现 v2。
+
+不改动说明：
+- 本轮不重新生成 ROI-aware 数据集；
+- 本轮不训练模型；
+- 本轮不修改 Labelme ROI JSON 或 person 标签。
+
+## 2026-04-21 复查修改后 4 张 ROI 过滤问题帧
+
+变更来源：
+- 用户对 ROI 标注进行了部分修改，并要求以上一轮发现的 4 张 `D15_20260119203927` 问题帧为例重新生成可视化，查看修改效果。
+
+变更总览：
+1. 重新从现有 Labelme ROI JSON 根目录提取 ROI 配置：
+   - `D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes`
+   - 输出仍为 `backend-train-model/person-train-model/train-result/working/roi/roi_config.generated.json`
+   - 当前仍为逐图 ROI：`per_image=502`
+2. 重新生成 4 张问题帧 overlay：
+   - `D15_20260119203927_frame_0181`
+   - `D15_20260119203927_frame_0182`
+   - `D15_20260119203927_frame_0183`
+   - `D15_20260119203927_frame_0184`
+3. 复查结果：
+   - 4 张图仍均为 `boxes=1, kept=0, dropped=1`；
+   - 4 个 person 框中心点仍在 ROI polygon 外；
+   - 中心点到 ROI 边界的 signed distance 约为 `-118px` 到 `-133px`。
+
+涉及文件：
+- `backend-train-model/person-train-model/train-result/working/roi/roi_config.generated.json`
+- `backend-train-model/person-train-model/train-result/review/roi_filter_overlays/`
+- `backend-train-model/docs/update_log.md`
+
+新增 / 变更配置项：
+- 无新增配置项。
+
+兼容性注意：
+- 本轮只刷新 ROI 配置与 overlay review 产物，不重新生成 ROI-aware 训练数据集。
+- 若希望这 4 张从空 ROI 负样本变为正样本，需要继续扩大对应图片的 ROI polygon，或后续实现 IoA / margin 保留规则。
+
+不改动说明：
+- 本轮不修改 Labelme 源 JSON；
+- 本轮不修改 person 标签；
+- 本轮不启动训练或评估。
+
+## 2026-04-21 新增 ROI 过滤问题帧可视化
+
+变更来源：
+- 用户追问 `D15_20260119203927` 的 ROI-aware test 中为什么存在 9 个空 ROI 负样本，并同意对其中 fullframe 有人但 ROI-aware 为空的 4 张问题帧做可视化检查。
+
+变更总览：
+1. 新增 `visualize_roi_filter_samples.py`：
+   - 读取原图、聚合 person 标签和逐图 ROI 配置；
+   - 在原图上画出 ROI polygon、ROI 最小外接矩形、person 框中心点；
+   - 用绿色标记会被 ROI-aware 保留的框；
+   - 用红色标记因 `center_inside=false` 被丢弃的框；
+   - 生成 overlay 图片和 manifest。
+2. 已针对以下 4 张问题帧生成可视化：
+   - `D15_20260119203927_frame_0181`
+   - `D15_20260119203927_frame_0182`
+   - `D15_20260119203927_frame_0183`
+   - `D15_20260119203927_frame_0184`
+
+涉及文件：
+- `backend-train-model/person-train-model/train-code/visualize_roi_filter_samples.py`
+- `backend-train-model/person-train-model/train-result/review/roi_filter_overlays/`
+- `backend-train-model/docs/update_log.md`
+
+新增 / 变更配置项：
+- 无新增配置项。
+
+兼容性注意：
+- 该脚本只生成可视化 review 产物，不修改 ROI JSON、person 标签或训练数据集。
+- 当前可视化依据仍是 ROI-aware v1 的 `center_inside` 保留规则。
+
+不改动说明：
+- 本轮不调整 ROI polygon；
+- 本轮不重新生成 ROI-aware 数据集；
+- 本轮不启动训练或评估。
+
+## 2026-04-21 新增 ROI-aware person 首轮训练问题分析文档
+
+变更来源：
+- 用户在完成 `person_roi_aware_baseline` 首轮训练与评估后，要求把“训练提前早停、效果一般、下一步如何改进”的分析结论整理为独立文档，放到 `backend-train-model/person-train-model/train-docs/` 下。
+
+变更总览：
+1. 新增 `backend-train-model/person-train-model/train-docs/roi_first_problem.md`。
+2. 文档系统记录了：
+   - ROI-aware 首轮训练 run 与 fullframe 对照 run；
+   - early stopping 发生在第 `123` 轮、最佳 `mAP50-95` 出现在第 `83` 轮；
+   - ROI-aware 与 fullframe 在 val / test 上的指标对比；
+   - 当前问题核心是高 precision、低 recall，test 侧漏检更重；
+   - ROI-aware 数据集框数减少、特定序列被过滤过多的现象；
+   - 下一步改进优先级，包括：
+     - 用 fullframe person best 权重初始化 ROI-aware；
+     - 尝试更高 `imgsz`；
+     - 为 ROI crop 增加 margin；
+     - 放宽边界目标保留规则；
+     - 做 ROI 过滤 overlay 质检；
+     - 后续再考虑降低训练增强强度。
+
+涉及文件：
+- `backend-train-model/person-train-model/train-docs/roi_first_problem.md`
+- `backend-train-model/docs/update_log.md`
+
+新增 / 变更配置项：
+- 无新增配置项。
+- 无代码逻辑变更。
+
+兼容性注意：
+- 本轮仅新增分析文档，不修改现有训练入口、ROI 配置结构或数据准备逻辑。
+- 文档中推荐的后续训练命令仍基于当前 `run_person_flow.py` 与已生成的 ROI-aware 数据集路径。
+
+不改动说明：
+- 本轮不重训模型；
+- 本轮不修改 `labelme_roi_to_config.py`、`prepare_roi_aware_person_dataset.py` 或任何数据集文件；
+- 本轮不修改 `inspection-flask/` 或线上权重路径。
+
 ## 2026-04-21 支持逐图 ROI JSON 并生成 ROI-aware person 数据集
 
 变更来源：

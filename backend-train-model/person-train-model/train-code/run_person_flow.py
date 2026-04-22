@@ -70,8 +70,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--limit-per-sequence", type=int, help="仅用于快速烟雾验证。")
     parser.add_argument(
         "--roi-json-root",
-        default=str(PERSON_ROOT / "roi-work"),
-        help="Labelme ROI 工作区 / JSON 根目录，用于 setup-roi-workdir 与 extract-roi-config。",
+        help=(
+            "Labelme ROI JSON / 工作区根目录。"
+            "extract-roi-config 默认读取 project_config.json 中的 roi.json_root；"
+            "setup-roi-workdir 默认使用 roi.work_root。"
+        ),
     )
     parser.add_argument(
         "--roi-config",
@@ -155,6 +158,19 @@ def roi_config_path_for(context: PersonProjectContext, raw_roi_config: Optional[
     if raw_roi_config:
         return Path(raw_roi_config).expanduser().resolve()
     return context.roi.config_path
+
+
+def roi_json_root_for(
+    context: PersonProjectContext,
+    raw_roi_json_root: Optional[str],
+    *,
+    command: str,
+) -> Path:
+    if raw_roi_json_root:
+        return Path(raw_roi_json_root).expanduser().resolve()
+    if command == "setup-roi-workdir":
+        return context.roi.work_root
+    return context.roi.json_root
 
 
 def roi_output_root_for(context: PersonProjectContext, raw_output_root: Optional[str]) -> Path:
@@ -358,7 +374,11 @@ def main() -> int:
 
         report = setup_roi_workdir(
             context,
-            roi_work_root=Path(args.roi_json_root),
+            roi_work_root=roi_json_root_for(
+                context,
+                args.roi_json_root,
+                command=args.command,
+            ),
             frames_per_sequence=args.roi_frames_per_sequence,
             overwrite_frames=args.overwrite_roi_frames,
         )
@@ -373,7 +393,11 @@ def main() -> int:
         output_path = roi_config_path_for(context, args.roi_config)
         result = extract_roi_config(
             context,
-            roi_json_root=Path(args.roi_json_root),
+            roi_json_root=roi_json_root_for(
+                context,
+                args.roi_json_root,
+                command=args.command,
+            ),
             output_path=output_path,
             label_name=args.roi_label,
             overwrite=args.overwrite,

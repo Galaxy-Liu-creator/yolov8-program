@@ -19,20 +19,20 @@
 
 ### 默认单源训练入口（`backend-train-model/config.py` / `backend-train-model/project_config.json`）
 
-- 图片根目录 1：`D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes\group3_1\clo\D04_20260123074846\frames`
-- 图片根目录 2：`D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes\group3_1\clo\D05_20260123074841\frames`
-- 图片根目录 3：`D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes\group3_1\clo\D15_20260123074848\frames`
-- 标注根目录：`D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes\group3_1\clo\label-clo`
+- 图片根目录 1：`D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes_labels\group3_1\clo\D04_20260123074846`
+- 图片根目录 2：`D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes_labels\group3_1\clo\D05_20260123074841`
+- 图片根目录 3：`D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes_labels\group3_1\clo\D15_20260123074848`
+- 标注根目录：`D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes_labels\group3_1\clo\label-clo`
 
 ### 多源 merged / All-train-model 入口（`backend-train-model/All-train-model/*.build.json`）
 
-- 图片根目录 4：`D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes\group3_2\clo\1\frames`
-- 图片根目录 5：`D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes\group3_2\clo\D15_20260119203927\frames`
-- 图片根目录 6：`D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes\group3_3\clo\D02_20260123070624\frames`
-- 图片根目录 7：`D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes\group3_3\clo\D02_20260123074836\frames`
-- `group3_1` 标注根目录：`D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes\group3_1\clo\label-clo`
-- `group3_2` 标注根目录：`D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes\group3_2\clo\label_clothes`
-- `group3_3` 标注根目录：`D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes\group3_3\clo\labels`
+- 图片根目录 4：`D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes_labels\group3_2\clo\1`
+- 图片根目录 5：`D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes_labels\group3_2\clo\D15_20260119203927`
+- 图片根目录 6：`D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes_labels\group3_3\clo\D02_20260123070624`
+- 图片根目录 7：`D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes_labels\group3_3\clo\D02_20260123074836`
+- `group3_1` 标注根目录：`D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes_labels\group3_1\clo\label-clo`
+- `group3_2` 标注根目录：`D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes_labels\group3_2\clo\label_clothes`
+- `group3_3` 标注根目录：`D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes_labels\group3_3\clo\labels`
 - 数据集配置文件：`当前尚未创建`
 - 示例图片：`docs/dataset_examples/sample_001.jpg`
 - 示例标注：`docs/dataset_examples/sample_001.txt`
@@ -42,7 +42,7 @@
 - 当前仓库同时保留两种数据入口：
   - 默认单源入口：`group3_1` 的 `3` 个图片根目录 + `1` 个统一标注根目录；
   - merged 多源入口：`7` 个图片根目录，按 `group3_1 / group3_2 / group3_3` 映射到 `3` 个标注根目录。
-- 当前图片文件实际都位于各序列目录下的 `frames/` 子目录中；更新配置时应把 `image_root` 指向 `frames`，而不是外层序列目录。
+- 当前 clothes 图片文件实际直接位于各序列目录本身；更新配置时应把 `image_root` 指向序列目录，而不是额外拼接 `frames/`。
 - 在尚未创建 `dataset.yaml` 前，训练、校验、转换脚本都必须以本文档中的路径约定和配对规则为准。
 - 如果后续创建数据集配置文件，需要保证其内容与本文档保持一致。
 

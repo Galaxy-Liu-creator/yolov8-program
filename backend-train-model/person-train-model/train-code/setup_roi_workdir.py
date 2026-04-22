@@ -17,7 +17,6 @@ from prepare_person_dataset import (
 )
 
 
-DEFAULT_ROI_WORK_ROOT = PERSON_ROOT / "roi-work"
 DEFAULT_FRAMES_PER_SEQUENCE = 3
 FRAME_INDEX_RE = re.compile(r"_frame_(\d+)$", re.IGNORECASE)
 
@@ -33,8 +32,7 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--roi-work-root",
-        default=str(DEFAULT_ROI_WORK_ROOT),
-        help="ROI 标注工作区根目录。",
+        help="ROI 标注工作区根目录；默认读取 project_config.json 中的 roi.work_root。",
     )
     parser.add_argument(
         "--frames-per-sequence",
@@ -235,13 +233,14 @@ def write_root_readme(
             "## 后续命令\n\n"
             "完成全部 ROI JSON 后，在仓库根目录运行：\n\n"
             "```powershell\n"
-            "D:\\Miniconda3_python\\envs\\yolo_code\\python.exe backend-train-model\\person-train-model\\train-code\\run_person_flow.py extract-roi-config --overwrite\n"
+            "D:\\Miniconda3_python\\envs\\yolo_code\\python.exe backend-train-model\\person-train-model\\train-code\\run_person_flow.py extract-roi-config --roi-json-root {roi_work_root} --overwrite\n"
             "D:\\Miniconda3_python\\envs\\yolo_code\\python.exe backend-train-model\\person-train-model\\train-code\\run_person_flow.py prepare-roi-aware --overwrite\n"
             "```\n"
         ).format(
             sequence_count=sequence_count,
             frames_per_sequence=frames_per_sequence,
             roi_config_path=context.roi.config_path,
+            roi_work_root=roi_work_root,
         ),
         encoding="utf-8",
     )
@@ -261,6 +260,8 @@ def write_roi_config_readme(context: PersonProjectContext) -> None:
             "```powershell\n"
             "D:\\Miniconda3_python\\envs\\yolo_code\\python.exe backend-train-model\\person-train-model\\train-code\\run_person_flow.py extract-roi-config --overwrite\n"
             "```\n\n"
+            "默认 ROI JSON 根目录读取 `person_project_config.json` 中的 `roi.json_root`；\n"
+            "如需从手工工作区提取，显式追加 `--roi-json-root <roi-work-root>`。\n\n"
             "如果当前 `roi_config.generated.json` 是空文件或旧文件，使用 `--overwrite` 重新生成即可。\n"
         ).format(roi_config_path=context.roi.config_path),
         encoding="utf-8",
@@ -353,7 +354,11 @@ def main() -> int:
     context = load_person_project_context(Path(args.project_config))
     report = setup_roi_workdir(
         context,
-        roi_work_root=Path(args.roi_work_root),
+        roi_work_root=(
+            Path(args.roi_work_root).expanduser().resolve()
+            if args.roi_work_root
+            else context.roi.work_root
+        ),
         frames_per_sequence=args.frames_per_sequence,
         overwrite_frames=args.overwrite_frames,
     )

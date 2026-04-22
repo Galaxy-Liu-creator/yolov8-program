@@ -44,6 +44,8 @@
   "roi": {
     "enabled": true,
     "mode": "mask_then_crop",
+    "json_root": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\roi-json",
+    "work_root": "roi-work",
     "keep_rule": {
       "center_inside": true
     },

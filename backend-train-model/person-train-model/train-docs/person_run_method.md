@@ -215,28 +215,28 @@ D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-
 
 ### 11.2 提取 ROI 配置
 
-当前已有逐图 ROI JSON，可直接从 clothes 数据目录的公共根递归读取：
+当前已有逐图 ROI JSON，可直接从 ROI 公共根递归读取；当前 `person_project_config.json` 默认已指向该目录：
 
 ```powershell
-D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py extract-roi-config --roi-json-root D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes --overwrite
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py extract-roi-config --overwrite
 ```
 
 这会读取以下现有目录中的 `.json`：
 
 ```text
-D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes\group3_1\clo\D04_20260123074846\roi-json
-D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes\group3_1\clo\D05_20260123074841\roi-json
-D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes\group3_1\clo\D15_20260123074848\roi-json
-D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes\group3_2\clo\1\roi-json
-D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes\group3_2\clo\D15_20260119203927\roi-json
-D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes\group3_3\clo\D02_20260123070624\roi-json
-D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes\group3_3\clo\D02_20260123074836\roi-json
+D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\roi-json\group3_1\D04_20260123074846\roi-json
+D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\roi-json\group3_1\D05_20260123074841\roi-json
+D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\roi-json\group3_1\D15_20260123074848\roi-json
+D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\roi-json\group3_2\1\roi-json
+D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\roi-json\group3_2\D15_20260119203927\roi-json
+D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\roi-json\group3_3\D02_20260123070624\roi-json
+D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\roi-json\group3_3\D02_20260123074836\roi-json
 ```
 
-如果使用自动创建的工作区，则默认从以下目录递归读取 Labelme JSON：
+如果需要改用自动创建的工作区，则显式传工作区根目录：
 
-```text
-backend-train-model/person-train-model/roi-work/
+```powershell
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py extract-roi-config --roi-json-root backend-train-model/person-train-model/roi-work --overwrite
 ```
 
 推荐目录结构仍为：

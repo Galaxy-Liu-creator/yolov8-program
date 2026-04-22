@@ -27,6 +27,8 @@ class PersonSequence:
 class RoiSettings:
     enabled: bool
     mode: str
+    json_root: Path
+    work_root: Path
     center_inside: bool
     config_path: Path
 
@@ -306,6 +308,19 @@ def load_person_project_context(config_path: Path) -> PersonProjectContext:
         roi=RoiSettings(
             enabled=coerce_bool(roi_section.get("enabled", False), "roi.enabled"),
             mode=roi_mode,
+            json_root=resolve_path(
+                roi_section.get(
+                    "json_root",
+                    roi_section.get("work_root", "roi-work"),
+                ),
+                config_dir,
+                "roi.json_root",
+            ),
+            work_root=resolve_path(
+                roi_section.get("work_root", "roi-work"),
+                config_dir,
+                "roi.work_root",
+            ),
             center_inside=coerce_bool(
                 keep_rule_section.get("center_inside", True),
                 "roi.keep_rule.center_inside",

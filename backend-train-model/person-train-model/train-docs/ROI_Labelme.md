@@ -568,19 +568,19 @@ D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-
 如果已经有现成目录，也可以直接复用。例如当前逐图 ROI JSON 可直接放在 / 读取自：
 
 ```text
-D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes\group3_1\clo\D04_20260123074846\roi-json
-D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes\group3_1\clo\D05_20260123074841\roi-json
-D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes\group3_1\clo\D15_20260123074848\roi-json
-D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes\group3_2\clo\1\roi-json
-D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes\group3_2\clo\D15_20260119203927\roi-json
-D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes\group3_3\clo\D02_20260123070624\roi-json
-D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes\group3_3\clo\D02_20260123074836\roi-json
+D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\roi-json\group3_1\D04_20260123074846\roi-json
+D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\roi-json\group3_1\D05_20260123074841\roi-json
+D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\roi-json\group3_1\D15_20260123074848\roi-json
+D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\roi-json\group3_2\1\roi-json
+D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\roi-json\group3_2\D15_20260119203927\roi-json
+D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\roi-json\group3_3\D02_20260123070624\roi-json
+D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\roi-json\group3_3\D02_20260123074836\roi-json
 ```
 
 此时不用复制到 `backend-train-model/person-train-model/roi-work/`，直接在提取命令里传公共根目录即可：
 
 ```powershell
-D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py extract-roi-config --roi-json-root D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes --overwrite
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py extract-roi-config --overwrite
 ```
 
 ### 步骤 3：用 `Labelme` 只画一个标签：`roi`
@@ -600,7 +600,7 @@ D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-
 当前仓库已经提供转换与数据集生成脚本。完成 `json` 标注后，在仓库根目录执行：
 
 ```powershell
-D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py extract-roi-config --roi-json-root D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes --overwrite
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py extract-roi-config --overwrite
 D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py prepare-roi-aware --overwrite
 ```
 

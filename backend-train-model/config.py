@@ -69,18 +69,18 @@ INSPECTION_PERSON_TARGET = INSPECTION_WEIGHTS_ROOT / "person_detect_yolov8.pt"
 INSPECTION_WORKWEAR_TARGET = INSPECTION_WEIGHTS_ROOT / "workwear_detect_yolov8.pt"
 
 # 原始图片目录列表。
-# 当前 clothes 原图已经下沉到各序列目录下的 `frames` 子目录，
-# 因此默认单源入口也直接指向这些 `frames` 目录。
+# 当前 clothes 原图直接位于各序列目录本身，
+# 因此默认单源入口直接指向这些序列目录。
 # 如需多源 merged 训练，请改用 `backend-train-model/All-train-model/*.build.json`。
 IMAGE_ROOTS = [
-    Path(r"D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes\group3_1\clo\D04_20260123074846\frames"),
-    Path(r"D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes\group3_1\clo\D05_20260123074841\frames"),
-    Path(r"D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes\group3_1\clo\D15_20260123074848\frames"),
+    Path(r"D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes_labels\group3_1\clo\D04_20260123074846"),
+    Path(r"D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes_labels\group3_1\clo\D05_20260123074841"),
+    Path(r"D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes_labels\group3_1\clo\D15_20260123074848"),
 ]
 
 # 当前项目使用统一标签目录，标签文件通过“同名 stem”与图片配对。
 LABEL_ROOT = Path(
-    r"D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes\group3_1\clo\label-clo"
+    r"D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes_labels\group3_1\clo\label-clo"
 )
 
 # 支持识别为训练图片的扩展名。

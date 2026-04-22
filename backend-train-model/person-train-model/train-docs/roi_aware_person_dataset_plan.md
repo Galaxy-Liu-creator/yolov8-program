@@ -304,7 +304,7 @@ ROI 边缘的人最容易出现：
 
 当前真实数据已采用逐图 ROI JSON：
 
-- ROI JSON 来源：`D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes\...\roi-json`
+- ROI JSON 来源：`D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\roi-json\...\roi-json`
 - 已生成逐图 ROI 配置：`train-result/working/roi/roi_config.generated.json`
 - 已生成 ROI-aware 数据集：`train-result/prepared/person_roi_aware/sequence_contiguous/`
 
