@@ -47,7 +47,9 @@
     "json_root": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\roi-json",
     "work_root": "roi-work",
     "keep_rule": {
-      "center_inside": true
+      "center_inside": false,
+      "bottom_center_inside": true,
+      "min_box_ioa": 0.25
     },
     "config_path": "train-result/working/roi/roi_config.generated.json"
   },
@@ -74,7 +76,7 @@
     "summary_path": "train-result/person_source_dataset_summary.json",
     "prepared_output_root": "train-result/prepared/person_fullframe/sequence_contiguous",
     "roi_aware_prepared_output_root": "train-result/prepared/person_roi_aware/sequence_contiguous",
-    "roi_aware_recommended_run_name": "person_roi_aware_baseline",
+    "roi_aware_recommended_run_name": "person_roi_aware_v2_from_fullframe",
     "export_alias_path": "train-result/export/person_detect_yolov8.pt",
     "export_alias_metadata_path": "train-result/export/person_detect_yolov8.metadata.json",
     "sequences": [

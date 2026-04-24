@@ -1,5 +1,226 @@
 ﻿# Update Log
 
+## 2026-04-24 新增 `roi_compare.md` 并同步 ROI-aware person 当前结论
+
+变更来源：
+- 用户已完成 `person_roi_aware_v2_from_fullframe` 的训练与评估，并要求把 `person_roi_aware`、`person_fullframe`、`person_roi_aware_v2` 三次训练的具体数据指标对比写入 `backend-train-model/person-train-model/train-docs/roi_compare.md`。
+- 用户进一步要求在对比文档中加入维护约束：以后每次完成新的训练评估，都必须继续新增对比记录。
+
+变更总览：
+1. 新增 `backend-train-model/person-train-model/train-docs/roi_compare.md`，集中记录三条 person 分支的训练 / 评估对比结果。
+2. 在 `roi_compare.md` 中补充文档维护约束，明确以后每次新增训练评估后都要追加新的对比记录，并保持“最新在前、历史在后”。
+3. 同步更新根 `AGENTS.md` 与 `backend-train-model/AGENTS.md` 中的 person / ROI-aware 当前状态，写明：
+   - 历史 ROI-aware v1 结果
+   - 当前 ROI-aware v2 数据集统计
+   - `person_roi_aware_v2_from_fullframe` 的当前 test 指标
+   - 当前结论与解读边界
+
+涉及文件：
+- `backend-train-model/person-train-model/train-docs/roi_compare.md`
+- `backend-train-model/AGENTS.md`
+- `AGENTS.md`
+- `backend-train-model/docs/update_log.md`
+
+新增 / 变更配置项：
+- 无新增代码配置项。
+- 无新的 CLI 参数变更。
+- 新增文档维护约束：
+  - `roi_compare.md` 后续必须持续追加新的训练 / 评估对比记录。
+
+兼容性注意：
+- `roi_compare.md` 中对 `person_fullframe` 与 ROI-aware 分支的比较，明确注明了“不是严格同数据集公平对照”；后续引用该文档时不要把这一点写错。
+- 当前“最好”的结论应写成：`ROI-aware v2 数据集 + from_fullframe 初始化` 这套组合最好，而不是把提升简单归因到单一 keep rule。
+
+本轮明确不改动：
+- 不新增任何训练代码、prepare 逻辑或配置项。
+- 不重跑已有训练与评估，只整理现有报告并写入文档。
+- 不修改 `inspection-flask/` 在线链路。
+
+## 2026-04-24 生成 `person_roi_aware_v2` 数据集并重排训练运行文档
+
+变更来源：
+- 用户确认保留 `person_roi_aware` 与 `person_roi_aware_v2` 两套产物，并已经手动创建 `backend-train-model/person-train-model/train-result/prepared/person_roi_aware_v2/` 目录。
+- 用户要求我直接生成 v2 数据集，并把 `person_run_method.md` 按 `person_fullframe`、`person_roi_aware`、`person_roi_aware_v2` 三个版本拆开，且新增“最新在前、历史在后”的文档迭代约束。
+
+变更总览：
+1. 生成独立的 v2 ROI 配置文件 `roi_config.v2.generated.json`，避免覆盖历史 v1 的 ROI 配置元信息。
+2. 生成独立的 v2 ROI-aware prepared 数据集 `person_roi_aware_v2/sequence_contiguous`，保留 v1 历史产物不变。
+3. 重写 `person_run_method.md` 的组织方式，把通用前置条件单独提到 H1，并把 `person_roi_aware_v2`、`person_roi_aware`、`person_fullframe` 三个版本拆成独立 H1 段。
+4. 在运行文档中新增维护约束：以后新增训练版本时，必须新增独立 H1 段，顺序固定为“最新在前、历史在后”，并保持版本段结构一致。
+
+涉及文件：
+- `backend-train-model/person-train-model/train-result/working/roi/roi_config.v2.generated.json`
+- `backend-train-model/person-train-model/train-result/prepared/person_roi_aware_v2/sequence_contiguous/dataset.yaml`
+- `backend-train-model/person-train-model/train-result/prepared/person_roi_aware_v2/sequence_contiguous/prepare_report.json`
+- `backend-train-model/person-train-model/train-docs/person_run_method.md`
+- `backend-train-model/docs/update_log.md`
+
+新增 / 变更配置项：
+- 无新增代码配置项。
+- 新增独立产物路径：
+  - `train-result/working/roi/roi_config.v2.generated.json`
+  - `train-result/prepared/person_roi_aware_v2/sequence_contiguous/`
+
+兼容性注意：
+- 本轮保留旧版 `person_roi_aware/sequence_contiguous` 目录不变；后续训练时请显式传 `--dataset-yaml` 区分 v1 / v2。
+- `person_roi_aware_v2` 当前 prepare 统计为：`502` 张图、`1342` 个保留框、`316` 个丢弃框、`14` 张空负样本；与历史 v1 数据集不完全一致，这是本轮规则变化带来的正常结果。
+- `person_run_method.md` 现在按版本管理；后续新增版本时不要插入到历史段落中间，应直接加在最前面的版本区。
+
+本轮明确不改动：
+- 不启动新的长时间训练，只生成 v2 数据集与整理运行文档。
+- 不覆盖历史 `person_roi_aware` v1 prepared 数据集。
+- 不修改 `inspection-flask/` 在线检测链路。
+
+## 2026-04-24 落地 ROI-aware person keep rule v2
+
+变更来源：
+- 用户针对 `backend-train-model/person-train-model/train-docs/roi_problem_solution.md` 中的 v2 规则继续追问“为什么需要 `bottom_center_inside OR box_ioa >= 0.25`”，并在确认思路后要求把相关代码直接改成 v2。
+- 当前更晚的结论文档已经明确：ROI-aware person 的下一步应先修正 ROI keep rule，再继续后续 `from_fullframe` 训练。
+
+变更总览：
+1. 扩展 `prepare_person_dataset.py` 的 ROI 配置解析，支持 `roi.keep_rule.bottom_center_inside` 与 `roi.keep_rule.min_box_ioa`，并增加 keep rule 至少启用一个条件的校验。
+2. 更新 `prepare_roi_aware_person_dataset.py`，把 ROI-aware 过滤逻辑从单一 `center_inside` 升级为可配置 keep rule；当前默认配置落为 `center_inside=false`、`bottom_center_inside=true`、`min_box_ioa=0.25`。
+3. 更新 `visualize_roi_filter_samples.py`，让 overlay 与 prepare 使用同一套 keep rule 判定，并额外绘制框中心点与底边中心点，便于复核边界样本。
+4. 更新 `labelme_roi_to_config.py` 与 `person_project_config.json`，让提取出的 ROI 配置元信息与项目默认 keep rule 保持一致。
+5. 同步更新 `person_run_method.md` 与 `roi_aware_person_dataset_plan.md`，避免文档继续停留在旧版 `center_inside` 规则。
+
+涉及文件：
+- `backend-train-model/person-train-model/train-code/prepare_person_dataset.py`
+- `backend-train-model/person-train-model/train-code/prepare_roi_aware_person_dataset.py`
+- `backend-train-model/person-train-model/train-code/visualize_roi_filter_samples.py`
+- `backend-train-model/person-train-model/train-code/labelme_roi_to_config.py`
+- `backend-train-model/person-train-model/person_project_config.json`
+- `backend-train-model/person-train-model/train-docs/person_run_method.md`
+- `backend-train-model/person-train-model/train-docs/roi_aware_person_dataset_plan.md`
+- `backend-train-model/docs/update_log.md`
+
+新增 / 变更配置项：
+- `backend-train-model/person-train-model/person_project_config.json`
+  - `roi.keep_rule.center_inside`：当前默认调整为 `false`
+  - `roi.keep_rule.bottom_center_inside`：新增，当前默认 `true`
+  - `roi.keep_rule.min_box_ioa`：新增，当前默认 `0.25`
+  - `person_dataset.roi_aware_recommended_run_name`：更新为 `person_roi_aware_v2_from_fullframe`
+- 保持 `roi.mode=mask_then_crop` 不变，本轮未引入 `crop_margin_px`。
+
+兼容性注意：
+- 旧配置若仍只启用 `center_inside=true`，当前代码仍兼容，不会被强制改成 v2；本轮只是把项目默认配置切到 v2。
+- `train-result/working/roi/roi_config.generated.json`、`train-result/prepared/person_roi_aware/.../prepare_report.json` 等历史产物不会自动回写；如需让产物元信息和当前默认规则一致，需要重新执行 `extract-roi-config --overwrite` 与 `prepare-roi-aware --overwrite`。
+- `box IoA` 当前采用基于 ROI mask 的像素面积近似计算，阈值按当前文档建议固定为 `0.25`。
+
+本轮明确不改动：
+- 不启动新的 `from_fullframe` 长时间训练，也不改动 `person_fullframe_baseline` 既有权重与评估报告。
+- 不在本轮加入 `crop_margin_px=64`；该项仍保留为下一阶段可选改进。
+- 不修改 `inspection-flask/` 在线检测链路。
+
+## 2026-04-23 统一 AI Agent 上下文入口与项目长期信息
+
+变更来源：
+- 用户要求阅读当前仓库文件，将每一类重要信息沉淀到 `.claude`、`AGENTS.md`、`CLAUDE.md` 等 AI 自动读取入口中，并判断保留哪个入口更合适、删除多余文件。
+
+变更总览：
+1. 将根目录 `AGENTS.md` 作为唯一主说明入口，集中记录项目模块分工、数据集事实、工服 baseline、person / ROI-aware person 状态、`inspection-flask` 在线链路、`otherMonitor` 三类检测和文档写作口径。
+2. 将 `CLAUDE.md` 改为 Claude Code 自动读取跳转文件，只要求 Claude 读取并遵守 `AGENTS.md`，避免重复维护两套事实。
+3. 更新 `backend-train-model/AGENTS.md`，补充本目录当前训练范围、工服指标、person 指标、ROI-aware 优先方案和日志维护要求。
+4. 更新 `docs/AGENTS.md` 与 `inspection-flask/AGENTS.md`，分别固化文档写作口径与在线检测链路边界。
+5. 删除 `.claude/settings.local.json`，因为该文件是 Claude 本地权限设置，不是项目长期说明入口，保留会造成“上下文入口过多”的误解。
+
+涉及文件：
+- `AGENTS.md`
+- `CLAUDE.md`
+- `backend-train-model/AGENTS.md`
+- `docs/AGENTS.md`
+- `inspection-flask/AGENTS.md`
+- `.claude/settings.local.json`
+- `backend-train-model/docs/update_log.md`
+
+新增 / 变更配置项：
+- 未新增训练配置项。
+- 仅调整 AI Agent 上下文入口与文档维护规则。
+
+兼容性注意：
+- Codex 仍以 `AGENTS.md` 为主入口。
+- Claude Code 仍会自动读取 `CLAUDE.md`，但长期事实统一跳转到 `AGENTS.md`。
+- `.claude/settings.local.json` 删除后，不再保留旧的 Claude 本地命令 allowlist；如后续确实需要 Claude 权限配置，应单独重建，不应混作项目说明文档。
+
+本轮明确不改动：
+- 不改训练代码、数据 YAML / JSON 配置、模型权重和训练产物。
+- 不修复历史 `update_log.md` 中已有的乱码段落。
+- 不重新构建任何数据集或重新评估模型。
+
+
+## 2026-04-22 ???? PPT ??????? person ??
+
+?????
+- ?????? PPT ???????? person ???????? 3 ???????????????????
+
+?????
+1. ???? `??PPT??.md` ????????????????????
+2. ?? person fullframe baseline ? ROI-aware person baseline ??? 4 ????Precision?Recall?mAP50?mAP50-95?????? best epoch?
+3. ?????? person ??????????? mAP50-95 ?? 0.55 ???ROI-aware person ? recall ?? fullframe person?
+4. ????????? ROI-aware person ???? fullframe / ROI-aware ? PR ????
+
+?????
+- `backend-train-model/docs/??PPT??.md`
+- `backend-train-model/docs/update_log.md`
+
+?? / ??????
+- ?????????????????
+
+??????
+- ?????????????????????????????
+
+??????
+- ?????????????ROI JSON ???????
+- ????????????????????????
+
+## 2026-04-22 ???? PPT ????? person ? ROI
+
+?????
+- ?????? merged fullframe baseline ?????????????? PPT ????? person ??? ROI ?????
+
+?????
+1. ?? `??PPT??.md` ???????????? person fullframe baseline?ROI-aware person ? ROI ?????
+2. ?????????7 ????502 ? person ???1651 ? person ??502 ? ROI JSON??? person fullframe / ROI-aware ? mAP50 ???
+3. ?????? person ?????person ?????ROI ?? overlay ? ROI-aware person ????
+
+?????
+- `backend-train-model/docs/??PPT??.md`
+- `backend-train-model/docs/update_log.md`
+
+?? / ??????
+- ?????????????????
+
+??????
+- ?????????????????????????????
+
+??????
+- ?????????????ROI JSON ???????
+- ????????????????????????
+
+## 2026-04-22 ???? PPT ????
+
+?????
+- ????? `backend-train-model/docs` ?????????? PPT ??? Markdown ??????????????????????????????? 2 ????????
+
+?????
+1. ?? `??PPT??.md`?? 3 ??????????
+2. ???????????7 ????clothes/person ? 502 ????? 980/1651 ??ROI JSON 502 ?????? merged fullframe baseline ? P/R/mAP ???
+3. ??????????????????????????ROI ?? overlay?person fullframe / ROI-aware ?????????? PPT?
+
+?????
+- `backend-train-model/docs/??PPT??.md`
+- `backend-train-model/docs/update_log.md`
+
+?? / ??????
+- ???????????????
+
+??????
+- ?????????????????????????????
+- ??????????? `backend-train-model/docs/` ??????????? Markdown ??? PPT ???
+
+??????
+- ??????????????????? ROI ?????
+- ?????????????????????????
 ## 2026-04-21 修正 clothes / person / ROI 默认路径并清理旧 ROI 工作区
 
 变更来源：

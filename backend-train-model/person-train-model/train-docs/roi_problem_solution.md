@@ -428,11 +428,44 @@ person_roi_aware_v2_from_fullframe
 D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py train --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_roi_aware\sequence_contiguous\dataset.yaml --run-name person_roi_aware_v2_from_fullframe --device cpu --workers 0 --batch 4 --imgsz 640 --epochs 180 --patience 60 --base-model backend-train-model\person-train-model\train-result\artifacts\runs\person_fullframe_baseline\weights\best.pt
 ```
 
-如果 `640` 仍然不够，再试：
+### 12.1 当前优先执行方案
+
+当前阶段建议先不要把重点放在切换 `yolov8s` 上，而是优先把下面两步跑扎实：
+
+1. 先按上面的 `person_roi_aware_v2_from_fullframe` 跑一版；
+2. 重点先验证：
+   - ROI 规则 v2 是否已经比旧版更合理；
+   - 使用 `person_fullframe_baseline/weights/best.pt` 做初始化后，`test recall` 是否回升；
+   - `mAP50 / mAP50-95` 是否至少明显优于当前 ROI-aware baseline。
+
+这样做的原因是：
+
+- 当前 ROI-aware 的主要短板更像是初始化方式和输入尺寸，而不只是模型容量；
+- 先把 `from_fullframe + imgsz=640` 跑通，更容易判断问题到底在规则、数据还是模型；
+- 如果第一步还主要卡在小目标漏检，再继续提高输入尺寸，结论会更清楚。
+
+因此，现阶段推荐顺序是：
+
+```text
+先修正规则和初始化
+-> 先跑 from_fullframe + imgsz=640
+-> 再试更高输入尺寸
+-> 最后才考虑 yolov8s 对照
+```
+
+如果 `640` 这一版仍然不够，再试：
 
 ```text
 imgsz=768, batch=2
 ```
+
+补这一版时，建议仍然保持：
+
+- 继续使用 `person_fullframe_baseline/weights/best.pt` 作为初始化；
+- 优先只改 `imgsz` 和 `batch`，不要同时再引入更大的模型；
+- 先看 `test recall`、`mAP50`、`mAP50-95` 是否一起改善，再决定是否进入下一阶段。
+
+只有在 `from_fullframe + imgsz=640` 和 `from_fullframe + imgsz=768, batch=2` 这两步都验证后，仍然明显受限，再考虑把 `yolov8s` 作为第二阶段对照实验。当前阶段不建议跳过这两步，直接改成 `yolov8s`。
 
 ---
 

@@ -290,6 +290,8 @@ def extract_roi_config(
         "mode": context.roi.mode,
         "keep_rule": {
             "center_inside": context.roi.center_inside,
+            "bottom_center_inside": context.roi.bottom_center_inside,
+            "min_box_ioa": context.roi.min_box_ioa,
         },
         "per_sequence": dict(sorted(per_sequence.items())),
         "per_image": {

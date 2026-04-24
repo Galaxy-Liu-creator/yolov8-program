@@ -17,7 +17,8 @@ from prepare_person_dataset import (
 )
 from prepare_roi_aware_person_dataset import (
     LabelEntry,
-    point_inside_polygon,
+    build_mask_and_crop_bounds,
+    evaluate_roi_keep_rule,
     polygon_from_config,
     read_label_entries,
     yolo_entry_to_xyxy,
@@ -131,61 +132,83 @@ def entry_to_int_box(
 def make_overlay(
     image: np.ndarray,
     *,
+    context: PersonProjectContext,
     polygon: Sequence[Sequence[float]],
     entries: Sequence[LabelEntry],
 ) -> Tuple[np.ndarray, Dict[str, int]]:
     image_height, image_width = image.shape[:2]
     overlay = image.copy()
-    polygon_array = np.array(
-        [
-            [
-                min(max(int(round(float(point[0]))), 0), image_width),
-                min(max(int(round(float(point[1]))), 0), image_height),
-            ]
-            for point in polygon
-        ],
-        dtype=np.int32,
+    polygon_array, mask, (x_min, y_min, x_max, y_max) = build_mask_and_crop_bounds(
+        image_width,
+        image_height,
+        polygon,
     )
-    if polygon_array.ndim != 2 or polygon_array.shape[0] < 3:
-        raise RuntimeError("ROI polygon 至少需要 3 个点。")
 
     shaded = image.copy()
     cv2.fillPoly(shaded, [polygon_array], (0, 180, 255))
     overlay = cv2.addWeighted(shaded, 0.25, overlay, 0.75, 0.0)
     cv2.polylines(overlay, [polygon_array], True, (0, 180, 255), 4, cv2.LINE_AA)
 
-    x_min = int(np.min(polygon_array[:, 0]))
-    y_min = int(np.min(polygon_array[:, 1]))
-    x_max = int(np.max(polygon_array[:, 0]))
-    y_max = int(np.max(polygon_array[:, 1]))
     cv2.rectangle(overlay, (x_min, y_min), (x_max, y_max), (255, 255, 0), 2)
 
     kept_count = 0
     dropped_count = 0
     for index, entry in enumerate(entries, start=1):
         x1, y1, x2, y2 = entry_to_int_box(entry, image_width, image_height)
+        _, keep_decision = evaluate_roi_keep_rule(
+            entry,
+            image_width=image_width,
+            image_height=image_height,
+            polygon=polygon_array,
+            roi_mask=mask,
+            roi_settings=context.roi,
+        )
         center_x = (x1 + x2) / 2.0
         center_y = (y1 + y2) / 2.0
-        center_inside = point_inside_polygon(center_x, center_y, polygon_array)
-        if center_inside:
+        bottom_center_x = center_x
+        bottom_center_y = y2
+        if keep_decision.keep:
             kept_count += 1
             color = (0, 255, 0)
-            status = "keep"
+            if keep_decision.triggered_rule == "center_inside":
+                status = "keep:center"
+            elif keep_decision.triggered_rule == "bottom_center_inside":
+                status = "keep:bottom"
+            else:
+                status = "keep:ioa{0:.2f}".format(keep_decision.box_ioa)
         else:
             dropped_count += 1
             color = (0, 0, 255)
-            status = "drop:center_out"
+            reasons: List[str] = []
+            if context.roi.center_inside and not keep_decision.center_inside:
+                reasons.append("center_out")
+            if context.roi.bottom_center_inside and not keep_decision.bottom_center_inside:
+                reasons.append("bottom_out")
+            if (
+                context.roi.min_box_ioa > 0.0
+                and keep_decision.box_ioa < context.roi.min_box_ioa
+            ):
+                reasons.append("ioa{0:.2f}".format(keep_decision.box_ioa))
+            status = "drop:{0}".format("+".join(reasons) if reasons else "rule_out")
         cv2.rectangle(overlay, (x1, y1), (x2, y2), color, 3)
-        cv2.circle(overlay, (int(round(center_x)), int(round(center_y))), 5, color, -1)
+        cv2.circle(overlay, (int(round(center_x)), int(round(center_y))), 5, (0, 255, 255), -1)
+        cv2.circle(
+            overlay,
+            (int(round(bottom_center_x)), int(round(bottom_center_y))),
+            5,
+            (255, 255, 0),
+            -1,
+        )
         draw_label(overlay, "{0}:{1}".format(index, status), (x1, max(25, y1 - 8)), color)
 
     draw_label(overlay, "ROI polygon: orange", (20, 40), (0, 180, 255))
     draw_label(overlay, "crop bbox: cyan", (20, 75), (255, 255, 0))
     draw_label(overlay, "green=kept red=dropped", (20, 110), (255, 255, 255))
+    draw_label(overlay, "yellow=center cyan=bottom", (20, 145), (255, 255, 255))
     draw_label(
         overlay,
         "boxes={0} kept={1} dropped={2}".format(len(entries), kept_count, dropped_count),
-        (20, 145),
+        (20, 180),
         (255, 255, 255),
     )
     return overlay, {
@@ -225,6 +248,7 @@ def visualize_samples(
         )
         overlay, stats = make_overlay(
             image,
+            context=context,
             polygon=polygon,
             entries=entries,
         )

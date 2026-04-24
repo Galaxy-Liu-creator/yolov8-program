@@ -30,6 +30,8 @@ class RoiSettings:
     json_root: Path
     work_root: Path
     center_inside: bool
+    bottom_center_inside: bool
+    min_box_ioa: float
     config_path: Path
 
 
@@ -111,6 +113,16 @@ def coerce_bool(raw_value: object, field_name: str) -> bool:
         if normalized in ("0", "false", "no", "n", "off"):
             return False
     raise RuntimeError("{0} 必须是布尔值。".format(field_name))
+
+
+def coerce_ratio(raw_value: object, field_name: str) -> float:
+    try:
+        value = float(raw_value)
+    except (TypeError, ValueError) as exc:
+        raise RuntimeError("{0} 必须是数字。".format(field_name)) from exc
+    if value < 0.0 or value > 1.0:
+        raise RuntimeError("{0} 必须位于 [0, 1]。".format(field_name))
+    return value
 
 
 def coerce_class_names(raw_value: object) -> Dict[int, str]:
@@ -249,7 +261,28 @@ def load_person_project_context(config_path: Path) -> PersonProjectContext:
 
     roi_mode = coerce_string(roi_section.get("mode", "mask_then_crop"), "roi.mode")
     if roi_mode != "mask_then_crop":
-        raise RuntimeError("当前 ROI-aware v1 仅支持 roi.mode=mask_then_crop。")
+        raise RuntimeError("当前 ROI-aware 仅支持 roi.mode=mask_then_crop。")
+
+    roi_center_inside = coerce_bool(
+        keep_rule_section.get("center_inside", True),
+        "roi.keep_rule.center_inside",
+    )
+    roi_bottom_center_inside = coerce_bool(
+        keep_rule_section.get("bottom_center_inside", False),
+        "roi.keep_rule.bottom_center_inside",
+    )
+    roi_min_box_ioa = coerce_ratio(
+        keep_rule_section.get("min_box_ioa", 0.0),
+        "roi.keep_rule.min_box_ioa",
+    )
+    if (
+        not roi_center_inside
+        and not roi_bottom_center_inside
+        and roi_min_box_ioa <= 0.0
+    ):
+        raise RuntimeError(
+            "roi.keep_rule 至少需要启用一种保留条件：center_inside、bottom_center_inside 或 min_box_ioa。"
+        )
 
     return PersonProjectContext(
         config_path=resolved_path,
@@ -321,10 +354,9 @@ def load_person_project_context(config_path: Path) -> PersonProjectContext:
                 config_dir,
                 "roi.work_root",
             ),
-            center_inside=coerce_bool(
-                keep_rule_section.get("center_inside", True),
-                "roi.keep_rule.center_inside",
-            ),
+            center_inside=roi_center_inside,
+            bottom_center_inside=roi_bottom_center_inside,
+            min_box_ioa=roi_min_box_ioa,
             config_path=resolve_path(
                 roi_section.get(
                     "config_path",

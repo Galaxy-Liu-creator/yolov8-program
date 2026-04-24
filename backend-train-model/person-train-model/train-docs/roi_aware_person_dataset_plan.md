@@ -123,19 +123,19 @@ ROI-aware person 数据集的目标不是替代当前母数据集，而是新增
 
 一个 person 框满足以下条件时保留为 ROI-aware 正样本：
 
-1. 目标框中心点落在 ROI 多边形内；
-2. 目标在 ROI 内具有可见主体；
+1. 目标框底边中心点落在 ROI 多边形内；
+2. 或目标框与 ROI 的 `box IoA >= 0.25`；
 3. 经过裁剪重映射后，目标框仍然有效。
 
 #### 边界目标处理
 
-对于贴近 ROI 边界的人，建议采用“保守保留”策略：
+对于贴近 ROI 边界的人，建议采用 v2 的“软边界保留”策略：
 
-- 若目标中心点在 ROI 内，则默认保留；
-- 若目标中心点在 ROI 外，则默认丢弃；
-- 若后续发现 ROI 边界附近漏检明显，再单独引入更细的 `visible_ratio / IoA` 规则。
+- 若目标框底边中心点在 ROI 内，则直接保留；
+- 若底边中心点不在 ROI 内，但 `box IoA >= 0.25`，也保留；
+- 否则丢弃。
 
-这样先保证实现简单、规则可复现。
+这样既保留 ROI 地面语义，又能补偿边界样本召回。
 
 #### 负样本保留
 
@@ -193,7 +193,9 @@ ROI-aware person 数据集的目标不是替代当前母数据集，而是新增
     "enabled": true,
     "mode": "mask_then_crop",
     "keep_rule": {
-      "center_inside": true
+      "center_inside": false,
+      "bottom_center_inside": true,
+      "min_box_ioa": 0.25
     },
     "per_sequence": {
       "D04_20260123074846": {
@@ -285,9 +287,9 @@ ROI 边缘的人最容易出现：
 
 ## 11. 当前代码落地状态
 
-截至 `2026-04-21`，当前仓库已落地 ROI-aware person 的第一版最小可用链路：
+截至 `2026-04-24`，当前仓库已将 ROI-aware person 从第一版最小链路升级到 keep rule v2：
 
-- `person_project_config.json` 中新增 `roi` 配置段，默认使用 `mask_then_crop + center_inside`；
+- `person_project_config.json` 中新增 `roi.keep_rule.bottom_center_inside` 与 `roi.keep_rule.min_box_ioa`，当前默认使用 `mask_then_crop + (bottom_center_inside OR box_ioa >= 0.25)`；
 - `labelme_roi_to_config.py` 负责把 Labelme `roi` polygon 提取为统一 ROI 配置；
 - `prepare_roi_aware_person_dataset.py` 负责生成遮罩、裁剪、坐标重映射后的 ROI-aware YOLO 数据集；
 - `run_person_flow.py` 新增 `extract-roi-config` 与 `prepare-roi-aware` 两个入口；

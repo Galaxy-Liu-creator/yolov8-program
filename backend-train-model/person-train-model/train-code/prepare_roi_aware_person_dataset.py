@@ -18,6 +18,7 @@ from prepare_person_dataset import (
     PERSON_ROOT,
     PersonProjectContext,
     PersonSequence,
+    RoiSettings,
     assert_directory_within_root,
     load_person_project_context,
     prepare_person_labels,
@@ -51,6 +52,15 @@ class ImageSample:
     image_path: Path
     label_path: Path
     stem: str
+
+
+@dataclass(frozen=True)
+class RoiKeepDecision:
+    keep: bool
+    triggered_rule: str
+    center_inside: bool
+    bottom_center_inside: bool
+    box_ioa: float
 
 
 def parse_args() -> argparse.Namespace:
@@ -478,6 +488,81 @@ def point_inside_polygon(
     ) >= 0
 
 
+def box_ioa_with_roi(
+    box: Tuple[float, float, float, float],
+    roi_mask: np.ndarray,
+) -> float:
+    x1, y1, x2, y2 = box
+    box_width = max(0.0, float(x2) - float(x1))
+    box_height = max(0.0, float(y2) - float(y1))
+    if box_width <= 0.0 or box_height <= 0.0:
+        return 0.0
+
+    mask_height, mask_width = roi_mask.shape[:2]
+    left = max(0, int(math.floor(float(x1))))
+    top = max(0, int(math.floor(float(y1))))
+    right = min(mask_width, int(math.ceil(float(x2))))
+    bottom = min(mask_height, int(math.ceil(float(y2))))
+    if right <= left or bottom <= top:
+        return 0.0
+
+    intersection_area = float(np.count_nonzero(roi_mask[top:bottom, left:right]))
+    box_area = max(box_width * box_height, 1.0)
+    return min(intersection_area / box_area, 1.0)
+
+
+def evaluate_roi_keep_rule(
+    entry: LabelEntry,
+    *,
+    image_width: int,
+    image_height: int,
+    polygon: np.ndarray,
+    roi_mask: np.ndarray,
+    roi_settings: RoiSettings,
+) -> Tuple[Tuple[float, float, float, float], RoiKeepDecision]:
+    box = yolo_entry_to_xyxy(entry, image_width, image_height)
+    x1, y1, x2, y2 = box
+    center_x = (x1 + x2) / 2.0
+    center_y = (y1 + y2) / 2.0
+    bottom_center_x = center_x
+    bottom_center_y = y2
+    center_inside = point_inside_polygon(center_x, center_y, polygon)
+    bottom_center_inside = point_inside_polygon(bottom_center_x, bottom_center_y, polygon)
+    box_ioa = box_ioa_with_roi(box, roi_mask)
+
+    if roi_settings.center_inside and center_inside:
+        return box, RoiKeepDecision(
+            keep=True,
+            triggered_rule="center_inside",
+            center_inside=center_inside,
+            bottom_center_inside=bottom_center_inside,
+            box_ioa=box_ioa,
+        )
+    if roi_settings.bottom_center_inside and bottom_center_inside:
+        return box, RoiKeepDecision(
+            keep=True,
+            triggered_rule="bottom_center_inside",
+            center_inside=center_inside,
+            bottom_center_inside=bottom_center_inside,
+            box_ioa=box_ioa,
+        )
+    if roi_settings.min_box_ioa > 0.0 and box_ioa >= roi_settings.min_box_ioa:
+        return box, RoiKeepDecision(
+            keep=True,
+            triggered_rule="min_box_ioa",
+            center_inside=center_inside,
+            bottom_center_inside=bottom_center_inside,
+            box_ioa=box_ioa,
+        )
+    return box, RoiKeepDecision(
+        keep=False,
+        triggered_rule="none",
+        center_inside=center_inside,
+        bottom_center_inside=bottom_center_inside,
+        box_ioa=box_ioa,
+    )
+
+
 def prepare_roi_aware_dataset(
     context: PersonProjectContext,
     *,
@@ -489,9 +574,7 @@ def prepare_roi_aware_dataset(
     if not context.roi.enabled:
         raise RuntimeError("当前配置中 roi.enabled=false，请先启用 ROI-aware 配置。")
     if context.roi.mode != "mask_then_crop":
-        raise RuntimeError("当前 ROI-aware v1 仅支持 roi.mode=mask_then_crop。")
-    if not context.roi.center_inside:
-        raise RuntimeError("当前 ROI-aware v1 仅支持 roi.keep_rule.center_inside=true。")
+        raise RuntimeError("当前 ROI-aware 仅支持 roi.mode=mask_then_crop。")
 
     ensure_person_labels_available(context, overwrite=overwrite)
     ensure_output_root(output_root, overwrite=overwrite)
@@ -558,10 +641,15 @@ def prepare_roi_aware_dataset(
             label_entries = read_label_entries(sample.label_path, context.class_names)
             local_entries: List[LabelEntry] = []
             for entry in label_entries:
-                x1, y1, x2, y2 = yolo_entry_to_xyxy(entry, image_width, image_height)
-                center_x = (x1 + x2) / 2.0
-                center_y = (y1 + y2) / 2.0
-                if not point_inside_polygon(center_x, center_y, polygon_array):
+                (x1, y1, x2, y2), keep_decision = evaluate_roi_keep_rule(
+                    entry,
+                    image_width=image_width,
+                    image_height=image_height,
+                    polygon=polygon_array,
+                    roi_mask=mask,
+                    roi_settings=context.roi,
+                )
+                if not keep_decision.keep:
                     dropped_boxes += 1
                     sequence_stats[sample.sequence_name]["dropped_boxes"] += 1
                     continue
@@ -623,6 +711,8 @@ def prepare_roi_aware_dataset(
         "mode": context.roi.mode,
         "keep_rule": {
             "center_inside": context.roi.center_inside,
+            "bottom_center_inside": context.roi.bottom_center_inside,
+            "min_box_ioa": context.roi.min_box_ioa,
         },
         "dataset_root": str(output_root),
         "dataset_yaml": str(dataset_yaml),
