@@ -13,6 +13,130 @@
   - 最终结论与解读边界
 - 如果不同版本使用的不是同一个 `dataset.yaml`，必须明确写出“不是严格同数据集公平对照”，避免把跨数据集结果误写成严格消融结论。
 
+## 2026-04-25 `person_roi_aware_v3_mask_then_crop_margin64_from_fullframe` 对比
+
+### 1. 对比对象
+
+| 版本 | run 名称 | 数据集 | 初始化方式 |
+| --- | --- | --- | --- |
+| `person_roi_aware_v3_mask_then_crop_margin64` | `person_roi_aware_v3_mask_then_crop_margin64_from_fullframe` | `train-result/prepared/person_roi_aware_v3_mask_then_crop_margin64/sequence_contiguous/dataset.yaml` | `person_fullframe_baseline/weights/best.pt` |
+| `person_roi_aware_v2` | `person_roi_aware_v2_from_fullframe` | `train-result/prepared/person_roi_aware_v2/sequence_contiguous/dataset.yaml` | `person_fullframe_baseline/weights/best.pt` |
+| `person_roi_aware` | `person_roi_aware_baseline` | `train-result/prepared/person_roi_aware/sequence_contiguous/dataset.yaml` | `backend-train-model/weights/yolov8n.pt` |
+| `person_fullframe` | `person_fullframe_baseline` | `train-result/prepared/person_fullframe/sequence_contiguous/dataset.yaml` | 当前 train report 记录为 `resume_checkpoint`，`initial_base_model` 指向同 run 的 `last.pt` |
+
+对应报告入口：
+
+- `backend-train-model/person-train-model/train-result/artifacts/reports/person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_train.json`
+- `backend-train-model/person-train-model/train-result/artifacts/reports/person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_eval.json`
+- `backend-train-model/person-train-model/train-result/prepared/person_roi_aware_v3_mask_then_crop_margin64/sequence_contiguous/prepare_report.json`
+- `backend-train-model/person-train-model/train-result/artifacts/reports/person_roi_aware_v2_from_fullframe_eval.json`
+- `backend-train-model/person-train-model/train-result/artifacts/reports/person_roi_aware_baseline_eval.json`
+- `backend-train-model/person-train-model/train-result/artifacts/reports/person_fullframe_baseline_eval.json`
+
+### 2. 结果解读边界
+
+- `person_fullframe` 与三版 ROI-aware 使用的不是同一个 `dataset.yaml`，因此 **fullframe vs ROI-aware** 仍然只能写成“当前分支级结果对比”，不能写成严格同数据集消融。
+- `person_roi_aware_v3_mask_then_crop_margin64` 与 `person_roi_aware_v2` 也不是完全相同的 `dataset.yaml`；二者是不同 prepared 输出目录。
+- 但 v3 与 v2 的 keep rule 相同、初始化方式相同、split 结构相同，核心变化主要是：
+  - `mask_then_crop + crop_margin_px=64`
+  - 对应的裁剪边界与 remap 后标签
+- 因此 **v3 vs v2** 更接近“近似单因子工程对比”，但依然不应误写成绝对严格的同数据集公平消融。
+
+### 3. Test 指标对比
+
+| 版本 | Precision | Recall | mAP50 | mAP75 | mAP50-95 |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| `person_roi_aware_v3_mask_then_crop_margin64` | `0.9208` | `0.7075` | `0.7779` | `0.4578` | `0.4607` |
+| `person_roi_aware_v2` | `0.9364` | `0.6957` | `0.7774` | `0.4414` | `0.4555` |
+| `person_roi_aware` | `0.9390` | `0.5950` | `0.6738` | `0.4005` | `0.3867` |
+| `person_fullframe` | `0.9228` | `0.6740` | `0.7606` | `0.4064` | `0.4102` |
+
+### 4. Val 指标对比
+
+| 版本 | Precision | Recall | mAP50 | mAP75 | mAP50-95 |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| `person_roi_aware_v3_mask_then_crop_margin64` | `0.9440` | `0.8011` | `0.8811` | `0.6133` | `0.5717` |
+| `person_roi_aware_v2` | `0.8939` | `0.7912` | `0.8649` | `0.6493` | `0.5739` |
+| `person_roi_aware` | `0.9831` | `0.7865` | `0.8725` | `0.5955` | `0.5509` |
+| `person_fullframe` | `0.9677` | `0.8215` | `0.9134` | `0.6222` | `0.5691` |
+
+### 5. ROI-aware 数据集统计对比
+
+| 版本 | mode | crop margin | keep rule | 保留框 | 丢弃框 | 裁剪框 | 空负样本 |
+| --- | --- | ---: | --- | ---: | ---: | ---: | ---: |
+| `person_roi_aware` | `mask_then_crop` | `0` | `center_inside == true` | `1343` | `315` | `49` | `12` |
+| `person_roi_aware_v2` | `mask_then_crop` | `0` | `bottom_center_inside OR box_ioa >= 0.25` | `1342` | `316` | `54` | `14` |
+| `person_roi_aware_v3_mask_then_crop_margin64` | `mask_then_crop` | `64` | `bottom_center_inside OR box_ioa >= 0.25` | `1335` | `316` | `23` | `15` |
+
+可以看到：
+
+- v3 最直接的工程效果是：`cropped_boxes` 从 `54` 明显下降到 `23`，减少了 `31` 个，降幅约 `57.4%`。
+- v3 并不是通过“更多保留框”来换指标；它的保留框反而从 `1342` 变成 `1335`，空负样本从 `14` 增加到 `15`。
+- 因此这次提升如果成立，更合理的解释是：**边界 crop 过紧问题被明显缓解了**，而不是简单放宽样本数量。
+
+### 6. 增量对比
+
+#### 6.1 `person_roi_aware_v3_mask_then_crop_margin64` 相比 `person_roi_aware_v2`（Test）
+
+| 指标 | 增量 |
+| --- | ---: |
+| Precision | `-0.0156` |
+| Recall | `+0.0119` |
+| mAP50 | `+0.0004` |
+| mAP75 | `+0.0164` |
+| mAP50-95 | `+0.0052` |
+
+相对变化：
+
+- Precision：约 `-1.7%`
+- Recall：约 `+1.7%`
+- mAP50：约 `+0.1%`
+- mAP75：约 `+3.7%`
+- mAP50-95：约 `+1.1%`
+
+这一组结果说明：**v3 相比 v2 是小幅改进，不是显著跃升。**
+
+#### 6.2 `person_roi_aware_v3_mask_then_crop_margin64` 相比 `person_fullframe`（Test）
+
+| 指标 | 增量 |
+| --- | ---: |
+| Precision | `-0.0020` |
+| Recall | `+0.0335` |
+| mAP50 | `+0.0172` |
+| mAP75 | `+0.0514` |
+| mAP50-95 | `+0.0505` |
+
+相对变化：
+
+- Precision：约 `-0.2%`
+- Recall：约 `+5.0%`
+- mAP50：约 `+2.3%`
+- mAP75：约 `+12.6%`
+- mAP50-95：约 `+12.3%`
+
+说明当前 v3 在 native test 结果上依然明显强于 `person_fullframe_baseline`。
+
+### 7. 训练过程补充信息
+
+- `person_roi_aware_v3_mask_then_crop_margin64_from_fullframe`
+  - `results.csv` 中按 val `mAP50-95` 统计的 best epoch 约为 `168`
+  - best val `mAP50-95` 约为 `0.5726`
+  - 最终第 `180` 轮 val `mAP50-95` 约为 `0.5659`
+- 这说明 v3 不是“前几轮偶然高点后快速崩掉”的 run，而是训练后期仍维持在和 v2 接近的稳定水平。
+
+### 8. 最终结论
+
+当前阶段更准确的结论建议写成下面这版：
+
+1. `person_roi_aware_v3_mask_then_crop_margin64_from_fullframe` 在当前 native test 上拿到了四者中最高的 Recall 与 mAP50-95，因此可以视为**当前 test 领先的 ROI-aware 候选版本**。
+2. 但它相对 `person_roi_aware_v2_from_fullframe` 的提升幅度很小：`mAP50-95` 仅提升 `0.0052`，Precision 还下降了 `0.0156`，因此**不能写成“显著优于 v2”**。
+3. v3 最确定的正向收益，不是指标大幅跃升，而是它确实把 ROI-aware 边界正样本的 crop 截断问题显著缓解了：`cropped_boxes` 从 `54` 降到 `23`。
+4. 因此当前最稳妥的工程口径应写成：
+   - `person_fullframe_baseline` 继续保留为稳定上游初始化来源；
+   - `person_roi_aware_v3_mask_then_crop_margin64_from_fullframe` 可以暂列为**当前 native test 领先但优势很小的 ROI-aware 候选版本**；
+   - `person_roi_aware_v2_from_fullframe` 仍应保留为稳定备选，不建议直接删除或覆盖；
+   - 如果后续还要确认这次 margin 的收益是否可靠，优先补做 `person_roi_aware_v3_crop_only_margin64` 对照，或只对 v2 / v3 里更优的一条再试 `imgsz=768`。
+
 ## 2026-04-24 `person_fullframe` / `person_roi_aware` / `person_roi_aware_v2` 对比
 
 ### 1. 对比对象

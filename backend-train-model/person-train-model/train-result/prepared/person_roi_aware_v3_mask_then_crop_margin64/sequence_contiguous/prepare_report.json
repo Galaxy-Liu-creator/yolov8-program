@@ -1,0 +1,101 @@
+{
+  "generated_at": "2026-04-25T11:09:31",
+  "project_config": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\person_project_config.json",
+  "roi_config_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\working\\roi\\roi_config.v3.mask_then_crop_margin64.generated.json",
+  "roi_scope": "per_image",
+  "mode": "mask_then_crop",
+  "crop_margin_px": 64,
+  "keep_rule": {
+    "center_inside": false,
+    "bottom_center_inside": true,
+    "min_box_ioa": 0.25
+  },
+  "dataset_root": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\prepared\\person_roi_aware_v3_mask_then_crop_margin64\\sequence_contiguous",
+  "dataset_yaml": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\prepared\\person_roi_aware_v3_mask_then_crop_margin64\\sequence_contiguous\\dataset.yaml",
+  "split_strategy": "sequence_contiguous",
+  "split_ratios": {
+    "train": 0.7,
+    "val": 0.15,
+    "test": 0.15
+  },
+  "split_image_counts": {
+    "train": 350,
+    "val": 77,
+    "test": 75
+  },
+  "split_label_counts": {
+    "train": 350,
+    "val": 77,
+    "test": 75
+  },
+  "split_box_counts": {
+    "train": 1039,
+    "val": 181,
+    "test": 115
+  },
+  "input_image_count": 502,
+  "output_image_count": 502,
+  "kept_boxes": 1335,
+  "dropped_boxes": 316,
+  "cropped_boxes": 23,
+  "empty_roi_negative_images": 15,
+  "limit_per_sequence": null,
+  "sequences": {
+    "D04_20260123074846": {
+      "input_images": 25,
+      "output_images": 25,
+      "kept_boxes": 78,
+      "dropped_boxes": 24,
+      "cropped_boxes": 3,
+      "empty_negative_images": 0
+    },
+    "D05_20260123074841": {
+      "input_images": 33,
+      "output_images": 33,
+      "kept_boxes": 157,
+      "dropped_boxes": 0,
+      "cropped_boxes": 4,
+      "empty_negative_images": 0
+    },
+    "D15_20260123074848": {
+      "input_images": 37,
+      "output_images": 37,
+      "kept_boxes": 139,
+      "dropped_boxes": 23,
+      "cropped_boxes": 2,
+      "empty_negative_images": 0
+    },
+    "D15_20260119061405": {
+      "input_images": 114,
+      "output_images": 114,
+      "kept_boxes": 212,
+      "dropped_boxes": 260,
+      "cropped_boxes": 8,
+      "empty_negative_images": 1
+    },
+    "D15_20260119203927": {
+      "input_images": 185,
+      "output_images": 185,
+      "kept_boxes": 552,
+      "dropped_boxes": 9,
+      "cropped_boxes": 5,
+      "empty_negative_images": 11
+    },
+    "D02_20260123070624": {
+      "input_images": 83,
+      "output_images": 83,
+      "kept_boxes": 143,
+      "dropped_boxes": 0,
+      "cropped_boxes": 0,
+      "empty_negative_images": 3
+    },
+    "D02_20260123074836": {
+      "input_images": 25,
+      "output_images": 25,
+      "kept_boxes": 54,
+      "dropped_boxes": 0,
+      "cropped_boxes": 1,
+      "empty_negative_images": 0
+    }
+  }
+}

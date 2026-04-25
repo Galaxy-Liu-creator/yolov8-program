@@ -2042,3 +2042,185 @@
 - 本轮不创建新的 `person` 数据目录或标签规范文档。
 - 本轮不执行 route verification 训练命令，只把它标为当前下一步。
 - 本轮不导出或复制最终 baseline 权重，需等第五阶段结果后再确定最终权重。
+## 2026-04-24 新增 ROI-aware v3 方案文档并补充“允许纠错”规则
+
+变更来源：
+- 用户要求把两个 ROI-aware v3 方案文档真正写入 `backend-train-model/person-train-model/train-docs/`，文件名分别为：
+  - `person_roi_aware_v3_mask_then_crop_margin64.md`
+  - `person_roi_aware_v3_crop_only_margin64.md`
+- 用户进一步要求把一条长期规则写入 `AGENTS.md`：当用户的技术判断可能不准确时，AI Agent 可以明确纠正、提出异议并给出更合理建议，而不是默认附和。
+
+变更总览：
+1. 新增 `person_roi_aware_v3_mask_then_crop_margin64.md`，系统说明 `mask_then_crop + crop_margin_px=64` 方案的定义、优势、风险、验证重点和推荐定位。
+2. 新增 `person_roi_aware_v3_crop_only_margin64.md`，系统说明 `crop_only + crop_margin_px=64` 方案的定义、优势、风险、验证重点和对照实验定位。
+3. 在两份文档中明确区分：
+   - 源 fullframe `person` 标注是完整存在的；
+   - ROI-aware prepared 标签只保留满足 keep rule 的 person；
+   - `crop-only` 的风险不在“源标签缺失”，而在“prepared 图像里可能出现可见但未保留为 ROI-aware 标签的 person”。
+4. 同步更新根 `AGENTS.md` 与 `backend-train-model/AGENTS.md`，明确加入“当用户的技术判断可能不准确时，AI Agent 应基于代码与事实主动纠正并给出更合理建议”的长期规则。
+
+涉及文件：
+- `backend-train-model/person-train-model/train-docs/person_roi_aware_v3_mask_then_crop_margin64.md`
+- `backend-train-model/person-train-model/train-docs/person_roi_aware_v3_crop_only_margin64.md`
+- `backend-train-model/AGENTS.md`
+- `AGENTS.md`
+- `backend-train-model/docs/update_log.md`
+
+新增 / 变更配置项：
+- 无新的代码配置项落地。
+- 本轮新增的是方案文档，不代表 `crop_margin_px=64`、`crop_only` 或新的 ROI-aware v3 prepare 逻辑已经在代码中实现。
+
+兼容性注意：
+- 当前仓库代码仍然只实现 `roi.mode=mask_then_crop`；两份 v3 文档当前是方案说明，不是现成可直接运行的已落地配置。
+- 两份文档都明确写出了：source fullframe 标签完整存在，但 ROI-aware prepare 后只保留符合 keep rule 的 person；后续讨论 `crop-only` 风险时不要再误写成“源数据里 ROI 外 person 没标注”。
+- 本轮新增的“允许纠错与反驳”规则是长期协作口径，不代表 AI Agent 可以脱离用户目标擅自扩写或擅自改需求；它只用于在发现技术判断与代码/数据事实不一致时主动指出并修正。
+
+本轮明确不改动：
+- 不修改 `prepare_roi_aware_person_dataset.py`、`prepare_person_dataset.py` 或 `person_project_config.json`。
+- 不实现新的 `crop_margin_px` 配置项与 ROI-aware v3 prepare 流程。
+- 不启动新的训练、评估或数据重生成任务。
+## 2026-04-25 新增 ROI cropped keep-positive 复核脚本并生成 review 产物
+
+变更来源：
+- 用户要求不要只凭单帧样本判断 `crop_margin_px=64` 是否必要，而是把当前 ROI-aware v2 中 `cropped_boxes=54` 里真正属于 keep-positive 的样本单独筛出来，并生成清单与可视化，作为后续是否实现 margin 的依据。
+
+变更总览：
+1. 新增 `backend-train-model/person-train-model/train-code/review_roi_cropped_keep_boxes.py`，用于复用当前 ROI-aware v2 keep rule 与 crop 逻辑，筛查“被保留但又被当前 crop bbox 裁剪”的样本。
+2. 脚本会为每个命中的样本同时输出：
+   - fullframe overlay（显示 ROI polygon、当前 crop bbox、模拟 margin64 bbox、原框与裁剪后框）
+   - 当前 `mask_then_crop` 预览图
+   - 模拟 `margin64` 后的 `mask_then_crop` 预览图
+3. 已生成 review 产物目录：
+   - `backend-train-model/person-train-model/train-result/review/roi_cropped_keep_positive_v2/`
+4. 当前复核结果：
+   - 扫描图片 `502` 张
+   - 命中 affected images `52` 张
+   - 命中 affected boxes `54` 个
+   - 其中 `margin64` 可完全恢复 `31` 个
+   - 仍然会被裁剪的还有 `23` 个
+
+涉及文件：
+- `backend-train-model/person-train-model/train-code/review_roi_cropped_keep_boxes.py`
+- `backend-train-model/person-train-model/train-result/review/roi_cropped_keep_positive_v2/cropped_keep_positive_summary.json`
+- `backend-train-model/person-train-model/train-result/review/roi_cropped_keep_positive_v2/cropped_keep_positive_summary.md`
+- `backend-train-model/person-train-model/train-result/review/roi_cropped_keep_positive_v2/overlays/`
+- `backend-train-model/person-train-model/train-result/review/roi_cropped_keep_positive_v2/current_mask_crops/`
+- `backend-train-model/person-train-model/train-result/review/roi_cropped_keep_positive_v2/margin64_mask_crops/`
+- `backend-train-model/docs/update_log.md`
+
+新增 / 变更配置项：
+- 无新的训练配置项落地。
+- 新增 review 脚本参数：
+  - `--output-root`
+  - `--margin-px`
+  - `--overwrite`
+
+兼容性注意：
+- 该脚本当前是复核工具，不会修改 prepared 数据集，也不会自动回写 `prepare_report.json`。
+- 脚本里的 `margin64` 结果是基于当前 `mask_then_crop` 逻辑做的模拟对照，不代表代码中已经正式实现了 `crop_margin_px=64`。
+- 当前复核结果表明：`margin64` 对一部分 top-cut / side-cut 的 keep-positive 样本有明确帮助，但对 bottom-cut 样本并不总是有效；是否真正落地仍应结合 review 产物判断。
+
+本轮明确不改动：
+- 不修改 `prepare_roi_aware_person_dataset.py` 的正式 prepare 逻辑。
+- 不修改 `person_project_config.json`。
+- 不生成新的 prepared 数据集，也不启动新的训练或评估。
+## 2026-04-25 落地 ROI-aware v3 的 `crop_margin_px=64` 与 `crop_only` / `mask_then_crop` 运行入口
+
+变更来源：
+- 用户确认继续推进 `crop_margin_px=64` 的正式落地，希望把 ROI-aware prepare 逻辑扩展到可运行的 v3 版本，并同步更新 `person_run_method.md`，把 `mask_then_crop` 与 `crop_only` 两条 v3 训练 / 评估方法按既有格式写入文档。
+
+变更总览：
+1. 扩展 `prepare_person_dataset.py` 中的 ROI 配置解析：
+   - `roi.mode` 不再只允许 `mask_then_crop`，现在正式支持 `mask_then_crop` 与 `crop_only`。
+   - 新增 `roi.crop_margin_px` 配置项，默认值为 `0`。
+   - 新增 `apply_roi_setting_overrides(...)`，用于 wrapper / 独立脚本按命令行显式覆盖 ROI mode 与 crop margin。
+2. 更新 `prepare_roi_aware_person_dataset.py`：
+   - `build_mask_and_crop_bounds(...)` 正式支持 `margin_px` 扩边；
+   - `prepare_roi_aware_dataset(...)` 正式支持两种图像处理流程：
+     - `mask_then_crop`
+     - `crop_only`
+   - `prepare_report.json` 新增 `crop_margin_px` 字段，并按实际生效的 ROI mode / margin 记录。
+3. 更新 `labelme_roi_to_config.py` 与 `run_person_flow.py`：
+   - `extract-roi-config` 和 `prepare-roi-aware` 现在都支持显式传：
+     - `--roi-mode`
+     - `--crop-margin-px`
+   - 便于为 `person_roi_aware_v2`、`person_roi_aware_v3_mask_then_crop_margin64`、`person_roi_aware_v3_crop_only_margin64` 分别生成带版本元数据的 ROI 配置与 prepared 数据集。
+4. 更新 `person_project_config.json`，把 `roi.crop_margin_px` 显式补入默认配置，当前默认值为 `0`，保持历史 v2 行为不变。
+5. 重写 `person_run_method.md` 的版本段顺序与运行命令，新增：
+   - `person_roi_aware_v3_mask_then_crop_margin64`
+   - `person_roi_aware_v3_crop_only_margin64`
+   并保持“最新在前、历史在后”的版本管理约束。
+6. 同步更新两份 v3 方案文档，去掉“代码尚未落地”的旧口径，改为说明：代码已支持 prepare 落地，文档继续承担方案定位、风险说明与验证口径记录。
+
+涉及文件：
+- `backend-train-model/person-train-model/train-code/prepare_person_dataset.py`
+- `backend-train-model/person-train-model/train-code/prepare_roi_aware_person_dataset.py`
+- `backend-train-model/person-train-model/train-code/labelme_roi_to_config.py`
+- `backend-train-model/person-train-model/train-code/run_person_flow.py`
+- `backend-train-model/person-train-model/person_project_config.json`
+- `backend-train-model/person-train-model/train-docs/person_run_method.md`
+- `backend-train-model/person-train-model/train-docs/person_roi_aware_v3_mask_then_crop_margin64.md`
+- `backend-train-model/person-train-model/train-docs/person_roi_aware_v3_crop_only_margin64.md`
+- `backend-train-model/docs/update_log.md`
+
+新增 / 变更配置项：
+- `roi.crop_margin_px`
+- 新增 CLI 参数：
+  - `extract-roi-config --roi-mode`
+  - `extract-roi-config --crop-margin-px`
+  - `prepare-roi-aware --roi-mode`
+  - `prepare-roi-aware --crop-margin-px`
+
+兼容性注意：
+- 当前 `person_project_config.json` 默认仍是 `mask_then_crop + crop_margin_px=0`，因此历史 v2 行为不会因为这次代码扩展而被被动改写。
+- `crop_only` 现在是正式可运行模式，但它仍然更适合作为对照实验，而不是默认主线；原因仍然是 ROI 外可见但未保留为标签的 person 可能重新进入 crop 图。
+- 版本化 ROI-aware 实验时，建议 `extract-roi-config` 与 `prepare-roi-aware` 两个阶段都显式传相同的 `--roi-mode` 与 `--crop-margin-px`，避免 ROI 配置元数据与最终 prepare 行为不一致。
+
+本轮明确不改动：
+- 不重写 `roi.keep_rule` 的当前默认值；仍保持 v2 的 `bottom_center_inside OR box_ioa >= 0.25`。
+- 不直接生成完整的 v3 prepared 数据集。
+- 不启动新的训练或评估任务；本轮只完成代码入口与运行文档落地。
+## 2026-04-25 同步 `person_roi_aware_v3_mask_then_crop_margin64_from_fullframe` 对比结果
+
+变更来源：
+- 用户已完成 `person_roi_aware_v3_mask_then_crop_margin64_from_fullframe` 的训练与评估，要求查看效果并把最新结果同步写入 `backend-train-model/person-train-model/train-docs/roi_compare.md`。
+- 根据仓库级维护约束，本轮同时把 ROI-aware 当前长期结论同步更新到根 `AGENTS.md` 与 `backend-train-model/AGENTS.md`，避免后续上下文继续停留在旧版 v2。
+
+变更总览：
+1. 更新 `roi_compare.md`，新增一条最新对比记录：`2026-04-25 person_roi_aware_v3_mask_then_crop_margin64_from_fullframe 对比`。
+2. 新增 v3 与 `person_roi_aware_v2`、`person_roi_aware`、`person_fullframe` 的 test / val 指标表，并明确写出：
+   - fullframe vs ROI-aware 不是同 `dataset.yaml`
+   - v3 vs v2 也不是完全相同的 `dataset.yaml`，但 keep rule、初始化方式和 split 结构相同，因此更接近“近似单因子工程对比”
+3. 在对比文档中补充了 v3 的 ROI-aware 数据集统计：
+   - `mode=mask_then_crop`
+   - `crop_margin_px=64`
+   - `kept_boxes=1335`
+   - `dropped_boxes=316`
+   - `cropped_boxes=23`
+   - `empty_roi_negative_images=15`
+4. 文档中明确写出本次最重要的工程观察：
+   - v3 相比 v2 的 native test 指标只有很小优势（`mAP50-95 +0.0052`）
+   - 但裁剪框从 `54` 明显降到 `23`
+   - 因此更准确的结论应是“当前 test 领先但优势很小的 ROI-aware 候选版本”，而不是“显著优于 v2”
+5. 同步更新根 `AGENTS.md` 与 `backend-train-model/AGENTS.md` 中关于“当前最佳 ROI-aware run / 当前结论 / 当前优先策略”的描述，改为与最新对比文档一致。
+
+涉及文件：
+- `backend-train-model/person-train-model/train-docs/roi_compare.md`
+- `AGENTS.md`
+- `backend-train-model/AGENTS.md`
+- `backend-train-model/docs/update_log.md`
+
+新增 / 变更配置项：
+- 无新的代码配置项。
+- 无新的训练 CLI 参数。
+- 本轮变更的是结果结论与长期上下文，不涉及 prepare / train / eval 逻辑改动。
+
+兼容性注意：
+- `person_roi_aware_v3_mask_then_crop_margin64_from_fullframe` 当前虽然拿到了更高的 native test `mAP50-95`，但相对 v2 的提升幅度很小，不应直接把 v2 定性为“已被明确淘汰”。
+- v3 与 v2 的 prepared 数据集目录不同，不能把这次结果表述为严格同数据集公平消融。
+- 当前更适合把 v3 写成“test 领先但优势很小的候选版本”，同时继续保留 v2 作为稳定备选。
+
+本轮明确不改动：
+- 不修改 `prepare_roi_aware_person_dataset.py`、`run_person_flow.py` 或任何训练代码。
+- 不改动已生成的 v3 prepared 数据集内容。
+- 不启动 `crop_only` 新训练，也不在本轮直接把默认唯一上游结论改写成“只保留 v3”。 

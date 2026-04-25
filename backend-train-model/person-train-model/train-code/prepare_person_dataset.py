@@ -3,7 +3,7 @@ from __future__ import annotations
 import argparse
 import json
 import shutil
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Mapping, Optional, Sequence, Set
@@ -32,6 +32,7 @@ class RoiSettings:
     center_inside: bool
     bottom_center_inside: bool
     min_box_ioa: float
+    crop_margin_px: int
     config_path: Path
 
 
@@ -122,6 +123,16 @@ def coerce_ratio(raw_value: object, field_name: str) -> float:
         raise RuntimeError("{0} 必须是数字。".format(field_name)) from exc
     if value < 0.0 or value > 1.0:
         raise RuntimeError("{0} 必须位于 [0, 1]。".format(field_name))
+    return value
+
+
+def coerce_non_negative_int(raw_value: object, field_name: str) -> int:
+    try:
+        value = int(raw_value)
+    except (TypeError, ValueError) as exc:
+        raise RuntimeError("{0} 必须是非负整数。".format(field_name)) from exc
+    if value < 0:
+        raise RuntimeError("{0} 不能为负数。".format(field_name))
     return value
 
 
@@ -260,8 +271,8 @@ def load_person_project_context(config_path: Path) -> PersonProjectContext:
         raise RuntimeError("配置中的 `roi.keep_rule` 段必须是对象。")
 
     roi_mode = coerce_string(roi_section.get("mode", "mask_then_crop"), "roi.mode")
-    if roi_mode != "mask_then_crop":
-        raise RuntimeError("当前 ROI-aware 仅支持 roi.mode=mask_then_crop。")
+    if roi_mode not in ("mask_then_crop", "crop_only"):
+        raise RuntimeError("roi.mode 仅支持 `mask_then_crop` 或 `crop_only`。")
 
     roi_center_inside = coerce_bool(
         keep_rule_section.get("center_inside", True),
@@ -274,6 +285,10 @@ def load_person_project_context(config_path: Path) -> PersonProjectContext:
     roi_min_box_ioa = coerce_ratio(
         keep_rule_section.get("min_box_ioa", 0.0),
         "roi.keep_rule.min_box_ioa",
+    )
+    roi_crop_margin_px = coerce_non_negative_int(
+        roi_section.get("crop_margin_px", 0),
+        "roi.crop_margin_px",
     )
     if (
         not roi_center_inside
@@ -357,6 +372,7 @@ def load_person_project_context(config_path: Path) -> PersonProjectContext:
             center_inside=roi_center_inside,
             bottom_center_inside=roi_bottom_center_inside,
             min_box_ioa=roi_min_box_ioa,
+            crop_margin_px=roi_crop_margin_px,
             config_path=resolve_path(
                 roi_section.get(
                     "config_path",
@@ -365,6 +381,30 @@ def load_person_project_context(config_path: Path) -> PersonProjectContext:
                 config_dir,
                 "roi.config_path",
             ),
+        ),
+    )
+
+
+def apply_roi_setting_overrides(
+    context: PersonProjectContext,
+    *,
+    mode: Optional[str] = None,
+    crop_margin_px: Optional[int] = None,
+) -> PersonProjectContext:
+    next_mode = context.roi.mode if mode is None else coerce_string(mode, "roi.mode")
+    if next_mode not in ("mask_then_crop", "crop_only"):
+        raise RuntimeError("roi.mode 仅支持 `mask_then_crop` 或 `crop_only`。")
+    next_crop_margin_px = (
+        context.roi.crop_margin_px
+        if crop_margin_px is None
+        else coerce_non_negative_int(crop_margin_px, "roi.crop_margin_px")
+    )
+    return replace(
+        context,
+        roi=replace(
+            context.roi,
+            mode=next_mode,
+            crop_margin_px=next_crop_margin_px,
         ),
     )
 

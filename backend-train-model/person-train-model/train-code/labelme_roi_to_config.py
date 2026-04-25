@@ -9,6 +9,7 @@ from typing import Dict, List, Mapping, Optional, Sequence, Set, Tuple
 from prepare_person_dataset import (
     DEFAULT_PROJECT_CONFIG,
     PersonProjectContext,
+    apply_roi_setting_overrides,
     load_person_project_context,
 )
 
@@ -43,6 +44,16 @@ def parse_args() -> argparse.Namespace:
         "--overwrite",
         action="store_true",
         help="允许覆盖既有 ROI 配置文件。",
+    )
+    parser.add_argument(
+        "--roi-mode",
+        choices=["mask_then_crop", "crop_only"],
+        help="覆盖 project_config 中写入 ROI 配置元数据的 roi.mode。",
+    )
+    parser.add_argument(
+        "--crop-margin-px",
+        type=int,
+        help="覆盖 project_config 中写入 ROI 配置元数据的 roi.crop_margin_px。",
     )
     return parser.parse_args()
 
@@ -288,6 +299,7 @@ def extract_roi_config(
         "label": label_name,
         "scope": "per_image",
         "mode": context.roi.mode,
+        "crop_margin_px": context.roi.crop_margin_px,
         "keep_rule": {
             "center_inside": context.roi.center_inside,
             "bottom_center_inside": context.roi.bottom_center_inside,
@@ -312,7 +324,11 @@ def extract_roi_config(
 
 def main() -> int:
     args = parse_args()
-    context = load_person_project_context(Path(args.project_config))
+    context = apply_roi_setting_overrides(
+        load_person_project_context(Path(args.project_config)),
+        mode=args.roi_mode,
+        crop_margin_px=args.crop_margin_px,
+    )
     output_path = Path(args.output).expanduser().resolve() if args.output else context.roi.config_path
     result = extract_roi_config(
         context,

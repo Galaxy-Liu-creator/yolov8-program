@@ -19,6 +19,7 @@ from prepare_person_dataset import (
     PersonProjectContext,
     PersonSequence,
     RoiSettings,
+    apply_roi_setting_overrides,
     assert_directory_within_root,
     load_person_project_context,
     prepare_person_labels,
@@ -89,6 +90,16 @@ def parse_args() -> argparse.Namespace:
         "--limit-per-sequence",
         type=int,
         help="仅用于快速烟雾验证；对每个序列只取前 N 张图片。",
+    )
+    parser.add_argument(
+        "--roi-mode",
+        choices=["mask_then_crop", "crop_only"],
+        help="覆盖 project_config 中的 roi.mode。",
+    )
+    parser.add_argument(
+        "--crop-margin-px",
+        type=int,
+        help="覆盖 project_config 中的 roi.crop_margin_px。",
     )
     return parser.parse_args()
 
@@ -427,6 +438,8 @@ def build_mask_and_crop_bounds(
     image_width: int,
     image_height: int,
     polygon: Sequence[Sequence[float]],
+    *,
+    margin_px: int = 0,
 ) -> Tuple[np.ndarray, np.ndarray, Tuple[int, int, int, int]]:
     coord_eps = 1e-6
     for index, point in enumerate(polygon):
@@ -468,6 +481,13 @@ def build_mask_and_crop_bounds(
     y_min = max(0, int(math.floor(float(np.min(polygon_array[:, 1])))))
     x_max = min(image_width, int(math.ceil(float(np.max(polygon_array[:, 0])))))
     y_max = min(image_height, int(math.ceil(float(np.max(polygon_array[:, 1])))))
+    if margin_px < 0:
+        raise RuntimeError("crop_margin_px 不能为负数。")
+    if margin_px > 0:
+        x_min = max(0, x_min - margin_px)
+        y_min = max(0, y_min - margin_px)
+        x_max = min(image_width, x_max + margin_px)
+        y_max = min(image_height, y_max + margin_px)
     if x_max <= x_min or y_max <= y_min:
         raise RuntimeError("ROI polygon 的最小外接矩形无效。")
 
@@ -573,8 +593,8 @@ def prepare_roi_aware_dataset(
 ) -> Dict[str, object]:
     if not context.roi.enabled:
         raise RuntimeError("当前配置中 roi.enabled=false，请先启用 ROI-aware 配置。")
-    if context.roi.mode != "mask_then_crop":
-        raise RuntimeError("当前 ROI-aware 仅支持 roi.mode=mask_then_crop。")
+    if context.roi.mode not in ("mask_then_crop", "crop_only"):
+        raise RuntimeError("roi.mode 仅支持 `mask_then_crop` 或 `crop_only`。")
 
     ensure_person_labels_available(context, overwrite=overwrite)
     ensure_output_root(output_root, overwrite=overwrite)
@@ -629,11 +649,16 @@ def prepare_roi_aware_dataset(
                 image_width,
                 image_height,
                 polygon,
+                margin_px=context.roi.crop_margin_px,
             )
 
-            masked_image = np.zeros_like(image)
-            masked_image[mask == 255] = image[mask == 255]
-            crop_image = masked_image[y_min:y_max, x_min:x_max]
+            if context.roi.mode == "mask_then_crop":
+                masked_image = np.zeros_like(image)
+                masked_image[mask == 255] = image[mask == 255]
+                crop_source = masked_image
+            else:
+                crop_source = image
+            crop_image = crop_source[y_min:y_max, x_min:x_max]
             crop_height, crop_width = crop_image.shape[:2]
             if crop_height <= 0 or crop_width <= 0:
                 raise RuntimeError("ROI 裁剪结果为空: {0}".format(sample.image_path))
@@ -709,6 +734,7 @@ def prepare_roi_aware_dataset(
         "roi_config_path": str(roi_config_path),
         "roi_scope": str(roi_payload.get("scope", "mixed")),
         "mode": context.roi.mode,
+        "crop_margin_px": context.roi.crop_margin_px,
         "keep_rule": {
             "center_inside": context.roi.center_inside,
             "bottom_center_inside": context.roi.bottom_center_inside,
@@ -738,7 +764,11 @@ def prepare_roi_aware_dataset(
 
 def main() -> int:
     args = parse_args()
-    context = load_person_project_context(Path(args.project_config))
+    context = apply_roi_setting_overrides(
+        load_person_project_context(Path(args.project_config)),
+        mode=args.roi_mode,
+        crop_margin_px=args.crop_margin_px,
+    )
     roi_config_path = Path(args.roi_config).expanduser().resolve() if args.roi_config else context.roi.config_path
     output_root = (
         Path(args.output_root).expanduser().resolve()

@@ -12,6 +12,7 @@
 - **上下文迭代**：每次修改长期有效的信息，例如数据路径、类别定义、训练策略、当前 baseline、业务链路、文档写作口径时，必须同步检查并更新本文件或对应子目录 `AGENTS.md`。
 - **不要重复维护**：长期事实尽量写在一个最贴近作用域的 `AGENTS.md`；其他入口只引用它，避免 `AGENTS.md`、`CLAUDE.md`、`.claude/` 三套内容互相打架。
 - **编码要求**：Markdown / JSON / YAML 默认按 UTF-8 读写；PowerShell 控制台可能显示中文乱码，读取中文文件时优先用 Python `encoding="utf-8"`。
+- **允许纠错与反驳**：当用户对技术判断、代码语义、训练逻辑、指标原因或生产贴合度的表述可能不准确时，AI Agent 不应默认附和；应明确指出可能不对的部分，说明依据，并给出更合理的修正解释或替代建议。
 
 ## 2. Python 与运行环境
 
@@ -63,10 +64,12 @@
 - `person_roi_aware_baseline` test 指标：Precision `0.9390`，Recall `0.5950`，mAP50 `0.6738`，mAP50-95 `0.3867`，当前作为历史对照保留。
 - 当前 ROI-aware v2 配置文件：`backend-train-model/person-train-model/train-result/working/roi/roi_config.v2.generated.json`。
 - 当前 ROI-aware v2 数据集输出 `502` 张图，保留 person 框 `1342` 个，丢弃 `316` 个，裁剪边界框 `54` 个，ROI 空负样本 `14` 张。
-- 当前最佳 ROI-aware run：`person_roi_aware_v2_from_fullframe`。
-- `person_roi_aware_v2_from_fullframe` test 指标：Precision `0.9364`，Recall `0.6957`，mAP50 `0.7774`，mAP50-95 `0.4555`。
-- 当前结论：`ROI-aware v2 + from_fullframe 初始化` 明显优于历史 `person_roi_aware_baseline`；其当前 native test 结果也高于 `person_fullframe_baseline`，但由于分支间 `dataset.yaml` 不同，这一点应写成“当前分支级结果领先”，不要写成严格同数据集公平对照结论。
-- 当前优先策略不是直接换 `yolov8s`，而是保留 `person_fullframe_baseline` 作为初始化来源，并优先使用 `person_roi_aware_v2_from_fullframe` 作为当前最佳 ROI-aware person 分支；若 recall 仍低，再试 `imgsz=768`、`batch=2`。
+- 当前 ROI-aware v3 `mask_then_crop + crop_margin_px=64` 配置文件：`backend-train-model/person-train-model/train-result/working/roi/roi_config.v3.mask_then_crop_margin64.generated.json`。
+- 当前 ROI-aware v3 `mask_then_crop + crop_margin_px=64` 数据集输出 `502` 张图，保留 person 框 `1335` 个，丢弃 `316` 个，裁剪边界框 `23` 个，ROI 空负样本 `15` 张。
+- 当前 native test 领先的 ROI-aware run（优势很小）：`person_roi_aware_v3_mask_then_crop_margin64_from_fullframe`。
+- `person_roi_aware_v3_mask_then_crop_margin64_from_fullframe` test 指标：Precision `0.9208`，Recall `0.7075`，mAP50 `0.7779`，mAP50-95 `0.4607`。
+- 当前结论：`ROI-aware v3 mask_then_crop + margin64 + from_fullframe 初始化` 相比历史 `person_roi_aware_baseline` 仍是明显提升；相比 `person_roi_aware_v2_from_fullframe` 则只体现为**很小的 native test 优势**，同时显著减少了边界裁剪框（`54 -> 23`）。因此更准确的口径应写成“当前 test 领先但优势很小的 ROI-aware 候选版本”，不要写成对 v2 的显著领先或严格同数据集公平消融结论。
+- 当前优先策略不是直接换 `yolov8s`，而是保留 `person_fullframe_baseline` 作为初始化来源；ROI-aware 分支优先关注 `person_roi_aware_v3_mask_then_crop_margin64_from_fullframe` 与 `person_roi_aware_v2_from_fullframe` 这两条近邻版本，若后续仍要继续冲 recall / mAP50-95，再优先考虑 `crop_only` 对照或对更优版本试 `imgsz=768`、`batch=2`。
 - 系统性对比文档入口：`backend-train-model/person-train-model/train-docs/roi_compare.md`。
 - ROI 边界改进建议记录在 `backend-train-model/person-train-model/train-docs/roi_problem_solution.md`：优先考虑 `bottom_center_inside OR box_ioa >= 0.25`，并配合 `crop_margin_px=64`。
 

@@ -1,6 +1,6 @@
 # 运行前置条件
 
-本文档用于统一记录 `person` 三条训练分支的运行方式：`person_fullframe`、`person_roi_aware`、`person_roi_aware_v2`。当前电脑没有独立显卡，默认仅使用 CPU 训练；集成显卡不作为 PyTorch / Ultralytics 的 CUDA 训练设备使用。
+本文档用于统一记录 `person` 五条训练分支的运行方式：`person_roi_aware_v3_mask_then_crop_margin64`、`person_roi_aware_v3_crop_only_margin64`、`person_roi_aware_v2`、`person_roi_aware`、`person_fullframe`。当前电脑没有独立显卡，默认仅使用 CPU 训练；集成显卡不作为 PyTorch / Ultralytics 的 CUDA 训练设备使用。
 
 ## 通用环境检查
 
@@ -34,7 +34,8 @@ Test-Path backend-train-model\person-train-model\train-result\artifacts\runs\per
 - 所有版本的训练与评估命令都建议显式传入 `--dataset-yaml` 与 `--run-name`，避免误用默认数据集或默认 run 名。
 - 所有 ROI-aware 派生版本都必须使用独立输出目录，不要把不同版本的 prepared 数据集写到同一路径。
 - 如果只是刷新某一版 ROI-aware 数据集，只覆盖该版本自己的 `output-root`，不要顺手覆盖其他版本产物。
-- `person_roi_aware_v2` 当前优先使用 `person_fullframe_baseline/weights/best.pt` 做初始化，而不是重新从 `yolov8n.pt` 起训。
+- 当前所有 ROI-aware `from_fullframe` 分支都默认把 `person_fullframe_baseline/weights/best.pt` 作为初始化来源。
+- 现在 `extract-roi-config` 与 `prepare-roi-aware` 都支持显式传 `--roi-mode` 与 `--crop-margin-px`；如果要做版本化 ROI-aware 数据集，两个阶段都建议显式传这两个参数，保证 ROI 配置元数据与 prepare 行为一致。
 
 ## 文档迭代约束
 
@@ -43,12 +44,115 @@ Test-Path backend-train-model\person-train-model\train-result\artifacts\runs\per
 - 不要把旧版本段直接改写成新版本；新版本应单独新增，旧版本保留为历史对照。
 - 每个版本段尽量保持同一结构：`当前定位`、`数据集与产物`、`如需重生成数据集`、`训练命令`、`评估命令`、`备注`。
 
+# person_roi_aware_v3_mask_then_crop_margin64
+
+## 当前定位
+
+- 当前已落地的 v3 主推荐 ROI-aware 分支。
+- keep rule 继续沿用 v2：`bottom_center_inside == true OR box_ioa_with_roi >= 0.25`。
+- 图像处理流程为：`mask_then_crop + crop_margin_px=64`。
+- 当前推荐 run 名：`person_roi_aware_v3_mask_then_crop_margin64_from_fullframe`。
+
+## 数据集与产物
+
+- ROI 配置：
+  - `backend-train-model/person-train-model/train-result/working/roi/roi_config.v3.mask_then_crop_margin64.generated.json`
+- 数据集 YAML：
+  - `backend-train-model/person-train-model/train-result/prepared/person_roi_aware_v3_mask_then_crop_margin64/sequence_contiguous/dataset.yaml`
+- 对应 prepare 报告：
+  - `backend-train-model/person-train-model/train-result/prepared/person_roi_aware_v3_mask_then_crop_margin64/sequence_contiguous/prepare_report.json`
+- 首次执行本节 `prepare-roi-aware` 前，上述数据集目录与统计文件可以还不存在；执行后才会生成。
+
+## 如需重生成数据集
+
+先生成带版本元数据的 ROI 配置：
+
+```powershell
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py extract-roi-config --roi-config backend-train-model\person-train-model\train-result\working\roi\roi_config.v3.mask_then_crop_margin64.generated.json --roi-mode mask_then_crop --crop-margin-px 64 --overwrite
+```
+
+再生成独立的 v3 `mask_then_crop + margin64` 数据集：
+
+```powershell
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py prepare-roi-aware --roi-config backend-train-model\person-train-model\train-result\working\roi\roi_config.v3.mask_then_crop_margin64.generated.json --output-root backend-train-model\person-train-model\train-result\prepared\person_roi_aware_v3_mask_then_crop_margin64\sequence_contiguous --roi-mode mask_then_crop --crop-margin-px 64 --overwrite
+```
+
+## 训练命令
+
+```powershell
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py train --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_roi_aware_v3_mask_then_crop_margin64\sequence_contiguous\dataset.yaml --run-name person_roi_aware_v3_mask_then_crop_margin64_from_fullframe --device cpu --workers 0 --batch 4 --imgsz 640 --epochs 180 --patience 60 --base-model backend-train-model\person-train-model\train-result\artifacts\runs\person_fullframe_baseline\weights\best.pt
+```
+
+## 评估命令
+
+```powershell
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py evaluate --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_roi_aware_v3_mask_then_crop_margin64\sequence_contiguous\dataset.yaml --run-name person_roi_aware_v3_mask_then_crop_margin64_from_fullframe --device cpu --workers 0
+```
+
+## 备注
+
+- 这一版的目标是先修掉 v2 中一批 keep-positive 但又被 crop bbox 裁残的样本，同时继续压制 ROI 外可见区域。
+- 如果后续需要与 v2 做单因子对比，优先只改 `crop_margin_px` 与数据集版本，其余训练参数先尽量保持一致。
+- 训练评估完成后，应把本版本与 `person_roi_aware_v2`、`person_roi_aware`、`person_fullframe` 的指标对比继续追加到 `backend-train-model/person-train-model/train-docs/roi_compare.md`。
+
+# person_roi_aware_v3_crop_only_margin64
+
+## 当前定位
+
+- 当前已落地的 v3 对照实验分支。
+- keep rule 同样沿用 v2：`bottom_center_inside == true OR box_ioa_with_roi >= 0.25`。
+- 图像处理流程为：`crop_only + crop_margin_px=64`。
+- 当前推荐 run 名：`person_roi_aware_v3_crop_only_margin64_from_fullframe`。
+
+## 数据集与产物
+
+- ROI 配置：
+  - `backend-train-model/person-train-model/train-result/working/roi/roi_config.v3.crop_only_margin64.generated.json`
+- 数据集 YAML：
+  - `backend-train-model/person-train-model/train-result/prepared/person_roi_aware_v3_crop_only_margin64/sequence_contiguous/dataset.yaml`
+- 对应 prepare 报告：
+  - `backend-train-model/person-train-model/train-result/prepared/person_roi_aware_v3_crop_only_margin64/sequence_contiguous/prepare_report.json`
+- 首次执行本节 `prepare-roi-aware` 前，上述数据集目录与统计文件可以还不存在；执行后才会生成。
+
+## 如需重生成数据集
+
+先生成带版本元数据的 ROI 配置：
+
+```powershell
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py extract-roi-config --roi-config backend-train-model\person-train-model\train-result\working\roi\roi_config.v3.crop_only_margin64.generated.json --roi-mode crop_only --crop-margin-px 64 --overwrite
+```
+
+再生成独立的 v3 `crop_only + margin64` 数据集：
+
+```powershell
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py prepare-roi-aware --roi-config backend-train-model\person-train-model\train-result\working\roi\roi_config.v3.crop_only_margin64.generated.json --output-root backend-train-model\person-train-model\train-result\prepared\person_roi_aware_v3_crop_only_margin64\sequence_contiguous --roi-mode crop_only --crop-margin-px 64 --overwrite
+```
+
+## 训练命令
+
+```powershell
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py train --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_roi_aware_v3_crop_only_margin64\sequence_contiguous\dataset.yaml --run-name person_roi_aware_v3_crop_only_margin64_from_fullframe --device cpu --workers 0 --batch 4 --imgsz 640 --epochs 180 --patience 60 --base-model backend-train-model\person-train-model\train-result\artifacts\runs\person_fullframe_baseline\weights\best.pt
+```
+
+## 评估命令
+
+```powershell
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py evaluate --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_roi_aware_v3_crop_only_margin64\sequence_contiguous\dataset.yaml --run-name person_roi_aware_v3_crop_only_margin64_from_fullframe --device cpu --workers 0
+```
+
+## 备注
+
+- 这一版的主要价值是作为对照，验证“边界正样本更自然”到底来自 `crop_only`，还是仅仅来自 `margin64`。
+- 这一版更容易把 ROI 外可见但未保留为标签的 person 带回 crop 图中，所以必须配合可视化抽查，不建议直接跳过 `mask_then_crop + margin64` 就把它当默认主线。
+- 训练评估完成后，同样需要把本版本的指标和结论继续追加到 `backend-train-model/person-train-model/train-docs/roi_compare.md`。
+
 # person_roi_aware_v2
 
 ## 当前定位
 
-- 当前最新 ROI-aware 派生分支。
+- 当前历史上已完成训练验证、且表现最好的 ROI-aware v2 分支。
 - 当前 keep rule 为：`bottom_center_inside == true OR box_ioa_with_roi >= 0.25`。
+- 当前图像处理流程为：`mask_then_crop + crop_margin_px=0`。
 - 当前推荐 run 名：`person_roi_aware_v2_from_fullframe`。
 
 ## 数据集与产物
@@ -71,13 +175,13 @@ Test-Path backend-train-model\person-train-model\train-result\artifacts\runs\per
 先重生成独立的 v2 ROI 配置：
 
 ```powershell
-D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py extract-roi-config --roi-config backend-train-model\person-train-model\train-result\working\roi\roi_config.v2.generated.json --overwrite
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py extract-roi-config --roi-config backend-train-model\person-train-model\train-result\working\roi\roi_config.v2.generated.json --roi-mode mask_then_crop --crop-margin-px 0 --overwrite
 ```
 
 再重生成独立的 v2 ROI-aware 数据集：
 
 ```powershell
-D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py prepare-roi-aware --roi-config backend-train-model\person-train-model\train-result\working\roi\roi_config.v2.generated.json --output-root backend-train-model\person-train-model\train-result\prepared\person_roi_aware_v2\sequence_contiguous --overwrite
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py prepare-roi-aware --roi-config backend-train-model\person-train-model\train-result\working\roi\roi_config.v2.generated.json --output-root backend-train-model\person-train-model\train-result\prepared\person_roi_aware_v2\sequence_contiguous --roi-mode mask_then_crop --crop-margin-px 0 --overwrite
 ```
 
 ## 训练命令
@@ -94,9 +198,9 @@ D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-
 
 ## 备注
 
-- 当前版本主要用于和 `person_roi_aware`、`person_fullframe` 做对照。
+- 当前版本主要用于和 `person_roi_aware`、`person_fullframe` 以及后续 v3 版本做对照。
 - 如果 `imgsz=640` 版本仍然 recall 偏低，再尝试 `imgsz=768, batch=2`，其余条件尽量先保持不变。
-- 这一版是当前默认优先推进的 ROI-aware 训练分支。
+- 这一版是当前已完成训练验证的 ROI-aware 历史最佳基线。
 
 # person_roi_aware
 
@@ -104,6 +208,7 @@ D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-
 
 - 历史 ROI-aware v1 分支。
 - 当前 keep rule 为：`center_inside == true`。
+- 当前图像处理流程可视为：`mask_then_crop + crop_margin_px=0`。
 - 当前仓库内这套 v1 数据集视为**保留的历史对照产物**。
 
 ## 数据集与产物
@@ -129,7 +234,7 @@ D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-
 
 ## 训练命令
 
-如果只是做当前 v1 / v2 的公平对照，优先使用 `from_fullframe` 初始化：
+如果只是做当前 v1 / v2 / v3 的公平对照，优先使用 `from_fullframe` 初始化：
 
 ```powershell
 D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py train --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_roi_aware\sequence_contiguous\dataset.yaml --run-name person_roi_aware_v1_from_fullframe --device cpu --workers 0 --batch 4 --imgsz 640 --epochs 180 --patience 60 --base-model backend-train-model\person-train-model\train-result\artifacts\runs\person_fullframe_baseline\weights\best.pt
@@ -144,7 +249,7 @@ D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-
 ## 备注
 
 - 如果要复现最早的历史 baseline，可继续使用历史 run 名 `person_roi_aware_baseline` 与 `backend-train-model\weights\yolov8n.pt` 作为初始化。
-- 当前阶段更有价值的用法是：把这一版当成旧规则对照组，与 `person_roi_aware_v2` 比较 recall、mAP50、mAP50-95。
+- 当前阶段更有价值的用法是：把这一版当成旧规则对照组，与 `person_roi_aware_v2` 以及两条 v3 路线比较 recall、mAP50、mAP50-95。
 
 # person_fullframe
 

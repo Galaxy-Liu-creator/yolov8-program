@@ -8,6 +8,7 @@
 - 当前训练方向包括 `clothes` fullframe、`person` fullframe、ROI-aware person，以及后续可能的 `personcrop -> clothes` 对照。
 - `inspection-flask/` 只作为在线链路参考；除非用户明确要求，不要在后端训练任务中顺手修改在线系统。
 - 仓库根 `docs/` 可作为业务背景参考，但训练事实以本目录配置、报告和当前用户说明为准。
+- 当用户对训练语义、ROI 裁剪影响、标签保留逻辑、指标解读或生产贴合度的表述可能不准确时，AI Agent 不应默认附和；应基于代码、配置、产物和当前链路明确指出可能不对的部分，给出更合理解释或替代建议后再继续执行。
 
 ## 2. 必读文件
 
@@ -59,10 +60,12 @@
 - `person_roi_aware_baseline` test：Precision `0.9390`，Recall `0.5950`，mAP50 `0.6738`，mAP50-95 `0.3867`，当前作为历史对照保留。
 - 当前 ROI-aware v2 配置：`train-result/working/roi/roi_config.v2.generated.json`，keep rule 为 `bottom_center_inside OR box_ioa >= 0.25`。
 - 当前 ROI-aware v2 数据集输出：`502` 张图，保留框 `1342`，丢弃框 `316`，裁剪框 `54`，ROI 空负样本 `14`。
-- 当前最佳 ROI-aware run：`person_roi_aware_v2_from_fullframe`。
-- `person_roi_aware_v2_from_fullframe` test：Precision `0.9364`，Recall `0.6957`，mAP50 `0.7774`，mAP50-95 `0.4555`。
-- 当前结论：`ROI-aware v2 + from_fullframe 初始化` 明显优于历史 `person_roi_aware_baseline`，并且当前 native 结果也高于 `person_fullframe_baseline`；但由于分支间 `dataset.yaml` 不同，和 fullframe 的比较应表述为“当前分支级结果领先”，不是严格同数据集公平对照。
-- 当前优先方案：保留 `person_fullframe_baseline` 作为上游初始化来源，把 `person_roi_aware_v2_from_fullframe` 作为当前最佳 ROI-aware person 分支；若后续仍要继续冲 recall，再试 `imgsz=768`、`batch=2`，暂不优先切换 `yolov8s`。
+- 当前 ROI-aware v3 `mask_then_crop + crop_margin_px=64` 配置：`train-result/working/roi/roi_config.v3.mask_then_crop_margin64.generated.json`。
+- 当前 ROI-aware v3 `mask_then_crop + crop_margin_px=64` 数据集输出：`502` 张图，保留框 `1335`，丢弃框 `316`，裁剪框 `23`，ROI 空负样本 `15`。
+- 当前 native test 领先的 ROI-aware run（优势很小）：`person_roi_aware_v3_mask_then_crop_margin64_from_fullframe`。
+- `person_roi_aware_v3_mask_then_crop_margin64_from_fullframe` test：Precision `0.9208`，Recall `0.7075`，mAP50 `0.7779`，mAP50-95 `0.4607`。
+- 当前结论：`ROI-aware v3 mask_then_crop + margin64 + from_fullframe 初始化` 相比历史 `person_roi_aware_baseline` 仍是明显提升；相比 `person_roi_aware_v2_from_fullframe` 则只体现为很小的 native test 优势，同时明显减少了裁剪框（`54 -> 23`）。因此当前更适合写成“当前 test 领先但优势很小的 ROI-aware 候选版本”，而不是对 v2 的显著领先。
+- 当前优先方案：保留 `person_fullframe_baseline` 作为上游初始化来源，同时保留 `person_roi_aware_v3_mask_then_crop_margin64_from_fullframe` 与 `person_roi_aware_v2_from_fullframe` 两条近邻版本；若后续仍要继续冲 recall / mAP50-95，再优先补 `crop_only` 对照或对更优版本试 `imgsz=768`、`batch=2`，暂不优先切换 `yolov8s`。
 - 对比文档入口：`backend-train-model/person-train-model/train-docs/roi_compare.md`。
 
 ## 7. 代码边界

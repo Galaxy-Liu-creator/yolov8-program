@@ -12,6 +12,7 @@ from prepare_person_dataset import (
     DEFAULT_PROJECT_CONFIG,
     PERSON_ROOT,
     PersonProjectContext,
+    apply_roi_setting_overrides,
     load_person_project_context,
     prepare_person_labels,
 )
@@ -113,6 +114,16 @@ def parse_args() -> argparse.Namespace:
         help="显式允许 Ultralytics 自动下载默认模型。",
     )
     parser.add_argument("--report-name", help="evaluate 阶段的报告文件名。")
+    parser.add_argument(
+        "--roi-mode",
+        choices=["mask_then_crop", "crop_only"],
+        help="覆盖 project_config 中的 roi.mode；主要供 extract-roi-config / prepare-roi-aware 使用。",
+    )
+    parser.add_argument(
+        "--crop-margin-px",
+        type=int,
+        help="覆盖 project_config 中的 roi.crop_margin_px；主要供 extract-roi-config / prepare-roi-aware 使用。",
+    )
     return parser.parse_args()
 
 
@@ -177,6 +188,17 @@ def roi_output_root_for(context: PersonProjectContext, raw_output_root: Optional
     if raw_output_root:
         return Path(raw_output_root).expanduser().resolve()
     return context.roi_aware_prepared_output_root
+
+
+def apply_roi_cli_overrides(
+    context: PersonProjectContext,
+    args: argparse.Namespace,
+) -> PersonProjectContext:
+    return apply_roi_setting_overrides(
+        context,
+        mode=args.roi_mode,
+        crop_margin_px=args.crop_margin_px,
+    )
 
 
 def best_weight_path_for(context: PersonProjectContext, run_name: str, raw_weights: Optional[str]) -> Path:
@@ -390,11 +412,12 @@ def main() -> int:
     if args.command == "extract-roi-config":
         from labelme_roi_to_config import extract_roi_config
 
-        output_path = roi_config_path_for(context, args.roi_config)
+        effective_context = apply_roi_cli_overrides(context, args)
+        output_path = roi_config_path_for(effective_context, args.roi_config)
         result = extract_roi_config(
-            context,
+            effective_context,
             roi_json_root=roi_json_root_for(
-                context,
+                effective_context,
                 args.roi_json_root,
                 command=args.command,
             ),
@@ -421,10 +444,11 @@ def main() -> int:
     if args.command == "prepare-roi-aware":
         from prepare_roi_aware_person_dataset import prepare_roi_aware_dataset
 
+        effective_context = apply_roi_cli_overrides(context, args)
         report = prepare_roi_aware_dataset(
-            context,
-            roi_config_path=roi_config_path_for(context, args.roi_config),
-            output_root=roi_output_root_for(context, args.output_root),
+            effective_context,
+            roi_config_path=roi_config_path_for(effective_context, args.roi_config),
+            output_root=roi_output_root_for(effective_context, args.output_root),
             overwrite=args.overwrite,
             limit_per_sequence=args.limit_per_sequence,
         )
