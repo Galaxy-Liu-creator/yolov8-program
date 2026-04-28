@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dir /s /b)",
+      "Bash(grep -E \"\\\\.\\(png|jpg\\)$\")",
+      "Bash(findstr /C:calling /C:barrier)",
+      "Bash(powershell.exe:*)"
+    ]
+  }
+}

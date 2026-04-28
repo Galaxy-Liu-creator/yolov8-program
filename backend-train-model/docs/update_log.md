@@ -1,5 +1,184 @@
 ﻿# Update Log
 
+## 2026-04-28 新增 ROI-aware person 下一轮迭代执行计划文档
+
+变更来源：
+- 用户在确认 `img768` 对照训练完成后，继续追问“当前效果是否仍不理想、接下来还能怎么改进”，并接受把“复盘项 + 下一轮受控实验方案 + 对应训练命令”整理成一份具体执行文档。
+- 结合当前 `roi_compare.md` 里的结论，判断下一步不应继续默认堆 `imgsz` 或直接切换 `yolov8s`，而应先把 ROI 边界问题、FN 来源和训练波动拆开验证。
+
+变更总览：
+1. 新增 `backend-train-model/person-train-model/train-docs/roi_next_iteration_plan.md`。
+2. 在新文档中明确写出四段式执行顺序：
+   - 先做 ROI 边界 keep-positive 样本复盘与 overlay 可视化；
+   - 再做当前 v3 主线的 seed 稳定性确认；
+   - 然后只尝试一个 `min_box_ioa: 0.25 -> 0.20` 的单因子 keep rule 实验；
+   - 若 FN 主要集中在小人 / 遮挡 / 边界入区，再优先补难样本。
+3. 在文档中补入现有可直接运行的命令：
+   - `review_roi_cropped_keep_boxes.py`
+   - `visualize_roi_filter_samples.py`
+   - `run_person_flow.py train/evaluate` 的 seed 对照命令
+   - `ioa20` 单因子实验的版本化配置与训练 / 评估命令
+4. 同步更新 `person_run_method.md`，增加“若要看下一轮改进优先级，转看 `roi_next_iteration_plan.md`”的入口说明。
+5. 同步更新根 `AGENTS.md` 与 `backend-train-model/AGENTS.md` 的长期口径，明确当前下一轮优先动作是：
+   - 先复盘 ROI 边界 / FN
+   - 先做 seed 稳定性确认
+   - 再做 keep rule 单因子实验
+   - 暂不默认继续放大 `imgsz`
+
+涉及文件：
+- `backend-train-model/person-train-model/train-docs/roi_next_iteration_plan.md`
+- `backend-train-model/person-train-model/train-docs/person_run_method.md`
+- `backend-train-model/AGENTS.md`
+- `AGENTS.md`
+- `backend-train-model/docs/update_log.md`
+
+新增 / 变更配置项：
+- 无训练代码变更。
+- 无现成项目配置文件变更。
+- 新文档中给出了待执行的版本化配置命名建议：
+  - `person_project_config.roi_v4_mask_then_crop_margin64_ioa20.json`
+  - `roi_config.v4.mask_then_crop_margin64_ioa20.generated.json`
+
+兼容性注意：
+- 这次新增的是“下一轮执行计划文档”，不是已经落地并完成评估的新 baseline。
+- 文档里的 `ioa20` 受控实验命令依赖先复制并修改一份版本化 `project_config`；在真实开跑前，不应把该实验当成既成事实写入结果对比结论。
+- 当前默认主线仍是 `person_roi_aware_v3_mask_then_crop_margin64_from_fullframe`，`person_roi_aware_v2_from_fullframe` 仍是稳定备选。
+
+本轮明确不改动：
+- 不修改 `train_workwear.py`、`run_person_flow.py`、ROI prepare 逻辑或任何训练代码。
+- 不新建正式实验结果目录，不启动新训练。
+- 不把计划性建议误写成已经验证完成的训练结论。
+
+## 2026-04-28 同步 `person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_img768` 完整结果到对比文档与长期说明
+
+变更来源：
+- 用户确认 `person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_img768` 已完成训练与评估，要求把这一轮结果补充迭代到 `backend-train-model/person-train-model/train-docs/roi_compare.md`。
+- 读取新生成的 train / eval 报告后确认：这轮 `imgsz=768, batch=2` 对照实验没有打赢当前 `640 / batch=4` 主线，因此需要同步修正文档里的“下一步优先试 `imgsz=768`”口径，避免长期说明继续滞后。
+
+变更总览：
+1. 在 `roi_compare.md` 顶部新增 `2026-04-28 person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_img768 对比` 记录。
+2. 补充该 run 与当前 `v3 mask_then_crop + margin64` 主线、`v2`、`crop_only`、`fullframe` 的 `val / test` 指标表、数据集统计差异、增量对比和训练过程说明。
+3. 在对比文档中明确写出结论：`img768` 虽然 Precision 更高，但 Recall、mAP50、mAP75、mAP50-95 都低于当前 `640` 主线，也没有优于 `v2`，因此不应升级为默认主线。
+4. 同步更新 `backend-train-model/AGENTS.md` 与根 `AGENTS.md` 中 ROI-aware 当前状态的长期口径，补入：
+   - `person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_img768` 的 test 指标
+   - “`imgsz=768, batch=2` 对照实验已完成，但不优于当前主线”的结论
+5. 同步更新 `person_run_method.md` 的 `v3 mask_then_crop` 段，把原来的“下一步优先训练 run 名 / 命令”改成“已完成的 `img768` 对照 run / 命令”，避免运行文档继续停留在实验前状态。
+
+涉及文件：
+- `backend-train-model/person-train-model/train-docs/roi_compare.md`
+- `backend-train-model/person-train-model/train-docs/person_run_method.md`
+- `backend-train-model/AGENTS.md`
+- `AGENTS.md`
+- `backend-train-model/docs/update_log.md`
+
+新增 / 变更配置项：
+- 无代码配置项变更。
+- 无新的 CLI 参数变更。
+- 新增长期结论更新：
+  - `person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_img768` 已完成评估，但不应升级为默认主线。
+
+兼容性注意：
+- `img768` 这轮对比与当前 `v3 mask_then_crop + margin64` 主线使用的是同一 prepared 数据集，因此结论主要反映训练配置变化，而不是样本数量变化。
+- `roi_compare.md` 中表格使用统一的 `_eval.json` native eval 口径；`results.csv` 只用于补充训练过程信息，不应和表格指标混为一谈。
+- 当前默认主线仍是 `person_roi_aware_v3_mask_then_crop_margin64_from_fullframe`，`person_roi_aware_v2_from_fullframe` 继续保留为稳定备选；`crop_only` 与 `img768` 都应视为已完成但不推荐提升为默认主线的对照实验。
+
+本轮明确不改动：
+- 不改 `train_workwear.py`、`run_person_flow.py`、prepare 逻辑或任何训练代码。
+- 不改 ROI keep rule、`crop_margin_px` 配置、prepared 数据集内容和历史训练产物。
+- 不启动新的训练、续训或重新评估，仅整理已完成 run 的结果并更新长期文档。
+
+## 2026-04-28 修正 ROI-aware v3 严格断点续训命令中的 `--project-config` 路径
+
+变更来源：
+- 用户按文档中的严格断点续训命令执行 `backend-train-model/train_workwear.py train --resume` 时，收到报错：项目配置文件路径被错误解析成了 `backend-train-model\\backend-train-model\\person-train-model\\person_project_config.json`。
+- 排查后确认，`train_workwear.py` 对 `--project-config` 的相对路径会以 `backend-train-model/` 作为基准目录解析，因此文档中的 `backend-train-model\\person-train-model\\person_project_config.json` 多写了一层前缀。
+
+变更总览：
+1. 修正 `person_run_method.md` 中 `person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_img768` 严格断点续训命令里的 `--project-config` 参数。
+2. 将错误写法 `backend-train-model\\person-train-model\\person_project_config.json` 改为脚本可正确解析的相对路径 `person-train-model\\person_project_config.json`。
+3. 保持 `--resume ...\\weights\\last.pt` 部分不变，因为该路径按当前仓库根目录运行时仍然有效。
+
+涉及文件：
+- `backend-train-model/person-train-model/train-docs/person_run_method.md`
+- `backend-train-model/docs/update_log.md`
+
+新增 / 变更配置项：
+- 无代码配置项变更。
+- 无新的 CLI 参数变更。
+- 本轮只更正文档中的命令路径写法。
+
+兼容性注意：
+- 这个修正只影响 `train_workwear.py` 的 `--project-config` 参数写法；`--resume` 仍应指向实际存在的 `weights\\last.pt`。
+- 如果从仓库根目录运行 `python backend-train-model\\train_workwear.py`，则 `--project-config` 的相对路径应按 `backend-train-model/` 为基准来写，而不是再手动补一层 `backend-train-model\\`。
+- 若后续改用绝对路径传 `--project-config`，则不会再受到这类相对路径基准差异影响。
+
+本轮明确不改动：
+- 不改 `train_workwear.py`、`config.py` 或任何训练代码逻辑。
+- 不改 ROI keep rule、数据集版本、训练参数和历史训练报告。
+- 不启动新的续训或重新训练，仅修正文档中的错误命令。
+
+## 2026-04-27 补充 ROI-aware v3 `img768` 的严格断点续训命令
+
+变更来源：
+- 用户在查看下一步 `imgsz=768, batch=2` 训练命令后，进一步追问“训练到中途中断了，怎么严格断点续训”，并要求把对应命令直接补进 `backend-train-model/person-train-model/train-docs/person_run_method.md`。
+- 当前仓库中的严格断点续训入口不在 `run_person_flow.py` wrapper，而在底层 `backend-train-model/train_workwear.py train --resume`，因此需要把这条命令显式写进运行文档，避免误用“重新开一轮训练”的方式代替续训。
+
+变更总览：
+1. 在 `person_run_method.md` 的 `person_roi_aware_v3_mask_then_crop_margin64` 段中新增“严格断点续训命令”小节。
+2. 明确给出 `person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_img768` 对应 `last.pt` 的严格续训命令，直接调用 `backend-train-model/train_workwear.py train --resume`。
+3. 补充备注说明：`--resume` 模式下不要再混传新的训练参数，否则就不再是严格断点续训。
+
+涉及文件：
+- `backend-train-model/person-train-model/train-docs/person_run_method.md`
+- `backend-train-model/docs/update_log.md`
+
+新增 / 变更配置项：
+- 无代码配置项变更。
+- 无新的 CLI 参数变更。
+- 新增文档中的严格断点续训命令入口：
+  - `backend-train-model/train_workwear.py train --resume ...\\weights\\last.pt`
+
+兼容性注意：
+- 这条续训命令只适用于“同一个 run 中途被打断，且 `last.pt` 仍保留 optimizer / epoch 状态”的情况；如果只是拿 `best.pt` 或已经完成的 run 重新开训，就不属于严格断点续训。
+- `run_person_flow.py train --base-model xxx\\last.pt` 不是严格断点续训，它只是在新的训练流程里把 checkpoint 当作初始权重使用。
+- 本轮补的是当前 `img768` 实验 run 的明确续训入口，不等于修改 person 训练主线或默认推荐 run。
+
+本轮明确不改动：
+- 不改 `train_workwear.py`、`run_person_flow.py` 或任何训练代码逻辑。
+- 不改 ROI keep rule、数据集版本、训练参数和历史训练报告。
+- 不启动新的续训或重新训练，仅补充运行文档。
+
+## 2026-04-27 更新 `person_run_method.md` 中 ROI-aware v3 的下一步训练命令
+
+变更来源：
+- 用户根据 `person_roi_aware_v3_mask_then_crop_margin64_from_fullframe` 与 `crop_only` / `v2` 的对比结果，要求把下一步继续提升指标所需的训练命令直接补充到 `backend-train-model/person-train-model/train-docs/person_run_method.md`。
+- 当前阶段结论已经收敛到：下一步优先在 `mask_then_crop + crop_margin_px=64 + from_fullframe` 这条更优分支上补跑 `imgsz=768, batch=2`，而不是切回 `crop_only` 或直接换 `yolov8s`。
+
+变更总览：
+1. 在 `person_run_method.md` 的 `person_roi_aware_v3_mask_then_crop_margin64` 段中保留已完成的 `imgsz=640, batch=4` 基线命令。
+2. 新增下一步优先训练的 `imgsz=768, batch=2` run 名、训练命令和对应评估命令，便于后续直接执行。
+3. 补充备注说明：这一步是受控实验，只调整输入分辨率和 batch，其他条件保持不变，用于验证小目标 / 边界样本上的进一步收益。
+
+涉及文件：
+- `backend-train-model/person-train-model/train-docs/person_run_method.md`
+- `backend-train-model/docs/update_log.md`
+
+新增 / 变更配置项：
+- 无代码配置项变更。
+- 无新的 CLI 参数变更。
+- 新增文档中的下一步推荐 run 名：
+  - `person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_img768`
+
+兼容性注意：
+- 本次新增的是同一数据集版本下的下一步训练命令，不等于替换历史 `person_roi_aware_v3_mask_then_crop_margin64_from_fullframe` 基线 run。
+- `imgsz=768, batch=2` 仅作为当前优先补跑实验；如果后续要写入正式“当前最佳 run”结论，应以新的训练和评估结果为准。
+- 本轮未同步修改 `person_project_config.json` 中的默认推荐 run 名；当前更新范围仅限训练运行文档。
+
+本轮明确不改动：
+- 不改 `prepare-roi-aware` 逻辑、ROI keep rule、`crop_margin_px` 配置和任何训练代码。
+- 不改 `person_project_config.json`、`backend-train-model/AGENTS.md` 或历史训练报告。
+- 不启动新的长时间训练，仅更新可直接执行的命令文档。
+
 ## 2026-04-24 新增 `roi_compare.md` 并同步 ROI-aware person 当前结论
 
 变更来源：
@@ -2223,4 +2402,52 @@
 本轮明确不改动：
 - 不修改 `prepare_roi_aware_person_dataset.py`、`run_person_flow.py` 或任何训练代码。
 - 不改动已生成的 v3 prepared 数据集内容。
-- 不启动 `crop_only` 新训练，也不在本轮直接把默认唯一上游结论改写成“只保留 v3”。 
+- 不启动 `crop_only` 新训练，也不在本轮直接把默认唯一上游结论改写成“只保留 v3”。
+## 2026-04-27 同步 `person_roi_aware_v3_crop_only_margin64_from_fullframe` 对照结果
+
+变更来源：
+- 用户已完成 `person_roi_aware_v3_crop_only_margin64_from_fullframe` 的训练与评估，要求把这次 `crop_only` 对照结果补充到 `backend-train-model/person-train-model/train-docs/roi_compare.md`。
+- 根据仓库级长期维护约束，本轮同时把“crop_only 已完成但不推荐作为默认主线”的结论同步更新到根 `AGENTS.md` 与 `backend-train-model/AGENTS.md`。
+
+变更总览：
+1. 更新 `roi_compare.md`，新增一条最新对比记录：`2026-04-27 person_roi_aware_v3_crop_only_margin64_from_fullframe 对比`。
+2. 新增 `crop_only` 与 `mask_then_crop`、`v2`、`v1`、`fullframe` 的 `val/test` 指标表，并明确写出：
+   - `crop_only` vs `mask_then_crop` 是当前最接近“单因子图像处理流程对比”的实验
+   - 两条 v3 版本的 keep rule、crop margin、split 结构、保留框 / 丢弃框 / 裁剪框 / 空负样本统计完全一致
+   - 主要差异只在 ROI 外像素是否置黑
+3. 在对比文档中明确记录这次实验的核心结论：
+   - `crop_only + margin64` 没有优于 `mask_then_crop + margin64`
+   - 也没有优于 `person_roi_aware_v2_from_fullframe`
+   - `margin64` 本身仍然有价值，因为两条 v3 路线都把裁剪框从 `54` 降到了 `23`
+4. 文档中同步补充 `crop_only` 的训练过程信息：
+   - `results.csv` 中 best epoch 约为 `72`
+   - 最终停在第 `132` 轮
+   - native val `mAP50-95` 与 `mask_then_crop` 接近，但 native test 没有转化为更优结果
+5. 同步更新根 `AGENTS.md` 与 `backend-train-model/AGENTS.md` 中 ROI-aware 当前状态的长期口径，补入：
+   - `person_roi_aware_v3_crop_only_margin64_from_fullframe` 的最终 test 指标
+   - 当前 ROI-aware 优先顺序
+   - `crop_only` 已完成但不推荐作为默认主线的结论
+
+涉及文件：
+- `backend-train-model/person-train-model/train-docs/roi_compare.md`
+- `AGENTS.md`
+- `backend-train-model/AGENTS.md`
+- `backend-train-model/docs/update_log.md`
+
+新增 / 变更配置项：
+- 无新的代码配置项。
+- 无新的训练 CLI 参数。
+- 本轮只更新结果结论与长期上下文，不涉及 prepare / train / evaluate 流程代码改动。
+
+兼容性注意：
+- `crop_only` 与 `mask_then_crop` 这次对照虽然 prepared 输出目录不同，但统计上属于同一套 keep rule / crop margin / split 逻辑，不应把这轮差异误解为“样本数量差异导致”。
+- 当前 `crop_only` 在 native test 上落后于 `mask_then_crop` 与 `v2`，因此不应再把它描述为“当前更贴近生产所以更可能更好”；这轮结果已经说明在当前数据与业务语义下，它至少不是默认主线的更优选择。
+- 当前最稳妥的排序仍是：
+  - `person_roi_aware_v3_mask_then_crop_margin64_from_fullframe`
+  - `person_roi_aware_v2_from_fullframe`
+  - `person_roi_aware_v3_crop_only_margin64_from_fullframe`
+
+本轮明确不改动：
+- 不修改任何训练代码、prepare 逻辑或配置文件。
+- 不重新生成任何 prepared 数据集。
+- 不在本轮启动 `imgsz=768` 新训练。

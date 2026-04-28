@@ -66,12 +66,21 @@
 - 当前 ROI-aware v2 数据集输出 `502` 张图，保留 person 框 `1342` 个，丢弃 `316` 个，裁剪边界框 `54` 个，ROI 空负样本 `14` 张。
 - 当前 ROI-aware v3 `mask_then_crop + crop_margin_px=64` 配置文件：`backend-train-model/person-train-model/train-result/working/roi/roi_config.v3.mask_then_crop_margin64.generated.json`。
 - 当前 ROI-aware v3 `mask_then_crop + crop_margin_px=64` 数据集输出 `502` 张图，保留 person 框 `1335` 个，丢弃 `316` 个，裁剪边界框 `23` 个，ROI 空负样本 `15` 张。
+- 当前 ROI-aware v3 `crop_only + crop_margin_px=64` 配置文件：`backend-train-model/person-train-model/train-result/working/roi/roi_config.v3.crop_only_margin64.generated.json`。
+- 当前 ROI-aware v3 `crop_only + crop_margin_px=64` 数据集输出 `502` 张图，保留 person 框 `1335` 个，丢弃 `316` 个，裁剪边界框 `23` 个，ROI 空负样本 `15` 张。
 - 当前 native test 领先的 ROI-aware run（优势很小）：`person_roi_aware_v3_mask_then_crop_margin64_from_fullframe`。
 - `person_roi_aware_v3_mask_then_crop_margin64_from_fullframe` test 指标：Precision `0.9208`，Recall `0.7075`，mAP50 `0.7779`，mAP50-95 `0.4607`。
-- 当前结论：`ROI-aware v3 mask_then_crop + margin64 + from_fullframe 初始化` 相比历史 `person_roi_aware_baseline` 仍是明显提升；相比 `person_roi_aware_v2_from_fullframe` 则只体现为**很小的 native test 优势**，同时显著减少了边界裁剪框（`54 -> 23`）。因此更准确的口径应写成“当前 test 领先但优势很小的 ROI-aware 候选版本”，不要写成对 v2 的显著领先或严格同数据集公平消融结论。
-- 当前优先策略不是直接换 `yolov8s`，而是保留 `person_fullframe_baseline` 作为初始化来源；ROI-aware 分支优先关注 `person_roi_aware_v3_mask_then_crop_margin64_from_fullframe` 与 `person_roi_aware_v2_from_fullframe` 这两条近邻版本，若后续仍要继续冲 recall / mAP50-95，再优先考虑 `crop_only` 对照或对更优版本试 `imgsz=768`、`batch=2`。
+- `person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_img768` test 指标：Precision `0.9663`，Recall `0.6435`，mAP50 `0.7535`，mAP50-95 `0.4399`。
+- `person_roi_aware_v3_crop_only_margin64_from_fullframe` test 指标：Precision `0.7955`，Recall `0.6766`，mAP50 `0.7432`，mAP50-95 `0.4521`。
+- 当前结论：`ROI-aware v3 mask_then_crop + margin64 + from_fullframe 初始化` 相比历史 `person_roi_aware_baseline` 仍是明显提升；相比 `person_roi_aware_v2_from_fullframe` 则只体现为**很小的 native test 优势**，同时显著减少了边界裁剪框（`54 -> 23`）。`crop_only + margin64` 与 `imgsz=768, batch=2` 这两条已完成的对照实验都没有优于当前 `640 / batch=4` 主线；其中 `img768` 虽然 Precision 更高，但 Recall、mAP50、mAP50-95 都回落，因此不应升级为默认主线。
+- 当前优先策略不是直接换 `yolov8s`，也不再默认继续放大输入尺寸；保留 `person_fullframe_baseline` 作为初始化来源，默认主线仍是 `person_roi_aware_v3_mask_then_crop_margin64_from_fullframe`，`person_roi_aware_v2_from_fullframe` 继续保留为稳定备选。
+- 当前下一轮优先动作：先做 ROI 边界 / FN 复盘与 seed 稳定性确认，再尝试只放松 `min_box_ioa` 的单因子实验；在此之前不默认继续放大 `imgsz`，也不把 `yolov8s` 作为第一优先级。
+- 已完成但不建议作为默认主线的对照实验：
+  - `person_roi_aware_v3_crop_only_margin64_from_fullframe`
+  - `person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_img768`
 - 系统性对比文档入口：`backend-train-model/person-train-model/train-docs/roi_compare.md`。
 - ROI 边界改进建议记录在 `backend-train-model/person-train-model/train-docs/roi_problem_solution.md`：优先考虑 `bottom_center_inside OR box_ioa >= 0.25`，并配合 `crop_margin_px=64`。
+- 下一轮改进执行文档入口：`backend-train-model/person-train-model/train-docs/roi_next_iteration_plan.md`。
 
 ## 7. `inspection-flask` 在线链路现状
 
