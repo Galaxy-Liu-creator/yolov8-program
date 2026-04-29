@@ -107,6 +107,47 @@ D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-
 D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py evaluate --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_roi_aware_v3_mask_then_crop_margin64\sequence_contiguous\dataset.yaml --run-name person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_img768 --device cpu --workers 0
 ```
 
+## Seed 稳定性对照命令
+
+如果接下来要验证当前 v3 主线相对 `v2` 的领先是否稳定，优先补下面两组 seed 对照；除了 `--seed` 与 `--run-name` 外，其余训练条件都保持与当前 `640 / batch=4` 主线一致。
+
+Seed 7 训练命令：
+
+```powershell
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py train --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_roi_aware_v3_mask_then_crop_margin64\sequence_contiguous\dataset.yaml --run-name person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_seed7 --device cpu --workers 0 --batch 4 --imgsz 640 --epochs 180 --patience 60 --seed 7 --base-model backend-train-model\person-train-model\train-result\artifacts\runs\person_fullframe_baseline\weights\best.pt
+```
+
+Seed 7 评估命令：
+
+```powershell
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py evaluate --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_roi_aware_v3_mask_then_crop_margin64\sequence_contiguous\dataset.yaml --run-name person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_seed7 --report-name person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_seed7_eval --device cpu --workers 0
+```
+
+Seed 13 训练命令：
+
+```powershell
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py train --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_roi_aware_v3_mask_then_crop_margin64\sequence_contiguous\dataset.yaml --run-name person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_seed13 --device cpu --workers 0 --batch 4 --imgsz 640 --epochs 180 --patience 60 --seed 13 --base-model backend-train-model\person-train-model\train-result\artifacts\runs\person_fullframe_baseline\weights\best.pt
+```
+
+Seed 13 评估命令：
+
+```powershell
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py evaluate --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_roi_aware_v3_mask_then_crop_margin64\sequence_contiguous\dataset.yaml --run-name person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_seed13 --report-name person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_seed13_eval --device cpu --workers 0
+```
+
+## 单帧 FP/FN 复盘命令
+
+当前已经新增逐图 `FP/FN` 复盘脚本 `backend-train-model/person-train-model/train-code/analyze_person_fpfn.py`。若要复盘当前主线 run 在 test split 上的单帧误检 / 漏检，直接运行：
+
+```powershell
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\analyze_person_fpfn.py --eval-report backend-train-model\person-train-model\train-result\artifacts\reports\person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_eval.json --split test --conf-threshold 0.25 --nms-iou 0.7 --match-iou 0.5 --device cpu --output-root backend-train-model\person-train-model\train-result\review\person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_fpfn_test_conf025 --overwrite
+```
+
+重点看输出：
+
+- `backend-train-model/person-train-model/train-result/review/person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_fpfn_test_conf025/fpfn_summary.md`
+- `backend-train-model/person-train-model/train-result/review/person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_fpfn_test_conf025/fpfn_per_image.json`
+
 ## 严格断点续训命令
 
 如果 `person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_img768` 训练中途被打断，严格断点续训不要再走 `run_person_flow.py train`，而是直接对这个 run 的 `last.pt` 调用底层训练脚本：
@@ -120,8 +161,10 @@ D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\train_workwea
 - 这一版的目标是先修掉 v2 中一批 keep-positive 但又被 crop bbox 裁残的样本，同时继续压制 ROI 外可见区域。
 - 当前这轮 `imgsz=768`、`batch=2` 对照训练已完成；它保持数据集、keep rule、`mask_then_crop + margin64` 和初始化来源不变，专门验证更高输入分辨率是否能继续抬 `Recall`、`mAP50`、`mAP50-95`。
 - 现有结果表明：这条 `img768` 对照 run 虽然 Precision 更高，但 native test 的 Recall、mAP50、mAP75、mAP50-95 都低于当前 `640 / batch=4` 主线，也没有优于 `person_roi_aware_v2_from_fullframe`，因此它应保留为**已完成对照实验**，不应升级为默认主线。
+- 当前 `roi_cropped_keep_positive_v3_margin64` 复盘已经确认：无 margin 时原本会被裁边的 `54` 个 keep-positive 框里，`margin64` 已经完整救回 `31` 个；剩余 `23` 个全部只是贴原图边界的 `0.001 px` 级残留裁边，说明 ROI crop 已不再是当前主瓶颈。
+- 当前更该优先补的是 `seed=7 / seed=13` 稳定性确认和 `FP/FN` 逐图复盘；只有在 `FP/FN` 逐图复盘提示边界场景异常集中，且原图 ROI filter 复盘进一步确认存在一批 `bottom_center_inside=false`、`box_ioa` 接近 `0.25` 的边界人被过滤时，才继续做 `min_box_ioa 0.25 -> 0.20` 的单因子实验。
 - `--resume` 会严格沿用 checkpoint 内保存的训练状态，因此不要再混传新的 `--imgsz`、`--batch`、`--dataset-yaml`、`--base-model`、`--run-name` 等训练参数；如果你想改这些参数，那已经不属于严格断点续训，而是新开一轮训练。
-- 如果后续需要与 v2 做单因子对比，优先只改 `crop_margin_px` 与数据集版本，其余训练参数先尽量保持一致。
+- 如果后续还要做和 `v2` 的单因子对比，优先只改一个主变量，并保持 `imgsz / batch / base-model / epochs / patience` 不变。
 - 训练评估完成后，应把本版本与 `person_roi_aware_v2`、`person_roi_aware`、`person_fullframe` 的指标对比继续追加到 `backend-train-model/person-train-model/train-docs/roi_compare.md`。
 
 # person_roi_aware_v3_crop_only_margin64

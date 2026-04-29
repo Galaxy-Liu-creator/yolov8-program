@@ -1,5 +1,294 @@
 ﻿# Update Log
 
+## 2026-04-28 根据用户反馈收紧阶段边界，改为“承接上次 ROI-aware 初版，当前从 v2 继续汇报”
+
+变更来源：
+- 用户指出：上一阶段汇报时已经完成 `ROI-aware person` 初版，因此本轮 `阶段PPT汇报.md` 不能再把“ROI-aware 跑通”写成本阶段主成果，而应从 `v2` 开始写，作为接着上次汇报继续推进的内容。
+
+变更总览：
+1. 重写 `backend-train-model/docs/阶段PPT汇报.md` 的阶段边界定义，明确：
+   - 上一阶段已完成 `person_fullframe_baseline` 与 `ROI-aware person` 初版跑通
+   - 本阶段默认从 `person_roi_aware_v2_from_fullframe` 起算
+2. 将 `Slide 4 / Slide 5` 的“本阶段进展”口径改为：
+   - `v2 -> v3 mask_then_crop + margin64`
+   - `crop_only + margin64` 对照
+   - `imgsz=768` 对照
+   - 逐图 FP/FN 与 hard FN 诊断闭环
+3. 将 `Slide 7 / Slide 8 / Slide 10` 的问题与解决方案口径改为“承接 v2 后继续优化”的版本，避免继续把：
+   - 早期 ROI-aware 初版成果
+   - 更早期 `center_inside -> bottom-center` 方案
+   写成当前阶段新增内容。
+
+涉及文件：
+- `backend-train-model/docs/阶段PPT汇报.md`
+- `backend-train-model/docs/update_log.md`
+
+新增 / 变更配置项：
+- 无训练配置、ROI keep rule、模型参数或数据准备逻辑变更。
+- 本轮只调整阶段汇报文档的时间边界与叙事口径。
+
+兼容性注意：
+- 本轮修改后的 `阶段PPT汇报.md` 更适合直接作为“接着上次汇报”的改稿依据，而不是再作为从零介绍 ROI-aware person 的材料。
+- 文档仍保留 `大创PPT汇报.pptx` 的页码结构，但 person 线的阶段起点已收紧到 `v2`。
+
+本轮明确不改动：
+- 不修改 `大创PPT汇报.pptx` 文件本身。
+- 不启动新的训练、评估或数据集重构。
+- 不修改任何训练代码、ROI prepare 逻辑或 review 脚本。
+
+## 2026-04-28 按《大创PPT汇报.pptx》页码结构重写阶段汇报文档
+
+变更来源：
+- 用户要求结合 `backend-train-model/docs/大创PPT汇报.pptx` 的现有页码结构，修改 `backend-train-model/docs/阶段PPT汇报.md`，使其不再是一份独立材料，而是可以直接对照现有 PPT 改稿的文档。
+
+变更总览：
+1. 读取并提取 `大创PPT汇报.pptx` 的 10 页文字结构，确认当前 deck 采用的是：
+   - `本阶段进展`
+   - `问题与缺陷`
+   - `改进方案`
+   的三段式叙事。
+2. 将 `阶段PPT汇报.md` 重写为“按 Slide 1-10 对应修改”的格式，直接对齐现有 PPT 页码，而不是继续维持通用型阶段总结结构。
+3. 保留原 deck 的主叙事框架，但把其中已经过时的内容替换为当前真实结论，重点修正：
+   - `person` 旧指标
+   - 把 `ROI 裁边 / ROI 边界过硬` 写成主因的旧口径
+   - 把 `center_inside -> bottom-center or box_ioA>=0.25` 写成“下一步方案”的旧表述
+4. 在文档中补充每页建议口播、应替换的旧口径，以及与当前页最匹配的图路径，方便直接改 PPT。
+
+涉及文件：
+- `backend-train-model/docs/阶段PPT汇报.md`
+- `backend-train-model/docs/update_log.md`
+
+新增 / 变更配置项：
+- 无训练配置、评估阈值、ROI keep rule 或模型权重变更。
+- 本轮只更新汇报文档结构与文案口径。
+
+兼容性注意：
+- `大创PPT汇报.pptx` 中保留了较早阶段的内容，因此本文档明确区分了：
+  - 可以保留的页码结构
+  - 需要替换的旧指标和旧结论
+- 当前文档推荐保留 deck 的三段式结构，但不再继续使用“ROI 边界太严格是当前主瓶颈”这一旧判断。
+
+本轮明确不改动：
+- 不修改 `大创PPT汇报.pptx` 文件本身。
+- 不启动新的训练、评估或数据重构。
+- 不修改任何训练代码、ROI prepare 逻辑、模型配置文件或 review 脚本。
+
+## 2026-04-28 重写阶段 PPT 汇报素材并补充可直接引用的配图建议
+
+变更来源：
+- 用户准备做阶段汇报，希望把“这一阶段完成的任务、遇到的问题、解决方案与下一步计划”统一整理到 `backend-train-model/docs/阶段PPT汇报.md`，并顺便挑出几张适合直接放进 PPT 的图。
+
+变更总览：
+1. 重写 `backend-train-model/docs/阶段PPT汇报.md`，将内容从早期 baseline 口径更新为当前阶段真实进展：
+   - `person_fullframe_baseline`
+   - `person_roi_aware_v2_from_fullframe`
+   - `person_roi_aware_v3_mask_then_crop_margin64_from_fullframe`
+   - `crop_only + margin64`
+   - `imgsz=768` 对照
+2. 将“本阶段完成的任务、核心指标对比、主要问题、已采取措施、阶段性结论、下一步计划”按 PPT 可直接复用的结构重写，避免继续沿用旧版 `center_inside` / 旧 baseline 的表述。
+3. 补充一组已存在于仓库中的推荐配图与统计数据来源，便于后续直接制作：
+   - 当前主线训练曲线与 PR 曲线
+   - ROI crop 改进示意图
+   - 关键 hard FN 复盘图
+   - FN 分桶统计摘要
+
+涉及文件：
+- `backend-train-model/docs/阶段PPT汇报.md`
+- `backend-train-model/docs/update_log.md`
+
+新增 / 变更配置项：
+- 无新的训练配置、模型参数或数据准备参数变更。
+- 本轮仅更新汇报文档与配图建议。
+
+兼容性注意：
+- 本轮更新不修改任何训练代码、评估口径、prepared 数据集、ROI keep rule 或模型权重。
+- 文档中引用的结论基于当前仓库内已经存在的训练结果与复盘产物，尤其是：
+  - `roi_cropped_keep_positive_v3_margin64`
+  - `person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_fpfn_test_conf025`
+  - `person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_fn_buckets`
+  - `person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_key_fn_review`
+
+本轮明确不改动：
+- 不启动新的长时间训练。
+- 不重生成新的 prepared 数据集。
+- 不修改 `prepare_roi_aware_person_dataset.py`、`run_person_flow.py`、`analyze_person_fpfn.py` 或任何模型配置文件。
+
+## 2026-04-28 新增 ROI-aware person hard FN 拼图复盘脚本，并补齐 latest img768 的逐图 FP/FN 结果
+
+变更来源：
+- 用户提出：当前只看单独的 FN 帧，看不出“到底是 ROI 过滤、crop、还是模型本身没学到”，希望直接看“最近一次训练之后的 ROI 图”和有问题样本，并结合 `roi_next_iteration_plan.md` 判断更有效的提升方向。
+
+变更总览：
+1. 新增 `backend-train-model/person-train-model/train-code/review_person_roi_failures.py`：
+   - 读取 `analyze_person_fpfn.py` 生成的 `fpfn_per_image.json`；
+   - 对同一张问题帧同时输出：
+     - 原图视角的 ROI polygon、crop bbox、original person 框 keep/drop 状态；
+     - prepared ROI 图上的 GT TP / GT FN / matched pred / FP；
+     - 样本级统计标题，便于判断问题更偏 ROI 规则、crop 边界还是模型检测能力。
+2. 使用既有 `analyze_person_fpfn.py`，补跑最新一次训练 `person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_img768` 的 test split 逐图复盘，输出到：
+   - `backend-train-model/person-train-model/train-result/review/person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_img768_fpfn_test_conf025/`
+3. 本轮新增 hard FN 拼图工具后，可以直接围绕 `D15_20260119061405`、`D15_20260119203927`、`D02_20260123074836`、`D02_20260123070624` 做同帧联动复盘，而不再需要在“单帧 FN 截图”和“单独 ROI overlay”之间来回切换。
+
+涉及文件：
+- `backend-train-model/person-train-model/train-code/review_person_roi_failures.py`
+- `backend-train-model/person-train-model/train-result/review/person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_img768_fpfn_test_conf025/fpfn_per_image.json`
+- `backend-train-model/person-train-model/train-result/review/person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_img768_fpfn_test_conf025/fpfn_summary.md`
+- `backend-train-model/docs/update_log.md`
+
+新增 / 变更配置项：
+- 无训练默认配置项变更。
+- 新增复盘脚本参数：
+  - `--fpfn-json`
+  - `--stem`
+  - `--top-fn`
+  - `--output-root`
+  - `--overwrite`
+
+兼容性注意：
+- 本轮新增的是“诊断视角”和新的 review 产物，不修改任何 ROI keep rule、prepared 数据集、训练参数或模型权重。
+- `review_person_roi_failures.py` 依赖已有的 `fpfn_per_image.json`；因此在复盘新的 run 前，仍需先执行 `analyze_person_fpfn.py`。
+- 最新 `img768` run 的逐图复盘结果表明：在同一 test split、同一 `conf=0.25 / nms_iou=0.7 / match_iou=0.5` 口径下，它从当前主线的 `TP=80 / FP=7 / FN=35` 退到 `TP=74 / FP=8 / FN=41`，因此这轮补充结果支持“`img768` 不是当前优先升级方向”的既有结论。
+
+本轮明确不改动：
+- 不修改 `prepare_roi_aware_person_dataset.py`、`run_person_flow.py`、`analyze_person_fpfn.py` 或任何训练 / 评估主流程。
+- 不重生成 prepared 数据集。
+- 不启动新的长时间训练。
+
+## 2026-04-28 继续统一修正文档中 ROI keep rule 的证据链表述
+
+变更来源：
+- 用户继续追问此前文档中“脚点已入区但 `box_ioa < 0.25` 所以没进训练集”的说法为何与代码冲突，并要求继续扫描相关文档，把类似的逻辑混写全部修正。
+
+变更总览：
+1. 继续回查 `prepare_roi_aware_person_dataset.py` 的 keep rule 实现，明确文档口径必须区分两类证据：
+   - 逐图 `FN/FPFN` 复盘只能说明“prepared 数据集里已经保留下来的 GT，模型有没有检出来”；
+   - 原图 ROI filter / overlay 复盘才能说明“某批边界人是否在 prepare 阶段就被 keep rule 过滤掉了”。
+2. 统一修正 `AGENTS.md`、`backend-train-model/AGENTS.md`、`person_run_method.md`、`roi_next_iteration_plan.md` 中对下一步 `ioa20` 实验的触发描述，避免再把“模型漏检”和“样本未进训练集”写成同一层证据。
+3. 修正文档中的 ROI 规则术语：
+   - 将 `阶段PPT汇报.md` 中含糊的 `bottom-center` / `box_ioA` 表述改为“框底边中心点在 ROI 内（bottom_center_inside）或 `box_ioa >= 0.25`”；
+   - 将 `roi_problem_solution.md`、`update_log.md` 中容易让人误解为“真实脚点检测”的说法收紧为“框底边中心点在 ROI 内，作为脚点语义近似”。
+4. 更新 `review_roi_cropped_keep_boxes.py` 的 Markdown 规则标签，将 `min_box_ioa` 对应说明改为“`box_ioa` 达到 `min_box_ioa` 阈值”，并重新生成两份 `cropped_keep_positive_summary.md`。
+
+涉及文件：
+- `AGENTS.md`
+- `backend-train-model/AGENTS.md`
+- `backend-train-model/person-train-model/train-docs/person_run_method.md`
+- `backend-train-model/person-train-model/train-docs/roi_next_iteration_plan.md`
+- `backend-train-model/person-train-model/train-docs/roi_problem_solution.md`
+- `backend-train-model/person-train-model/train-code/review_roi_cropped_keep_boxes.py`
+- `backend-train-model/person-train-model/train-result/review/roi_cropped_keep_positive_v2/cropped_keep_positive_summary.md`
+- `backend-train-model/person-train-model/train-result/review/roi_cropped_keep_positive_v3_margin64/cropped_keep_positive_summary.md`
+- `backend-train-model/docs/阶段PPT汇报.md`
+- `backend-train-model/docs/update_log.md`
+
+兼容性注意：
+- 本轮只修正文档口径、复盘摘要文案和术语说明，不修改 ROI keep rule 代码、数据集、训练结果或模型权重。
+- 当前更严格的统一口径是：若要考虑 `min_box_ioa 0.25 -> 0.20`，必须由“逐图 `FN` 复盘 + 原图 ROI filter 复盘”共同构成证据闭环。
+
+## 2026-04-28 将 person review 目录下的 Markdown 复盘摘要统一改为中文输出
+
+变更来源：
+- 用户查看 `backend-train-model/person-train-model/train-result/review/` 下的复盘摘要时，提出这些 `.md` 文件“除了路径，其他内容都希望换成中文”，避免后续人工复盘时还要先做英文字段对照。
+
+变更总览：
+1. 更新 `backend-train-model/person-train-model/train-code/review_roi_cropped_keep_boxes.py` 的 Markdown 生成逻辑：
+   - 将标题、统计字段、章节名、样本说明改为中文；
+   - 将 `train/val/test`、`top/bottom/left/right` 等可读项改为中文；
+   - 将规则说明改为“中文解释 + 原规则名”的形式，便于人工阅读同时保留技术对应关系。
+2. 更新 `backend-train-model/person-train-model/train-code/analyze_person_fpfn.py` 的 Markdown 生成逻辑：
+   - 将标题、字段名、表头、误检 / 漏检分组标题改为中文；
+   - 保留 run 名、序列名、路径等原始标识，避免丢失定位信息。
+3. 重新生成当前 review 目录下已有的 3 个 Markdown 摘要文件：
+   - `backend-train-model/person-train-model/train-result/review/roi_cropped_keep_positive_v2/cropped_keep_positive_summary.md`
+   - `backend-train-model/person-train-model/train-result/review/roi_cropped_keep_positive_v3_margin64/cropped_keep_positive_summary.md`
+   - `backend-train-model/person-train-model/train-result/review/person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_fpfn_test_conf025/fpfn_summary.md`
+
+涉及文件：
+- `backend-train-model/person-train-model/train-code/review_roi_cropped_keep_boxes.py`
+- `backend-train-model/person-train-model/train-code/analyze_person_fpfn.py`
+- `backend-train-model/person-train-model/train-result/review/roi_cropped_keep_positive_v2/cropped_keep_positive_summary.md`
+- `backend-train-model/person-train-model/train-result/review/roi_cropped_keep_positive_v3_margin64/cropped_keep_positive_summary.md`
+- `backend-train-model/person-train-model/train-result/review/person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_fpfn_test_conf025/fpfn_summary.md`
+- `backend-train-model/docs/update_log.md`
+
+兼容性注意：
+- 本轮只调整 Markdown 摘要的人类可读文本，不修改对应 JSON 结构与字段名。
+- 路径、run 名、序列名、图片 stem 等定位信息继续保留原值，不做翻译。
+
+本轮明确不改动：
+- 不改 ROI 规则、训练参数、评估阈值和任何模型结果。
+- 不改 review 目录下的图片、JSON 结果内容，只重写 Markdown 摘要文本。
+
+## 2026-04-28 修正 `roi_next_iteration_plan.md` 中关于 `bottom_center_inside` 与 `box_ioa` 的不严谨表述
+
+变更来源：
+- 用户指出 `backend-train-model/person-train-model/train-docs/roi_next_iteration_plan.md` 中曾写到“脚点已入区，但 box_ioa 略低于 `0.25`，结果没进训练集”，而当前代码 keep rule 又是 `bottom_center_inside OR box_ioa >= 0.25`，两者在字面上存在冲突。
+
+变更总览：
+1. 回查 `prepare_roi_aware_person_dataset.py` 中的实际 keep rule 实现，确认只要 `bottom_center_inside == true`，该框就会被保留，不会再因为 `box_ioa < 0.25` 被丢弃。
+2. 将 `roi_next_iteration_plan.md` 中不严谨的表述改为更准确的版本：
+   - 从“脚点已入区，但 box_ioa 略低于 `0.25`，结果没进训练集”
+   - 改为“肉眼看起来已经接近入区，但按代码判定 `bottom_center_inside` 仍然是 `false`，同时 `box_ioa` 又略低于 `0.25`，结果没进训练集”
+
+涉及文件：
+- `backend-train-model/person-train-model/train-docs/roi_next_iteration_plan.md`
+- `backend-train-model/docs/update_log.md`
+
+兼容性注意：
+- 本轮只修正文档语义，不修改任何 ROI keep rule、数据集、训练结果或代码逻辑。
+
+## 2026-04-28 新增 person 单帧 FP/FN 复盘脚本并重排 ROI-aware v3 下一步优先级
+
+变更来源：
+- 用户在完成 `roi_cropped_keep_positive_v3_margin64` 复盘后，继续要求查看复盘结果，并明确希望把后续训练重心收敛到更有效的方向。
+- 结合这轮 ROI 裁边复盘结果，确认当前 `margin64` 已经基本解决 keep-positive 裁边问题；继续加 margin 不再是优先事项。
+- 为了把“当前问题到底在 ROI 边界，还是在难样本 / 难序列 / 训练波动”拆开，新增了逐图 `FP/FN` 复盘脚本，并实际对当前 v3 主线 test split 跑了一轮复盘。
+
+变更总览：
+1. 新增 `backend-train-model/person-train-model/train-code/analyze_person_fpfn.py`。
+2. 使用该脚本对 `person_roi_aware_v3_mask_then_crop_margin64_from_fullframe` 的 test split 做首轮逐图复盘，输出到：
+   - `backend-train-model/person-train-model/train-result/review/person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_fpfn_test_conf025/`
+3. 记录本轮高信号结论：
+   - 当前主线在 `conf=0.25 / nms_iou=0.7 / match_iou=0.5` 下复盘结果为 `TP=80 / FP=7 / FN=35`；
+   - 误差主要集中在 `D15_20260119061405`、`D15_20260119203927`、`D02_20260123074836`、`D02_20260123070624`；
+   - ROI 裁边复盘已确认剩余 `23` 个裁边框只是原图边界上的 `0.001 px` 级残留，不再应视为当前主瓶颈。
+4. 更新 `backend-train-model/person-train-model/train-docs/person_run_method.md`：
+   - 补入 `seed=7`、`seed=13` 的训练 / 评估命令；
+   - 补入 `analyze_person_fpfn.py` 的复盘命令；
+   - 把 v3 主线备注改成“先做 seed 稳定性 + FN 复盘，而不是继续堆 `imgsz` / margin”。
+5. 重写 `backend-train-model/person-train-model/train-docs/roi_next_iteration_plan.md`：
+   - 把已完成的 ROI 裁边复盘与首轮 FP/FN 复盘结果写入文档；
+   - 把下一步顺序改成 `seed 稳定性 -> 人工 FN 复盘 -> 条件触发的 ioa20 单因子实验`；
+   - 将 `min_box_ioa=0.20` 明确降级为“只有在逐图 FN 复盘提示边界场景异常集中，且原图 ROI filter 复盘进一步确认存在一批 `bottom_center_inside=false`、`box_ioa` 接近 `0.25` 的边界人被过滤时才启动”的条件实验。
+6. 同步更新根 `AGENTS.md` 与 `backend-train-model/AGENTS.md` 的长期口径：
+   - 补入 ROI 裁边复盘结论；
+   - 补入新 FP/FN 复盘脚本与输出目录；
+   - 明确当前重心是 `seed=7 / seed=13` 稳定性确认和 hardest sequences 的人工 FN 复盘。
+
+涉及文件：
+- `backend-train-model/person-train-model/train-code/analyze_person_fpfn.py`
+- `backend-train-model/person-train-model/train-docs/person_run_method.md`
+- `backend-train-model/person-train-model/train-docs/roi_next_iteration_plan.md`
+- `backend-train-model/AGENTS.md`
+- `AGENTS.md`
+- `backend-train-model/docs/update_log.md`
+
+新增 / 变更配置项：
+- 无新的正式训练配置默认值变更。
+- 无新的默认 baseline 升级。
+- 新增逐图复盘入口脚本：
+  - `backend-train-model/person-train-model/train-code/analyze_person_fpfn.py`
+
+兼容性注意：
+- 当前 `person_roi_aware_v3_mask_then_crop_margin64_from_fullframe` 仍是默认主线，`person_roi_aware_v2_from_fullframe` 仍保留为稳定备选。
+- 这轮新增的是“诊断能力”和“执行优先级修正”，不是新的正式训练 baseline。
+- `min_box_ioa=0.20` 仍然只是条件实验，不应在尚未完成“逐图 FN 复盘 + 原图 ROI filter 复盘”的证据闭环前写成默认下一步。
+
+本轮明确不改动：
+- 不修改 `train_workwear.py`、`run_person_flow.py`、ROI prepare 逻辑或任何训练代码主流程。
+- 不重跑新的长时间训练。
+- 不把 `imgsz=768`、更大 margin 或 `yolov8s` 升级为默认下一步路线。
+
 ## 2026-04-28 新增 ROI-aware person 下一轮迭代执行计划文档
 
 变更来源：
@@ -12,7 +301,7 @@
    - 先做 ROI 边界 keep-positive 样本复盘与 overlay 可视化；
    - 再做当前 v3 主线的 seed 稳定性确认；
    - 然后只尝试一个 `min_box_ioa: 0.25 -> 0.20` 的单因子 keep rule 实验；
-   - 若 FN 主要集中在小人 / 遮挡 / 边界入区，再优先补难样本。
+   - 若 FN 主要集中在小人 / 遮挡 / 半身 / 背光，再优先补难样本；若边界场景异常集中，则还需要结合原图 ROI filter 复盘再判断是不是 keep rule 过滤问题。
 3. 在文档中补入现有可直接运行的命令：
    - `review_roi_cropped_keep_boxes.py`
    - `visualize_roi_filter_samples.py`
@@ -473,7 +762,7 @@
 2. 文档明确指出：
    - 不建议使用 `any overlap` 作为保留规则；
    - `center_inside` 对边界人偏硬；
-   - ROI 表达的是地面业务区域，因此更适合使用底边中心点 / 脚点语义；
+   - ROI 表达的是地面业务区域，因此当前实现更适合使用“框底边中心点在 ROI 内”的判定语义；它只是对脚点位置的近似，不等于真实脚点检测；
    - 使用 `box_ioa = area(person_box ∩ ROI) / area(person_box)`，而不是 IoU。
 3. 文档提出下一版推荐规则：
    - `bottom_center_inside == true`

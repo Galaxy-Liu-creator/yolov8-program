@@ -310,30 +310,63 @@ def write_summary_markdown(
     margin_still_cropped_boxes: int,
     sample_reports: Sequence[Mapping[str, object]],
 ) -> None:
+    split_labels = {
+        "train": "训练集",
+        "val": "验证集",
+        "test": "测试集",
+    }
+    rule_labels = {
+        "center_inside": "中心点在 ROI 内",
+        "bottom_center_inside": "底部中心点在 ROI 内",
+        "min_box_ioa": "box_ioa 达到 min_box_ioa 阈值",
+    }
+    side_labels = {
+        "top": "上边",
+        "bottom": "下边",
+        "left": "左边",
+        "right": "右边",
+    }
+
+    def format_rule_name(rule_name: object) -> str:
+        raw_name = str(rule_name)
+        return "{0}（{1}）".format(rule_labels.get(raw_name, raw_name), raw_name)
+
+    def format_side_name(side_name: object) -> str:
+        raw_name = str(side_name)
+        return side_labels.get(raw_name, raw_name)
+
+    def format_side_list(side_names: object) -> str:
+        values = [format_side_name(side_name) for side_name in list(side_names or [])]
+        return "、".join(values) if values else "无"
+
+    def format_split_name(split_name: object) -> str:
+        raw_name = str(split_name)
+        return split_labels.get(raw_name, raw_name)
+
     lines: List[str] = [
-        "# ROI-aware v2 keep-positive cropped boxes review",
+        "# ROI 感知保留正样本裁边复盘摘要",
         "",
-        "- generated_at: `{0}`".format(generated_at),
-        "- total_scanned_images: `{0}`".format(total_scanned_images),
-        "- affected_images: `{0}`".format(affected_images),
-        "- affected_boxes: `{0}`".format(affected_boxes),
-        "- margin64_recovers_fully: `{0}`".format(margin_recovered_boxes),
-        "- margin64_still_cropped: `{0}`".format(margin_still_cropped_boxes),
+        "- 生成时间: `{0}`".format(generated_at),
+        "- 扫描图片总数: `{0}`".format(total_scanned_images),
+        "- 受影响图片数: `{0}`".format(affected_images),
+        "- 受影响框数: `{0}`".format(affected_boxes),
+        "- `margin64` 完整救回框数: `{0}`".format(margin_recovered_boxes),
+        "- `margin64` 仍然裁边框数: `{0}`".format(margin_still_cropped_boxes),
         "",
-        "## Trigger Rule Counts",
+        "## 触发规则统计",
         "",
     ]
     for rule_name, count in sorted(trigger_rule_counts.items()):
-        lines.append("- `{0}`: `{1}`".format(rule_name, count))
-    lines.extend(["", "## Current Cut Side Counts", ""])
+        lines.append("- `{0}`: `{1}`".format(format_rule_name(rule_name), count))
+    lines.extend(["", "## 当前裁边方向统计", ""])
     for side_name, count in sorted(current_cut_side_counts.items()):
-        lines.append("- `{0}`: `{1}`".format(side_name, count))
-    lines.extend(["", "## Affected Samples", ""])
+        lines.append("- `{0}`: `{1}`".format(format_side_name(side_name), count))
+    lines.extend(["", "## 受影响样本", ""])
     for sample_report in sample_reports:
         lines.append(
-            "- `{0}` (`{1}` / `{2}`): boxes=`{3}` current_overlay=`{4}`".format(
+            "- `{0}`（`{1}` / `{2}`）：框数=`{3}` 叠图路径=`{4}`".format(
                 sample_report["stem"],
-                sample_report["split"],
+                format_split_name(sample_report["split"]),
                 sample_report["sequence_name"],
                 len(sample_report["boxes"]),
                 sample_report["overlay_path"],
@@ -341,10 +374,10 @@ def write_summary_markdown(
         )
         for box_report in sample_report["boxes"]:
             lines.append(
-                "  - rule=`{0}` current_cut=`{1}` margin_cut=`{2}` current_preview=`{3}` margin_preview=`{4}`".format(
-                    box_report["rule"],
-                    ",".join(box_report["current_cut_sides"]) if box_report["current_cut_sides"] else "none",
-                    ",".join(box_report["margin_cut_sides"]) if box_report["margin_cut_sides"] else "none",
+                "  - 触发规则=`{0}` 当前裁边=`{1}` `margin64` 后裁边=`{2}` 当前预览=`{3}` `margin64` 预览=`{4}`".format(
+                    format_rule_name(box_report["rule"]),
+                    format_side_list(box_report["current_cut_sides"]),
+                    format_side_list(box_report["margin_cut_sides"]),
                     sample_report["current_crop_preview_path"],
                     sample_report["margin_crop_preview_path"],
                 )
