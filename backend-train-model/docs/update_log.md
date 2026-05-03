@@ -1,5 +1,140 @@
 ﻿# Update Log
 
+## 2026-05-03 将 `person_fullframe_with_new_labels` 的 `prepare-labels` / `train` 命令写入运行手册
+
+变更来源：
+- 用户要求在确认空标签已经补成空白 `txt` 之后，把对应的训练命令写入 `backend-train-model\person-train-model\train-docs\person_run_method.md`，避免后续手工检索命令时遗漏这条 fullframe 扩样入口。
+
+变更总览：
+1. 在 `backend-train-model/person-train-model/train-docs/person_run_method.md` 顶部新增 `person_fullframe_with_new_labels` 版本段，按既有结构补齐：
+   - 当前定位；
+   - 数据集与产物；
+   - `prepare-labels` / `prepare` 重新生成命令；
+   - 训练命令；
+   - 评估命令；
+   - 备注。
+2. 明确写入这次扩样的空标签处理结果，确保文档直接说明：
+   - 新样本中 `00179`、`00516`、`00559`、`01332` 已作为空白 `txt` 保留；
+   - `prepare-labels` 已完成空标签补齐并落盘；
+   - 后续训练前不需要再手工补空标签。
+3. 将该版本段的训练命令固定为 `person_fullframe_with_new_labels_baseline`，并保留一个更保守的 `batch=2` 备选命令，方便 CPU 环境下先做轻量验证。
+
+涉及文件：
+- `backend-train-model/person-train-model/train-docs/person_run_method.md`
+- `backend-train-model/docs/update_log.md`
+
+新增 / 变更配置项：
+- 无新的训练配置项或模型参数。
+- 本轮只把已有 fullframe 扩样配置对应的运行命令写入运行手册。
+
+兼容性注意：
+- 本轮没有改动任何训练逻辑、数据准备逻辑或 ROI-aware 配置。
+- 新增的 fullframe 版本段只是文档入口，实际数据仍然以 `person_project_config.fullframe_with_new_labels.json` 和对应 prepared 输出为准。
+- 文档中的命令默认使用已生成的 `dataset.yaml`，不额外隐含重新训练或重新导出动作。
+
+本轮明确不改动：
+- 不修改 `person_project_config.fullframe_with_new_labels.json` 的内容。
+- 不重新生成数据集。
+- 不启动任何训练、评估或导出任务。
+
+## 2026-05-03 新增 `person_fullframe_with_new_labels` 扩样配置并完成 `new_person_labels` 合并整理
+
+变更来源：
+- 用户已经完成新的 `person` 标注，图片目录为 `D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\new_person_labels\images`，标注目录为 `D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\new_person_labels\person_labels`，希望先把 `person` 整理进现有训练体系，同时确认是否可以和旧 `person` 一起训练。
+- 当前新样本只有 `person` 标注，没有同步准备 `clothes`，因此需要先判断是直接并入 fullframe 训练，还是误接入现有 ROI-aware 主线。
+
+变更总览：
+1. 新增独立的 fullframe 扩样配置 `backend-train-model/person-train-model/person_project_config.fullframe_with_new_labels.json`，将原有 `502` 张旧 `person` 图与 `new_person_labels` 的 `2507` 张图并入同一套 `person` 训练入口。
+2. 在该配置中新增一条 `new_person_labels` 序列：
+   - `source_id: g34`
+   - `group: new_person_labels`
+   - `sequence_name: new_person_labels_flat_20260503`
+   - `image_root: D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\new_person_labels\images`
+   - `label_root: D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\new_person_labels\person_labels`
+3. 明确把这次扩样限定为 `fullframe person`，并显式设置 `roi.enabled=false`，避免在新样本尚未补齐 ROI 时误接入 ROI-aware 训练主线。
+4. 已执行 `prepare-labels` 与 `prepare`，生成并落盘：
+   - `train-result/working/aggregated_labels_fullframe_with_new_labels`
+   - `train-result/person_source_dataset_summary_fullframe_with_new_labels.json`
+   - `train-result/prepared/person_fullframe_with_new_labels/sequence_contiguous/`
+   - `train-result/prepared/person_fullframe_with_new_labels/sequence_contiguous/dataset.yaml`
+5. 同步更新 `backend-train-model/AGENTS.md`，把这次 fullframe 扩样配置及其输出统计写入长期上下文，避免后续再把“新样本已整理完成”与“ROI-aware 主线已准备好”混在一起。
+
+结果摘要：
+- 总图片：`3009`
+- 总标注框：`8861`
+- 空标注文件：`13`
+- 切分：`train=2105 / val=453 / test=451`
+- 新增样本中的空标注文件：`00179`、`00516`、`00559`、`01332`
+- 旧数据中自动补空标注的样本仍按原策略处理，`prepare` 成功完成，没有中断训练链路
+
+涉及文件：
+- `backend-train-model/person-train-model/person_project_config.fullframe_with_new_labels.json`
+- `backend-train-model/AGENTS.md`
+- `backend-train-model/person-train-model/train-result/person_source_dataset_summary_fullframe_with_new_labels.json`
+- `backend-train-model/person-train-model/train-result/prepared/person_fullframe_with_new_labels/sequence_contiguous/`
+- `backend-train-model/docs/update_log.md`
+
+新增 / 变更配置项：
+- `person_dataset.recommended_run_name`
+- `person_dataset.aggregated_label_root`
+- `person_dataset.summary_path`
+- `person_dataset.prepared_output_root`
+- `person_dataset.roi_aware_prepared_output_root`
+- `person_dataset.roi_aware_recommended_run_name`
+- `person_dataset.export_alias_path`
+- `person_dataset.export_alias_metadata_path`
+- 新增序列 `g34 / new_person_labels / new_person_labels_flat_20260503`
+- `roi.enabled=false`
+
+兼容性注意：
+- 本轮没有改动 `person` 原始 fullframe 训练逻辑，也没有覆盖现有 ROI-aware 主配置。
+- `sequence_contiguous` 仍适用于这次扩样，因为新旧样本的 stem 不重名，且新样本以独立 flat 序列接入。
+- `prepare` 期间出现的少量“标注框极小越界、已自动裁剪到 [0,1]”提示属于非致命校正，没有阻断数据集生成。
+
+本轮明确不改动：
+- 不修改任何训练代码、评估脚本或在线推理代码。
+- 不生成新的 `clothes` 数据或 `ROI-aware person` 数据。
+- 不启动新的训练、评估或导出任务。
+
+## 2026-05-03 新增 `new_train.md` 统一说明 `clothes / person` 扩样接入策略
+
+变更来源：
+- 用户准备继续为 `clothes` 和 `person` 增加训练样本，并明确追问：`person` 是否只需要正常训练，以及 `clothes` 面对“新工服款式”时，到底应该在标注阶段拆类，还是先单类训练、后续再处理。
+
+变更总览：
+1. 新增 `backend-train-model/person-train-model/train-docs/new_train.md`，集中回答当前仓库下这类问题，明确区分：
+   - `person` 扩样的默认处理方式；
+   - `clothes` 在“工服款式不同但业务语义不变”时的推荐做法；
+   - 什么时候才值得把 `clothes` 从单类升级为多类。
+2. 在文档中明确写清当前仓库前提：
+   - `person` 仍是单类 `0 -> person`
+   - `clothes` 仍是单类 `0 -> clothes`
+   - 在线链路默认通过 `WORKWEAR_LABELS=["clothes"]` 与 `WORKWEAR_COMPLIANCE_MODE="any"` 解释工服检测结果
+3. 将当前推荐策略收敛为：
+   - `person` 正常加样本、正常训练；
+   - `clothes` 若只是新旧工服款式差异，先保持单类 `clothes`，并通过 `style_tag / source_id / sequence_name` 等元数据记录域差异；
+   - 至少保留一部分新款工服样本做独立 holdout，不要只看混训后的总体指标。
+4. 同步更新 `backend-train-model/AGENTS.md` 的“必读文件”入口，避免后续再次把“新工服款式不同”直接误写成“默认应该拆类”。
+
+涉及文件：
+- `backend-train-model/person-train-model/train-docs/new_train.md`
+- `backend-train-model/AGENTS.md`
+- `backend-train-model/docs/update_log.md`
+
+新增 / 变更配置项：
+- 无新的训练配置项、模型参数、ROI keep rule 或数据准备脚本变更。
+- 本轮仅新增文档说明与入口引用。
+
+兼容性注意：
+- 本轮没有把 `clothes` 正式升级为多类，也没有改动任何现有 `class_names`、`dataset.yaml`、`build.json`、在线 `WORKWEAR_LABELS` 或训练默认参数。
+- 文档中的建议是：当前仓库下，面对“款式不同但都算合规工服”的新增样本，优先把问题视为样本域扩展，而不是立即改写为多类检测任务。
+- 如果后续真的要把 `clothes` 拆成多类，仍需同步检查训练配置、评估口径和在线规则，而不是只改标注文件。
+
+本轮明确不改动：
+- 不修改任何训练代码、评估脚本、ROI prepare 逻辑或在线推理代码。
+- 不重建 `clothes` 或 `person` 数据集。
+- 不启动新的训练、评估或导出任务。
+
 ## 2026-04-28 根据用户反馈收紧阶段边界，改为“承接上次 ROI-aware 初版，当前从 v2 继续汇报”
 
 变更来源：

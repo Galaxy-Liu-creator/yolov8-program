@@ -1,6 +1,6 @@
 # 运行前置条件
 
-本文档用于统一记录 `person` 五条训练分支的运行方式：`person_roi_aware_v3_mask_then_crop_margin64`、`person_roi_aware_v3_crop_only_margin64`、`person_roi_aware_v2`、`person_roi_aware`、`person_fullframe`。当前电脑没有独立显卡，默认仅使用 CPU 训练；集成显卡不作为 PyTorch / Ultralytics 的 CUDA 训练设备使用。
+本文档用于统一记录 `person` 六条训练分支的运行方式：`person_fullframe_with_new_labels`、`person_roi_aware_v3_mask_then_crop_margin64`、`person_roi_aware_v3_crop_only_margin64`、`person_roi_aware_v2`、`person_roi_aware`、`person_fullframe`。当前电脑没有独立显卡，默认仅使用 CPU 训练；集成显卡不作为 PyTorch / Ultralytics 的 CUDA 训练设备使用。
 
 ## 通用环境检查
 
@@ -44,6 +44,80 @@ Test-Path backend-train-model\person-train-model\train-result\artifacts\runs\per
 - 不要把旧版本段直接改写成新版本；新版本应单独新增，旧版本保留为历史对照。
 - 每个版本段尽量保持同一结构：`当前定位`、`数据集与产物`、`如需重生成数据集`、`训练命令`、`评估命令`、`备注`。
 - 如果当前需求不是“如何跑这条命令”，而是“下一轮该优先做什么改进”，优先看 `backend-train-model/person-train-model/train-docs/roi_next_iteration_plan.md`。
+
+# person_fullframe_with_new_labels
+
+## 当前定位
+
+- 当前最新的 `person` fullframe 扩样分支。
+- 用于把原有 `502` 张旧 `person` 图与 `new_person_labels` 的 `2507` 张图合并后重新训练 fullframe `person`。
+- 当前推荐 run 名：`person_fullframe_with_new_labels_baseline`。
+- 当前显式设置 `roi.enabled=false`，因此它只是 fullframe 分支，不应直接当成已补齐 ROI 的 ROI-aware 上游版本。
+
+## 数据集与产物
+
+- person 项目配置：
+  - `backend-train-model/person-train-model/person_project_config.fullframe_with_new_labels.json`
+- 聚合标签目录：
+  - `backend-train-model/person-train-model/train-result/working/aggregated_labels_fullframe_with_new_labels`
+- 数据源汇总：
+  - `backend-train-model/person-train-model/train-result/person_source_dataset_summary_fullframe_with_new_labels.json`
+- 数据集 YAML：
+  - `backend-train-model/person-train-model/train-result/prepared/person_fullframe_with_new_labels/sequence_contiguous/dataset.yaml`
+- 对应 prepare 报告：
+  - `backend-train-model/person-train-model/train-result/prepared/person_fullframe_with_new_labels/sequence_contiguous/prepare_report.json`
+- 当前 prepare 统计：
+  - train：`2105` 张图片，`5984` 个 person 框
+  - val：`453` 张图片，`1586` 个 person 框
+  - test：`451` 张图片，`1291` 个 person 框
+  - 合计：`3009` 张图片，`8861` 个 person 框
+- 空标注负样本：
+  - 新建空标注：`7`
+  - 源标签本身为空：`6`
+  - 最终空标注：`13`
+- 新增样本中已确认保留为空白 txt 的文件：
+  - `00179.txt`
+  - `00516.txt`
+  - `00559.txt`
+  - `01332.txt`
+
+## 如需重生成数据集
+
+先重新聚合标签，并确保缺失标签已补为空白 txt：
+
+```powershell
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py prepare-labels --project-config backend-train-model\person-train-model\person_project_config.fullframe_with_new_labels.json --overwrite
+```
+
+再重生成 fullframe prepared 数据集：
+
+```powershell
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py prepare --project-config backend-train-model\person-train-model\person_project_config.fullframe_with_new_labels.json --overwrite
+```
+
+## 训练命令
+
+```powershell
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py train --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_fullframe_with_new_labels\sequence_contiguous\dataset.yaml --run-name person_fullframe_with_new_labels_baseline --device cpu --workers 0 --batch 4 --imgsz 640 --epochs 180 --patience 40 --base-model backend-train-model\weights\yolov8n.pt
+```
+
+如果 CPU 压力较大，可先用更保守的 batch：
+
+```powershell
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py train --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_fullframe_with_new_labels\sequence_contiguous\dataset.yaml --run-name person_fullframe_with_new_labels_baseline_batch2 --device cpu --workers 0 --batch 2 --imgsz 640 --epochs 180 --patience 40 --base-model backend-train-model\weights\yolov8n.pt
+```
+
+## 评估命令
+
+```powershell
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py evaluate --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_fullframe_with_new_labels\sequence_contiguous\dataset.yaml --run-name person_fullframe_with_new_labels_baseline --device cpu --workers 0
+```
+
+## 备注
+
+- 这条分支当前已经完成 `prepare-labels` 与 `prepare`，空标签补齐逻辑已经落盘，不需要手工再去新建空白 txt。
+- 当前这版 fullframe 扩样是“旧 `person` + 新 `person`”的合并训练入口，不包含新增 ROI 信息；如果后续要接 ROI-aware，需要先为新样本补齐 ROI，再单独准备新的 ROI-aware 数据集。
+- `prepare` 期间如果再次出现“标注框极小越界，已自动裁剪到 [0,1]”提示，当前可视为非致命数据清洗告警；只要 `prepare_report.json` 正常生成，就不影响后续训练启动。
 
 # person_roi_aware_v3_mask_then_crop_margin64
 

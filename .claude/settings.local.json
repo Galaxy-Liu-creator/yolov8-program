@@ -4,7 +4,12 @@
       "Bash(dir /s /b)",
       "Bash(grep -E \"\\\\.\\(png|jpg\\)$\")",
       "Bash(findstr /C:calling /C:barrier)",
-      "Bash(powershell.exe:*)"
+      "Bash(powershell.exe:*)",
+      "WebSearch",
+      "Bash(Get-Content:*)",
+      "WebFetch(domain:github.com)",
+      "Bash(python:*)",
+      "WebFetch(domain:www.firecrawl.dev)"
     ]
   }
 }
