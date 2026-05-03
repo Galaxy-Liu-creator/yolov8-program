@@ -1,5 +1,37 @@
 ﻿# Update Log
 
+## 2026-05-03 删除 `person_fullframe_with_new_labels_baseline` 的本轮训练产物
+
+变更来源：
+- 用户确认刚才启动的 `person` 训练过慢，希望删除这次新产生的训练 run 产物，避免保留一轮未打算继续使用的 CPU 训练输出。
+
+变更总览：
+1. 定位并删除本轮刚生成的训练 run 目录：
+   - `backend-train-model/person-train-model/train-result/artifacts/runs/person_fullframe_with_new_labels_baseline`
+2. 核对这次没有新的评估 report，也没有新的 export alias，因此本轮只删除训练 run 目录本身。
+3. 明确保留本次数据整理相关产物：
+   - `person_project_config.fullframe_with_new_labels.json`
+   - `aggregated_labels_fullframe_with_new_labels`
+   - `person_source_dataset_summary_fullframe_with_new_labels.json`
+   - `prepared/person_fullframe_with_new_labels/sequence_contiguous/`
+
+涉及文件：
+- `backend-train-model/person-train-model/train-result/artifacts/runs/person_fullframe_with_new_labels_baseline/`
+- `backend-train-model/docs/update_log.md`
+
+新增 / 变更配置项：
+- 无新的配置项或训练参数变更。
+- 本轮只删除本次训练输出目录，不修改训练入口、数据集或文档中的推荐命令。
+
+兼容性注意：
+- 删除的是本轮 run 产物，不影响后续继续使用同一份 `dataset.yaml` 重新开跑。
+- 现有的 prepared 数据集和空标签补齐结果仍然保留，因此后续若要重训，不需要重新整理这批 `person` 数据。
+
+本轮明确不改动：
+- 不删除 `person_fullframe_with_new_labels` 的 prepared 数据集。
+- 不删除新建的 fullframe 扩样配置和训练文档。
+- 不删除历史 `person_fullframe_baseline` 或任意 ROI-aware run。
+
 ## 2026-05-03 将 `person_fullframe_with_new_labels` 的 `prepare-labels` / `train` 命令写入运行手册
 
 变更来源：
