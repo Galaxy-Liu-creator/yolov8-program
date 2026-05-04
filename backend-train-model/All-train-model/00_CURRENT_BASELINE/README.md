@@ -10,7 +10,7 @@
 
 ## 当前结论
 
-- baseline 状态：`tentative`
+- baseline 状态：`tentative_baseline`
 - 任务：`clothes fullframe`
 - 当前暂定 baseline run：`clothes_merged_v2_balanced_from_first_holdout_v1`
 - 选择原因：在相同 `unified_holdout_v1` 上，`route verification` 结果相比 `clothes_merged_v2_balanced_holdout_v1` 略优，且更接近后续真实业务“先有 clothes 基线，再沿链路继续推进”的使用路径

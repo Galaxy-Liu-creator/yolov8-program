@@ -37,6 +37,19 @@ class RoiSettings:
 
 
 @dataclass(frozen=True)
+class TrainDefaults:
+    imgsz: int
+    epochs: int
+    batch: int
+    patience: int
+    workers: int
+    device: str
+    seed: int
+    base_model: Optional[Path]
+    init_weights: Optional[Path]
+
+
+@dataclass(frozen=True)
 class PersonProjectContext:
     config_path: Path
     config_dir: Path
@@ -53,8 +66,10 @@ class PersonProjectContext:
     roi_aware_prepared_output_root: Path
     export_alias_path: Path
     export_alias_metadata_path: Path
+    default_dataset_variant: str
     recommended_run_name: str
     roi_aware_recommended_run_name: str
+    training_defaults: TrainDefaults
     roi: RoiSettings
 
 
@@ -91,6 +106,18 @@ def resolve_path(raw_value: object, base_dir: Path, field_name: str) -> Path:
     text = str(raw_value).strip()
     if not text:
         raise RuntimeError("{0} 不能为空。".format(field_name))
+    candidate = Path(text).expanduser()
+    if candidate.is_absolute():
+        return candidate.resolve()
+    return (base_dir / candidate).resolve()
+
+
+def resolve_optional_path(raw_value: object, base_dir: Path) -> Optional[Path]:
+    if raw_value is None:
+        return None
+    text = str(raw_value).strip()
+    if not text:
+        return None
     candidate = Path(text).expanduser()
     if candidate.is_absolute():
         return candidate.resolve()
@@ -218,9 +245,28 @@ def load_person_project_context(config_path: Path) -> PersonProjectContext:
     person_dataset_section = payload.get("person_dataset")
     if not isinstance(person_dataset_section, Mapping):
         raise RuntimeError("配置缺少 `person_dataset` 段。")
+    default_dataset_variant = coerce_string(
+        person_dataset_section.get("default_dataset_variant", "fullframe"),
+        "person_dataset.default_dataset_variant",
+    )
+    if default_dataset_variant not in ("fullframe", "roi_aware"):
+        raise RuntimeError(
+            "person_dataset.default_dataset_variant 仅支持 `fullframe` 或 `roi_aware`。"
+        )
     raw_sequences = person_dataset_section.get("sequences")
     if not isinstance(raw_sequences, Sequence) or isinstance(raw_sequences, (str, bytes)):
         raise RuntimeError("person_dataset.sequences 必须是数组。")
+
+    training_section = payload.get("training", {})
+    if training_section is None:
+        training_section = {}
+    if not isinstance(training_section, Mapping):
+        raise RuntimeError("配置中的 `training` 段必须是对象。")
+    raw_train_defaults = training_section.get("default_train_args", {})
+    if raw_train_defaults is None:
+        raw_train_defaults = {}
+    if not isinstance(raw_train_defaults, Mapping):
+        raise RuntimeError("配置中的 `training.default_train_args` 段必须是对象。")
 
     sequences: List[PersonSequence] = []
     for index, raw_item in enumerate(raw_sequences):
@@ -290,13 +336,18 @@ def load_person_project_context(config_path: Path) -> PersonProjectContext:
         roi_section.get("crop_margin_px", 0),
         "roi.crop_margin_px",
     )
-    if (
+    roi_enabled = coerce_bool(roi_section.get("enabled", False), "roi.enabled")
+    if roi_enabled and (
         not roi_center_inside
         and not roi_bottom_center_inside
         and roi_min_box_ioa <= 0.0
     ):
         raise RuntimeError(
             "roi.keep_rule 至少需要启用一种保留条件：center_inside、bottom_center_inside 或 min_box_ioa。"
+        )
+    if default_dataset_variant == "roi_aware" and not roi_enabled:
+        raise RuntimeError(
+            "当 person_dataset.default_dataset_variant=roi_aware 时，roi.enabled 必须为 true。"
         )
 
     return PersonProjectContext(
@@ -342,6 +393,7 @@ def load_person_project_context(config_path: Path) -> PersonProjectContext:
             config_dir,
             "person_dataset.export_alias_metadata_path",
         ),
+        default_dataset_variant=default_dataset_variant,
         recommended_run_name=coerce_string(
             person_dataset_section.get("recommended_run_name", "person_fullframe_baseline"),
             "person_dataset.recommended_run_name",
@@ -353,8 +405,40 @@ def load_person_project_context(config_path: Path) -> PersonProjectContext:
             ),
             "person_dataset.roi_aware_recommended_run_name",
         ),
+        training_defaults=TrainDefaults(
+            imgsz=coerce_non_negative_int(
+                raw_train_defaults.get("imgsz", 640),
+                "training.default_train_args.imgsz",
+            ),
+            epochs=coerce_non_negative_int(
+                raw_train_defaults.get("epochs", 180),
+                "training.default_train_args.epochs",
+            ),
+            batch=coerce_non_negative_int(
+                raw_train_defaults.get("batch", 4),
+                "training.default_train_args.batch",
+            ),
+            patience=coerce_non_negative_int(
+                raw_train_defaults.get("patience", 40),
+                "training.default_train_args.patience",
+            ),
+            workers=coerce_non_negative_int(
+                raw_train_defaults.get("workers", 0),
+                "training.default_train_args.workers",
+            ),
+            device=coerce_string(
+                raw_train_defaults.get("device", "cpu"),
+                "training.default_train_args.device",
+            ),
+            seed=coerce_non_negative_int(
+                raw_train_defaults.get("seed", 42),
+                "training.default_train_args.seed",
+            ),
+            base_model=resolve_optional_path(raw_train_defaults.get("base_model"), config_dir),
+            init_weights=resolve_optional_path(raw_train_defaults.get("init_weights"), config_dir),
+        ),
         roi=RoiSettings(
-            enabled=coerce_bool(roi_section.get("enabled", False), "roi.enabled"),
+            enabled=roi_enabled,
             mode=roi_mode,
             json_root=resolve_path(
                 roi_section.get(

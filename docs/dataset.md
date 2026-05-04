@@ -33,7 +33,11 @@
 - `group3_1` 标注根目录：`D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes_labels\group3_1\clo\label-clo`
 - `group3_2` 标注根目录：`D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes_labels\group3_2\clo\label_clothes`
 - `group3_3` 标注根目录：`D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes_labels\group3_3\clo\labels`
-- 数据集配置文件：`当前尚未创建`
+- 数据集配置文件：
+  - 单源 clothes 入口：`backend-train-model/project_config.json`
+  - merged 公共训练入口：`backend-train-model/All-train-model/merged_train_project_config.json`
+  - merged 数据集构建入口：`backend-train-model/All-train-model/*.build.json`
+  - person 训练入口：`backend-train-model/person-train-model/person_project_config*.json`
 - 示例图片：`docs/dataset_examples/sample_001.jpg`
 - 示例标注：`docs/dataset_examples/sample_001.txt`
 
@@ -43,8 +47,8 @@
   - 默认单源入口：`group3_1` 的 `3` 个图片根目录 + `1` 个统一标注根目录；
   - merged 多源入口：`7` 个图片根目录，按 `group3_1 / group3_2 / group3_3` 映射到 `3` 个标注根目录。
 - 当前 clothes 图片文件实际直接位于各序列目录本身；更新配置时应把 `image_root` 指向序列目录，而不是额外拼接 `frames/`。
-- 在尚未创建 `dataset.yaml` 前，训练、校验、转换脚本都必须以本文档中的路径约定和配对规则为准。
-- 如果后续创建数据集配置文件，需要保证其内容与本文档保持一致。
+- 当前单源 clothes 入口仍未单独沉淀仓库内 `dataset.yaml`，训练、校验、转换脚本仍需以本文档中的路径约定和配对规则为准。
+- merged clothes 与 person 训练线已经存在项目配置 / build 配置文件；更新这些配置时，也需要保证其内容与本文档保持一致。
 
 ## 3. 文件配对规则
 

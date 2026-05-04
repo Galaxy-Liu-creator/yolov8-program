@@ -12,7 +12,6 @@
       "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_3\\D02_20260123070624",
       "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_3\\D02_20260123074836"
     ],
-    "label_root": "train-result/working/aggregated_labels",
     "image_extensions": [
       ".jpg"
     ],
@@ -42,7 +41,7 @@
     "fallback_to_fullframe": true
   },
   "roi": {
-    "enabled": true,
+    "enabled": false,
     "mode": "mask_then_crop",
     "crop_margin_px": 0,
     "json_root": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\roi-json",
@@ -66,12 +65,14 @@
       "epochs": 180,
       "batch": 4,
       "patience": 40,
-      "workers": 0,
-      "device": "cpu",
-      "seed": 42
+      "workers": 4,
+      "device": "0",
+      "seed": 42,
+      "base_model": "../weights/yolov8n.pt"
     }
   },
   "person_dataset": {
+    "default_dataset_variant": "fullframe",
     "recommended_run_name": "person_fullframe_baseline",
     "aggregated_label_root": "train-result/working/aggregated_labels",
     "summary_path": "train-result/person_source_dataset_summary.json",

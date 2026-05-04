@@ -52,8 +52,8 @@
       "epochs": 180,
       "batch": 4,
       "patience": 40,
-      "workers": 0,
-      "device": "cpu",
+      "workers": 4,
+      "device": "0",
       "seed": 42
     }
   }

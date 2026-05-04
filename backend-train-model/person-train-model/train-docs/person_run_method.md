@@ -1,6 +1,6 @@
 # 运行前置条件
 
-本文档用于统一记录 `person` 六条训练分支的运行方式：`person_fullframe_with_new_labels`、`person_roi_aware_v3_mask_then_crop_margin64`、`person_roi_aware_v3_crop_only_margin64`、`person_roi_aware_v2`、`person_roi_aware`、`person_fullframe`。当前电脑没有独立显卡，默认仅使用 CPU 训练；集成显卡不作为 PyTorch / Ultralytics 的 CUDA 训练设备使用。
+本文档用于统一记录 `person` 六条训练分支的运行方式：`person_fullframe_with_new_labels`、`person_roi_aware_v3_mask_then_crop_margin64`、`person_roi_aware_v3_crop_only_margin64`、`person_roi_aware_v2`、`person_roi_aware`、`person_fullframe`。当前训练默认在另一台带 GPU 的电脑上执行；除非用户明确要求回退到本机 CPU，否则本文件中的训练 / 评估命令默认按 GPU 训练编写。
 
 ## 通用环境检查
 
@@ -30,12 +30,17 @@ Test-Path backend-train-model\person-train-model\train-result\artifacts\runs\per
 
 ## 通用运行约束
 
-- Windows + CPU 下统一使用 `--workers 0`，避免 DataLoader 多进程问题。
-- 所有版本的训练与评估命令都建议显式传入 `--dataset-yaml` 与 `--run-name`，避免误用默认数据集或默认 run 名。
+- 当前默认优先使用 GPU（`--device 0`）训练；只有当训练机出现 DataLoader 稳定性问题时，才把 `--workers` 回退到 `0`。
+- 所有版本的训练与评估命令都建议显式传入 `--project-config`、`--dataset-yaml` 与 `--run-name`，避免误用默认数据集、默认配置或默认 run 名；当前 wrapper 已会从 `project-config -> training.default_train_args` 读取默认训练参数，但关键实验尤其是非默认输入尺寸评估，仍建议显式传 `--imgsz / --batch / --workers / --device`。
 - 所有 ROI-aware 派生版本都必须使用独立输出目录，不要把不同版本的 prepared 数据集写到同一路径。
 - 如果只是刷新某一版 ROI-aware 数据集，只覆盖该版本自己的 `output-root`，不要顺手覆盖其他版本产物。
 - 当前所有 ROI-aware `from_fullframe` 分支都默认把 `person_fullframe_baseline/weights/best.pt` 作为初始化来源。
 - 现在 `extract-roi-config` 与 `prepare-roi-aware` 都支持显式传 `--roi-mode` 与 `--crop-margin-px`；如果要做版本化 ROI-aware 数据集，两个阶段都建议显式传这两个参数，保证 ROI 配置元数据与 prepare 行为一致。
+- 当前正式建议使用的版本化 ROI-aware 配置入口：
+  - `backend-train-model/person-train-model/person_project_config.roi_v3.mask_then_crop_margin64.json`
+  - `backend-train-model/person-train-model/person_project_config.roi_v3.crop_only_margin64.json`
+  - `backend-train-model/person-train-model/person_project_config.roi_v2.mask_then_crop_ioa25.json`
+  - `backend-train-model/person-train-model/person_project_config.roi_v1.center_inside.json`
 
 ## 文档迭代约束
 
@@ -98,20 +103,51 @@ D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-
 ## 训练命令
 
 ```powershell
-D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py train --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_fullframe_with_new_labels\sequence_contiguous\dataset.yaml --run-name person_fullframe_with_new_labels_baseline --device cpu --workers 0 --batch 4 --imgsz 640 --epochs 180 --patience 40 --base-model backend-train-model\weights\yolov8n.pt
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py train --project-config backend-train-model\person-train-model\person_project_config.fullframe_with_new_labels.json --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_fullframe_with_new_labels\sequence_contiguous\dataset.yaml --run-name person_fullframe_with_new_labels_baseline --device 0 --workers 4 --batch 4 --imgsz 640 --epochs 180 --patience 40 --base-model backend-train-model\weights\yolov8n.pt
 ```
 
-如果 CPU 压力较大，可先用更保守的 batch：
+如果训练机显存或稳定性有压力，可先用更保守的 batch：
 
 ```powershell
-D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py train --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_fullframe_with_new_labels\sequence_contiguous\dataset.yaml --run-name person_fullframe_with_new_labels_baseline_batch2 --device cpu --workers 0 --batch 2 --imgsz 640 --epochs 180 --patience 40 --base-model backend-train-model\weights\yolov8n.pt
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py train --project-config backend-train-model\person-train-model\person_project_config.fullframe_with_new_labels.json --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_fullframe_with_new_labels\sequence_contiguous\dataset.yaml --run-name person_fullframe_with_new_labels_baseline_batch2 --device 0 --workers 4 --batch 2 --imgsz 640 --epochs 180 --patience 40 --base-model backend-train-model\weights\yolov8n.pt
 ```
 
 ## 评估命令
 
 ```powershell
-D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py evaluate --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_fullframe_with_new_labels\sequence_contiguous\dataset.yaml --run-name person_fullframe_with_new_labels_baseline --device cpu --workers 0
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py evaluate --project-config backend-train-model\person-train-model\person_project_config.fullframe_with_new_labels.json --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_fullframe_with_new_labels\sequence_contiguous\dataset.yaml --run-name person_fullframe_with_new_labels_baseline --imgsz 640 --batch 4 --workers 4 --device 0
 ```
+
+## 下一步第一优先级：`imgsz=768` 单因子对照
+
+当前这条 `person_fullframe_with_new_labels` 线的下一步第一优先级，是先做 **输入分辨率单因子对照**，验证小目标和高 IoU 框质量能否改善。
+
+实验约束：
+
+- 保持数据集不变；
+- 保持 `epochs / patience / base-model` 不变；
+- 当前优先先做更严格的单因子对照，因此保持 `batch=4` 不变，只改 `imgsz=768`；
+- 重点观察 `mAP50-95`、`mAP75` 和小目标场景的漏检 / 框偏移。
+
+### 训练命令
+
+```powershell
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py train --project-config backend-train-model\person-train-model\person_project_config.fullframe_with_new_labels.json --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_fullframe_with_new_labels\sequence_contiguous\dataset.yaml --run-name person_fullframe_with_new_labels_img768 --device 0 --workers 4 --batch 4 --imgsz 768 --epochs 180 --patience 40 --base-model backend-train-model\weights\yolov8n.pt
+```
+
+如果 `imgsz=768, batch=4` 在训练机上遇到显存或稳定性问题，再退回下面这个保守备选：
+
+```powershell
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py train --project-config backend-train-model\person-train-model\person_project_config.fullframe_with_new_labels.json --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_fullframe_with_new_labels\sequence_contiguous\dataset.yaml --run-name person_fullframe_with_new_labels_img768_batch2 --device 0 --workers 4 --batch 2 --imgsz 768 --epochs 180 --patience 40 --base-model backend-train-model\weights\yolov8n.pt
+```
+
+### 评估命令
+
+```powershell
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py evaluate --project-config backend-train-model\person-train-model\person_project_config.fullframe_with_new_labels.json --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_fullframe_with_new_labels\sequence_contiguous\dataset.yaml --weights backend-train-model\person-train-model\train-result\artifacts\runs\person_fullframe_with_new_labels_img768\weights\best.pt --run-name person_fullframe_with_new_labels_img768 --imgsz 768 --batch 4 --workers 4 --device 0 --report-name person_fullframe_with_new_labels_img768_eval
+```
+
+说明：这条命令同时显式锁定了 `project-config`、`dataset-yaml`、`weights`、`run-name` 和 `imgsz=768`，因此评估指标与报告元数据会一起对齐；其中 `report_name` 仍沿用 `person_fullframe_with_new_labels_img768_eval`，会直接覆盖旧报告。此前如果只补 `--imgsz 768` 但没有把评估入口全部对齐，仍可能出现报告中的 `project_config_path` / `image_roots` 与当前扩样 fullframe 数据集不完全自洽的情况。
 
 ## 备注
 
@@ -144,13 +180,13 @@ D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-
 先生成带版本元数据的 ROI 配置：
 
 ```powershell
-D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py extract-roi-config --roi-config backend-train-model\person-train-model\train-result\working\roi\roi_config.v3.mask_then_crop_margin64.generated.json --roi-mode mask_then_crop --crop-margin-px 64 --overwrite
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py extract-roi-config --project-config backend-train-model\person-train-model\person_project_config.roi_v3.mask_then_crop_margin64.json --roi-config backend-train-model\person-train-model\train-result\working\roi\roi_config.v3.mask_then_crop_margin64.generated.json --roi-mode mask_then_crop --crop-margin-px 64 --overwrite
 ```
 
 再生成独立的 v3 `mask_then_crop + margin64` 数据集：
 
 ```powershell
-D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py prepare-roi-aware --roi-config backend-train-model\person-train-model\train-result\working\roi\roi_config.v3.mask_then_crop_margin64.generated.json --output-root backend-train-model\person-train-model\train-result\prepared\person_roi_aware_v3_mask_then_crop_margin64\sequence_contiguous --roi-mode mask_then_crop --crop-margin-px 64 --overwrite
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py prepare-roi-aware --project-config backend-train-model\person-train-model\person_project_config.roi_v3.mask_then_crop_margin64.json --roi-config backend-train-model\person-train-model\train-result\working\roi\roi_config.v3.mask_then_crop_margin64.generated.json --output-root backend-train-model\person-train-model\train-result\prepared\person_roi_aware_v3_mask_then_crop_margin64\sequence_contiguous --roi-mode mask_then_crop --crop-margin-px 64 --overwrite
 ```
 
 ## 训练命令
@@ -158,13 +194,13 @@ D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-
 当前已完成的 `640 / batch=4` 基线命令：
 
 ```powershell
-D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py train --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_roi_aware_v3_mask_then_crop_margin64\sequence_contiguous\dataset.yaml --run-name person_roi_aware_v3_mask_then_crop_margin64_from_fullframe --device cpu --workers 0 --batch 4 --imgsz 640 --epochs 180 --patience 60 --base-model backend-train-model\person-train-model\train-result\artifacts\runs\person_fullframe_baseline\weights\best.pt
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py train --project-config backend-train-model\person-train-model\person_project_config.roi_v3.mask_then_crop_margin64.json --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_roi_aware_v3_mask_then_crop_margin64\sequence_contiguous\dataset.yaml --run-name person_roi_aware_v3_mask_then_crop_margin64_from_fullframe --device 0 --workers 4 --batch 4 --imgsz 640 --epochs 180 --patience 60 --base-model backend-train-model\person-train-model\train-result\artifacts\runs\person_fullframe_baseline\weights\best.pt
 ```
 
 已完成的 `768 / batch=2` 对照训练命令：
 
 ```powershell
-D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py train --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_roi_aware_v3_mask_then_crop_margin64\sequence_contiguous\dataset.yaml --run-name person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_img768 --device cpu --workers 0 --batch 2 --imgsz 768 --epochs 180 --patience 60 --base-model backend-train-model\person-train-model\train-result\artifacts\runs\person_fullframe_baseline\weights\best.pt
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py train --project-config backend-train-model\person-train-model\person_project_config.roi_v3.mask_then_crop_margin64.json --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_roi_aware_v3_mask_then_crop_margin64\sequence_contiguous\dataset.yaml --run-name person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_img768 --device 0 --workers 4 --batch 2 --imgsz 768 --epochs 180 --patience 60 --base-model backend-train-model\person-train-model\train-result\artifacts\runs\person_fullframe_baseline\weights\best.pt
 ```
 
 ## 评估命令
@@ -172,13 +208,13 @@ D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-
 当前已完成的 `640 / batch=4` 基线评估命令：
 
 ```powershell
-D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py evaluate --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_roi_aware_v3_mask_then_crop_margin64\sequence_contiguous\dataset.yaml --run-name person_roi_aware_v3_mask_then_crop_margin64_from_fullframe --device cpu --workers 0
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py evaluate --project-config backend-train-model\person-train-model\person_project_config.roi_v3.mask_then_crop_margin64.json --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_roi_aware_v3_mask_then_crop_margin64\sequence_contiguous\dataset.yaml --run-name person_roi_aware_v3_mask_then_crop_margin64_from_fullframe --imgsz 640 --batch 4 --workers 4 --device 0
 ```
 
 对应 `768 / batch=2` 对照 run 的评估命令：
 
 ```powershell
-D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py evaluate --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_roi_aware_v3_mask_then_crop_margin64\sequence_contiguous\dataset.yaml --run-name person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_img768 --device cpu --workers 0
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py evaluate --project-config backend-train-model\person-train-model\person_project_config.roi_v3.mask_then_crop_margin64.json --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_roi_aware_v3_mask_then_crop_margin64\sequence_contiguous\dataset.yaml --run-name person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_img768 --imgsz 768 --batch 2 --workers 4 --device 0
 ```
 
 ## Seed 稳定性对照命令
@@ -188,25 +224,25 @@ D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-
 Seed 7 训练命令：
 
 ```powershell
-D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py train --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_roi_aware_v3_mask_then_crop_margin64\sequence_contiguous\dataset.yaml --run-name person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_seed7 --device cpu --workers 0 --batch 4 --imgsz 640 --epochs 180 --patience 60 --seed 7 --base-model backend-train-model\person-train-model\train-result\artifacts\runs\person_fullframe_baseline\weights\best.pt
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py train --project-config backend-train-model\person-train-model\person_project_config.roi_v3.mask_then_crop_margin64.json --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_roi_aware_v3_mask_then_crop_margin64\sequence_contiguous\dataset.yaml --run-name person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_seed7 --device 0 --workers 4 --batch 4 --imgsz 640 --epochs 180 --patience 60 --seed 7 --base-model backend-train-model\person-train-model\train-result\artifacts\runs\person_fullframe_baseline\weights\best.pt
 ```
 
 Seed 7 评估命令：
 
 ```powershell
-D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py evaluate --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_roi_aware_v3_mask_then_crop_margin64\sequence_contiguous\dataset.yaml --run-name person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_seed7 --report-name person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_seed7_eval --device cpu --workers 0
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py evaluate --project-config backend-train-model\person-train-model\person_project_config.roi_v3.mask_then_crop_margin64.json --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_roi_aware_v3_mask_then_crop_margin64\sequence_contiguous\dataset.yaml --run-name person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_seed7 --imgsz 640 --batch 4 --workers 4 --device 0 --report-name person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_seed7_eval
 ```
 
 Seed 13 训练命令：
 
 ```powershell
-D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py train --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_roi_aware_v3_mask_then_crop_margin64\sequence_contiguous\dataset.yaml --run-name person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_seed13 --device cpu --workers 0 --batch 4 --imgsz 640 --epochs 180 --patience 60 --seed 13 --base-model backend-train-model\person-train-model\train-result\artifacts\runs\person_fullframe_baseline\weights\best.pt
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py train --project-config backend-train-model\person-train-model\person_project_config.roi_v3.mask_then_crop_margin64.json --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_roi_aware_v3_mask_then_crop_margin64\sequence_contiguous\dataset.yaml --run-name person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_seed13 --device 0 --workers 4 --batch 4 --imgsz 640 --epochs 180 --patience 60 --seed 13 --base-model backend-train-model\person-train-model\train-result\artifacts\runs\person_fullframe_baseline\weights\best.pt
 ```
 
 Seed 13 评估命令：
 
 ```powershell
-D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py evaluate --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_roi_aware_v3_mask_then_crop_margin64\sequence_contiguous\dataset.yaml --run-name person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_seed13 --report-name person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_seed13_eval --device cpu --workers 0
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py evaluate --project-config backend-train-model\person-train-model\person_project_config.roi_v3.mask_then_crop_margin64.json --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_roi_aware_v3_mask_then_crop_margin64\sequence_contiguous\dataset.yaml --run-name person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_seed13 --imgsz 640 --batch 4 --workers 4 --device 0 --report-name person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_seed13_eval
 ```
 
 ## 单帧 FP/FN 复盘命令
@@ -214,7 +250,7 @@ D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-
 当前已经新增逐图 `FP/FN` 复盘脚本 `backend-train-model/person-train-model/train-code/analyze_person_fpfn.py`。若要复盘当前主线 run 在 test split 上的单帧误检 / 漏检，直接运行：
 
 ```powershell
-D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\analyze_person_fpfn.py --eval-report backend-train-model\person-train-model\train-result\artifacts\reports\person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_eval.json --split test --conf-threshold 0.25 --nms-iou 0.7 --match-iou 0.5 --device cpu --output-root backend-train-model\person-train-model\train-result\review\person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_fpfn_test_conf025 --overwrite
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\analyze_person_fpfn.py --eval-report backend-train-model\person-train-model\train-result\artifacts\reports\person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_eval.json --split test --conf-threshold 0.25 --nms-iou 0.7 --match-iou 0.5 --device 0 --output-root backend-train-model\person-train-model\train-result\review\person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_fpfn_test_conf025 --overwrite
 ```
 
 重点看输出：
@@ -227,7 +263,7 @@ D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-
 如果 `person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_img768` 训练中途被打断，严格断点续训不要再走 `run_person_flow.py train`，而是直接对这个 run 的 `last.pt` 调用底层训练脚本：
 
 ```powershell
-D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\train_workwear.py train --project-config person-train-model\person_project_config.json --resume backend-train-model\person-train-model\train-result\artifacts\runs\person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_img768\weights\last.pt
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\train_workwear.py train --project-config person-train-model\person_project_config.roi_v3.mask_then_crop_margin64.json --resume backend-train-model\person-train-model\train-result\artifacts\runs\person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_img768\weights\last.pt
 ```
 
 ## 备注
@@ -277,13 +313,13 @@ D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-
 ## 训练命令
 
 ```powershell
-D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py train --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_roi_aware_v3_crop_only_margin64\sequence_contiguous\dataset.yaml --run-name person_roi_aware_v3_crop_only_margin64_from_fullframe --device cpu --workers 0 --batch 4 --imgsz 640 --epochs 180 --patience 60 --base-model backend-train-model\person-train-model\train-result\artifacts\runs\person_fullframe_baseline\weights\best.pt
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py train --project-config backend-train-model\person-train-model\person_project_config.roi_v3.crop_only_margin64.json --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_roi_aware_v3_crop_only_margin64\sequence_contiguous\dataset.yaml --run-name person_roi_aware_v3_crop_only_margin64_from_fullframe --device 0 --workers 4 --batch 4 --imgsz 640 --epochs 180 --patience 60 --base-model backend-train-model\person-train-model\train-result\artifacts\runs\person_fullframe_baseline\weights\best.pt
 ```
 
 ## 评估命令
 
 ```powershell
-D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py evaluate --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_roi_aware_v3_crop_only_margin64\sequence_contiguous\dataset.yaml --run-name person_roi_aware_v3_crop_only_margin64_from_fullframe --device cpu --workers 0
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py evaluate --project-config backend-train-model\person-train-model\person_project_config.roi_v3.crop_only_margin64.json --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_roi_aware_v3_crop_only_margin64\sequence_contiguous\dataset.yaml --run-name person_roi_aware_v3_crop_only_margin64_from_fullframe --imgsz 640 --batch 4 --workers 4 --device 0
 ```
 
 ## 备注
@@ -321,25 +357,25 @@ D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-
 先重生成独立的 v2 ROI 配置：
 
 ```powershell
-D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py extract-roi-config --roi-config backend-train-model\person-train-model\train-result\working\roi\roi_config.v2.generated.json --roi-mode mask_then_crop --crop-margin-px 0 --overwrite
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py extract-roi-config --project-config backend-train-model\person-train-model\person_project_config.roi_v2.mask_then_crop_ioa25.json --roi-config backend-train-model\person-train-model\train-result\working\roi\roi_config.v2.generated.json --roi-mode mask_then_crop --crop-margin-px 0 --overwrite
 ```
 
 再重生成独立的 v2 ROI-aware 数据集：
 
 ```powershell
-D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py prepare-roi-aware --roi-config backend-train-model\person-train-model\train-result\working\roi\roi_config.v2.generated.json --output-root backend-train-model\person-train-model\train-result\prepared\person_roi_aware_v2\sequence_contiguous --roi-mode mask_then_crop --crop-margin-px 0 --overwrite
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py prepare-roi-aware --project-config backend-train-model\person-train-model\person_project_config.roi_v2.mask_then_crop_ioa25.json --roi-config backend-train-model\person-train-model\train-result\working\roi\roi_config.v2.generated.json --output-root backend-train-model\person-train-model\train-result\prepared\person_roi_aware_v2\sequence_contiguous --roi-mode mask_then_crop --crop-margin-px 0 --overwrite
 ```
 
 ## 训练命令
 
 ```powershell
-D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py train --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_roi_aware_v2\sequence_contiguous\dataset.yaml --run-name person_roi_aware_v2_from_fullframe --device cpu --workers 0 --batch 4 --imgsz 640 --epochs 180 --patience 60 --base-model backend-train-model\person-train-model\train-result\artifacts\runs\person_fullframe_baseline\weights\best.pt
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py train --project-config backend-train-model\person-train-model\person_project_config.roi_v2.mask_then_crop_ioa25.json --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_roi_aware_v2\sequence_contiguous\dataset.yaml --run-name person_roi_aware_v2_from_fullframe --device 0 --workers 4 --batch 4 --imgsz 640 --epochs 180 --patience 60 --base-model backend-train-model\person-train-model\train-result\artifacts\runs\person_fullframe_baseline\weights\best.pt
 ```
 
 ## 评估命令
 
 ```powershell
-D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py evaluate --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_roi_aware_v2\sequence_contiguous\dataset.yaml --run-name person_roi_aware_v2_from_fullframe --device cpu --workers 0
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py evaluate --project-config backend-train-model\person-train-model\person_project_config.roi_v2.mask_then_crop_ioa25.json --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_roi_aware_v2\sequence_contiguous\dataset.yaml --run-name person_roi_aware_v2_from_fullframe --imgsz 640 --batch 4 --workers 4 --device 0
 ```
 
 ## 备注
@@ -374,7 +410,7 @@ D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-
 
 ## 如需重生成数据集
 
-- 当前不建议直接在现有 `person_project_config.json` 默认配置上原地重生成 v1。
+- 当前不建议直接在现有 `person_project_config.json` 默认配置上原地重生成 v1；如需严格复现，请改用 `backend-train-model/person-train-model/person_project_config.roi_v1.center_inside.json`。
 - 原因是当前项目默认 keep rule 已经切到 v2；如果要严格重建 v1，应单独准备 v1 配置入口或保留专门的 v1 ROI 配置文件，再输出到独立目录。
 - 因此，当前更推荐把仓库里现有 `person_roi_aware` 目录作为冻结的历史对照数据集使用。
 
@@ -383,13 +419,13 @@ D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-
 如果只是做当前 v1 / v2 / v3 的公平对照，优先使用 `from_fullframe` 初始化：
 
 ```powershell
-D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py train --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_roi_aware\sequence_contiguous\dataset.yaml --run-name person_roi_aware_v1_from_fullframe --device cpu --workers 0 --batch 4 --imgsz 640 --epochs 180 --patience 60 --base-model backend-train-model\person-train-model\train-result\artifacts\runs\person_fullframe_baseline\weights\best.pt
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py train --project-config backend-train-model\person-train-model\person_project_config.roi_v1.center_inside.json --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_roi_aware\sequence_contiguous\dataset.yaml --run-name person_roi_aware_v1_from_fullframe --device 0 --workers 4 --batch 4 --imgsz 640 --epochs 180 --patience 60 --base-model backend-train-model\person-train-model\train-result\artifacts\runs\person_fullframe_baseline\weights\best.pt
 ```
 
 ## 评估命令
 
 ```powershell
-D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py evaluate --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_roi_aware\sequence_contiguous\dataset.yaml --run-name person_roi_aware_v1_from_fullframe --device cpu --workers 0
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py evaluate --project-config backend-train-model\person-train-model\person_project_config.roi_v1.center_inside.json --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_roi_aware\sequence_contiguous\dataset.yaml --run-name person_roi_aware_v1_from_fullframe --imgsz 640 --batch 4 --workers 4 --device 0
 ```
 
 ## 备注
@@ -424,25 +460,25 @@ D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-
 ## 如需重生成数据集
 
 ```powershell
-D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py prepare --overwrite
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py prepare --project-config backend-train-model\person-train-model\person_project_config.json --overwrite
 ```
 
 ## 训练命令
 
 ```powershell
-D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py train --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_fullframe\sequence_contiguous\dataset.yaml --run-name person_fullframe_baseline --device cpu --workers 0 --batch 4 --imgsz 640 --epochs 180 --patience 40 --base-model backend-train-model\weights\yolov8n.pt
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py train --project-config backend-train-model\person-train-model\person_project_config.json --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_fullframe\sequence_contiguous\dataset.yaml --run-name person_fullframe_baseline --device 0 --workers 4 --batch 4 --imgsz 640 --epochs 180 --patience 40 --base-model backend-train-model\weights\yolov8n.pt
 ```
 
-如果 CPU 压力较大，可先用更保守的 batch：
+如果训练机显存或稳定性有压力，可先用更保守的 batch：
 
 ```powershell
-D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py train --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_fullframe\sequence_contiguous\dataset.yaml --run-name person_fullframe_baseline_batch2 --device cpu --workers 0 --batch 2 --imgsz 640 --epochs 180 --patience 40 --base-model backend-train-model\weights\yolov8n.pt
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py train --project-config backend-train-model\person-train-model\person_project_config.json --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_fullframe\sequence_contiguous\dataset.yaml --run-name person_fullframe_baseline_batch2 --device 0 --workers 4 --batch 2 --imgsz 640 --epochs 180 --patience 40 --base-model backend-train-model\weights\yolov8n.pt
 ```
 
 ## 评估命令
 
 ```powershell
-D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py evaluate --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_fullframe\sequence_contiguous\dataset.yaml --run-name person_fullframe_baseline --device cpu --workers 0
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py evaluate --project-config backend-train-model\person-train-model\person_project_config.json --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_fullframe\sequence_contiguous\dataset.yaml --run-name person_fullframe_baseline --imgsz 640 --batch 4 --workers 4 --device 0
 ```
 
 ## 备注

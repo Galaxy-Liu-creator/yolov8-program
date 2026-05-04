@@ -29,7 +29,7 @@
 已执行命令：
 
 ```powershell
-D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\review_roi_cropped_keep_boxes.py --project-config backend-train-model\person-train-model\person_project_config.json --roi-config backend-train-model\person-train-model\train-result\working\roi\roi_config.v3.mask_then_crop_margin64.generated.json --output-root backend-train-model\person-train-model\train-result\review\roi_cropped_keep_positive_v3_margin64 --margin-px 64 --overwrite
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\review_roi_cropped_keep_boxes.py --project-config backend-train-model\person-train-model\person_project_config.roi_v3.mask_then_crop_margin64.json --roi-config backend-train-model\person-train-model\train-result\working\roi\roi_config.v3.mask_then_crop_margin64.generated.json --output-root backend-train-model\person-train-model\train-result\review\roi_cropped_keep_positive_v3_margin64 --margin-px 64 --overwrite
 ```
 
 当前结论：
@@ -112,13 +112,13 @@ D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-
 训练：
 
 ```powershell
-D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py train --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_roi_aware_v3_mask_then_crop_margin64\sequence_contiguous\dataset.yaml --run-name person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_seed7 --device cpu --workers 0 --batch 4 --imgsz 640 --epochs 180 --patience 60 --seed 7 --base-model backend-train-model\person-train-model\train-result\artifacts\runs\person_fullframe_baseline\weights\best.pt
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py train --project-config backend-train-model\person-train-model\person_project_config.roi_v3.mask_then_crop_margin64.json --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_roi_aware_v3_mask_then_crop_margin64\sequence_contiguous\dataset.yaml --run-name person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_seed7 --device 0 --workers 4 --batch 4 --imgsz 640 --epochs 180 --patience 60 --seed 7 --base-model backend-train-model\person-train-model\train-result\artifacts\runs\person_fullframe_baseline\weights\best.pt
 ```
 
 评估：
 
 ```powershell
-D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py evaluate --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_roi_aware_v3_mask_then_crop_margin64\sequence_contiguous\dataset.yaml --run-name person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_seed7 --report-name person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_seed7_eval --device cpu --workers 0
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py evaluate --project-config backend-train-model\person-train-model\person_project_config.roi_v3.mask_then_crop_margin64.json --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_roi_aware_v3_mask_then_crop_margin64\sequence_contiguous\dataset.yaml --run-name person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_seed7 --report-name person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_seed7_eval --imgsz 640 --batch 4 --workers 4 --device 0
 ```
 
 ### 4.2 Seed 13
@@ -126,13 +126,13 @@ D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-
 训练：
 
 ```powershell
-D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py train --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_roi_aware_v3_mask_then_crop_margin64\sequence_contiguous\dataset.yaml --run-name person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_seed13 --device cpu --workers 0 --batch 4 --imgsz 640 --epochs 180 --patience 60 --seed 13 --base-model backend-train-model\person-train-model\train-result\artifacts\runs\person_fullframe_baseline\weights\best.pt
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py train --project-config backend-train-model\person-train-model\person_project_config.roi_v3.mask_then_crop_margin64.json --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_roi_aware_v3_mask_then_crop_margin64\sequence_contiguous\dataset.yaml --run-name person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_seed13 --device 0 --workers 4 --batch 4 --imgsz 640 --epochs 180 --patience 60 --seed 13 --base-model backend-train-model\person-train-model\train-result\artifacts\runs\person_fullframe_baseline\weights\best.pt
 ```
 
 评估：
 
 ```powershell
-D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py evaluate --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_roi_aware_v3_mask_then_crop_margin64\sequence_contiguous\dataset.yaml --run-name person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_seed13 --report-name person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_seed13_eval --device cpu --workers 0
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py evaluate --project-config backend-train-model\person-train-model\person_project_config.roi_v3.mask_then_crop_margin64.json --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_roi_aware_v3_mask_then_crop_margin64\sequence_contiguous\dataset.yaml --run-name person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_seed13 --report-name person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_seed13_eval --imgsz 640 --batch 4 --workers 4 --device 0
 ```
 
 ### 4.3 如需重跑当前主线 test 的逐图 FP/FN 复盘
@@ -148,7 +148,7 @@ D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-
 命令模板：
 
 ```powershell
-D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\visualize_roi_filter_samples.py --project-config backend-train-model\person-train-model\person_project_config.json --roi-config backend-train-model\person-train-model\train-result\working\roi\roi_config.v3.mask_then_crop_margin64.generated.json --output-root backend-train-model\person-train-model\train-result\review\roi_filter_overlays_v3_margin64 --stem D15_20260119203927_frame_0162 --stem D15_20260119203927_frame_0164 --stem D15_20260119061405_frame_0346
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\visualize_roi_filter_samples.py --project-config backend-train-model\person-train-model\person_project_config.roi_v3.mask_then_crop_margin64.json --roi-config backend-train-model\person-train-model\train-result\working\roi\roi_config.v3.mask_then_crop_margin64.generated.json --output-root backend-train-model\person-train-model\train-result\review\roi_filter_overlays_v3_margin64 --stem D15_20260119203927_frame_0162 --stem D15_20260119203927_frame_0164 --stem D15_20260119061405_frame_0346
 ```
 
 ## 5. 仅在满足条件时才做的 `ioa20` 单因子实验
@@ -180,7 +180,7 @@ D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-
 先复制一份版本化配置：
 
 ```powershell
-Copy-Item backend-train-model\person-train-model\person_project_config.json backend-train-model\person-train-model\person_project_config.roi_v4_mask_then_crop_margin64_ioa20.json
+Copy-Item backend-train-model\person-train-model\person_project_config.roi_v3.mask_then_crop_margin64.json backend-train-model\person-train-model\person_project_config.roi_v4_mask_then_crop_margin64_ioa20.json
 ```
 
 然后只改下面这些字段：
@@ -198,8 +198,11 @@ Copy-Item backend-train-model\person-train-model\person_project_config.json back
     "config_path": "train-result/working/roi/roi_config.v4.mask_then_crop_margin64_ioa20.generated.json"
   },
   "person_dataset": {
+    "default_dataset_variant": "roi_aware",
     "roi_aware_prepared_output_root": "train-result/prepared/person_roi_aware_v4_mask_then_crop_margin64_ioa20/sequence_contiguous",
-    "roi_aware_recommended_run_name": "person_roi_aware_v4_mask_then_crop_margin64_ioa20_from_fullframe"
+    "roi_aware_recommended_run_name": "person_roi_aware_v4_mask_then_crop_margin64_ioa20_from_fullframe",
+    "export_alias_path": "train-result/export/person_detect_yolov8_roi_v4_mask_then_crop_margin64_ioa20.pt",
+    "export_alias_metadata_path": "train-result/export/person_detect_yolov8_roi_v4_mask_then_crop_margin64_ioa20.metadata.json"
   }
 }
 ```
@@ -219,13 +222,13 @@ D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-
 训练：
 
 ```powershell
-D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py train --project-config backend-train-model\person-train-model\person_project_config.roi_v4_mask_then_crop_margin64_ioa20.json --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_roi_aware_v4_mask_then_crop_margin64_ioa20\sequence_contiguous\dataset.yaml --run-name person_roi_aware_v4_mask_then_crop_margin64_ioa20_from_fullframe --device cpu --workers 0 --batch 4 --imgsz 640 --epochs 180 --patience 60 --seed 42 --base-model backend-train-model\person-train-model\train-result\artifacts\runs\person_fullframe_baseline\weights\best.pt
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py train --project-config backend-train-model\person-train-model\person_project_config.roi_v4_mask_then_crop_margin64_ioa20.json --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_roi_aware_v4_mask_then_crop_margin64_ioa20\sequence_contiguous\dataset.yaml --run-name person_roi_aware_v4_mask_then_crop_margin64_ioa20_from_fullframe --device 0 --workers 4 --batch 4 --imgsz 640 --epochs 180 --patience 60 --seed 42 --base-model backend-train-model\person-train-model\train-result\artifacts\runs\person_fullframe_baseline\weights\best.pt
 ```
 
 评估：
 
 ```powershell
-D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py evaluate --project-config backend-train-model\person-train-model\person_project_config.roi_v4_mask_then_crop_margin64_ioa20.json --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_roi_aware_v4_mask_then_crop_margin64_ioa20\sequence_contiguous\dataset.yaml --run-name person_roi_aware_v4_mask_then_crop_margin64_ioa20_from_fullframe --report-name person_roi_aware_v4_mask_then_crop_margin64_ioa20_from_fullframe_eval --device cpu --workers 0
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py evaluate --project-config backend-train-model\person-train-model\person_project_config.roi_v4_mask_then_crop_margin64_ioa20.json --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_roi_aware_v4_mask_then_crop_margin64_ioa20\sequence_contiguous\dataset.yaml --run-name person_roi_aware_v4_mask_then_crop_margin64_ioa20_from_fullframe --report-name person_roi_aware_v4_mask_then_crop_margin64_ioa20_from_fullframe_eval --imgsz 640 --batch 4 --workers 4 --device 0
 ```
 
 判定标准：

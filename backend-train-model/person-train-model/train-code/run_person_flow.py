@@ -46,7 +46,10 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--project-config",
         default=str(DEFAULT_PROJECT_CONFIG),
-        help="person 项目配置 JSON 路径。",
+        help=(
+            "person 项目配置 JSON 路径。默认仍使用兼容入口 person_project_config.json；"
+            "正式训练分支建议显式传入版本化配置。"
+        ),
     )
     parser.add_argument(
         "--python-exe",
@@ -61,13 +64,48 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--dataset-yaml", help="显式指定 dataset.yaml。")
     parser.add_argument("--weights", help="显式指定待评估 / 待导出的 best.pt。")
     parser.add_argument("--run-name", help="显式指定训练 run 名称。")
-    parser.add_argument("--imgsz", type=int, default=640)
-    parser.add_argument("--epochs", type=int, default=180)
-    parser.add_argument("--batch", type=int, default=4)
-    parser.add_argument("--patience", type=int, default=40)
-    parser.add_argument("--workers", type=int, default=0)
-    parser.add_argument("--device", default="cpu")
-    parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument(
+        "--imgsz",
+        type=int,
+        help="训练 / 评估输入尺寸；默认读取 project-config 中的 training.default_train_args.imgsz。",
+    )
+    parser.add_argument(
+        "--epochs",
+        type=int,
+        help="训练轮数；默认读取 project-config 中的 training.default_train_args.epochs。",
+    )
+    parser.add_argument(
+        "--batch",
+        type=int,
+        help="训练 / 评估 batch；默认读取 project-config 中的 training.default_train_args.batch。",
+    )
+    parser.add_argument(
+        "--patience",
+        type=int,
+        help="早停 patience；默认读取 project-config 中的 training.default_train_args.patience。",
+    )
+    parser.add_argument(
+        "--workers",
+        type=int,
+        help="DataLoader workers；默认读取 project-config 中的 training.default_train_args.workers。",
+    )
+    parser.add_argument(
+        "--device",
+        help="训练 / 评估设备；默认读取 project-config 中的 training.default_train_args.device。",
+    )
+    parser.add_argument(
+        "--seed",
+        type=int,
+        help="随机种子；默认读取 project-config 中的 training.default_train_args.seed。",
+    )
+    parser.add_argument(
+        "--split-strategy",
+        choices=["sequence_contiguous", "sequence_holdout"],
+        help=(
+            "覆盖数据集切分策略；默认读取 project-config 中的 "
+            "data.default_split_strategy。"
+        ),
+    )
     parser.add_argument("--limit-per-sequence", type=int, help="仅用于快速烟雾验证。")
     parser.add_argument(
         "--roi-json-root",
@@ -159,10 +197,69 @@ def ensure_person_labels_available(
     ensure_person_labels(context, overwrite=overwrite)
 
 
+def default_dataset_root_for(context: PersonProjectContext) -> Path:
+    if context.default_dataset_variant == "roi_aware":
+        return context.roi_aware_prepared_output_root
+    return context.prepared_output_root
+
+
+def default_run_name_for(context: PersonProjectContext) -> str:
+    if context.default_dataset_variant == "roi_aware":
+        return context.roi_aware_recommended_run_name
+    return context.recommended_run_name
+
+
+def apply_context_train_defaults(
+    args: argparse.Namespace,
+    context: PersonProjectContext,
+) -> None:
+    defaults = context.training_defaults
+    if args.imgsz is None:
+        args.imgsz = defaults.imgsz
+    if args.epochs is None:
+        args.epochs = defaults.epochs
+    if args.batch is None:
+        args.batch = defaults.batch
+    if args.patience is None:
+        args.patience = defaults.patience
+    if args.workers is None:
+        args.workers = defaults.workers
+    if args.device is None:
+        args.device = defaults.device
+    if args.seed is None:
+        args.seed = defaults.seed
+    if args.base_model is None and defaults.base_model is not None:
+        args.base_model = str(defaults.base_model)
+    if args.init_weights is None and defaults.init_weights is not None:
+        args.init_weights = str(defaults.init_weights)
+
+
 def dataset_yaml_path_for(context: PersonProjectContext, raw_dataset_yaml: Optional[str]) -> Path:
     if raw_dataset_yaml:
         return Path(raw_dataset_yaml).expanduser().resolve()
-    return (context.prepared_output_root / "dataset.yaml").resolve()
+    return (default_dataset_root_for(context) / "dataset.yaml").resolve()
+
+
+def validate_explicit_dataset_yaml_matches_context(
+    context: PersonProjectContext,
+    dataset_yaml: Path,
+) -> None:
+    resolved_dataset_yaml = dataset_yaml.expanduser().resolve()
+    expected_roots = [
+        context.prepared_output_root.resolve(),
+        context.roi_aware_prepared_output_root.resolve(),
+    ]
+    if any(resolved_dataset_yaml.is_relative_to(root) for root in expected_roots):
+        return
+    expected_roots_text = "\n".join("- {0}".format(root) for root in expected_roots)
+    raise RuntimeError(
+        "显式传入的 dataset.yaml 与当前 --project-config 不一致，可能导致报告元数据混乱。\n"
+        "当前 project-config: {0}\n"
+        "当前 dataset.yaml: {1}\n"
+        "该 project-config 期望的 prepared 根目录为:\n{2}\n"
+        "请改用匹配的 project-config，或把 dataset.yaml 切换到当前配置对应的 prepared 输出。"
+        .format(context.config_path, resolved_dataset_yaml, expected_roots_text)
+    )
 
 
 def roi_config_path_for(context: PersonProjectContext, raw_roi_config: Optional[str]) -> Path:
@@ -211,6 +308,18 @@ def train_report_name_for(run_name: str) -> str:
     return "{0}_eval".format(run_name)
 
 
+def dataset_variant_for_yaml(
+    context: PersonProjectContext,
+    dataset_yaml: Path,
+) -> str:
+    resolved_dataset_yaml = dataset_yaml.expanduser().resolve()
+    if resolved_dataset_yaml.is_relative_to(context.roi_aware_prepared_output_root.resolve()):
+        return "roi_aware"
+    if resolved_dataset_yaml.is_relative_to(context.prepared_output_root.resolve()):
+        return "fullframe"
+    return context.default_dataset_variant
+
+
 def prepare_command(
     *,
     context: PersonProjectContext,
@@ -229,9 +338,50 @@ def prepare_command(
     ]
     if args.overwrite:
         command.append("--overwrite")
+    if args.split_strategy is not None:
+        command.extend(["--split-strategy", args.split_strategy])
     if args.limit_per_sequence is not None:
         command.extend(["--limit-per-sequence", str(args.limit_per_sequence)])
     return command
+
+
+def run_prepare_for_variant(
+    *,
+    context: PersonProjectContext,
+    args: argparse.Namespace,
+    dataset_variant: str,
+) -> Path:
+    if dataset_variant == "roi_aware":
+        from prepare_roi_aware_person_dataset import prepare_roi_aware_dataset
+
+        effective_context = apply_roi_cli_overrides(context, args)
+        report = prepare_roi_aware_dataset(
+            effective_context,
+            roi_config_path=roi_config_path_for(effective_context, args.roi_config),
+            output_root=roi_output_root_for(effective_context, args.output_root),
+            overwrite=args.overwrite,
+            limit_per_sequence=args.limit_per_sequence,
+            split_strategy=args.split_strategy,
+        )
+        print("ROI-aware 数据集 : {0}".format(report["dataset_root"]))
+        print("dataset.yaml    : {0}".format(report["dataset_yaml"]))
+        print(
+            "输入图片={0}, 输出图片={1}, 保留框={2}, 丢弃框={3}, 空负样本={4}".format(
+                report["input_image_count"],
+                report["output_image_count"],
+                report["kept_boxes"],
+                report["dropped_boxes"],
+                report["empty_roi_negative_images"],
+            )
+        )
+        return Path(report["dataset_yaml"]).expanduser().resolve()
+
+    ensure_person_labels_available(context, overwrite=args.overwrite)
+    run_command(prepare_command(context=context, args=args))
+    dataset_yaml = (context.prepared_output_root / "dataset.yaml").resolve()
+    if not dataset_yaml.exists():
+        raise RuntimeError("prepare 完成后仍未找到 dataset.yaml: {0}".format(dataset_yaml))
+    return dataset_yaml
 
 
 def audit_command(
@@ -257,7 +407,7 @@ def train_command(
     args: argparse.Namespace,
     dataset_yaml: Path,
 ) -> List[str]:
-    run_name = args.run_name or context.recommended_run_name
+    run_name = args.run_name or default_run_name_for(context)
     command = [
         args.python_exe,
         str(TRAIN_SCRIPT),
@@ -301,7 +451,7 @@ def evaluate_command(
     dataset_yaml: Path,
     weight_path: Path,
 ) -> List[str]:
-    run_name = args.run_name or context.recommended_run_name
+    run_name = args.run_name or default_run_name_for(context)
     report_name = args.report_name or train_report_name_for(run_name)
     return [
         args.python_exe,
@@ -373,19 +523,22 @@ def alias_export(context: PersonProjectContext, *, overwrite: bool) -> None:
 
 def ensure_prepared_dataset(context: PersonProjectContext, args: argparse.Namespace) -> Path:
     dataset_yaml = dataset_yaml_path_for(context, args.dataset_yaml)
+    if args.dataset_yaml:
+        validate_explicit_dataset_yaml_matches_context(context, dataset_yaml)
     if dataset_yaml.exists():
         return dataset_yaml
-    ensure_person_labels(context, overwrite=args.overwrite)
-    run_command(prepare_command(context=context, args=args))
-    if not dataset_yaml.exists():
-        raise RuntimeError("prepare 完成后仍未找到 dataset.yaml: {0}".format(dataset_yaml))
-    return dataset_yaml
+    return run_prepare_for_variant(
+        context=context,
+        args=args,
+        dataset_variant=dataset_variant_for_yaml(context, dataset_yaml),
+    )
 
 
 def main() -> int:
     args = parse_args()
     context = load_person_project_context(Path(args.project_config))
-    run_name = args.run_name or context.recommended_run_name
+    apply_context_train_defaults(args, context)
+    run_name = args.run_name or default_run_name_for(context)
 
     if args.command == "prepare-labels":
         ensure_person_labels(context, overwrite=args.overwrite)
@@ -437,31 +590,21 @@ def main() -> int:
         return 0
 
     if args.command == "prepare":
-        ensure_person_labels(context, overwrite=args.overwrite)
-        run_command(prepare_command(context=context, args=args))
+        run_prepare_for_variant(
+            context=context,
+            args=args,
+            dataset_variant=dataset_variant_for_yaml(
+                context,
+                dataset_yaml_path_for(context, args.dataset_yaml),
+            ),
+        )
         return 0
 
     if args.command == "prepare-roi-aware":
-        from prepare_roi_aware_person_dataset import prepare_roi_aware_dataset
-
-        effective_context = apply_roi_cli_overrides(context, args)
-        report = prepare_roi_aware_dataset(
-            effective_context,
-            roi_config_path=roi_config_path_for(effective_context, args.roi_config),
-            output_root=roi_output_root_for(effective_context, args.output_root),
-            overwrite=args.overwrite,
-            limit_per_sequence=args.limit_per_sequence,
-        )
-        print("ROI-aware 数据集 : {0}".format(report["dataset_root"]))
-        print("dataset.yaml    : {0}".format(report["dataset_yaml"]))
-        print(
-            "输入图片={0}, 输出图片={1}, 保留框={2}, 丢弃框={3}, 空负样本={4}".format(
-                report["input_image_count"],
-                report["output_image_count"],
-                report["kept_boxes"],
-                report["dropped_boxes"],
-                report["empty_roi_negative_images"],
-            )
+        run_prepare_for_variant(
+            context=context,
+            args=args,
+            dataset_variant="roi_aware",
         )
         return 0
 
@@ -493,9 +636,11 @@ def main() -> int:
         dataset_yaml = dataset_yaml_path_for(context, args.dataset_yaml)
         ensure_person_labels(context, overwrite=args.overwrite)
         run_command(audit_command(context=context, args=args))
-        run_command(prepare_command(context=context, args=args))
-        if not dataset_yaml.exists():
-            raise RuntimeError("prepare 完成后仍未找到 dataset.yaml: {0}".format(dataset_yaml))
+        dataset_yaml = run_prepare_for_variant(
+            context=context,
+            args=args,
+            dataset_variant=dataset_variant_for_yaml(context, dataset_yaml),
+        )
         run_command(train_command(context=context, args=args, dataset_yaml=dataset_yaml))
         run_command(
             evaluate_command(

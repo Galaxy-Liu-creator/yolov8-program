@@ -8,6 +8,7 @@
 - 当前训练方向包括 `clothes` fullframe、`person` fullframe、ROI-aware person，以及后续可能的 `personcrop -> clothes` 对照。
 - `inspection-flask/` 只作为在线链路参考；除非用户明确要求，不要在后端训练任务中顺手修改在线系统。
 - 仓库根 `docs/` 可作为业务背景参考，但训练事实以本目录配置、报告和当前用户说明为准。
+- 当前后端训练默认在另一台带 GPU 的电脑上执行；如无特殊说明，后续训练命令默认按 GPU（`--device 0`）口径编写，`--workers 0` 只作为稳定性回退方案。
 - 当用户对训练语义、ROI 裁剪影响、标签保留逻辑、指标解读或生产贴合度的表述可能不准确时，AI Agent 不应默认附和；应基于代码、配置、产物和当前链路明确指出可能不对的部分，给出更合理解释或替代建议后再继续执行。
 
 ## 2. 必读文件
@@ -38,7 +39,8 @@
 - 优先修改配置入口，不要把新路径、新默认值硬编码进流程。
 - `clothes` 默认入口：`backend-train-model/project_config.json`。
 - merged 工服入口：`backend-train-model/All-train-model/*.build.json` 与 `merged_train_project_config.json`。
-- person / ROI 入口：`backend-train-model/person-train-model/person_project_config.json`。
+- person / ROI 入口：`backend-train-model/person-train-model/person_project_config*.json`。
+- 其中 `backend-train-model/person-train-model/person_project_config.json` 当前只保留为兼容 / 历史入口；正式 ROI-aware 版本应优先使用独立版本化配置文件。
 - person 扩样但尚未补齐 ROI 时，优先使用独立 fullframe 配置：`backend-train-model/person-train-model/person_project_config.fullframe_with_new_labels.json`，不要直接覆盖当前 ROI-aware 主配置。
 - 新增配置项后，同步检查 CLI 默认值、训练 / 评估 / 导出报告、文档和 update log 是否一致。
 - 历史 `build_report.json` 只记录当时构建状态，可能包含旧绝对路径；当前路径以配置文件为准。
@@ -61,6 +63,11 @@
 - 历史 ROI-aware v1 数据集输出：`502` 张图，保留框 `1343`，丢弃框 `315`，裁剪框 `49`，ROI 空负样本 `12`。
 - `person_roi_aware_baseline` test：Precision `0.9390`，Recall `0.5950`，mAP50 `0.6738`，mAP50-95 `0.3867`，当前作为历史对照保留。
 - 已新增 fullframe 扩样配置：`person_project_config.fullframe_with_new_labels.json`；它把原有 `502` 张图与 `new_person_labels` 的 `2507` 张图合并用于 fullframe person，但当前显式设置 `roi.enabled=false`，避免在新样本尚未补齐 ROI 前误接入 ROI-aware 流程。
+- 当前正式 ROI-aware 配置入口已版本化：
+  - `person_project_config.roi_v1.center_inside.json`
+  - `person_project_config.roi_v2.mask_then_crop_ioa25.json`
+  - `person_project_config.roi_v3.mask_then_crop_margin64.json`
+  - `person_project_config.roi_v3.crop_only_margin64.json`
 - 该 fullframe 扩样数据已完成 prepare：总图 `3009`、总框 `8861`，split 为 `train=2105 / val=453 / test=451`；输出目录为 `train-result/prepared/person_fullframe_with_new_labels/sequence_contiguous/`，对应 summary 为 `train-result/person_source_dataset_summary_fullframe_with_new_labels.json`。
 - 当前 ROI-aware v2 配置：`train-result/working/roi/roi_config.v2.generated.json`，keep rule 为 `bottom_center_inside OR box_ioa >= 0.25`。
 - 当前 ROI-aware v2 数据集输出：`502` 张图，保留框 `1342`，丢弃框 `316`，裁剪框 `54`，ROI 空负样本 `14`。

@@ -10,8 +10,7 @@
       "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_2\\1",
       "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_2\\D15_20260119203927",
       "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_3\\D02_20260123070624",
-      "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_3\\D02_20260123074836",
-      "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\new_person_labels\\images"
+      "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_3\\D02_20260123074836"
     ],
     "image_extensions": [
       ".jpg"
@@ -42,17 +41,17 @@
     "fallback_to_fullframe": true
   },
   "roi": {
-    "enabled": false,
+    "enabled": true,
     "mode": "mask_then_crop",
     "crop_margin_px": 0,
     "json_root": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\roi-json",
-    "work_root": "roi-work-fullframe-with-new-labels",
+    "work_root": "roi-work-v2-mask-then-crop-ioa25",
     "keep_rule": {
       "center_inside": false,
       "bottom_center_inside": true,
       "min_box_ioa": 0.25
     },
-    "config_path": "train-result/working/roi/roi_config.fullframe_with_new_labels.generated.json"
+    "config_path": "train-result/working/roi/roi_config.v2.generated.json"
   },
   "models": {
     "allow_remote_model_download": false,
@@ -65,23 +64,23 @@
       "imgsz": 640,
       "epochs": 180,
       "batch": 4,
-      "patience": 40,
+      "patience": 60,
       "workers": 4,
       "device": "0",
       "seed": 42,
-      "base_model": "../weights/yolov8n.pt"
+      "base_model": "train-result/artifacts/runs/person_fullframe_baseline/weights/best.pt"
     }
   },
   "person_dataset": {
-    "default_dataset_variant": "fullframe",
-    "recommended_run_name": "person_fullframe_with_new_labels_baseline",
-    "aggregated_label_root": "train-result/working/aggregated_labels_fullframe_with_new_labels",
-    "summary_path": "train-result/person_source_dataset_summary_fullframe_with_new_labels.json",
-    "prepared_output_root": "train-result/prepared/person_fullframe_with_new_labels/sequence_contiguous",
-    "roi_aware_prepared_output_root": "train-result/prepared/person_roi_aware_with_new_labels_pending_roi/sequence_contiguous",
-    "roi_aware_recommended_run_name": "person_roi_aware_with_new_labels_pending_roi",
-    "export_alias_path": "train-result/export/person_detect_yolov8_with_new_labels.pt",
-    "export_alias_metadata_path": "train-result/export/person_detect_yolov8_with_new_labels.metadata.json",
+    "default_dataset_variant": "roi_aware",
+    "recommended_run_name": "person_fullframe_baseline",
+    "aggregated_label_root": "train-result/working/aggregated_labels",
+    "summary_path": "train-result/person_source_dataset_summary.json",
+    "prepared_output_root": "train-result/prepared/person_fullframe/sequence_contiguous",
+    "roi_aware_prepared_output_root": "train-result/prepared/person_roi_aware_v2/sequence_contiguous",
+    "roi_aware_recommended_run_name": "person_roi_aware_v2_from_fullframe",
+    "export_alias_path": "train-result/export/person_detect_yolov8_roi_v2_from_fullframe.pt",
+    "export_alias_metadata_path": "train-result/export/person_detect_yolov8_roi_v2_from_fullframe.metadata.json",
     "sequences": [
       {
         "source_id": "g31",
@@ -131,13 +130,6 @@
         "sequence_name": "D02_20260123074836",
         "image_root": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_3\\D02_20260123074836",
         "label_root": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_3\\labels"
-      },
-      {
-        "source_id": "g34",
-        "group": "new_person_labels",
-        "sequence_name": "new_person_labels_flat_20260503",
-        "image_root": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\new_person_labels\\images",
-        "label_root": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\new_person_labels\\person_labels"
       }
     ]
   }

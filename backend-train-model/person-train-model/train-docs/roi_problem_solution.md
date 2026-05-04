@@ -339,7 +339,7 @@ boxes=1, kept=0, dropped=1
 
 ## 10. 推荐实现字段
 
-建议在 `person_project_config.json` 的 `roi.keep_rule` 中逐步扩展，例如：
+建议为 ROI-aware 分支单独准备版本化配置，不要再直接改动兼容入口 `person_project_config.json`。例如，如果要固化“`mask_then_crop + crop_margin_px=64`”这条当前更完整的方案，可以把下面这组字段写到 `backend-train-model/person-train-model/person_project_config.roi_v3.mask_then_crop_margin64.json`：
 
 ```json
 {
@@ -352,7 +352,7 @@ boxes=1, kept=0, dropped=1
       "min_box_ioa": 0.25
     },
     "crop_margin_px": 64,
-    "config_path": "train-result/working/roi/roi_config.generated.json"
+    "config_path": "train-result/working/roi/roi_config.v3.mask_then_crop_margin64.generated.json"
   }
 }
 ```
@@ -425,7 +425,7 @@ person_roi_aware_v2_from_fullframe
 建议命令：
 
 ```powershell
-D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py train --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_roi_aware\sequence_contiguous\dataset.yaml --run-name person_roi_aware_v2_from_fullframe --device cpu --workers 0 --batch 4 --imgsz 640 --epochs 180 --patience 60 --base-model backend-train-model\person-train-model\train-result\artifacts\runs\person_fullframe_baseline\weights\best.pt
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py train --project-config backend-train-model\person-train-model\person_project_config.roi_v2.mask_then_crop_ioa25.json --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_roi_aware_v2\sequence_contiguous\dataset.yaml --run-name person_roi_aware_v2_from_fullframe --device 0 --workers 4 --batch 4 --imgsz 640 --epochs 180 --patience 60 --base-model backend-train-model\person-train-model\train-result\artifacts\runs\person_fullframe_baseline\weights\best.pt
 ```
 
 ### 12.1 当前优先执行方案

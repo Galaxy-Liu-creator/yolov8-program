@@ -92,6 +92,11 @@ def parse_args() -> argparse.Namespace:
         help="仅用于快速烟雾验证；对每个序列只取前 N 张图片。",
     )
     parser.add_argument(
+        "--split-strategy",
+        choices=["sequence_contiguous", "sequence_holdout"],
+        help="覆盖 project-config 中的 data.default_split_strategy。",
+    )
+    parser.add_argument(
         "--roi-mode",
         choices=["mask_then_crop", "crop_only"],
         help="覆盖 project_config 中的 roi.mode。",
@@ -590,6 +595,7 @@ def prepare_roi_aware_dataset(
     output_root: Path,
     overwrite: bool,
     limit_per_sequence: Optional[int],
+    split_strategy: Optional[str] = None,
 ) -> Dict[str, object]:
     if not context.roi.enabled:
         raise RuntimeError("当前配置中 roi.enabled=false，请先启用 ROI-aware 配置。")
@@ -603,10 +609,11 @@ def prepare_roi_aware_dataset(
         context,
         limit_per_sequence=limit_per_sequence,
     )
+    effective_split_strategy = split_strategy or context.default_split_strategy
     split_map = build_split_map(
         samples_by_sequence,
         split_ratios=context.split_ratios,
-        split_strategy=context.default_split_strategy,
+        split_strategy=effective_split_strategy,
     )
 
     split_image_counts = {"train": 0, "val": 0, "test": 0}
@@ -742,7 +749,7 @@ def prepare_roi_aware_dataset(
         },
         "dataset_root": str(output_root),
         "dataset_yaml": str(dataset_yaml),
-        "split_strategy": context.default_split_strategy,
+        "default_split_strategy": context.default_split_strategy,
         "split_ratios": context.split_ratios,
         "split_image_counts": split_image_counts,
         "split_label_counts": split_label_counts,
@@ -754,6 +761,7 @@ def prepare_roi_aware_dataset(
         "cropped_boxes": cropped_boxes,
         "empty_roi_negative_images": empty_roi_negative_images,
         "limit_per_sequence": limit_per_sequence,
+        "split_strategy": effective_split_strategy,
         "sequences": sequence_stats,
     }
     report_path = output_root / "prepare_report.json"
@@ -781,6 +789,7 @@ def main() -> int:
         output_root=output_root,
         overwrite=args.overwrite,
         limit_per_sequence=args.limit_per_sequence,
+        split_strategy=args.split_strategy,
     )
     print("ROI-aware 数据集 : {0}".format(report["dataset_root"]))
     print("dataset.yaml    : {0}".format(report["dataset_yaml"]))

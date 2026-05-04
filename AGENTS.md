@@ -20,7 +20,8 @@
 - Python 解释器：`D:\Miniconda3_python\envs\yolo_code\python.exe`
 - Python 版本：`3.9.25`
 - 训练 / 数据脚本默认不联网下载模型；优先使用仓库或本地显式指定的权重。
-- Windows + CPU 训练优先使用 `--workers 0`，避免 DataLoader 多进程问题。
+- 当前后端训练默认在另一台带 GPU 的电脑上执行；如无特殊说明，优先使用 GPU（`--device 0`）训练。
+- `--workers 0` 仅作为 Windows / DataLoader 稳定性回退方案，不再作为默认训练口径。
 
 ## 3. 仓库模块分工
 
@@ -40,7 +41,7 @@
 - 代码默认切分比例：`train=0.70 / val=0.15 / test=0.15`；但当前主实验可能用显式 split manifest 覆盖默认比例。
 - 代码默认切分策略：`sequence_contiguous`，用于默认单源 `clothes` prepare 与当前 `person_fullframe / person_roi_aware` 数据集。
 - 当前 `clothes` merged baseline 不是简单默认切分，而是以 `All-train-model/splits/*.split.csv` 为准：`trainval_balanced_v1.split.csv` 构建训练/验证集，`unified_holdout_v1.split.csv` 构建统一 test holdout。
-- 当前真实路径以配置文件为准：`backend-train-model/project_config.json`、`backend-train-model/All-train-model/*.build.json`、`backend-train-model/person-train-model/person_project_config.json`。
+- 当前真实路径以配置文件为准：`backend-train-model/project_config.json`、`backend-train-model/All-train-model/*.build.json`、`backend-train-model/person-train-model/person_project_config*.json`。
 - 部分历史 `build_report.json` 可能保留旧绝对路径记录；更新路径或重新构建时不要反向以旧报告覆盖当前配置。
 
 ## 5. `clothes` / 工服训练现状
@@ -68,6 +69,13 @@
 - 当前 ROI-aware v3 `mask_then_crop + crop_margin_px=64` 数据集输出 `502` 张图，保留 person 框 `1335` 个，丢弃 `316` 个，裁剪边界框 `23` 个，ROI 空负样本 `15` 张。
 - 当前 ROI-aware v3 `crop_only + crop_margin_px=64` 配置文件：`backend-train-model/person-train-model/train-result/working/roi/roi_config.v3.crop_only_margin64.generated.json`。
 - 当前 ROI-aware v3 `crop_only + crop_margin_px=64` 数据集输出 `502` 张图，保留 person 框 `1335` 个，丢弃 `316` 个，裁剪边界框 `23` 个，ROI 空负样本 `15` 张。
+- 当前 person 正式配置入口已版本化：
+  - fullframe 扩样：`backend-train-model/person-train-model/person_project_config.fullframe_with_new_labels.json`
+  - ROI-aware v1：`backend-train-model/person-train-model/person_project_config.roi_v1.center_inside.json`
+  - ROI-aware v2：`backend-train-model/person-train-model/person_project_config.roi_v2.mask_then_crop_ioa25.json`
+  - ROI-aware v3 mask：`backend-train-model/person-train-model/person_project_config.roi_v3.mask_then_crop_margin64.json`
+  - ROI-aware v3 crop：`backend-train-model/person-train-model/person_project_config.roi_v3.crop_only_margin64.json`
+- `backend-train-model/person-train-model/person_project_config.json` 当前保留为兼容 / 历史入口，不再作为 ROI-aware v2/v3 的正式唯一配置来源。
 - 已完成 `roi_cropped_keep_positive_v3_margin64` 复盘：无 margin 时原本会裁边的 `54` 个 keep-positive 框里，`margin64` 已完整救回 `31` 个；剩余 `23` 个全部只是贴原图下/右边界的 `0.001 px` 级残留裁边，说明 ROI crop 已不再是当前主瓶颈。复盘输出目录：`backend-train-model/person-train-model/train-result/review/roi_cropped_keep_positive_v3_margin64/`。
 - 当前 native test 领先的 ROI-aware run（优势很小）：`person_roi_aware_v3_mask_then_crop_margin64_from_fullframe`。
 - `person_roi_aware_v3_mask_then_crop_margin64_from_fullframe` test 指标：Precision `0.9208`，Recall `0.7075`，mAP50 `0.7779`，mAP50-95 `0.4607`。

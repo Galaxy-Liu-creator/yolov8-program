@@ -1,5 +1,224 @@
 ﻿# Update Log
 
+## 2026-05-05 修正 person fullframe img768 的评估命令口径
+
+1. 变更来源：用户准备重新评估 `person_fullframe_with_new_labels_img768`，要求把运行文档中的对应评估命令替换成能够同时保证评估指标与报告元数据自洽的版本，并明确继续覆盖旧报告。
+2. 变更总览：
+   - 更新 `person_run_method.md` 中 `person_fullframe_with_new_labels` 的 `imgsz=768` 对照实验评估命令。
+   - 在原有显式 `--project-config`、`--dataset-yaml`、`--run-name`、`--imgsz 768` 基础上，补充显式 `--weights backend-train-model\person-train-model\train-result\artifacts\runs\person_fullframe_with_new_labels_img768\weights\best.pt`。
+   - 保持 `--report-name person_fullframe_with_new_labels_img768_eval` 不变，继续覆盖旧报告。
+   - 同步把说明文字改成“评估入口整体对齐”的口径，明确本次不仅是修正 `imgsz=768`，也是为了让 `project_config_path`、`image_roots` 等报告元数据与当前 fullframe 扩样数据集保持一致。
+3. 涉及文件：
+   - `backend-train-model/person-train-model/train-docs/person_run_method.md`
+   - `backend-train-model/docs/update_log.md`
+4. 新增 / 变更配置项：
+   - 无新增 JSON 配置字段。
+   - 文档中的 `img768` 评估命令新增显式 `--weights` 参数。
+   - 文档中的 `img768` 评估命令继续使用 `--report-name person_fullframe_with_new_labels_img768_eval` 覆盖旧报告。
+5. 兼容性注意：
+   - 本轮只更新运行文档，不重跑训练或评估；旧报告是否被覆盖取决于后续是否按新命令实际执行。
+   - 只要继续使用同一个 `report_name`，重新评估后会覆盖同名旧报告；若未来需要并存多版结果，应改用新的 `report_name`。
+6. 本轮明确不改动的部分：
+   - 不修改训练脚本逻辑、prepare 逻辑或任何 ROI-aware 配置。
+   - 不改写既有训练权重、prepared 数据集或历史指标结论。
+
+## 2026-05-04 继续收口 person 兼容入口语义、ROI v1 路径冲突与 split-strategy 覆盖能力
+
+1. 变更来源：用户继续做完整人工审查，进一步指出 `person_project_config.json` 的 `fullframe + roi.enabled=true` 语义混杂、`roi_v1` 与兼容入口共用 ROI 配置 / prepared 输出路径、以及 ROI-aware prepare 无法像 fullframe 一样临时覆盖 `split_strategy`。
+2. 变更总览：
+   - 更新 `person_project_config.json`：将兼容入口明确收口为 fullframe-only，`roi.enabled` 改为 `false`，避免再把该文件误当成 ROI-aware 正式入口。
+   - 更新 `person_project_config.roi_v1.center_inside.json`：把 `roi.config_path` 版本化为 `roi_config.v1.center_inside.generated.json`，并把 `roi_aware_prepared_output_root` 独立为 `person_roi_aware_v1/sequence_contiguous`，避免与兼容入口或其他历史路径相互覆盖。
+   - 更新 `run_person_flow.py` 与 `prepare_roi_aware_person_dataset.py`：为 ROI-aware prepare 补齐 `--split-strategy` 覆盖能力，并让 fullframe / ROI-aware 两条 prepare 路径都能从 CLI 临时覆盖切分策略。
+   - 同步更新 `docs/config.md`，把 person 兼容入口、ROI-aware v1 prepared 路径，以及 `prepare-roi-aware --split-strategy` 的现状写清楚。
+   - 额外核实 `roi_v1 keep_rule.min_box_ioa=0.0`：当前代码判断是 `roi_settings.min_box_ioa > 0.0 and box_ioa >= ...`，因此 `0.0` 不会导致 IoA 条件永远为真；本轮仅记录结论，不修改该逻辑。
+3. 涉及文件：
+   - `backend-train-model/person-train-model/person_project_config.json`
+   - `backend-train-model/person-train-model/person_project_config.roi_v1.center_inside.json`
+   - `backend-train-model/person-train-model/train-code/run_person_flow.py`
+   - `backend-train-model/person-train-model/train-code/prepare_roi_aware_person_dataset.py`
+   - `docs/config.md`
+   - `backend-train-model/docs/update_log.md`
+4. 新增 / 变更配置项：
+   - `person_project_config.json -> roi.enabled: true -> false`
+   - `person_project_config.roi_v1.center_inside.json -> roi.config_path: train-result/working/roi/roi_config.v1.center_inside.generated.json`
+   - `person_project_config.roi_v1.center_inside.json -> person_dataset.roi_aware_prepared_output_root: train-result/prepared/person_roi_aware_v1/sequence_contiguous`
+   - `run_person_flow.py -> --split-strategy`
+   - `prepare_roi_aware_person_dataset.py -> --split-strategy`
+   - `prepare_roi_aware_dataset(..., split_strategy=...)`：新增 ROI-aware 切分策略覆盖参数，并把实际生效值写入 `prepare_report.json`
+5. 兼容性注意：
+   - 现在省略 `--project-config` 时，wrapper 默认仍会回到 `person_project_config.json`，但该入口只保留 fullframe 兼容语义；若继续用它跑 ROI-aware prepare，会被更早拦截。这是刻意收紧，不再鼓励兼容入口承担 ROI-aware 正式职责。
+   - `roi_v1` 的新路径不会自动迁移旧 prepared 目录或旧 ROI config 文件；历史产物仍保留原状，但后续若重跑 v1，应以新的版本化路径为准。
+   - 本轮没有修改 `recommended_run_name` 在 ROI-aware 配置中的保留语义；正常 ROI-aware 默认 run 名仍由 `roi_aware_recommended_run_name` 提供。
+6. 本轮明确不改动的部分：
+   - 不修改任何已生成 prepared 数据集内容、训练权重或评估结果。
+   - 不改写 `roi_v1 keep_rule.min_box_ioa=0.0` 的行为，因为当前实现已确认安全。
+   - 不修改在线链路与其他监控方向代码。
+
+## 2026-05-04 继续修复 person 配置消费中的 fullframe prepare、冗余字段与 ROI disabled 校验问题
+
+1. 变更来源：用户继续人工复核 person 线，进一步指出 `all` 命令在 fullframe 路径下会因重复创建汇总标签目录而失败、`data.label_root` 是未被消费的死字段，以及 `roi.enabled=false` 时仍会执行 keep rule 校验存在潜在误伤风险。
+2. 变更总览：
+   - 修复 `run_person_flow.py`：`run_prepare_for_variant()` 的 fullframe 分支改为复用 `ensure_person_labels_available()`，避免 `all` 命令在 `overwrite=false` 时第二次创建 `aggregated_label_root` 直接报错。
+   - 修复 `prepare_person_dataset.py`：当 `roi.enabled=false` 时，不再强制要求 `roi.keep_rule` 至少启用一条保留条件；只有启用 ROI-aware 时才执行该校验。
+   - 清理 person 全部正式配置中的冗余 `data.label_root` 字段，避免误导读者以为 loader 会消费该字段；当前聚合标签真实入口仍是 `person_dataset.aggregated_label_root`。
+3. 涉及文件：
+   - `backend-train-model/person-train-model/train-code/prepare_person_dataset.py`
+   - `backend-train-model/person-train-model/train-code/run_person_flow.py`
+   - `backend-train-model/person-train-model/person_project_config.json`
+   - `backend-train-model/person-train-model/person_project_config.fullframe_with_new_labels.json`
+   - `backend-train-model/person-train-model/person_project_config.roi_v1.center_inside.json`
+   - `backend-train-model/person-train-model/person_project_config.roi_v2.mask_then_crop_ioa25.json`
+   - `backend-train-model/person-train-model/person_project_config.roi_v3.mask_then_crop_margin64.json`
+   - `backend-train-model/person-train-model/person_project_config.roi_v3.crop_only_margin64.json`
+   - `backend-train-model/docs/update_log.md`
+4. 新增 / 变更配置项：
+   - 无新增 JSON 业务字段。
+   - 删除冗余字段：`data.label_root`
+   - `run_person_flow.py`：fullframe prepare 改为复用 `ensure_person_labels_available()`
+   - `prepare_person_dataset.py`：`roi.keep_rule` 的强制校验仅在 `roi.enabled=true` 时触发
+5. 兼容性注意：
+   - 删除 `data.label_root` 不影响现有配置加载，因为 loader 从未读取该字段；真实汇总标签入口仍由 `person_dataset.aggregated_label_root` 提供。
+   - `person_project_config.fullframe_with_new_labels.json` 现在即使把 keep rule 全部置空，只要 `roi.enabled=false` 也不会因为 ROI disabled 分支触发无意义报错。
+   - 本轮未改变 `fullframe + roi.enabled=true` 的兼容入口能力，也未修改任何已生成 prepared 数据集。
+6. 本轮明确不改动的部分：
+   - 不修改任何训练指标结论与 run 选择结果。
+   - 不重跑训练、评估、prepare 或 review。
+   - 不修改在线链路与其他监控方向代码。
+
+## 2026-05-04 跟进修复 person 包装脚本与版本化配置的 4 个遗漏问题
+
+1. 变更来源：用户在统一训练配置后继续人工复核，指出 person 线仍存在 4 个问题：`prepare` 阶段对 ROI-aware 变体仍硬编码走 fullframe、wrapper 不能从配置读取默认初始化权重、ROI 配置中的 fullframe fallback 命名语义容易误读、以及 `default_dataset_variant` 与 `roi.enabled` 缺少必要的交叉校验。
+2. 变更总览：
+   - 修复 `run_person_flow.py`：现在会根据 `dataset.yaml` 目标路径或 `default_dataset_variant` 自动选择 fullframe prepare / ROI-aware prepare，不再把 ROI-aware 变体错误导向 `prepare --mode fullframe`。
+   - 扩展 `prepare_person_dataset.py` 的 `TrainDefaults`，支持从 `training.default_train_args` 读取 `base_model` 与 `init_weights`，并让 `run_person_flow.py` 在 CLI 未显式传参时自动继承这些默认初始化来源。
+   - 在 `prepare_person_dataset.py` 中增加必要校验：当 `person_dataset.default_dataset_variant=roi_aware` 时，`roi.enabled` 必须为 `true`。
+   - 为 fullframe / ROI-aware 正式配置补齐 `training.default_train_args.base_model`，并同步更新 `docs/config.md` 对 `recommended_run_name` 语义与默认初始化来源的说明。
+3. 涉及文件：
+   - `backend-train-model/person-train-model/train-code/prepare_person_dataset.py`
+   - `backend-train-model/person-train-model/train-code/run_person_flow.py`
+   - `backend-train-model/person-train-model/person_project_config.json`
+   - `backend-train-model/person-train-model/person_project_config.fullframe_with_new_labels.json`
+   - `backend-train-model/person-train-model/person_project_config.roi_v1.center_inside.json`
+   - `backend-train-model/person-train-model/person_project_config.roi_v2.mask_then_crop_ioa25.json`
+   - `backend-train-model/person-train-model/person_project_config.roi_v3.mask_then_crop_margin64.json`
+   - `backend-train-model/person-train-model/person_project_config.roi_v3.crop_only_margin64.json`
+   - `docs/config.md`
+   - `backend-train-model/docs/update_log.md`
+4. 新增 / 变更配置项：
+   - `training.default_train_args.base_model`：新增到 fullframe / ROI-aware 正式配置，用于 wrapper 默认继承初始化来源
+   - `TrainDefaults.base_model` / `TrainDefaults.init_weights`：新增代码级配置消费字段
+   - `run_person_flow.py`：新增按目标 `dataset.yaml` 识别 fullframe / roi_aware prepare 路径的逻辑
+   - `prepare_person_dataset.py`：新增 `default_dataset_variant=roi_aware -> roi.enabled=true` 校验
+5. 兼容性注意：
+   - `recommended_run_name=person_fullframe_baseline` 在 ROI-aware 配置中仍保留，用于 fullframe fallback 语义；正常 ROI-aware 默认 run 名仍由 `roi_aware_recommended_run_name` 提供，不构成功能性错误。
+   - 本轮没有把 `fullframe + roi.enabled=true` 判定为非法组合，因为兼容入口 `person_project_config.json` 仍需要保留这种“默认 fullframe、可显式切到 ROI-aware”的双用途能力。
+   - 若后续继续新增版本化 ROI-aware 配置，建议同步补齐 `training.default_train_args.base_model`，否则 wrapper 会重新依赖 CLI 手动传参。
+6. 本轮明确不改动的部分：
+   - 不修改任何历史指标结论与已生成 prepared 数据集统计。
+   - 不重跑训练、评估、export 或 review。
+   - 不修改 `inspection-flask/` 在线链路和其他监控方向代码。
+
+## 2026-05-04 统一训练配置入口、版本化 person ROI-aware config，并新增总览文档
+
+1. 变更来源：用户要求系统性审查 `backend-train-model/` 训练主线的全部配置文件、代码消费逻辑与训练文档，把不一致项统一到“最新、最贴近当前进度”的口径，并在仓库根 `docs/` 下补一份训练配置总览。
+2. 变更总览：
+   - 为 person 新增正式版本化 ROI-aware 配置入口：
+     - `backend-train-model/person-train-model/person_project_config.roi_v1.center_inside.json`
+     - `backend-train-model/person-train-model/person_project_config.roi_v2.mask_then_crop_ioa25.json`
+     - `backend-train-model/person-train-model/person_project_config.roi_v3.mask_then_crop_margin64.json`
+     - `backend-train-model/person-train-model/person_project_config.roi_v3.crop_only_margin64.json`
+   - 在 `person_project_config.json` 与 `person_project_config.fullframe_with_new_labels.json` 中显式加入 `person_dataset.default_dataset_variant`，并把兼容 / 正式入口边界固定下来。
+   - 扩展 `prepare_person_dataset.py` / `run_person_flow.py`，让 wrapper 可以从 `project-config -> training.default_train_args` 和 `person_dataset.default_dataset_variant` 读取默认训练参数、默认 dataset root 与默认 run 名，减少“兼容 config + 版本化 dataset”错配。
+   - 将 clothes 的 `project_config.json` 与 `All-train-model/merged_train_project_config.json` 默认训练口径统一为 GPU（`device=0`、`workers=4`）。
+   - 统一 `person_run_method.md`、`roi_problem_solution.md`、`roi_next_iteration_plan.md`、`docs/dataset.md`、`backend-train-model/AGENTS.md`、仓库根 `AGENTS.md` 的配置口径，并新增 `docs/config.md` 作为训练配置总览入口。
+3. 涉及文件：
+   - `backend-train-model/project_config.json`
+   - `backend-train-model/All-train-model/merged_train_project_config.json`
+   - `backend-train-model/All-train-model/00_CURRENT_BASELINE/README.md`
+   - `backend-train-model/person-train-model/person_project_config.json`
+   - `backend-train-model/person-train-model/person_project_config.fullframe_with_new_labels.json`
+   - `backend-train-model/person-train-model/person_project_config.roi_v1.center_inside.json`
+   - `backend-train-model/person-train-model/person_project_config.roi_v2.mask_then_crop_ioa25.json`
+   - `backend-train-model/person-train-model/person_project_config.roi_v3.mask_then_crop_margin64.json`
+   - `backend-train-model/person-train-model/person_project_config.roi_v3.crop_only_margin64.json`
+   - `backend-train-model/person-train-model/train-code/prepare_person_dataset.py`
+   - `backend-train-model/person-train-model/train-code/run_person_flow.py`
+   - `backend-train-model/person-train-model/train-docs/person_run_method.md`
+   - `backend-train-model/person-train-model/train-docs/roi_problem_solution.md`
+   - `backend-train-model/person-train-model/train-docs/roi_next_iteration_plan.md`
+   - `backend-train-model/AGENTS.md`
+   - `AGENTS.md`
+   - `docs/dataset.md`
+   - `docs/config.md`
+   - `backend-train-model/docs/update_log.md`
+4. 新增 / 变更配置项：
+   - `person_dataset.default_dataset_variant`：新增，支持 `fullframe` / `roi_aware`
+   - `prepare_person_dataset.PersonProjectContext.training_defaults`：新增代码级配置消费字段
+   - `prepare_person_dataset.PersonProjectContext.default_dataset_variant`：新增代码级配置消费字段
+   - `backend-train-model/project_config.json -> training.default_train_args.workers: 0 -> 4`
+   - `backend-train-model/project_config.json -> training.default_train_args.device: cpu -> 0`
+   - `backend-train-model/All-train-model/merged_train_project_config.json -> training.default_train_args.workers: 0 -> 4`
+   - `backend-train-model/All-train-model/merged_train_project_config.json -> training.default_train_args.device: cpu -> 0`
+   - `run_person_flow.py`：CLI 的 `imgsz / epochs / batch / patience / workers / device / seed` 由硬编码默认值改为优先读取当前 `project-config`
+5. 兼容性注意：
+   - `backend-train-model/person-train-model/person_project_config.json` 仍保留为兼容 / 历史入口，但不再建议作为 ROI-aware v2/v3 的正式唯一配置来源。
+   - 现在如果依赖 wrapper 的隐式默认值，实际取值会随 `project-config` 中的 `training.default_train_args` 与 `person_dataset.default_dataset_variant` 变化；正式实验仍建议显式传入 `--project-config`、`--dataset-yaml`、`--run-name` 和关键训练参数。
+   - 本轮没有重生成任何 prepared 数据集，也没有改写历史 report；历史产物中的旧 metadata 会继续保留原状。
+6. 本轮明确不改动的部分：
+   - 不重跑任何训练、评估、导出或 review 任务。
+   - 不修改 `inspection-flask/` 在线链路配置。
+   - 不改变当前指标结论、ROI keep rule 的实验结论或既有 baseline 选择结果。
+
+## 2026-05-04 继续统一 person 运行文档中的 GPU / project-config 口径
+
+1. 变更来源：用户继续要求清理 `person_run_method.md` 中残留的 CPU 命令与未显式传入 `--project-config` 的历史段落，避免同一份运行文档再次出现 GPU / CPU 混用和配置口径不统一。
+2. 变更总览：继续把 `person_roi_aware_v2`、`person_roi_aware`、`person_fullframe` 以及剩余 ROI-aware v3 段落的训练 / 评估命令统一为 GPU 默认口径；同时补齐显式 `--project-config`、`--imgsz`、`--batch`、`--workers` 传参，并把文案中的“CPU 压力”改成训练机显存 / 稳定性表述。
+3. 涉及文件：
+   - `backend-train-model/person-train-model/train-docs/person_run_method.md`
+   - `backend-train-model/docs/update_log.md`
+4. 新增 / 变更配置项：未新增项目配置文件字段；本轮仅统一运行文档中的命令口径，默认训练 / 评估示例统一为 `--device 0 --workers 4`，并要求历史分支命令显式传入 `--project-config`。
+5. 兼容性注意：若后续某台 GPU 训练机 DataLoader 稳定性不足，仍可按文档总则把 `--workers` 回退到 `0`；若显存不足，可保留 `batch=2` 作为备选，但不应再把 GPU 主线命令写回 CPU 口径。
+6. 本轮明确不改动的部分：未改动训练脚本逻辑、ROI keep rule、已有训练产物、历史指标结论与 `roi_compare.md` 内容。
+
+## 2026-05-04 统一 fullframe 扩样线的 project-config 口径并增加 dataset/config 一致性校验
+
+变更来源：
+- 用户指出 `person_fullframe_with_new_labels` 相关 train / eval report 中，存在 `dataset.yaml` 明明来自 fullframe 扩样线，但 `project_config_path` 却仍指向旧 `person_project_config.json` 的混乱情况，要求把配置口径统一，避免后续继续出现这种元数据错配。
+
+变更总览：
+1. 更新 `backend-train-model/person-train-model/train-docs/person_run_method.md`：
+   - 在 `person_fullframe_with_new_labels` 段内，所有 train / evaluate 命令统一显式传入 `--project-config backend-train-model/person-train-model/person_project_config.fullframe_with_new_labels.json`；
+   - 通用运行约束补充：train / evaluate 命令建议同时显式传 `--project-config`、`--dataset-yaml`、`--run-name`，避免再混入默认旧配置。
+2. 更新配置文件默认训练口径：
+   - `backend-train-model/person-train-model/person_project_config.json`
+   - `backend-train-model/person-train-model/person_project_config.fullframe_with_new_labels.json`
+   的 `training.default_train_args` 从 CPU 口径统一改为 GPU 口径（`device=0`、`workers=4`）。
+3. 更新 `backend-train-model/person-train-model/train-code/run_person_flow.py`：
+   - 新增 `validate_explicit_dataset_yaml_matches_context()`；
+   - 当用户显式传入 `--dataset-yaml` 时，若其路径不属于当前 `--project-config` 对应的 prepared 输出根目录，将直接报错，阻止继续生成“dataset 来自 A，但 config 来自 B”的混乱 report。
+
+涉及文件：
+- `backend-train-model/person-train-model/train-docs/person_run_method.md`
+- `backend-train-model/person-train-model/person_project_config.json`
+- `backend-train-model/person-train-model/person_project_config.fullframe_with_new_labels.json`
+- `backend-train-model/person-train-model/train-code/run_person_flow.py`
+- `backend-train-model/docs/update_log.md`
+
+新增 / 变更配置项：
+- `person_project_config.json -> training.default_train_args.workers: 0 -> 4`
+- `person_project_config.json -> training.default_train_args.device: cpu -> 0`
+- `person_project_config.fullframe_with_new_labels.json -> training.default_train_args.workers: 0 -> 4`
+- `person_project_config.fullframe_with_new_labels.json -> training.default_train_args.device: cpu -> 0`
+
+兼容性注意：
+- 以后如果显式传 `--dataset-yaml`，它必须和当前 `--project-config` 的 prepared 根目录一致，否则 `run_person_flow.py` 会直接报错，这是本轮为了防止 report 元数据混乱而新增的保护机制。
+- 本轮不会修改已有历史 report 文件；历史 report 中已经写入的旧 `project_config_path` 仍会保留原状。
+
+本轮明确不改动：
+- 不重生成任何 prepared 数据集。
+- 不自动重跑历史训练或评估。
+- 不顺手改动 ROI-aware 其他历史实验 report 的内容。
+
 ## 2026-05-03 删除 `person_fullframe_with_new_labels_baseline` 的本轮训练产物
 
 变更来源：
