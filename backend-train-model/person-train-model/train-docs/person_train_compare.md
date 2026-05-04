@@ -13,6 +13,92 @@
   - 最终结论与解读边界
 - 如果不同版本使用的不是同一个 `dataset.yaml`，必须明确写出“不是严格同数据集公平对照”，避免把跨数据集结果误写成严格消融结论。
 
+## 2026-05-04 `person_fullframe_with_new_labels_baseline` 对比
+
+### 1. 对比对象
+
+| 版本 | run 名称 | 数据集 | 初始化方式 |
+| --- | --- | --- | --- |
+| `person_fullframe_with_new_labels` | `person_fullframe_with_new_labels_baseline` | `train-result/prepared/person_fullframe_with_new_labels/sequence_contiguous/dataset.yaml` | 当前 train report 记录为 `resume_checkpoint`；`initial_base_model` 指向同 run 的 `last.pt` |
+| `person_fullframe` | `person_fullframe_baseline` | `train-result/prepared/person_fullframe/sequence_contiguous/dataset.yaml` | 当前 train report 记录为 `resume_checkpoint`，`initial_base_model` 指向同 run 的 `last.pt` |
+
+对应报告入口：
+
+- `backend-train-model/person-train-model/train-result/artifacts/reports/person_fullframe_with_new_labels_baseline_train.json`
+- `backend-train-model/person-train-model/train-result/artifacts/reports/person_fullframe_with_new_labels_baseline_eval.json`
+- `backend-train-model/person-train-model/train-result/prepared/person_fullframe_with_new_labels/sequence_contiguous/prepare_report.json`
+- `backend-train-model/person-train-model/train-result/person_source_dataset_summary_fullframe_with_new_labels.json`
+
+### 2. 结果解读边界
+
+- `person_fullframe_with_new_labels` 与旧 `person_fullframe` 不是同一个 `dataset.yaml`，因此这组对比不是严格同数据集公平消融，更适合写成“扩样前后 fullframe 分支的实际收益”。
+- 本次新样本合并后，训练集规模从 `502` 张扩展到 `3009` 张，`person` 框从 `1658` 个扩展到 `8861` 个；因此指标变化既包含数据扩样收益，也包含新样本域带来的难度变化。
+- 当前 report 里出现的 `E:\...` 绝对路径，是训练机器上的历史元数据，不影响已经保存的 metric 数值；跨机器复跑时应改用当前机器路径或仓库内配置入口。
+
+### 3. Test 指标对比
+
+| 版本 | Precision | Recall | mAP50 | mAP75 | mAP50-95 |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| `person_fullframe_with_new_labels` | `0.9304` | `0.8552` | `0.9054` | `0.4527` | `0.4802` |
+| `person_fullframe` | `0.9228` | `0.6740` | `0.7606` | `0.4064` | `0.4102` |
+
+### 4. Val 指标对比
+
+| 版本 | Precision | Recall | mAP50 | mAP75 | mAP50-95 |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| `person_fullframe_with_new_labels` | `0.9554` | `0.9067` | `0.9517` | `0.4910` | `0.5095` |
+| `person_fullframe` | `0.9677` | `0.8215` | `0.9134` | `0.6222` | `0.5691` |
+
+### 5. 数据集统计对比
+
+| 版本 | images | boxes | train | val | test | empty labels |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| `person_fullframe_with_new_labels` | `3009` | `8861` | `2105` | `453` | `451` | `13` |
+| `person_fullframe` | `502` | `1658` | `350` | `77` | `75` | `8` |
+
+可以看到：
+
+- 新增样本带来的数据量提升非常明显，图像数增加了 `2507` 张，框数增加了 `7203` 个。
+- 这次提升最直接体现在 `test Recall`、`mAP50`、`mAP50-95`，说明扩样后模型对更多 person 形态有了更强覆盖。
+- 但 `test mAP50-95 = 0.4802` 仍然不算高，`mAP75 = 0.4527` 也偏低，说明**高 IoU 下的定位精度仍是当前短板**，尤其是小目标、远景、遮挡与边界框贴合度。
+
+### 6. 增量对比
+
+#### 6.1 `person_fullframe_with_new_labels` 相比 `person_fullframe`（Test）
+
+| 指标 | 增量 |
+| --- | ---: |
+| Precision | `+0.0076` |
+| Recall | `+0.1812` |
+| mAP50 | `+0.1448` |
+| mAP75 | `+0.0463` |
+| mAP50-95 | `+0.0700` |
+
+相对变化：
+
+- Precision：约 `+0.8%`
+- Recall：约 `+26.9%`
+- mAP50：约 `+19.0%`
+- mAP75：约 `+11.4%`
+- mAP50-95：约 `+17.1%`
+
+这说明这次扩样不是“只提升一点点”，而是确实把 fullframe 分支的整体覆盖能力拉上来了；但如果把重点放在小目标和高 IoU 框质量上，当前结果仍然属于“有明显进步，但离很强还有距离”。
+
+### 7. 当前对小目标的迭代建议
+
+当前这个结果最值得继续追的不是单纯再堆训练轮数，而是围绕 **高 IoU 定位误差** 做单因子实验，优先顺序建议如下：
+
+1. **先提输入分辨率**：在同一数据集上做 `imgsz=640 -> 768 -> 960` 的单因子对照；小目标最直接的收益通常来自更多像素。
+2. **再做难样本补齐**：把远景、遮挡、逆光、半身、密集人群、极小框序列单独做 hard set，优先补 `D15_20260119061405`、`D15_20260119203927`、`D02_20260123074836`、`D02_20260123070624` 这类难序列。
+3. **提高定位能力而不是只堆 recall**：训练后期适当减弱过强的数据增强，尽量保留更多局部细节；必要时用更高容量模型做第二阶段对照。
+4. **如果小目标集中在固定区域，考虑局部裁切 / 切片分支**：对超小人或密集区，局部 crop + 保留上下文通常比继续放大全图更有效。
+
+### 8. 最终结论
+
+1. `person_fullframe_with_new_labels_baseline` 相比旧 `person_fullframe_baseline` 是一次**明确有效的扩样提升**，尤其在 `Recall` 和 `mAP50-95` 上有明显进步。
+2. 但 `mAP50-95 = 0.4802` 还没有到“很强”的程度；如果你的重点是小目标和高 IoU 框质量，当前瓶颈已经从“有没有检测到”转向“框是否足够准”。
+3. 所以下一轮不建议继续只看总指标，而应优先围绕 **分辨率、难样本、定位能力、局部裁切** 这四个方向做单因子对照。
+
 ## 2026-04-28 `person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_img768` 对比
 
 ### 1. 对比对象
