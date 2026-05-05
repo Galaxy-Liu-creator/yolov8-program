@@ -1,5 +1,154 @@
 ﻿# Update Log
 
+## 2026-05-05 按 gnew 多视频拼接事实改造 new_clothes_train 切分策略并同步文档
+
+1. 变更来源：用户明确说明 `gnew` 不是单一连续序列，而是由 `3~4` 个不同视频 / 场景拼接形成，要求按 `new_clothes_train/train-docs/check_log.md` 的建议修正切分逻辑，优先保证训练评估分布更稳，并同步更新运行文档与审查日志。
+2. 变更总览：
+   - 更新 `new_clothes_train/train-code/prepare_new_clothes_dataset.py`：将 gnew 的切分策略从 `sequence_contiguous_by_sorted_stem` 改为 `stratified_random_by_positive_empty`，按 `positive / empty` 两层独立随机分配 `train / val / test`，固定 `seed=42`。
+   - 重新生成 `new_clothes_train/splits/clothes_merged_with_new_labels_v1.split.csv` 与 `clothes_merged_with_new_labels_v1_summary.json`。
+   - 重新 build `new_clothes_train/datasets/clothes_merged_with_new_labels_v1/`，让新的 split 真正进入 merged 数据集。
+   - 更新 `new_clothes_train/train-code/validate_new_clothes_source.py`：校验逻辑对齐 `build_merged_clothes_dataset.py` 的坐标容差与边界处理，避免把可被 builder 正常接受的轻微边界框误报为非法标注。
+   - 更新 `new_clothes_train/train-docs/new_clothes_run_method.md`，把 gnew 新切分策略、修复后的分布统计、build 后关键计数和校验结果写成最新正式口径。
+   - 更新 `new_clothes_train/train-docs/check_log.md`，把“旧版 contiguous 问题”与“本轮已执行修复结果”区分清楚，并把“gnew 由 3~4 个视频 / 场景拼接形成”升级为已确认事实。
+3. 涉及文件：
+   - `backend-train-model/new_clothes_train/train-code/prepare_new_clothes_dataset.py`
+   - `backend-train-model/new_clothes_train/train-code/validate_new_clothes_source.py`
+   - `backend-train-model/new_clothes_train/splits/clothes_merged_with_new_labels_v1.split.csv`
+   - `backend-train-model/new_clothes_train/splits/clothes_merged_with_new_labels_v1_summary.json`
+   - `backend-train-model/new_clothes_train/train-docs/new_clothes_run_method.md`
+   - `backend-train-model/new_clothes_train/train-docs/check_log.md`
+   - `backend-train-model/docs/update_log.md`
+4. 新增 / 变更配置项：
+   - gnew 切分策略：`sequence_contiguous_by_sorted_stem -> stratified_random_by_positive_empty`
+   - gnew 切分随机种子：`seed=42`
+   - gnew `holdout_group`：`new_source_sequence_contiguous_v1 -> new_source_stratified_random_v2`
+   - 校验脚本新增容差常量：`COORD_TOLERANCE=1e-6`、`BOX_EDGE_TOLERANCE=1e-6`
+5. 兼容性注意：
+   - 这次修改不会影响 legacy `g31/g32/g33` 的 split 口径，它们仍沿用既有 `trainval_balanced_v1` 与 `unified_holdout_v1`。
+   - 当前“分层随机切分”是为先修复 gnew `val/test` 分布失衡问题而采用的稳妥版本；它比旧 contiguous 方案更适合当前训练，但仍不是最终的“按真实视频场景整段切分”终态。
+   - 如果后续能补齐每段视频对应的 stem 范围，建议继续升级为“按场景整段切分 + 场景级 split 分配”。
+   - `validate_new_clothes_source.py` 的“非法标注”口径现在与 builder 对齐，因此更新后 `invalid_label_file_count=0` 不表示原始标注完全无边界贴边现象，而是表示不存在超出 builder 可接受容差的非法 YOLO 行。
+6. 本轮明确不改动的部分：
+   - 不修改 `All-train-model/` 下现有 baseline、历史 runs、旧 split manifest 和既有基线结论。
+   - 不修改 `inspection-flask/` 在线链路、person 主线或其他监控方向代码。
+
+## 2026-05-05 统一 person 主线分桶与 person-guided clothes 路线验证的优先级
+
+1. 变更来源：用户指出 `person_train_solution.md` 中“先做 hard sample 分桶”和 `experence_from_yolov5.md` 中“person-guided clothes 路线验证”看起来像两套并列建议，要求统一两者的推进顺序并写回 person 训练分析文档。
+2. 变更总览：
+   - 在 `backend-train-model/person-train-model/train-docs/person_train_solution.md` 顶部新增一条 `2026-05-05` 记录段。
+   - 明确区分：`person hard sample 分桶` 解决的是上游 `person` 主线诊断问题；`oracle / pred person-guided clothes` 解决的是下游 clothes 路线验证问题。
+   - 统一写清当前优先级：先继续做 `person` 主线的 hard sample 分桶；再对 current clothes fullframe hardest cases 做轻量复盘；只有当 clothes 难例也明显集中在 person 附着小目标场景时，才启动小规模 `oracle person-guided clothes` 验证；只有 oracle 版明确胜出，才继续推进真实 `pred-personcrop clothes`。
+   - 把 `experence_from_yolov5.md` 中的路线建议正式降为“person 主线之后的次级验证分支”，避免误解为当前要立即依赖尚不稳定的 person 预测框切换主线。
+3. 涉及文件：
+   - `backend-train-model/person-train-model/train-docs/person_train_solution.md`
+   - `backend-train-model/docs/update_log.md`
+4. 新增 / 变更配置项：
+   - 无新增 JSON 配置字段。
+   - 本轮仅统一分析文档中的优先级与术语边界，不改训练脚本、配置文件、评估命令或现有实验产物。
+5. 兼容性注意：
+   - 本轮没有否定 `person-guided clothes` 路线本身，而是把它的位置明确调整为：在 `person` 主线分桶之后、并且有 clothes hard case 证据支持时再启动的小规模验证分支。
+   - 文档中的 `oracle person-guided clothes` 仍然只是路线验证概念，不等同于最终部署链路；后续若要落地到真实链路，仍需单独评估 `pred-personcrop clothes` 受到当前 person 上游误差影响的幅度。
+6. 本轮明确不改动的部分：
+   - 不修改 `backend-train-model/docs/experence_from_yolov5.md` 中已有结论，只在 `person_train_solution.md` 中补充统一后的主线优先级说明。
+   - 不修改现有 clothes / person 训练脚本、prepared 数据集、权重、评估报告和既有基线指标。
+
+## 2026-05-05 新增 new_clothes_train 的工服扩样整理配置与运行文档
+
+1. 变更来源：用户提供新的 `clothes` 标注数据源，要求将其与 `All-train-model/` 中现有 legacy clothes 数据整合，在 `backend-train-model/new_clothes_train/` 下补齐整理脚本、build 配置、训练配置和运行文档，并确保缺失标注图片自动补空白 txt。
+2. 变更总览：
+   - 新增 `new_clothes_train/train-code/prepare_new_clothes_dataset.py`，用于扫描 `new_clothes_labels` 图片与标注、自动补齐空白 txt、继承旧 split manifest，并生成新的 merged split 清单与统计摘要。
+   - 新增 `new_clothes_train/new_clothes_train_project_config.json`，默认训练参数对齐当前 clothes 主线：`imgsz=640`、`epochs=180`、`batch=4`、`patience=40`、`workers=4`、`device=0`、`seed=42`。
+   - 新增 `new_clothes_train/clothes_merged_with_new_labels_v1.build.json`，沿用现有 `All-train-model/*.build.json` 的 JSON 风格，接入旧 7 个 legacy source 与新的 `gnew` source。
+   - 新增 `new_clothes_train/new_clothes_run_method.md`，记录数据来源、缺标补空规则、切分方式、整理结果，以及 build / train / evaluate / export 命令。
+   - 已生成 `new_clothes_train/train-result/working/new_source_prepare_summary.json`、`new_clothes_train/splits/clothes_merged_with_new_labels_v1.split.csv`、`new_clothes_train/splits/clothes_merged_with_new_labels_v1_summary.json` 等整理产物。
+3. 涉及文件：
+   - `backend-train-model/new_clothes_train/train-code/prepare_new_clothes_dataset.py`
+   - `backend-train-model/new_clothes_train/new_clothes_train_project_config.json`
+   - `backend-train-model/new_clothes_train/clothes_merged_with_new_labels_v1.build.json`
+   - `backend-train-model/new_clothes_train/new_clothes_run_method.md`
+   - `backend-train-model/new_clothes_train/train-result/working/new_source_prepare_summary.json`
+   - `backend-train-model/new_clothes_train/splits/clothes_merged_with_new_labels_v1.split.csv`
+   - `backend-train-model/new_clothes_train/splits/clothes_merged_with_new_labels_v1_summary.json`
+   - `backend-train-model/docs/update_log.md`
+4. 新增 / 变更配置项：
+   - 新增 `source_id=gnew`、`sequence_name=new_clothes_flat_2507` 的新数据源接入配置。
+   - 新增 `split_manifest_csv=new_clothes_train/splits/clothes_merged_with_new_labels_v1.split.csv`。
+   - 新增新源补齐标注目录：`new_clothes_train/train-result/working/new_source_completed_labels`。
+   - 新增独立训练配置文件：`new_clothes_train/new_clothes_train_project_config.json`。
+5. 兼容性注意：
+   - 旧 7 个 legacy clothes source 不重新洗牌，继续继承 `trainval_balanced_v1` 与 `unified_holdout_v1` 的既有切分，避免破坏当前基线对照口径。
+   - 新增 `gnew` 源当前按平铺文件名排序后做 `70/15/15` 连续切分；如果后续确认存在更细粒度时序边界，应再拆分 sequence 后重建 manifest。
+   - `classes.txt` 被识别为说明性孤立文件，不参与样本配对或训练。
+   - 构建 merged 数据集时应先进入 `backend-train-model/` 目录执行 `build_merged_clothes_dataset.py`，否则会因工作目录错误找不到脚本。
+6. 本轮明确不改动的部分：
+   - 不修改 `All-train-model/` 下现有 baseline、历史 runs、旧 split manifest 和已固化评估结论。
+   - 不修改 `inspection-flask/` 在线链路、person 训练主线或其他监控方向代码。
+
+## 2026-05-05 继续细化 YOLOv5 经验文档中的 person-guided clothes 执行顺序
+
+1. 变更来源：用户进一步指出当前 person 指标并不乐观，要求把 `experence_from_yolov5.md` 中关于 `personcrop clothes` 的建议改得更严谨，避免误写成“现在就应直接依赖当前 person 预测框做主线”。
+2. 变更总览：
+   - 更新 `backend-train-model/docs/experence_from_yolov5.md` 中关于 `person-guided clothes` 的描述。
+   - 明确区分三条路线：`fullframe clothes`、`oracle personcrop clothes`、`pred-personcrop clothes`。
+   - 明确写入：当前更合理的优先级应是先做 **oracle 路线验证**，先判断“路线值不值”，而不是直接把 `pred-personcrop clothes` 升级为下一条默认主线。
+   - 补充更详细的建议执行顺序：先复盘 fullframe hard cases，再做 oracle person-guided 对照，只有当 oracle 版明显优于 fullframe 时，才继续推进依赖当前 person 上游的真实 `pred-personcrop clothes`，之后再考虑更大模型、细粒度标签和更接近旧系统的端到端规则链实验。
+3. 涉及文件：
+   - `backend-train-model/docs/experence_from_yolov5.md`
+   - `backend-train-model/docs/update_log.md`
+4. 新增 / 变更配置项：
+   - 无新增 JSON 配置字段。
+   - 本轮仅细化分析文档中的实验顺序与术语边界，不修改训练脚本、配置文件或评估命令。
+5. 兼容性注意：
+   - 文档中的 `oracle personcrop clothes` 是“路线验证”概念，不等同于最终部署链路；后续若要落地为真实线上方案，仍需单独评估 `pred-personcrop clothes` 受到当前 person 上游误差影响的幅度。
+   - 本轮没有否定 `person-guided clothes` 路线本身，而是把其研究顺序从“直接上依赖 person 预测框的主线”调整为“先做不依赖当前 person 质量的 oracle 验证”。
+6. 本轮明确不改动的部分：
+   - 不修改 `inspection-flask_old/` 下任何旧代码、旧权重或旧文档。
+   - 不修改 `backend-train-model/` 下现有 clothes / person 训练脚本、prepared 数据集、基线指标和 person 训练主线结论。
+
+## 2026-05-05 新增基于 inspection-flask_old 的 YOLOv5 工服经验审查文档
+
+1. 变更来源：用户要求审查 `inspection-flask_old/` 中旧版 YOLOv5 工服检测代码，梳理其训练线索、数据切分线索与可借鉴经验，并将分析结论沉淀为新文档 `experence_from_yolov5.md`。
+2. 变更总览：
+   - 新增 `backend-train-model/docs/experence_from_yolov5.md`。
+   - 文档系统性梳理了旧代码中能确认的 YOLOv5 工服线证据：权重入口、推理参数、person-guided 白底输入流程、`coat / cloth / shirt` 标签语义、以及旧线上规则判断方式。
+   - 明确记录：`inspection-flask_old/` 内未保留可直接复现的 `train.py`、`val.py`、工服 `data.yaml`、split manifest 或正式评估报告，因此无法从当前旧仓库唯一还原其 train/val/test 切分方法。
+   - 基于现有证据总结对当前 YOLOv8 clothes 训练最值得借鉴的方向：优先做 `person-guided clothes` 对照、优先解决小目标有效像素与背景干扰问题，再考虑更大模型、细粒度标签或更大输入尺寸。
+3. 涉及文件：
+   - `backend-train-model/docs/experence_from_yolov5.md`
+   - `backend-train-model/docs/update_log.md`
+4. 新增 / 变更配置项：
+   - 无新增 JSON 配置字段。
+   - 本轮仅新增分析文档，不修改训练脚本、数据集配置、评估口径或在线链路配置。
+5. 兼容性注意：
+   - 文档中的“旧 YOLOv5 训练与切分方法”只写入了当前仓库能核实的部分；未找到的训练脚本、dataset yaml 和 split 文件已明确标注为缺失，不应把推断写成既定事实。
+   - 文档中的建议重点是路线借鉴，不代表当前应直接回退到 YOLOv5 或直接推翻现有 YOLOv8 fullframe baseline。
+6. 本轮明确不改动的部分：
+   - 不修改 `inspection-flask_old/` 下任何旧代码、旧权重或旧文档。
+   - 不修改 `backend-train-model/` 下现有 clothes / person 训练脚本、prepared 数据集和基线指标。
+
+## 2026-05-05 修订 person fullframe 扩样分析文档中的 img768 结论与后续顺序
+
+1. 变更来源：用户要求基于已经完成的 `person_fullframe_with_new_labels_img768` 正式评估结果，修订 `person_train_solution.md` 中关于 `mAP50-95` 提升不上去的原因分析、两次训练早停结论以及后续推荐执行顺序。
+2. 变更总览：
+   - 在 `person_train_solution.md` 顶部新增 `2026-05-05` 记录段，保留 `2026-05-04` 旧记录作为历史对照。
+   - 用当前正式 `train 768 + eval 768` 报告修正 `img768` 的外部 eval 数值：val `0.51466`、test `0.49699`。
+   - 将“当前正式 `img768` 是按 640 误评估”的表述降级为历史命令风险说明，明确当前保留的正式 eval 报告已经按 `768` 运行。
+   - 细化早停结论：明确 `img768` 可视为平台期 patience 早停；baseline 因为是 resume run，只表述为后段平台化，不再写成同等强度的标准早停证据。
+   - 同步把推荐执行顺序改为：先锁定现有正式结论，再做 hard sample 分桶复盘，之后按小目标 / 暗光主因分流，最后再考虑更大模型或额外稳定性对照。
+3. 涉及文件：
+   - `backend-train-model/person-train-model/train-docs/person_train_solution.md`
+   - `backend-train-model/docs/update_log.md`
+4. 新增 / 变更配置项：
+   - 无新增 JSON 配置字段。
+   - 本轮仅更新分析文档口径与推荐执行顺序，不改训练 / 评估命令、不改脚本默认参数。
+5. 兼容性注意：
+   - 本轮不会重跑训练、评估或复盘脚本；文档中的最新结论以当前仓库已保留的 `results.csv`、`*_train.json`、`*_eval.json` 为依据。
+   - `2026-05-04` 旧记录仍保留，后续阅读时应以前置的 `2026-05-05` 新记录为最新结论。
+6. 本轮明确不改动的部分：
+   - 不修改任何训练脚本、prepared 数据集、权重文件或评估报告内容。
+   - 不改写 `person_run_method.md`、ROI-aware 相关配置和在线链路代码。
+
 ## 2026-05-05 修正 person fullframe img768 的评估命令口径
 
 1. 变更来源：用户准备重新评估 `person_fullframe_with_new_labels_img768`，要求把运行文档中的对应评估命令替换成能够同时保证评估指标与报告元数据自洽的版本，并明确继续覆盖旧报告。

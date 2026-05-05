@@ -10,7 +10,8 @@
       "WebFetch(domain:github.com)",
       "Bash(python:*)",
       "WebFetch(domain:www.firecrawl.dev)",
-      "Bash(dir \"D:\\\\University-Competition\\\\Innovation_Entrepreneurship\\\\MyProgram\\\\yolov8-program\\\\backend-train-model\\\\All-train-model\\\\\" 2>&1:*)"
+      "Bash(dir \"D:\\\\University-Competition\\\\Innovation_Entrepreneurship\\\\MyProgram\\\\yolov8-program\\\\backend-train-model\\\\All-train-model\\\\\" 2>&1:*)",
+      "Bash(dir /s /b \"D:\\\\University-Competition\\\\Innovation_Entrepreneurship\\\\MyProgram\\\\yolov8-program\\\\backend-train-model\\\\new_clothes_train\")"
     ]
   }
 }

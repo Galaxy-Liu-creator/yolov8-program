@@ -1,0 +1,63 @@
+{
+  "dataset_name": "clothes_merged_with_new_labels_v1",
+  "seed": 42,
+  "legacy_old_split_policy": {
+    "trainval_manifest": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\All-train-model\\splits\\trainval_balanced_v1.split.csv",
+    "holdout_manifest": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\All-train-model\\splits\\unified_holdout_v1.split.csv",
+    "description": "旧 7 个 clothes source 保持现有 balanced train/val 与 unified holdout test 分配不变。"
+  },
+  "new_source_split_policy": {
+    "source_id": "gnew",
+    "sequence_name": "new_clothes_flat_2507",
+    "strategy": "stratified_random_by_positive_empty",
+    "train_ratio": 0.7,
+    "val_ratio": 0.15,
+    "test_ratio": 0.15000000000000005,
+    "seed": 42
+  },
+  "prepare_summary": {
+    "new_image_root": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\new_clothes_labels\\images",
+    "new_raw_label_root": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\new_clothes_labels\\clothes_labels",
+    "completed_label_root": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\new_clothes_train\\train-result\\working\\new_source_completed_labels",
+    "image_count": 2507,
+    "existing_label_count": 2188,
+    "created_empty_label_count": 319,
+    "positive_label_file_count": 2185,
+    "empty_label_file_count": 322,
+    "orphan_label_count": 1,
+    "orphan_label_stems": [
+      "classes"
+    ]
+  },
+  "overall_split_counts": {
+    "train": 2106,
+    "val": 450,
+    "test": 453
+  },
+  "overall_split_source_counts": {
+    "train": {
+      "g31": 67,
+      "g32": 209,
+      "g33": 76,
+      "gnew": 1754
+    },
+    "val": {
+      "g31": 14,
+      "g32": 45,
+      "g33": 16,
+      "gnew": 375
+    },
+    "test": {
+      "g31": 14,
+      "g32": 45,
+      "g33": 16,
+      "gnew": 378
+    }
+  },
+  "overall_source_totals": {
+    "g31": 95,
+    "g32": 299,
+    "g33": 108,
+    "gnew": 2507
+  }
+}
