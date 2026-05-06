@@ -1,20 +1,49 @@
 ﻿# Update Log
 
+## 2026-05-06 新增 person hardest val/test 分桶复盘文档并沉淀结论
+
+1. 变更来源：用户要求说明 `person_fullframe_with_new_labels` 这条线中“对 hardest val/test 样本做分桶复盘”应该怎么做，并让我实际完成这轮分桶、给出最终结论；随后又要求把这次分桶结果写入 `backend-train-model/person-train-model/train-docs/person分桶.md`，再继续给出更贴近业务语义的二层归纳。
+2. 变更总览：
+   - 新增并填充 `backend-train-model/person-train-model/train-docs/person分桶.md`。
+   - 文档明确写入本轮复盘口径：对 `baseline / img768` 的 `val / test` 四组结果，在 `conf=0.25 / nms_iou=0.7 / match_iou=0.5` 下做逐图 FP/FN 复盘，并对每个 FN GT 框计算 `best_iou / rel_height / min_edge_px` 后分桶。
+   - 文档沉淀四类算法桶：`small_boundary_person`、`small_interior_person`、`medium_large_pose_or_appearance`、`crowded_or_localization`，并分别给出 baseline val、baseline test、img768 val、img768 test 的 FN 数量、占比、主要序列和 hardest 图片。
+   - 文档补充 baseline 与 img768 的合并视角对比，明确记录：两者 hardest FN 的主体都不是单纯边界小人，而是 `medium_large_pose_or_appearance + small_interior_person`；`img768` 没有改变失败结构，反而让 `medium_large_pose_or_appearance` 占比更高。
+   - 文档继续给出更贴近业务语义的二层归纳和下一步优先级：先围绕 `D15_20260119061405 / D15_20260119203927` 做中等/较大难例人工复核，再围绕 `D02_20260123070624 / D02_20260123074836` 看小型内部 / 边界人问题，最后才考虑是否把 `person-guided clothes` 提升为后续验证分支。
+   - 按用户后续要求，不再单独拆新的 `person语义细分桶.md`，而是把“语义细分桶怎么做”直接并入 `person分桶.md`：新增最该优先人工复核的序列 / 图片、建议语义标签集合、逐 GT 标注字段、从算法分桶到人工语义复核的执行步骤，以及建议的 review 目录结构。
+   - 文档明确写清：当前不需要把全部 FN 全量人工看完，更推荐“自动分桶预筛 + 关键代表帧人工复核”的两层流程；第一批优先帧聚焦 `D15_20260119061405_frame_0345/0346/0348/0355`、`D02_20260123070624_frame_0060/0061`、`D02_20260123074836_frame_0022`、`D05_20260123074841_frame_0026`。
+   - 为了先把“算法预筛能做的全部做完”，本轮新增自动统计产物 `backend-train-model/person-train-model/train-result/review/person_fullframe_with_new_labels_prescreen_summary.json`，在 4 个既有 FN 主桶之外，又额外计算了 `size_bin / pred_mode / crowd_bin / edge / combined repeated frames` 等辅助预筛结果。
+   - `person分桶.md` 继续补入上述辅助预筛规则的显式定义，并把 4 个 run 的扩展统计表、4 run 合并后的 hardest sequences / repeated frames，以及自动评分后建议优先人工复核的代表帧名单写入文档。
+   - 文档同时明确区分：FN 四桶是当前主结论的正式分桶口径；`size_bin / pred_mode / crowd_bin / edge` 是本轮新增的 heuristic 预筛规则，只用于先缩小人工复核范围，不应误写成长期固定 canonical 标准。
+3. 涉及文件：
+   - `backend-train-model/person-train-model/train-docs/person分桶.md`
+   - `backend-train-model/person-train-model/train-result/review/person_fullframe_with_new_labels_prescreen_summary.json`
+   - `backend-train-model/docs/update_log.md`
+4. 新增 / 变更配置项：
+   - 无新增 JSON 配置字段。
+   - 本轮仅新增分析文档与结论，不修改训练脚本、project config、prepared 数据集、权重文件或评估命令。
+5. 兼容性注意：
+   - 文档中的分桶是基于现有 `fpfn_per_image.json` 复盘结果和统一几何规则得到的“算法分桶”，不是逐帧人工逐框标注的新真值；当前新增的语义细分桶部分主要是执行指南和目录设计，不等于已经完成全量人工语义标注。
+   - 当前新增的 `size_bin / pred_mode / crowd_bin / edge` 统计，是为了本轮“先自动做完预筛”而显式定义的辅助 heuristic；后续若继续复用这些统计，必须沿用本文档写清的阈值，不要把它们误当成仓库历史上早已固定的官方桶定义。
+   - 本轮把 `person分桶.md` 作为独立分析入口使用，不替代 `person_train_solution.md` 中更宏观的结论记录；两者应保持“一个讲全局方案，一个讲分桶细节”的分工。
+6. 本轮明确不改动的部分：
+   - 不修改 `person_train_solution.md`、`experence_from_yolov5.md` 的既有结论。
+   - 不修改现有 clothes / person 训练脚本、prepared 数据集、权重、评估报告与当前主线配置。
+
 ## 2026-05-05 按 gnew 多视频拼接事实改造 new_clothes_train 切分策略并同步文档
 
 1. 变更来源：用户明确说明 `gnew` 不是单一连续序列，而是由 `3~4` 个不同视频 / 场景拼接形成，要求按 `new_clothes_train/train-docs/check_log.md` 的建议修正切分逻辑，优先保证训练评估分布更稳，并同步更新运行文档与审查日志。
 2. 变更总览：
    - 更新 `new_clothes_train/train-code/prepare_new_clothes_dataset.py`：将 gnew 的切分策略从 `sequence_contiguous_by_sorted_stem` 改为 `stratified_random_by_positive_empty`，按 `positive / empty` 两层独立随机分配 `train / val / test`，固定 `seed=42`。
-   - 重新生成 `new_clothes_train/splits/clothes_merged_with_new_labels_v1.split.csv` 与 `clothes_merged_with_new_labels_v1_summary.json`。
-   - 重新 build `new_clothes_train/datasets/clothes_merged_with_new_labels_v1/`，让新的 split 真正进入 merged 数据集。
+   - 重新生成 `new_clothes_train/train-result/splits/clothes_merged_with_new_labels_v1.split.csv` 与 `clothes_merged_with_new_labels_v1_summary.json`。
+   - 重新 build `new_clothes_train/train-result/datasets/clothes_merged_with_new_labels_v1/`，让新的 split 真正进入 merged 数据集。
    - 更新 `new_clothes_train/train-code/validate_new_clothes_source.py`：校验逻辑对齐 `build_merged_clothes_dataset.py` 的坐标容差与边界处理，避免把可被 builder 正常接受的轻微边界框误报为非法标注。
    - 更新 `new_clothes_train/train-docs/new_clothes_run_method.md`，把 gnew 新切分策略、修复后的分布统计、build 后关键计数和校验结果写成最新正式口径。
    - 更新 `new_clothes_train/train-docs/check_log.md`，把“旧版 contiguous 问题”与“本轮已执行修复结果”区分清楚，并把“gnew 由 3~4 个视频 / 场景拼接形成”升级为已确认事实。
 3. 涉及文件：
    - `backend-train-model/new_clothes_train/train-code/prepare_new_clothes_dataset.py`
    - `backend-train-model/new_clothes_train/train-code/validate_new_clothes_source.py`
-   - `backend-train-model/new_clothes_train/splits/clothes_merged_with_new_labels_v1.split.csv`
-   - `backend-train-model/new_clothes_train/splits/clothes_merged_with_new_labels_v1_summary.json`
+   - `backend-train-model/new_clothes_train/train-result/splits/clothes_merged_with_new_labels_v1.split.csv`
+   - `backend-train-model/new_clothes_train/train-result/splits/clothes_merged_with_new_labels_v1_summary.json`
    - `backend-train-model/new_clothes_train/train-docs/new_clothes_run_method.md`
    - `backend-train-model/new_clothes_train/train-docs/check_log.md`
    - `backend-train-model/docs/update_log.md`
@@ -61,19 +90,19 @@
    - 新增 `new_clothes_train/new_clothes_train_project_config.json`，默认训练参数对齐当前 clothes 主线：`imgsz=640`、`epochs=180`、`batch=4`、`patience=40`、`workers=4`、`device=0`、`seed=42`。
    - 新增 `new_clothes_train/clothes_merged_with_new_labels_v1.build.json`，沿用现有 `All-train-model/*.build.json` 的 JSON 风格，接入旧 7 个 legacy source 与新的 `gnew` source。
    - 新增 `new_clothes_train/new_clothes_run_method.md`，记录数据来源、缺标补空规则、切分方式、整理结果，以及 build / train / evaluate / export 命令。
-   - 已生成 `new_clothes_train/train-result/working/new_source_prepare_summary.json`、`new_clothes_train/splits/clothes_merged_with_new_labels_v1.split.csv`、`new_clothes_train/splits/clothes_merged_with_new_labels_v1_summary.json` 等整理产物。
+   - 已生成 `new_clothes_train/train-result/working/new_source_prepare_summary.json`、`new_clothes_train/train-result/splits/clothes_merged_with_new_labels_v1.split.csv`、`new_clothes_train/train-result/splits/clothes_merged_with_new_labels_v1_summary.json` 等整理产物。
 3. 涉及文件：
    - `backend-train-model/new_clothes_train/train-code/prepare_new_clothes_dataset.py`
    - `backend-train-model/new_clothes_train/new_clothes_train_project_config.json`
    - `backend-train-model/new_clothes_train/clothes_merged_with_new_labels_v1.build.json`
    - `backend-train-model/new_clothes_train/new_clothes_run_method.md`
    - `backend-train-model/new_clothes_train/train-result/working/new_source_prepare_summary.json`
-   - `backend-train-model/new_clothes_train/splits/clothes_merged_with_new_labels_v1.split.csv`
-   - `backend-train-model/new_clothes_train/splits/clothes_merged_with_new_labels_v1_summary.json`
+   - `backend-train-model/new_clothes_train/train-result/splits/clothes_merged_with_new_labels_v1.split.csv`
+   - `backend-train-model/new_clothes_train/train-result/splits/clothes_merged_with_new_labels_v1_summary.json`
    - `backend-train-model/docs/update_log.md`
 4. 新增 / 变更配置项：
    - 新增 `source_id=gnew`、`sequence_name=new_clothes_flat_2507` 的新数据源接入配置。
-   - 新增 `split_manifest_csv=new_clothes_train/splits/clothes_merged_with_new_labels_v1.split.csv`。
+   - 新增 `split_manifest_csv=new_clothes_train/train-result/splits/clothes_merged_with_new_labels_v1.split.csv`。
    - 新增新源补齐标注目录：`new_clothes_train/train-result/working/new_source_completed_labels`。
    - 新增独立训练配置文件：`new_clothes_train/new_clothes_train_project_config.json`。
 5. 兼容性注意：

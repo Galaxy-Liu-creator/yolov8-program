@@ -46,8 +46,8 @@
 ### 3.3 生成产物
 
 - `backend-train-model/new_clothes_train/train-result/working/new_source_prepare_summary.json`
-- `backend-train-model/new_clothes_train/splits/clothes_merged_with_new_labels_v1.split.csv`
-- `backend-train-model/new_clothes_train/splits/clothes_merged_with_new_labels_v1_summary.json`
+- `backend-train-model/new_clothes_train/train-result/splits/clothes_merged_with_new_labels_v1.split.csv`
+- `backend-train-model/new_clothes_train/train-result/splits/clothes_merged_with_new_labels_v1_summary.json`
 - `backend-train-model/new_clothes_train/train-result/working/new_source_completed_labels/*.txt`
 
 ## 4. 数据整理结果
@@ -199,7 +199,7 @@ D:\Miniconda3_python\envs\yolo_code\python.exe build_merged_clothes_dataset.py -
 
 正常构建后，目标数据集会落在：
 
-- `backend-train-model/new_clothes_train/datasets/clothes_merged_with_new_labels_v1/`
+- `backend-train-model/new_clothes_train/train-result/datasets/clothes_merged_with_new_labels_v1/`
 
 其中应包含与现有风格一致的：
 
@@ -233,19 +233,19 @@ D:\Miniconda3_python\envs\yolo_code\python.exe build_merged_clothes_dataset.py -
 构建完成后，使用下面命令训练：
 
 ```powershell
-D:\Miniconda3_python\envs\yolo_code\python.exe train_workwear.py train --project-config new_clothes_train\new_clothes_train_project_config.json --dataset-yaml new_clothes_train\datasets\clothes_merged_with_new_labels_v1\dataset.yaml --name clothes_merged_with_new_labels_v1_baseline
+D:\Miniconda3_python\envs\yolo_code\python.exe train_workwear.py train --project-config new_clothes_train\new_clothes_train_project_config.json --dataset-yaml new_clothes_train\train-result\datasets\clothes_merged_with_new_labels_v1\dataset.yaml --name clothes_merged_with_new_labels_v1_baseline
 ```
 
 ## 9. 评估命令
 
 ```powershell
-D:\Miniconda3_python\envs\yolo_code\python.exe train_workwear.py evaluate --project-config new_clothes_train\new_clothes_train_project_config.json --dataset-yaml new_clothes_train\datasets\clothes_merged_with_new_labels_v1\dataset.yaml --weights new_clothes_train\artifacts\runs\clothes_merged_with_new_labels_v1_baseline\weights\best.pt
+D:\Miniconda3_python\envs\yolo_code\python.exe train_workwear.py evaluate --project-config new_clothes_train\new_clothes_train_project_config.json --dataset-yaml new_clothes_train\train-result\datasets\clothes_merged_with_new_labels_v1\dataset.yaml --weights new_clothes_train\train-result\artifacts\runs\clothes_merged_with_new_labels_v1_baseline\weights\best.pt
 ```
 
 ## 10. 导出命令
 
 ```powershell
-D:\Miniconda3_python\envs\yolo_code\python.exe train_workwear.py export --project-config new_clothes_train\new_clothes_train_project_config.json --weights new_clothes_train\artifacts\runs\clothes_merged_with_new_labels_v1_baseline\weights\best.pt --overwrite
+D:\Miniconda3_python\envs\yolo_code\python.exe train_workwear.py export --project-config new_clothes_train\new_clothes_train_project_config.json --weights new_clothes_train\train-result\artifacts\runs\clothes_merged_with_new_labels_v1_baseline\weights\best.pt --overwrite
 ```
 
 ## 11. 结果目录约定
@@ -253,16 +253,19 @@ D:\Miniconda3_python\envs\yolo_code\python.exe train_workwear.py export --projec
 本轮 `new_clothes_train` 下的职责划分如下：
 
 - `train-code/`：新增整理脚本
-- `splits/`：本轮新的 split manifest 与统计
+- 根目录：build 配置与训练 project config 等入口文件
+- `train-result/splits/`：本轮新的 split manifest 与统计
 - `train-result/working/`：补齐标签与整理摘要
-- `datasets/`：构建后的标准 YOLO 数据集
-- `artifacts/`：训练 / 评估 / 导出结果
+- `train-result/datasets/`：构建后的标准 YOLO 数据集
+- `train-result/review/`：merged builder 输出的缺标审计结果
+- `train-result/artifacts/`：训练 / 评估 / 导出结果
 
 另外，本轮新增了新源数据检查脚本与报告：
 
 - 脚本：`backend-train-model/new_clothes_train/train-code/validate_new_clothes_source.py`
 - 原始检查报告 JSON：`backend-train-model/new_clothes_train/train-result/working/new_source_validation_report.json`
 - 原始检查报告 MD：`backend-train-model/new_clothes_train/train-result/working/new_source_validation_report.md`
+- 训练结果评审：`backend-train-model/new_clothes_train/train-docs/clothes_merged_with_new_labels_v1_eval_review.md`
 
 当前检查结论：
 

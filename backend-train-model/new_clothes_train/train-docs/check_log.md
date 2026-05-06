@@ -10,9 +10,9 @@
 具体文件：
 
 - `clothes_merged_with_new_labels_v1.build.json`
-- `splits/clothes_merged_with_new_labels_v1.split.csv`
-- `splits/clothes_merged_with_new_labels_v1_summary.json`
-- `datasets/clothes_merged_with_new_labels_v1/build_report.json`
+- `train-result/splits/clothes_merged_with_new_labels_v1.split.csv`
+- `train-result/splits/clothes_merged_with_new_labels_v1_summary.json`
+- `train-result/datasets/clothes_merged_with_new_labels_v1/build_report.json`
 
 ---
 

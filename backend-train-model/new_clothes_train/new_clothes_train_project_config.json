@@ -1,6 +1,6 @@
 {
   "artifacts": {
-    "root": "artifacts"
+    "root": "train-result/artifacts"
   },
   "data": {
     "class_names": {

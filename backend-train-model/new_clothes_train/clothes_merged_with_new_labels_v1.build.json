@@ -1,8 +1,8 @@
 {
   "dataset_name": "clothes_merged_with_new_labels_v1",
-  "output_root": "datasets/clothes_merged_with_new_labels_v1",
-  "review_root": "review/clothes_merged_with_new_labels_v1",
-  "split_manifest_csv": "splits/clothes_merged_with_new_labels_v1.split.csv",
+  "output_root": "train-result/datasets/clothes_merged_with_new_labels_v1",
+  "review_root": "train-result/review/clothes_merged_with_new_labels_v1",
+  "split_manifest_csv": "train-result/splits/clothes_merged_with_new_labels_v1.split.csv",
   "strict_split_manifest": true,
   "train_project_config": "new_clothes_train_project_config.json",
   "recommended_run_name": "clothes_merged_with_new_labels_v1_baseline",
