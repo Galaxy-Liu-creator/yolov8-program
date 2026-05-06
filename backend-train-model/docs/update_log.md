@@ -14,9 +14,32 @@
    - 为了先把“算法预筛能做的全部做完”，本轮新增自动统计产物 `backend-train-model/person-train-model/train-result/review/person_fullframe_with_new_labels_prescreen_summary.json`，在 4 个既有 FN 主桶之外，又额外计算了 `size_bin / pred_mode / crowd_bin / edge / combined repeated frames` 等辅助预筛结果。
    - `person分桶.md` 继续补入上述辅助预筛规则的显式定义，并把 4 个 run 的扩展统计表、4 run 合并后的 hardest sequences / repeated frames，以及自动评分后建议优先人工复核的代表帧名单写入文档。
    - 文档同时明确区分：FN 四桶是当前主结论的正式分桶口径；`size_bin / pred_mode / crowd_bin / edge` 是本轮新增的 heuristic 预筛规则，只用于先缩小人工复核范围，不应误写成长期固定 canonical 标准。
+   - 按用户最新要求，文档又进一步明确写入当前推荐推进顺序：现阶段先固定“按实际 FN 样本分桶”为主线，暂不切换到“按 8 个来源桶分桶”的补充分桶；只有当第一轮人工语义复核结束后，仍需要做来源归因时，再回头补做 8 来源桶视角的统计。
+   - 按用户后续要求，基于 `person分桶.md` 中推荐的目录结构，补齐了 `backend-train-model/person-train-model/train-result/review/person_fullframe_with_new_labels_hard_sample_review/` 下的 review 目录骨架，新增 `README.md`、`bucket_summary_links.md`、`semantic_bucket_summary.md`、`semantic_bucket_manifest.json` 以及 5 个重点序列的 `notes.md` 模板，并在各个 Markdown 文件中用中文写清用途和使用方式。
+   - 新增 `backend-train-model/person-train-model/train-docs/人工复核.md`，把人工复核所需软件、环境、安装方式、两种复核模式、LabelImg 具体使用步骤、语义标签解释、修框记录口径和第一轮建议执行顺序写成完整操作手册。
+   - 新增 `backend-train-model/person-train-model/train-code/export_hard_review_assets.py`，用于把当前优先人工复核帧按 `prepare_report.json` 的 8 个来源自动整理到 review 工作台，并为每张图生成按 run 区分的 overlay 图。
+   - 实际导出了 `20` 张当前优先人工复核图片，并在 `backend-train-model/person-train-model/train-result/review/person_fullframe_with_new_labels_hard_sample_review/by_source/` 下按 8 个来源建立 `source_*` 目录；每个来源目录内再按 `sequence_*` 拆分，并分别放入 `images/`、`labels/`、`overlays/`。
+   - 同步新增 `by_source/README.md` 与 `by_source/review_asset_manifest.json`，用于让组员按来源领取素材，并明确知道每张图对应哪些 run 的 overlay 文件。
+   - 进一步细化 `sequence_D15_20260119203927/notes.md`，补齐当前实际已经导出的 3 张代表帧：`0142 / 0143 / 0180`。
+   - 按用户最新要求，进一步把顶层 `sequence_*` 目录调整为“只保留 `notes.md` 记录文件”，不再在这些目录里重复维护图片、标签或 overlay；实际复核素材统一只放在 `by_source/` 下，同时同步修订 `person分桶.md`、`README.md`、相关 `notes.md` 和 `人工复核.md` 的说明口径。
+   - 按用户后续要求，在 `人工复核.md` 中新增一版明确的“组员统一填写规范”：补充多人协作时谁改 `notes.md`、谁汇总 `semantic_bucket_manifest.json`、谁最终更新 `semantic_bucket_summary.md` 的推荐流程，并明确 `by_source/review_asset_manifest.json` 只是素材索引文件，人工复核过程中不需要修改。
+   - 为避免组员误改全局文件，`人工复核.md` 进一步补充了可直接转发给组员的“最简规则”：默认只需要在 `by_source/` 看素材，并在对应 `sequence_*/notes.md` 记录观察；`semantic_bucket_manifest.json`、`semantic_bucket_summary.md` 与 `by_source/review_asset_manifest.json` 由指定汇总人或素材维护人统一处理。
 3. 涉及文件：
    - `backend-train-model/person-train-model/train-docs/person分桶.md`
+   - `backend-train-model/person-train-model/train-docs/人工复核.md`
+   - `backend-train-model/person-train-model/train-code/export_hard_review_assets.py`
    - `backend-train-model/person-train-model/train-result/review/person_fullframe_with_new_labels_prescreen_summary.json`
+   - `backend-train-model/person-train-model/train-result/review/person_fullframe_with_new_labels_hard_sample_review/README.md`
+   - `backend-train-model/person-train-model/train-result/review/person_fullframe_with_new_labels_hard_sample_review/bucket_summary_links.md`
+   - `backend-train-model/person-train-model/train-result/review/person_fullframe_with_new_labels_hard_sample_review/semantic_bucket_summary.md`
+   - `backend-train-model/person-train-model/train-result/review/person_fullframe_with_new_labels_hard_sample_review/semantic_bucket_manifest.json`
+   - `backend-train-model/person-train-model/train-result/review/person_fullframe_with_new_labels_hard_sample_review/by_source/README.md`
+   - `backend-train-model/person-train-model/train-result/review/person_fullframe_with_new_labels_hard_sample_review/by_source/review_asset_manifest.json`
+   - `backend-train-model/person-train-model/train-result/review/person_fullframe_with_new_labels_hard_sample_review/sequence_D15_20260119061405/notes.md`
+   - `backend-train-model/person-train-model/train-result/review/person_fullframe_with_new_labels_hard_sample_review/sequence_D15_20260119203927/notes.md`
+   - `backend-train-model/person-train-model/train-result/review/person_fullframe_with_new_labels_hard_sample_review/sequence_D02_20260123070624/notes.md`
+   - `backend-train-model/person-train-model/train-result/review/person_fullframe_with_new_labels_hard_sample_review/sequence_D02_20260123074836/notes.md`
+   - `backend-train-model/person-train-model/train-result/review/person_fullframe_with_new_labels_hard_sample_review/sequence_D05_20260123074841/notes.md`
    - `backend-train-model/docs/update_log.md`
 4. 新增 / 变更配置项：
    - 无新增 JSON 配置字段。
@@ -24,6 +47,12 @@
 5. 兼容性注意：
    - 文档中的分桶是基于现有 `fpfn_per_image.json` 复盘结果和统一几何规则得到的“算法分桶”，不是逐帧人工逐框标注的新真值；当前新增的语义细分桶部分主要是执行指南和目录设计，不等于已经完成全量人工语义标注。
    - 当前新增的 `size_bin / pred_mode / crowd_bin / edge` 统计，是为了本轮“先自动做完预筛”而显式定义的辅助 heuristic；后续若继续复用这些统计，必须沿用本文档写清的阈值，不要把它们误当成仓库历史上早已固定的官方桶定义。
+   - `person_fullframe_with_new_labels_hard_sample_review/` 下新增的目录骨架和 Markdown 文件，当前主要承担“人工复核工作台”和“模板”作用，其中大部分文件仍属于待填写状态；它们不是已经完成的人工结论本身。
+   - `by_source/` 下当前导出的图片集合，是基于这轮自动预筛后的优先人工复核名单整理出来的，不等于“全量 560 个 FN GT 全部拷出”；如果后续人工复核范围扩大，需要重新运行 `export_hard_review_assets.py` 或扩展选择逻辑。
+   - 当前推荐的目录职责已经调整为：`by_source/` 专门放实际复核素材，顶层 `sequence_*` 专门写记录；后续不要再把同一批图片 / 标签 / overlay 复制第二份到顶层 `sequence_*`，否则容易造成双份素材不一致。
+   - 当前推荐的协作方式是：组员优先修改自己负责序列的 `notes.md`，再由汇总人批量更新 `semantic_bucket_manifest.json`，最后由组长或统一汇总人更新 `semantic_bucket_summary.md`；不要让多人同时直接改同一个 JSON 或 summary 文件。
+   - 除非用户或组长明确指定，否则普通组员不应直接修改 `semantic_bucket_manifest.json`、`semantic_bucket_summary.md` 或 `by_source/review_asset_manifest.json`，以减少多人并发编辑带来的冲突风险。
+   - `人工复核.md` 中当前默认推荐 LabelImg 作为 bbox 复核工具，Labelme 只作为可选补充；如果后续团队改用其他标注软件，应同步更新这份手册，避免文档和实际流程脱节。
    - 本轮把 `person分桶.md` 作为独立分析入口使用，不替代 `person_train_solution.md` 中更宏观的结论记录；两者应保持“一个讲全局方案，一个讲分桶细节”的分工。
 6. 本轮明确不改动的部分：
    - 不修改 `person_train_solution.md`、`experence_from_yolov5.md` 的既有结论。
