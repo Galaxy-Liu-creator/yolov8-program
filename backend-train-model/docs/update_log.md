@@ -1,5 +1,56 @@
 ﻿# Update Log
 
+## 2026-05-14 新增 person_with_new_labels 决策与运行文档
+
+1. 变更来源：用户要求把“新增 `new_person_labels` 之后，当前应先继续 fullframe 训练还是先等 ROI 补齐”的判断整理成正式文档，并把对应训练 / 评估命令单独沉淀为 runbook，统一放到 `backend-train-model/person-train-model/train-docs/` 下。
+2. 变更总览：
+   - 新增 `backend-train-model/person-train-model/train-docs/person_with_new_labels_decision.md`，系统说明当前 new labels person 主线与旧 502 张 ROI-aware 主线的关系，并明确当前更合理的方案是：先继续 `person_fullframe_with_new_labels` 训练，把 ROI 补齐作为并行准备工作推进，ROI 补齐后再新开 new labels 的 ROI-aware 正式版本。
+   - 新增 `backend-train-model/person-train-model/train-docs/person_with_new_labels_run.md`，给出与上述决策相匹配的当前可执行命令，重点覆盖 `person_fullframe_with_new_labels_baseline_seed7 / seed13` 的训练与评估命令，以及 `img768` 候选在“640 稳定后再补 seed”的条件式入口。
+   - 在 runbook 中明确写出：当前不把旧 `person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_seed7 / seed13` 命令当作 new labels 主线的第一优先动作；同时保留 ROI 补齐后的后续接入约束，但不伪造尚未落盘的 new labels ROI-aware 正式配置命令。
+   - 后续按用户反馈，已进一步规范 `person_with_new_labels_run.md` 的 Markdown 格式，去掉会影响预览显示的多余缩进，确保“运行前检查”“seed7 / seed13 训练与评估”等代码块在文档中可直接看到完整命令，而不是显示为空白代码框。
+3. 涉及文件：
+   - `backend-train-model/person-train-model/train-docs/person_with_new_labels_decision.md`
+   - `backend-train-model/person-train-model/train-docs/person_with_new_labels_run.md`
+   - `backend-train-model/docs/update_log.md`
+4. 新增 / 变更配置项：
+   - 无新增训练配置文件。
+   - 无新增脚本参数。
+   - 本轮只新增决策文档与运行文档，不修改现有 `person_project_config*.json`、ROI 配置、prepared 数据集、模型权重或评估逻辑。
+5. 兼容性注意：
+   - `person_with_new_labels_decision.md` 与 `person_with_new_labels_run.md` 的核心约束是：当前可直接执行的主线仍是 `person_fullframe_with_new_labels`，不是旧 502 张 ROI-aware 主线的 seed 稳定性确认；因此不要把这两份新文档中的“下一步先跑 fullframe seed7 / seed13”误读成对旧 ROI-aware 主线的结论修订。
+   - runbook 当前故意不提供“可直接执行”的 new labels ROI-aware 训练命令，因为这条线的正式版本化配置与 ROI 数据入口尚未作为仓库当前事实完全落盘；后续一旦补齐 ROI 并新增正式配置，应优先更新这两份文档，而不是继续复用旧 502 张 ROI-aware 命令。
+   - `person_with_new_labels_run.md` 当前应以普通 Markdown 段落 + 标准 fenced code block 方式渲染；如果后续再次批量生成类似 runbook，需避免给整份文档每一行额外添加前导空格，以免编辑器预览把代码块显示成空白或异常折叠。
+6. 本轮明确不改动：
+   - 不修改现有 `person_run_method.md`、`roi_next_iteration_plan.md`、`人工复核.md`、`person_project_config*.json` 或 `roi_config*.generated.json`。
+   - 不修改任何训练代码、数据准备流程、模型权重、评估报告和在线检测链路。
+
+## 2026-05-14 补齐 5.13 阶段 sequence notes 模版
+
+1. 变更来源：用户要求把 `stage_2026-05-13_crowded_overlap_formal_closeout/` 下需要的 `5-13notes.md` 模版补齐，并明确参考 `backend-train-model/person-train-model/train-docs/人工复核.md` 中 `5.13` 阶段“今天至少要回答什么、哪些问题不阻塞推进、下一步更建议先做什么”的收口口径。
+2. 变更总览：
+   - 统一把 `5.13` 阶段三条必需 sequence notes 重构为更贴近 `5.10` 阶段 `5-10notes.md` 的表格化模板结构，而不只是保留“5.13 阶段结论摘要版”。
+   - 对 crowded 主线两条核心序列 `D15_20260119203927`、`D05_20260123074841`，按 `5-10notes.md` 的写法补齐为：`本轮定位 -> 今天优先看的帧 -> 今天要回答的问题 -> 记录提醒 -> 字段总览表 -> 推荐填写顺序 -> 逐帧正式收口记录表 -> sequence 级正式结论 -> 当前明确不建议优先做什么`。
+   - 对对照序列 `D15_20260119061405`，同步补成与 `5-10notes.md` 对照模板一致的结构：`本轮定位 -> 今天建议只抽看 -> 今天要回答的问题 -> 记录提醒 -> 字段总览表 -> 推荐填写顺序 -> 对照帧正式收口记录表 -> 对照序列正式结论 -> 当前明确不建议优先做什么`。
+   - 在不回写 `5.10` 历史阶段正文的前提下，把 `5.13` 阶段需要的“当前正式收口口径”直接嵌入表格中，保证后续组员既能按模板继续补 overlay 级短句，也能直接复用当前 sequence 级收口结论。
+   - 本轮保持 `semantic_bucket_summary.md`、`semantic_bucket_manifest.json`、`active_stage.json` 与 `review_stage_index.md` 不变；只补齐 `5-13notes.md` 的模板结构与当前正式收口话术。
+3. 涉及文件：
+   - `backend-train-model/person-train-model/train-result/review/person_fullframe_with_new_labels_hard_sample_review/stage_reviews/stage_2026-05-13_crowded_overlap_formal_closeout/sequence_notes/sequence_D15_20260119203927/5-13notes.md`
+   - `backend-train-model/person-train-model/train-result/review/person_fullframe_with_new_labels_hard_sample_review/stage_reviews/stage_2026-05-13_crowded_overlap_formal_closeout/sequence_notes/sequence_D05_20260123074841/5-13notes.md`
+   - `backend-train-model/person-train-model/train-result/review/person_fullframe_with_new_labels_hard_sample_review/stage_reviews/stage_2026-05-13_crowded_overlap_formal_closeout/sequence_notes/sequence_D15_20260119061405/5-13notes.md`
+   - `backend-train-model/docs/update_log.md`
+4. 新增 / 变更配置项：
+   - 无新增训练配置、数据配置、脚本参数或评估参数。
+   - 本轮只补充人工复核 notes 模版结构，不改动训练入口、prepared 数据集、模型权重、ROI 配置或在线链路代码。
+5. 兼容性注意：
+   - 本轮新增的是 `5.13` 阶段 notes 的固定填写结构，目的是让后续继续补 overlay 级短句或 sequence 级收口时可以直接沿用同一模版；不改变 `semantic_bucket_manifest.json` 的字段语义。
+   - `5.13` 模版现在在章节组织上已尽量对齐 `5.10` 阶段 `5-10notes.md`，但每一栏表达的仍然是“正式收口”语义，而不是继续回到 `5.10` 当天的“机制探索中”语义。
+   - `D15_20260119203927` 仍主要按 sequence 级结论保守收口，`D05_20260123074841` 仍保留“顶部问答偏一框合两人、逐帧结论偏第二人无响应”的内部口径差异；这些差异被明确记录为“不阻塞推进”的问题，而不是本轮必须返工完成的硬阻塞项。
+   - `D15_20260119061405` 仍只作为对照序列，不应被误读为当前下一轮训练的主入口。
+6. 本轮明确不改动：
+   - 不修改 `5.10` 阶段 `5-10notes.md`、`semantic_bucket_summary.md`、`semantic_bucket_manifest.json`。
+   - 不修改 `5.13` 阶段的 `semantic_bucket_summary.md`、`semantic_bucket_manifest.json`、`active_stage.json` 或 `review_stage_index.md`。
+   - 不修改训练代码、数据准备流程、评估脚本、模型权重和在线检测链路。
+
 ## 2026-05-13 更新阶段汇报 PPT 后端模型训练进展页
 
 1. 变更来源：用户要求在不覆盖原始 PPT 的前提下，继续修改 `backend-train-model/docs/PPT/` 下阶段汇报材料，把“后端模型训练进展”页更新为当前 `clothes` 与 `person` 的最新 new labels 可用基线 / 候选权重，并写出对应指标；用户补充说明卡片可以适当拉大，但必须保证文字完整放入且布局合理。
