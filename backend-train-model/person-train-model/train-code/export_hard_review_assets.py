@@ -2,19 +2,20 @@ from __future__ import annotations
 
 import json
 import shutil
+import zipfile
 from collections import Counter, defaultdict
 from pathlib import Path
-from typing import Dict, List, Tuple
+from typing import Dict, Iterable, List, Tuple
 
 from PIL import Image, ImageDraw, ImageFont
 
 
 SCRIPT_PATH = Path(__file__).resolve()
-REPO_ROOT = SCRIPT_PATH.parents[3]
 PERSON_ROOT = SCRIPT_PATH.parents[1]
 REVIEW_ROOT = PERSON_ROOT / "train-result" / "review"
 HARD_REVIEW_ROOT = REVIEW_ROOT / "person_fullframe_with_new_labels_hard_sample_review"
 BY_SOURCE_ROOT = HARD_REVIEW_ROOT / "by_source"
+SEND_PACKAGES_ROOT = BY_SOURCE_ROOT / "send_packages"
 SUMMARY_JSON = REVIEW_ROOT / "person_fullframe_with_new_labels_prescreen_summary.json"
 PREPARE_REPORT = (
     PERSON_ROOT
@@ -30,6 +31,19 @@ RUNS = {
     "img768_val": REVIEW_ROOT / "person_fullframe_with_new_labels_img768_fpfn_val_conf025" / "fpfn_per_image.json",
     "img768_test": REVIEW_ROOT / "person_fullframe_with_new_labels_img768_fpfn_test_conf025" / "fpfn_per_image.json",
 }
+FONT_CANDIDATES = [
+    Path("C:/Windows/Fonts/msyh.ttc"),
+    Path("C:/Windows/Fonts/msyhbd.ttc"),
+    Path("C:/Windows/Fonts/simhei.ttf"),
+    Path("C:/Windows/Fonts/simsun.ttc"),
+]
+LEGEND_TITLE = "框颜色说明（GT=人工标注，Pred=模型检测）"
+LEGEND_ITEMS: Tuple[Tuple[Tuple[int, int, int], str], ...] = (
+    ((0, 128, 255), "蓝色框：Pred 预测框（与 GT 成功匹配）"),
+    ((0, 200, 0), "绿色框：GT 真值框（已匹配 / TP 对应 GT）"),
+    ((255, 0, 0), "红色框：GT 真值框（人工标注有，但模型漏检 / FN）"),
+    ((255, 165, 0), "橙色框：Pred 预测框（模型多检 / FP，若出现）"),
+)
 
 
 def iou(box_a: List[float], box_b: List[float]) -> float:
@@ -62,7 +76,93 @@ def safe_name(name: str) -> str:
     return name.replace("/", "_").replace("\\", "_")
 
 
-def draw_box(draw: ImageDraw.ImageDraw, box: List[float], color: Tuple[int, int, int], width: int, label: str = "") -> None:
+def load_font(size: int) -> ImageFont.ImageFont:
+    for font_path in FONT_CANDIDATES:
+        if not font_path.exists():
+            continue
+        try:
+            return ImageFont.truetype(str(font_path), size=size)
+        except OSError:
+            continue
+    return ImageFont.load_default()
+
+
+def text_size(draw: ImageDraw.ImageDraw, text: str, font: ImageFont.ImageFont) -> Tuple[int, int]:
+    left, top, right, bottom = draw.textbbox((0, 0), text, font=font)
+    return right - left, bottom - top
+
+
+def choose_legend_fonts(draw: ImageDraw.ImageDraw, image_width: int) -> Tuple[ImageFont.ImageFont, ImageFont.ImageFont]:
+    for title_size, body_size in ((28, 24), (24, 20), (22, 18), (20, 16)):
+        title_font = load_font(title_size)
+        body_font = load_font(body_size)
+        title_width, _ = text_size(draw, LEGEND_TITLE, title_font)
+        max_line_width = max(text_size(draw, line, body_font)[0] for _, line in LEGEND_ITEMS)
+        content_width = max(title_width, 34 + max_line_width)
+        if content_width + 40 <= image_width - 16:
+            return title_font, body_font
+    return load_font(18), load_font(16)
+
+
+def draw_overlay_legend(draw: ImageDraw.ImageDraw, image_width: int) -> None:
+    title_font, body_font = choose_legend_fonts(draw, image_width)
+    margin_x = 14
+    margin_y = 34
+    padding = 12
+    row_gap = 10
+    swatch_size = 22
+    swatch_gap = 12
+
+    title_width, title_height = text_size(draw, LEGEND_TITLE, title_font)
+    line_sizes = [text_size(draw, line, body_font) for _, line in LEGEND_ITEMS]
+    max_line_width = max(width for width, _ in line_sizes)
+    line_height = max(height for _, height in line_sizes)
+
+    legend_width = max(title_width, swatch_size + swatch_gap + max_line_width) + padding * 2
+    legend_height = (
+        padding * 2
+        + title_height
+        + 10
+        + len(LEGEND_ITEMS) * line_height
+        + (len(LEGEND_ITEMS) - 1) * row_gap
+    )
+
+    x1 = margin_x
+    y1 = margin_y
+    x2 = min(image_width - margin_x, x1 + legend_width)
+    y2 = y1 + legend_height
+
+    shadow_offset = 4
+    draw.rectangle((x1 + shadow_offset, y1 + shadow_offset, x2 + shadow_offset, y2 + shadow_offset), fill=(0, 0, 0))
+    draw.rectangle((x1, y1, x2, y2), fill=(255, 255, 255), outline=(0, 0, 0), width=2)
+
+    current_y = y1 + padding
+    draw.text((x1 + padding, current_y), LEGEND_TITLE, fill=(0, 0, 0), font=title_font)
+    current_y += title_height + 10
+
+    for color, line in LEGEND_ITEMS:
+        swatch_y = current_y + max(0, (line_height - swatch_size) // 2)
+        draw.rectangle(
+            (x1 + padding, swatch_y, x1 + padding + swatch_size, swatch_y + swatch_size),
+            outline=color,
+            width=5,
+        )
+        draw.text(
+            (x1 + padding + swatch_size + swatch_gap, current_y),
+            line,
+            fill=(0, 0, 0),
+            font=body_font,
+        )
+        current_y += line_height + row_gap
+
+
+def draw_box(
+    draw: ImageDraw.ImageDraw,
+    box: List[float],
+    color: Tuple[int, int, int],
+    width: int,
+    label: str = "",
+) -> None:
     xyxy = [box[0], box[1], box[2], box[3]]
     draw.rectangle(xyxy, outline=color, width=width)
     if label:
@@ -77,6 +177,10 @@ def load_json(path: Path):
 
 def ensure_dir(path: Path) -> None:
     path.mkdir(parents=True, exist_ok=True)
+
+
+def write_text(path: Path, content: str) -> None:
+    path.write_text(content, encoding="utf-8")
 
 
 def choose_source_root(image_path: str, roots: List[str]) -> str:
@@ -140,20 +244,22 @@ def collect_selected_stems(summary: dict, registry: Dict[str, dict]) -> Tuple[Li
     for stem, reason in selected.items():
         if stem not in registry:
             continue
-        ordered.append({
-            "stem": stem,
-            "reason": reason,
-            "sequence_name": registry[stem]["sequence_name"],
-        })
+        ordered.append(
+            {
+                "stem": stem,
+                "reason": reason,
+                "sequence_name": registry[stem]["sequence_name"],
+            }
+        )
     ordered.sort(key=lambda item: (item["sequence_name"], item["stem"]))
     return ordered, selected
 
 
-def create_overlay(frame: dict, run_name: str, source_sequence_dir: Path) -> str:
+def create_overlay(frame: dict, run_name: str, sequence_dir: Path) -> str:
     item = frame["runs"][run_name]
     image = Image.open(frame["original_image_path"]).convert("RGB")
     draw = ImageDraw.Draw(image)
-    font = ImageFont.load_default()
+    header_font = load_font(16)
 
     for pair in item["matched_pairs"]:
         draw_box(draw, pair["gt_xyxy"], (0, 200, 0), 2, f"GT{pair['gt_index']}")
@@ -171,18 +277,34 @@ def create_overlay(frame: dict, run_name: str, source_sequence_dir: Path) -> str
         bucket = classify(best, rel_h, min_edge)
         draw_box(draw, gt["xyxy"], (255, 0, 0), 4, f"FN{gt['gt_index']} {bucket}")
 
-    header = f"{run_name} | split={item['prepared_image_relpath'].split('/')[1]} | fn={item['fn_count']} fp={item['fp_count']}"
+    split_name = item["prepared_image_relpath"].split("/")[1]
+    header = f"{run_name} | split={split_name} | fn={item['fn_count']} fp={item['fp_count']}"
     draw.rectangle((0, 0, min(image.width, 1000), 24), fill=(0, 0, 0))
-    draw.text((6, 6), header, fill=(255, 255, 255), font=font)
+    draw.text((6, 4), header, fill=(255, 255, 255), font=header_font)
+    draw_overlay_legend(draw, image.width)
 
     overlay_name = f"{run_name}__{frame['stem']}.jpg"
-    overlay_path = source_sequence_dir / "overlays" / overlay_name
+    overlay_path = sequence_dir / "overlays" / overlay_name
     image.save(overlay_path, quality=95)
     return overlay_name
 
 
-def write_text(path: Path, content: str) -> None:
-    path.write_text(content, encoding="utf-8")
+def copy_label_or_empty(src: Path, dst: Path) -> None:
+    if src.exists():
+        shutil.copy2(src, dst)
+    else:
+        dst.write_text("", encoding="utf-8")
+
+
+def create_zip_from_paths(paths: Iterable[Path], zip_path: Path, root_parent: Path) -> None:
+    ensure_dir(zip_path.parent)
+    with zipfile.ZipFile(zip_path, "w", compression=zipfile.ZIP_DEFLATED) as zf:
+        for root in paths:
+            for path in sorted(root.rglob("*")):
+                if path.is_dir():
+                    continue
+                arcname = path.relative_to(root_parent)
+                zf.write(path, arcname.as_posix())
 
 
 def main() -> None:
@@ -194,6 +316,9 @@ def main() -> None:
     selected_items, selected_reason_map = collect_selected_stems(summary, registry)
 
     ensure_dir(BY_SOURCE_ROOT)
+    ensure_dir(SEND_PACKAGES_ROOT)
+    for stale_zip in SEND_PACKAGES_ROOT.glob("*.zip"):
+        stale_zip.unlink()
 
     manifest = {
         "description": "按 prepare_report.json 的 8 个来源整理人工复核图片、标签和 overlay。",
@@ -202,6 +327,7 @@ def main() -> None:
             "note_extra": "当前各序列 notes.md 中额外强调的边界 / 拥挤代表帧",
             "d15_19203927_fill": "为第二优先级主序列 D15_20260119203927 补齐的 top 帧",
         },
+        "all_sources_zip": str((SEND_PACKAGES_ROOT / "all_sources__review_bundle.zip").relative_to(HARD_REVIEW_ROOT)),
         "sources": [],
     }
 
@@ -218,7 +344,7 @@ def main() -> None:
         "",
         "这个目录专门存放已经筛出来、需要人工复核的图片素材，按 `prepare_report.json` 中的 8 个来源进行整理。",
         "",
-        "每个来源目录下再按具体 `sequence_name` 拆分，方便把任务按来源或按序列分给组员。",
+        "每个来源目录下再按具体 `sequence_name` 拆分，方便本地查看和后续继续扩展。",
         "",
         "## 2. 目录约定",
         "",
@@ -229,11 +355,18 @@ def main() -> None:
         "- `sequence_*/labels/`：对应 YOLO txt",
         "- `sequence_*/overlays/`：按 run 生成的 overlay 图",
         "",
-        "## 3. 当前说明",
+        "## 3. 发送建议",
+        "",
+        "如果只需要发给 1 个组员，优先发送 `send_packages/all_sources__review_bundle.zip`。",
+        "不要再按单条序列分别发 zip 包。",
+        "",
+        "## 4. 当前说明",
         "",
         "如果某个来源目录下当前没有图片，表示这轮优先人工复核名单里暂时没有从该来源挑出来的样本，不代表该来源永远不需要复核。",
         "",
     ]
+
+    exported_source_dirs: List[Path] = []
 
     for source_root in source_roots:
         source_name = source_name_map[source_root]
@@ -255,6 +388,14 @@ def main() -> None:
             "- `sequence_*/overlays/`：按不同 run 生成的 overlay 图",
             "",
         ]
+
+        manifest_entry = {
+            "source_name": source_name,
+            "source_root": source_root,
+            "selected_frame_count": len(frame_items),
+            "sequences": [],
+        }
+
         if not frame_items:
             source_readme_lines.extend(
                 [
@@ -264,12 +405,10 @@ def main() -> None:
                     "如果后续要扩展复核范围，可根据 `person_fullframe_with_new_labels_prescreen_summary.json` 再补充。",
                 ]
             )
-        manifest_entry = {
-            "source_name": source_name,
-            "source_root": source_root,
-            "selected_frame_count": len(frame_items),
-            "sequences": [],
-        }
+            write_text(source_dir / "README.md", "\n".join(source_readme_lines).strip() + "\n")
+            manifest["sources"].append(manifest_entry)
+            exported_source_dirs.append(source_dir)
+            continue
 
         sequence_group: Dict[str, List[dict]] = defaultdict(list)
         for item in frame_items:
@@ -285,13 +424,15 @@ def main() -> None:
                 "sequence_name": sequence_name,
                 "frames": [],
             }
+
             for item in sorted(items, key=lambda x: x["stem"]):
                 frame = registry[item["stem"]]
                 image_src = Path(frame["original_image_path"])
                 label_src = Path(frame["original_label_path"])
-                shutil.copy2(image_src, seq_dir / "images" / image_src.name)
-                if label_src.exists():
-                    shutil.copy2(label_src, seq_dir / "labels" / label_src.name)
+                image_dst = seq_dir / "images" / image_src.name
+                label_dst = seq_dir / "labels" / label_src.name
+                shutil.copy2(image_src, image_dst)
+                copy_label_or_empty(label_src, label_dst)
 
                 overlay_files = []
                 for run_name in sorted(frame["runs"].keys()):
@@ -314,7 +455,7 @@ def main() -> None:
                     f"## 序列 `{sequence_name}`",
                     "",
                     f"- 当前放入待复核图片：`{len(manifest_sequence['frames'])}` 张",
-                    "- 请优先看 `images/` 中原图，再对照 `overlays/` 中不同 run 的 overlay。",
+                    "- 优先看 `images/` 中原图，再对照 `overlays/` 中不同 run 的 overlay。",
                     "- 如果怀疑标签有问题，优先在当前目录做临时副本再进入 LabelImg 修框。",
                     "",
                 ]
@@ -322,12 +463,32 @@ def main() -> None:
 
         write_text(source_dir / "README.md", "\n".join(source_readme_lines).strip() + "\n")
         manifest["sources"].append(manifest_entry)
+        exported_source_dirs.append(source_dir)
+
+    all_sources_zip = SEND_PACKAGES_ROOT / "all_sources__review_bundle.zip"
+    create_zip_from_paths(exported_source_dirs, all_sources_zip, BY_SOURCE_ROOT)
 
     write_text(BY_SOURCE_ROOT / "README.md", "\n".join(by_source_readme_lines).strip() + "\n")
     write_text(BY_SOURCE_ROOT / "review_asset_manifest.json", json.dumps(manifest, ensure_ascii=False, indent=2) + "\n")
 
+    send_readme_lines = [
+        "# 发给组员的压缩包",
+        "",
+        "如果只需要发给 1 个组员，直接发送下面这个总压缩包：",
+        "",
+        "- `all_sources__review_bundle.zip`",
+        "",
+        "这个 zip 已经包含全部 `source_*` 顶层目录，以及每个来源下的图片、标签和 overlay。",
+        "为了避免接收端解析失败，不再额外按单条序列生成 zip 包。",
+        "",
+        "组员解压后，直接在解压目录内查看 `source_* / sequence_* / images|labels|overlays` 即可。",
+        "",
+    ]
+    write_text(SEND_PACKAGES_ROOT / "README.md", "\n".join(send_readme_lines))
+
     print(f"selected_frames={len(selected_items)}")
     print(f"output_root={BY_SOURCE_ROOT}")
+    print(f"all_sources_zip={all_sources_zip}")
 
 
 if __name__ == "__main__":

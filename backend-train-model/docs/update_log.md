@@ -1,5 +1,466 @@
 ﻿# Update Log
 
+## 2026-05-13 更新阶段汇报 PPT 后端模型训练进展页
+
+1. 变更来源：用户要求在不覆盖原始 PPT 的前提下，继续修改 `backend-train-model/docs/PPT/` 下阶段汇报材料，把“后端模型训练进展”页更新为当前 `clothes` 与 `person` 的最新 new labels 可用基线 / 候选权重，并写出对应指标；用户补充说明卡片可以适当拉大，但必须保证文字完整放入且布局合理。
+2. 变更总览：
+   - 新增 / 更新输出副本 `backend-train-model/docs/PPT/大创PPT汇报_人工复核阶段版_训练进展更新_20260513.pptx`，继续保留原始 `大创PPT汇报.pptx` 与上一版 `大创PPT汇报_人工复核阶段版_20260513.pptx`，未覆盖源文件。
+   - 将第 4 页“后端模型训练进展”改为两张加宽大卡片：左侧汇总 `clothes new labels baseline`，右侧汇总 `person new labels baseline / candidate`，保留原 PPT 的深蓝页眉、橙色标题、白色圆角卡片和正文风格。
+   - `clothes` 更新为 `clothes_merged_with_new_labels_v1_baseline`，写入权重路径、split `2106 / 450 / 453`、Val 指标 `P 0.9769 / R 0.9594 / mAP50 0.9817 / mAP75 0.8645 / mAP50-95 0.7106`，以及 Test 指标 `P 0.9835 / R 0.9683 / mAP50 0.9924 / mAP75 0.8491 / mAP50-95 0.7075`。
+   - `person` 写入 `person_fullframe_with_new_labels_img768` 作为最新候选，`person_fullframe_with_new_labels_baseline` 作为稳健基线；写入 split `2105 / 453 / 451`，并补齐 `img768` Val / Test 指标与 `640` 稳健基线 Test 指标。
+   - PPT 页内明确取舍：`img768` 的 `mAP50-95` 更高，但 `640` 稳健基线的 Precision / Recall / mAP50 更稳，因此 `img768` 先作为最新候选，不直接写成已替代稳健基线。
+   - 同步更新 `backend-train-model/AGENTS.md`，沉淀当前 new labels 工服与 person 可用基线 / 候选权重及指标，避免后续汇报或训练文档回退到旧口径。
+3. 涉及文件：
+   - `backend-train-model/docs/PPT/大创PPT汇报_人工复核阶段版_训练进展更新_20260513.pptx`
+   - `backend-train-model/docs/PPT/大创PPT汇报_人工复核阶段版_20260513.pptx`（只读作为上一版来源，未覆盖）
+   - `backend-train-model/docs/PPT/大创PPT汇报.pptx`（未覆盖）
+   - `backend-train-model/AGENTS.md`
+   - `backend-train-model/docs/update_log.md`
+4. 新增 / 变更配置项：
+   - 无新增训练配置项。
+   - 无新增 CLI 参数。
+   - 无新增或替换模型权重；本轮只引用已有训练产物和评估报告，生成新的 PPT 汇报副本。
+5. 兼容性注意：
+   - 第 4 页为适配完整指标文本，采用两张更大的内容卡片承载 `clothes` 与 `person` 两条线，删去了上一版右侧小卡片式阶段收口内容；这是汇报版式调整，不改变训练结论本身。
+   - `person_fullframe_with_new_labels_img768` 只写为“最新候选”，不是默认上线权重或已替换稳健基线；后续若要升级默认基线，仍需结合稳定性、召回和实际误检 / 漏检复盘。
+6. 本轮明确不改动：
+   - 不覆盖原始 PPT 或上一版人工复核阶段 PPT。
+   - 不修改训练代码、prepare 流程、数据集 split、评估脚本、模型权重或在线检测链路。
+   - 不修改人工复核原始记录、review 图片素材或历史阶段台账。
+
+## 2026-05-13 生成阶段汇报 PPT 人工复核版
+
+1. 变更来源：用户要求参考 `backend-train-model/person-train-model/train-docs/人工复核.md` 中的四次人工复核任务，以及 `person_fullframe_with_new_labels_hard_sample_review/` 下前三次复核记录，修改 `backend-train-model/docs/PPT/` 下现有 `.pptx` 阶段汇报；要求保留源文件，不覆盖原 PPT，并在新稿中加入对应图片例证。
+2. 变更总览：
+   - 新增 `backend-train-model/docs/PPT/大创PPT汇报_人工复核阶段版_20260513.pptx`，源 `大创PPT汇报.pptx` 保持不覆盖。
+   - 新稿沿用原 PPT 的标题栏、卡片、双图对照页等版式与字体样式，仅在副本中更新阶段内容。
+   - 更新代表帧页口径：把 `D15_20260119061405_frame_0346` 写作“可见性弱型”例证，把 `D15_20260119203927_frame_0180` 写作 `crowded / overlap` 例证，并明确对应 5.6 / 5.7 / 5.10 复核结论。
+   - 将原“对应的解决方案”页调整为“人工复核阶段成果”，概括 `5.6` 第一轮语义复核、`5.7` 双主线确认、`5.10` 机制复盘启动三步。
+   - 新增“人工复核例证”页，加入 `D05_20260123074841_frame_0029` 的 crowded / overlap 对照图，以及 `D02_20260123074836_frame_0023` 的远景 / 贴边对照图。
+   - 新增“下阶段任务安排（5.13）”页；按用户当前汇报口径，将 `5.13` 写作下一阶段任务，而不是本阶段已完成成果。
+3. 涉及文件：
+   - `backend-train-model/docs/PPT/大创PPT汇报_人工复核阶段版_20260513.pptx`
+   - `backend-train-model/docs/PPT/大创PPT汇报.pptx`（只读参考，未覆盖）
+   - `backend-train-model/docs/update_log.md`
+   - 参考素材目录：`backend-train-model/person-train-model/train-result/review/person_fullframe_with_new_labels_hard_sample_review/`
+4. 新增 / 变更配置项：
+   - 无新增训练配置项。
+   - 无新增 CLI 参数。
+   - 本轮仅生成汇报材料，不改动数据准备、训练、评估或在线检测逻辑。
+5. 兼容性注意：
+   - 新 PPT 中的 `5.13` 页服从用户当前汇报要求，作为“下阶段任务安排”呈现；这与目录中已有 `active_stage.json` 的历史状态记录不冲突，因为本轮没有修改人工复核台账本身。
+   - 新稿中的人工复核成果只把 `5.6`、`5.7`、`5.10` 作为本阶段已完成内容；`5.13` 不写成已完成成果。
+6. 本轮明确不改动：
+   - 不覆盖原始 PPT。
+   - 不修改 `人工复核.md`、各阶段 `semantic_bucket_summary.md`、`semantic_bucket_manifest.json` 或 `sequence_notes`。
+   - 不修改任何训练代码、配置文件、权重或 review 原始图片素材。
+
+## 2026-05-13 新增 5.13 阶段承接 crowded 主线正式收口
+
+1. 变更来源：用户要求不要把当前新结论继续写入 `5.10` 段，而是新开 `5.13` 阶段，独立沉淀 crowded / overlap 主线的正式结论、已发现问题和下一阶段任务。
+2. 变更总览：
+   - 新增 `stage_reviews/stage_2026-05-13_crowded_overlap_formal_closeout/` 阶段目录，并补齐 `stage_meta.json`、`semantic_bucket_manifest.json`、`semantic_bucket_summary.md` 与三条 `sequence_notes/**/5-13notes.md`。
+   - 更新 `backend-train-model/person-train-model/train-result/review/person_fullframe_with_new_labels_hard_sample_review/active_stage.json`，把当前 active stage 从 `5.10` 切换到 `5.13`。
+   - 更新 `backend-train-model/person-train-model/train-result/review/person_fullframe_with_new_labels_hard_sample_review/review_stage_index.md`，把 `5.13` 调整为当前激活阶段，并把 `5.10` 降为历史阶段。
+   - 更新 `backend-train-model/person-train-model/train-docs/人工复核.md`，新增 `## 5.13 crowded/overlap正式收口与下一阶段任务确认`，并把 `5.10` 明确改成历史阶段口径；同时把 `5.13` 段改写为与 `5.10 / 5.7` 一致的阶段结构，补齐“今天应该先做什么”“建议的压缩节奏”“当前阶段收口标准”“当前阶段人工复核具体怎么做”“今天的最低交付”等固定小节。
+   - 保持 `5.10` 阶段 `semantic_bucket_manifest.json` 与 `semantic_bucket_summary.md` 继续只表达 `2026-05-10` 当天的阶段目标和机制收口要求，不把 `5.13` 的正式结论继续回写进去。
+3. 涉及文件：
+   - `backend-train-model/person-train-model/train-result/review/person_fullframe_with_new_labels_hard_sample_review/active_stage.json`
+   - `backend-train-model/person-train-model/train-result/review/person_fullframe_with_new_labels_hard_sample_review/review_stage_index.md`
+   - `backend-train-model/person-train-model/train-result/review/person_fullframe_with_new_labels_hard_sample_review/stage_reviews/stage_2026-05-13_crowded_overlap_formal_closeout/stage_meta.json`
+   - `backend-train-model/person-train-model/train-result/review/person_fullframe_with_new_labels_hard_sample_review/stage_reviews/stage_2026-05-13_crowded_overlap_formal_closeout/semantic_bucket_manifest.json`
+   - `backend-train-model/person-train-model/train-result/review/person_fullframe_with_new_labels_hard_sample_review/stage_reviews/stage_2026-05-13_crowded_overlap_formal_closeout/semantic_bucket_summary.md`
+   - `backend-train-model/person-train-model/train-result/review/person_fullframe_with_new_labels_hard_sample_review/stage_reviews/stage_2026-05-13_crowded_overlap_formal_closeout/sequence_notes/sequence_D15_20260119203927/5-13notes.md`
+   - `backend-train-model/person-train-model/train-result/review/person_fullframe_with_new_labels_hard_sample_review/stage_reviews/stage_2026-05-13_crowded_overlap_formal_closeout/sequence_notes/sequence_D05_20260123074841/5-13notes.md`
+   - `backend-train-model/person-train-model/train-result/review/person_fullframe_with_new_labels_hard_sample_review/stage_reviews/stage_2026-05-13_crowded_overlap_formal_closeout/sequence_notes/sequence_D15_20260119061405/5-13notes.md`
+   - `backend-train-model/person-train-model/train-docs/人工复核.md`
+   - `backend-train-model/docs/update_log.md`
+4. 新增 / 变更配置项：
+   - 无新增训练配置、数据配置或脚本参数。
+   - 本轮只新增人工复核阶段台账与阶段入口切换，不修改训练代码、prepare 流程、评估命令、数据集切分、模型权重或在线链路代码。
+5. 兼容性注意：
+   - `5.13` 阶段的正式收口结论，仍然主要依据 `5.10` 现有 notes，因此 `D15_20260119203927_frame_0143 / 0180` 继续属于“按 sequence 级结论保守收口”的写法，不等于它们已经补齐和 `D05` 一样细的逐帧证据表。
+   - 当前正式收口更偏 `second_person_no_response`，但并不代表 `merge_two_people` 已被永久排除；它仍保留为后续需要继续核验的伴随分支。
+   - `D15_20260119061405` 继续只作为“可见性弱型”对照序列使用；本轮没有为修正对照 notes 的局部措辞而回改 `5-10notes.md`。
+6. 本轮明确不改动的部分：
+   - 不修改 `stage_2026-05-10_crowded_overlap_mechanism_closeout/sequence_notes/**/5-10notes.md` 正文。
+   - 不修改 `5.7` 与 `5.6` 历史阶段的 summary / manifest / notes 正文内容。
+   - 不修改 `by_source/` 共享素材、训练脚本、prepared 数据集、评估报告、模型权重和在线链路代码。
+
+## 2026-05-10 细化 5.10 阶段 sequence notes 模版并补齐字段中文注释
+
+1. 变更来源：用户指出 `stage_2026-05-10_crowded_overlap_mechanism_closeout/sequence_notes` 下的 `5-10notes.md` 模版还不够易填，要求把几个 notes 模版都改好，并为每个字段补上清晰的中文注释和代表含义，便于组员直接按模版填写。
+2. 变更总览：
+   - 更新 `sequence_D15_20260119203927/5-10notes.md`，新增字段填写说明、逐帧模版和 sequence 级结论模版，并对 `semantic_*`、`mechanism_*`、`need_relabel`、`relabel_status` 等字段补上中文含义说明。
+   - 更新 `sequence_D05_20260123074841/5-10notes.md`，补齐与 crowded / overlap 主线一致的逐帧记录模版、sequence 级结论模版和字段中文说明。
+   - 更新 `sequence_D15_20260119061405/5-10notes.md`，为“可见性弱型”对照序列新增对照帧记录模版、对 crowded 主线的区分作用字段，以及 `need_relabel / relabel_status` 等中文说明。
+   - 继续把三份 notes 模版从“条目式说明”升级为“表格化填写说明 + 表格化逐帧模版 + 表格化 sequence 结论模版 + 示例填写”，让组员能够直接照表填，不必再自行理解字段结构。
+   - 对照三份 `5-10notes1.md` 中已经完成的问答结果，把**已确认的 sequence / 对照序列级结论**直接并入正式 `5-10notes.md` 的原模版结构中：包括 D15 crowded 主线更偏“第二人无响应”、D05 crowded 辅助对照更偏“一框合两人且存在遮挡叠加匹配失败”、D15_20260119061405 仍稳定属于“可见性弱型”对照，并明确哪些内容仍待后续逐帧细分。
+   - 本轮只改 `5.10` 阶段 notes 模版与填写口径，不直接替用户填写逐帧结论，也不提前回填 `semantic_bucket_manifest.json` 与 `semantic_bucket_summary.md`。
+3. 涉及文件：
+   - `backend-train-model/person-train-model/train-result/review/person_fullframe_with_new_labels_hard_sample_review/stage_reviews/stage_2026-05-10_crowded_overlap_mechanism_closeout/sequence_notes/sequence_D15_20260119203927/5-10notes.md`
+   - `backend-train-model/person-train-model/train-result/review/person_fullframe_with_new_labels_hard_sample_review/stage_reviews/stage_2026-05-10_crowded_overlap_mechanism_closeout/sequence_notes/sequence_D05_20260123074841/5-10notes.md`
+   - `backend-train-model/person-train-model/train-result/review/person_fullframe_with_new_labels_hard_sample_review/stage_reviews/stage_2026-05-10_crowded_overlap_mechanism_closeout/sequence_notes/sequence_D15_20260119061405/5-10notes.md`
+   - `backend-train-model/docs/update_log.md`
+4. 新增 / 变更配置项：
+   - 无新增训练配置、数据配置或脚本参数。
+   - 本轮只细化人工复核 notes 模版的字段解释与填写结构，不改动训练逻辑、评估命令、数据集切分、模型权重或在线链路代码。
+5. 兼容性注意：
+   - 本轮新增的是“便于人工填写”的中文字段说明，不改变 `semantic_bucket_manifest.json` 既有字段名和预期取值。
+   - 正式 `5-10notes.md` 不再额外写明“从 `5-10notes1.md` 同步”，而是直接保留原模版结构并写入当前已确认结论；`5-10notes1.md` 继续保留为中间工作记录即可。
+   - 只有当组员按新模版真正补齐逐帧判断后，才适合把结论同步回写到 `semantic_bucket_manifest.json` 与 `semantic_bucket_summary.md`；当前 notes 结构更新本身不代表结论已完成。
+6. 本轮明确不改动的部分：
+   - 不修改 `5.7` 与 `5.6` 历史阶段正文内容。
+   - 不修改 `semantic_bucket_manifest.json`、`semantic_bucket_summary.md`、`by_source/` 共享素材、训练脚本、prepared 数据集、评估报告、模型权重和在线链路代码。
+
+## 2026-05-10 直接重导 `by_source` overlay 并将中文图例并入生成流程
+
+1. 变更来源：用户要求不要只在现有 overlay 上做二次后处理，而是直接重新生成一份并覆盖 `person_fullframe_with_new_labels_hard_sample_review/by_source/` 下原有 overlay 图片。
+2. 变更总览：
+   - 修改 `backend-train-model/person-train-model/train-code/export_hard_review_assets.py`，将左上角中文图例直接并入 `create_overlay()` 生成流程。
+   - 图例随 overlay 原生导出，明确区分：蓝色匹配预测框、绿色匹配 GT 框、红色 FN GT 框，以及可能出现的橙色 FP 预测框。
+   - 重新执行 `export_hard_review_assets.py`，覆盖 `by_source/**/overlays/*.jpg` 下原有复核 overlay 图，使后续重新导出时默认就带中文说明。
+3. 涉及文件：
+   - `backend-train-model/person-train-model/train-code/export_hard_review_assets.py`
+   - `backend-train-model/person-train-model/train-result/review/person_fullframe_with_new_labels_hard_sample_review/by_source/**/overlays/*.jpg`
+   - `backend-train-model/docs/update_log.md`
+4. 新增 / 变更配置项：
+   - 无新增训练配置、数据配置或脚本参数。
+   - 本轮只改 overlay 生成样式，不改动训练逻辑、prepare 流程、评估命令、数据集切分和模型权重。
+5. 兼容性注意：
+   - 从本轮之后，只要重新运行 `export_hard_review_assets.py`，导出的 by_source overlay 就会自带中文图例，不再依赖额外的二次标注步骤。
+   - 重新导出 by_source 时，`images/`、`labels/`、`README.md`、`review_asset_manifest.json` 和发送 zip 也会按脚本现有逻辑一并刷新；当前没有改动这些结构的字段语义。
+6. 本轮明确不改动的部分：
+   - 不修改人工标注文件、`stage_reviews/` 台账、训练脚本主流程、prepared 数据集、评估报告、模型权重和在线链路代码。
+
+## 2026-05-10 为 `by_source` overlay 批量补中文框颜色图例
+
+1. 变更来源：用户要求对 `person_fullframe_with_new_labels_hard_sample_review/by_source/` 下的复核图补充清晰的中文图例，明确区分蓝色框、绿色框、红色框各自含义，并应用到整批 `by_source` 复核 overlay 图片上。
+2. 变更总览：
+   - 新增脚本 `backend-train-model/person-train-model/train-code/annotate_by_source_overlay_legend_zh.py`，递归处理 `by_source/**/overlays/*.jpg`。
+   - 在每张 overlay 左上角增加中文图例，明确说明：`GT=人工标注`、`Pred=模型检测`，并区分蓝色匹配预测框、绿色匹配 GT 框、红色漏检 GT 框，以及可能出现的橙色 FP 预测框。
+   - 本轮只处理复核 overlay 图，不修改 `images/` 下原图、`labels/` 下标注文件及 review 台账结构。
+3. 涉及文件：
+   - `backend-train-model/person-train-model/train-code/annotate_by_source_overlay_legend_zh.py`
+   - `backend-train-model/person-train-model/train-result/review/person_fullframe_with_new_labels_hard_sample_review/by_source/**/overlays/*.jpg`
+   - `backend-train-model/docs/update_log.md`
+4. 新增 / 变更配置项：
+   - 无新增训练配置、数据配置或脚本参数。
+   - 本轮新增的是 overlay 可视化后处理脚本，不改动训练逻辑、prepare 流程、评估命令、数据集切分和模型权重。
+5. 兼容性注意：
+   - 图例脚本默认直接覆盖 `overlays/` 里的 jpg 文件，因此后续如果重新执行 `export_hard_review_assets.py` 或重新导出 by_source 复核图，可能需要再次运行本脚本补回中文图例。
+   - 图例语义基于当前 by_source overlay 生成口径：绿色表示已匹配 GT，蓝色表示与该 GT 成功匹配的预测框，红色表示 FN GT，橙色表示 FP 预测框。
+6. 本轮明确不改动的部分：
+   - 不修改 `images/` 原图、`labels/` 标注文件、`review_asset_manifest.json`、`stage_reviews/` 台账、训练脚本主流程、prepared 数据集、评估报告、模型权重和在线链路代码。
+
+## 2026-05-10 加快 `5.10` 阶段推进节奏并压缩训练前置等待
+
+1. 变更来源：用户指出当前项目进度较赶，`backend-train-model/person-train-model/train-docs/人工复核.md` 中 `5.10` 阶段推进节奏偏慢；要求只修改 `5.10` 部分，给同一阶段配置更多当轮任务，不再把训练前置动作拉成过长链路。
+2. 变更总览：
+   - 仅重写 `人工复核.md` 的 `5.10 crowded/overlap机制收口与下一阶段启动准备` 部分，保留 `5.7` 与 `5.6` 历史阶段正文不动。
+   - 将 `5.10` 的执行口径从“先做机制收口，再择机判断下一步”改成“机制收口 + relabel 判断 + 下一轮训练入口判断”同一轮并行推进。
+   - 新增压缩节奏、当天最低交付、当日分流结论等内容，要求 crowded 重点帧、manifest 回写、sequence notes、summary 结论和训练入口判断尽量在同一天内形成闭环。
+3. 涉及文件：
+   - `backend-train-model/person-train-model/train-docs/人工复核.md`
+   - `backend-train-model/docs/update_log.md`
+4. 新增 / 变更配置项：
+   - 无新增训练配置、数据配置或脚本参数。
+   - 本轮只调整 `5.10` 阶段的人工复核执行节奏、任务密度与输出要求，不修改训练代码、prepare 流程、评估命令、数据集切分、模型权重或在线链路代码。
+5. 兼容性注意：
+   - 本轮只是把 `5.10` 阶段的推进方式改得更紧凑，不改变当前 hardest FN 的两条主线判断，也不把多变量训练升级为默认动作。
+   - 即使强调加快节奏，`5.10` 仍然要求先完成 crowded / overlap 主机制收口，再决定是否走 hard sample 治理、ROI 证据链补充或修框 / 补标分支。
+6. 本轮明确不改动的部分：
+   - 不修改 `5.7` 与 `5.6` 历史阶段正文内容。
+   - 不修改 `stage_reviews/` 下现有复核记录、`by_source/` 共享素材、训练脚本、prepared 数据集、评估报告、模型权重和在线链路代码。
+
+## 2026-05-10 按日期口径新增 `5.10` 人工复核阶段并切换 active stage
+
+1. 变更来源：用户指出 `5.7` 是按日期编号的历史阶段，不应继续把它当成今天的默认阶段；要求直接修改当前人工复核入口，使文档与阶段索引改成“`2026-05-10` 这一天应该做什么”。
+2. 变更总览：
+   - 更新 `backend-train-model/person-train-model/train-docs/人工复核.md`，新增 `## 5.10 crowded/overlap机制收口与下一阶段启动准备`，明确今天的阶段目标、优先帧、机制级收口要求、退出条件与不建议优先做的事项。
+   - 将 `5.7` 在手册中的定位改成“`2026-05-07` 历史阶段”，不再把它写成今天默认执行入口；同时保留 `5.6` 作为更早历史阶段。
+   - 更新 `backend-train-model/person-train-model/train-result/review/person_fullframe_with_new_labels_hard_sample_review/active_stage.json`，把当前 active stage 从 `5.7` 切换到 `5.10`。
+   - 更新 `backend-train-model/person-train-model/train-result/review/person_fullframe_with_new_labels_hard_sample_review/review_stage_index.md`，把当前激活阶段、历史阶段顺序和使用建议同步改成按日期推进的口径。
+   - 新增 `stage_reviews/stage_2026-05-10_crowded_overlap_mechanism_closeout/` 阶段目录及初始台账文件：
+     - `stage_meta.json`
+     - `semantic_bucket_summary.md`
+     - `semantic_bucket_manifest.json`
+     - `sequence_notes/**/5-10notes.md`
+   - `5.10` 阶段的 manifest 改成承接 `5.7` 已有语义结论、继续补 `mechanism_primary / mechanism_secondary / mechanism_confidence` 的结构，避免今天再把 `5.7` 已完成的语义桶重做一遍。
+3. 涉及文件：
+   - `backend-train-model/person-train-model/train-docs/人工复核.md`
+   - `backend-train-model/person-train-model/train-result/review/person_fullframe_with_new_labels_hard_sample_review/active_stage.json`
+   - `backend-train-model/person-train-model/train-result/review/person_fullframe_with_new_labels_hard_sample_review/review_stage_index.md`
+   - `backend-train-model/person-train-model/train-result/review/person_fullframe_with_new_labels_hard_sample_review/stage_reviews/stage_2026-05-10_crowded_overlap_mechanism_closeout/stage_meta.json`
+   - `backend-train-model/person-train-model/train-result/review/person_fullframe_with_new_labels_hard_sample_review/stage_reviews/stage_2026-05-10_crowded_overlap_mechanism_closeout/semantic_bucket_summary.md`
+   - `backend-train-model/person-train-model/train-result/review/person_fullframe_with_new_labels_hard_sample_review/stage_reviews/stage_2026-05-10_crowded_overlap_mechanism_closeout/semantic_bucket_manifest.json`
+   - `backend-train-model/person-train-model/train-result/review/person_fullframe_with_new_labels_hard_sample_review/stage_reviews/stage_2026-05-10_crowded_overlap_mechanism_closeout/sequence_notes/**/5-10notes.md`
+   - `backend-train-model/docs/update_log.md`
+4. 新增 / 变更配置项：
+   - 无新增训练配置、数据配置或脚本参数。
+   - 本轮新增的是人工复核阶段目录与台账字段，不修改训练代码、prepare 流程、评估命令、数据集切分、模型权重或在线链路代码。
+5. 兼容性注意：
+   - 从本轮之后，`5.7` 明确视为 `2026-05-07` 当天的历史阶段；今天默认应以 `5.10` active stage 为准。
+   - `5.10` 阶段的 manifest 重点补的是机制字段，不建议再把 `5.7` 已完成的语义字段整轮重抄一遍。
+   - 如果后续进入 `5.11` 或更高日期阶段，应继续沿用这种“按日期开新阶段 + active stage 切换 + 历史阶段保留”的写法。
+6. 本轮明确不改动的部分：
+   - 不修改 `5.7` 与 `5.6` 阶段已经归档的 summary / manifest / notes 正文内容。
+   - 不修改 `by_source/` 共享素材、`review_asset_manifest.json`、训练脚本、prepared 数据集、评估报告、模型权重和在线链路代码。
+
+## 2026-05-10 重排 person 人工复核 / ROI-aware / fullframe 后续文档的当前口径
+
+1. 变更来源：用户要求把当前更合理的下一步方案按优先级写回 `backend-train-model/person-train-model/train-docs/人工复核.md`，并同时审核、清理和改写多份已经过时的 person / ROI 训练文档，删除对现阶段参考价值不高的旧方案，换成真正更有价值的当前行动口径。
+2. 变更总览：
+   - 继续更新 `backend-train-model/person-train-model/train-docs/人工复核.md`，把文档入口明确切到 `active_stage.json`，补充 `5.7 crowded/overlap` 当前还差什么、收口标准、默认执行入口、双主线与机制级复盘要求，并把后半部分的通用流程改成以 current active stage 驱动的写法。
+   - 重写 `backend-train-model/person-train-model/train-docs/roi_next_iteration_plan.md` 的正文定位，明确它是“当前阶段行动计划”而不是历史 runbook；保留当前主线、已完成复盘结论和 `ioa20` 触发条件，同时把命令块下沉为附录，不再让命令本身盖过优先级判断。
+   - 重写 `backend-train-model/person-train-model/train-docs/roi_problem_solution.md` 的文档定位，使其从“下一版建议方案”切换为“规则设计背景与现行口径说明”；保留 `center_inside` 太硬、`bottom_center_inside`、IoA 语义、`0.25` 起点等长期有效解释，同时删除/降级已经被 v2/v3 与后续实验证据覆盖的“推荐落地顺序 / 推荐训练对照 / 下一版最推荐方案”等过时未来时态内容。
+   - 重写 `backend-train-model/person-train-model/train-docs/person_train_solution.md` 的主叙事，从“fullframe 扩样后的小目标改进方案”切到“hardest FN 双主线分析与后续方案”，新增基于 `5.7` 人工复核的最新记录，明确：当前主问题已拆成“可见性弱型”和“crowded / overlap 型”，远景 / 贴边更多是对照子类，不再继续把 `small_boundary_person` 或单纯 `img768` 收益当成整条线的主推进框架。
+3. 涉及文件：
+   - `backend-train-model/person-train-model/train-docs/人工复核.md`
+   - `backend-train-model/person-train-model/train-docs/roi_next_iteration_plan.md`
+   - `backend-train-model/person-train-model/train-docs/roi_problem_solution.md`
+   - `backend-train-model/person-train-model/train-docs/person_train_solution.md`
+   - `backend-train-model/docs/update_log.md`
+4. 新增 / 变更配置项：
+   - 无新增训练配置、数据配置或脚本参数。
+   - 本轮仅更新 person / ROI 训练文档、人工复核手册和文档优先级口径，不修改训练代码、prepare 流程、评估命令逻辑、数据集切分、模型权重或在线链路代码。
+5. 兼容性注意：
+   - `roi_problem_solution.md` 现在主要承担“规则设计背景”职责，不应再被误用成当前行动计划；当前行动优先级应以 `roi_next_iteration_plan.md` 为准。
+   - `person_train_solution.md` 现在不再把整条 fullframe 线主要写成“小目标改进方案”；如果后续文档或汇报仍沿用旧标题口径，应同步调整为更贴近 hardest FN 双主线的表述。
+   - `人工复核.md` 虽然继续保留 `5.6` 历史阶段，但当前默认执行入口必须以 `active_stage.json` 为准；后续新增 `5.8` 或更高阶段时，应继续沿用这种“历史保留 + active stage 驱动”的写法。
+6. 本轮明确不改动的部分：
+   - 不修改 `stage_reviews/` 下已有人工复核记录正文内容。
+   - 不修改 `by_source/` 共享素材、`review_asset_manifest.json`、训练脚本、prepared 数据集、评估报告、模型权重和在线链路代码。
+
+## 2026-05-08 全仓库复查顶层 sequence notes 依赖并删除冗余索引目录
+
+1. 变更来源：用户要求先全仓库检查是否还存在对 `person_fullframe_with_new_labels_hard_sample_review/sequence_*/notes.md` 的引用，再检查 README / 手册 / 组员说明文本是否都已经切换到 `stage_reviews/` 结构；若确认没有实际依赖，则删除顶层 `sequence_*` 目录，并同步更新相关说明文档。
+2. 变更总览：
+   - 复查后确认：当前仍提到顶层 `sequence_*/notes.md` 的主要是历史 `update_log.md` 记录；用于实际协作和当前操作的文档已切到 `stage_reviews/` 结构。
+   - 继续更新 `backend-train-model/person-train-model/train-docs/人工复核.md`，把阶段操作步骤进一步收敛到“当前激活阶段目录 + 5-xnotes.md + 当前阶段 summary/manifest”的真实写法，并删除仍然提示先打开顶层 sequence 索引页的现行指导。
+   - 更新 `backend-train-model/person-train-model/train-result/review/person_fullframe_with_new_labels_hard_sample_review/README.md`，将顶层 `sequence_*` 目录从“兼容保留层”进一步升级为“已不再需要的旧层”，明确后续只看 `stage_reviews/`。
+   - 更新 `backend-train-model/person-train-model/train-result/review/person_fullframe_with_new_labels_hard_sample_review/bucket_summary_links.md`，将跳转目标全部切换为 `review_stage_index.md`、`active_stage.json` 与 `stage_reviews/stage_*/sequence_notes/`。
+   - 更新 `backend-train-model/person-train-model/train-result/review/person_fullframe_with_new_labels_hard_sample_review/review_stage_index.md`，去掉“顶层 `sequence_*/notes.md` 仍作为兼容层”的表述，改为明确写出其历史过渡任务已完成。
+   - 在确认当前操作文档已切换后，删除 review 根目录下 5 个顶层 `sequence_*` 索引目录：
+     - `sequence_D15_20260119061405/`
+     - `sequence_D15_20260119203927/`
+     - `sequence_D02_20260123070624/`
+     - `sequence_D02_20260123074836/`
+     - `sequence_D05_20260123074841/`
+3. 涉及文件：
+   - `backend-train-model/person-train-model/train-docs/人工复核.md`
+   - `backend-train-model/person-train-model/train-result/review/person_fullframe_with_new_labels_hard_sample_review/README.md`
+   - `backend-train-model/person-train-model/train-result/review/person_fullframe_with_new_labels_hard_sample_review/bucket_summary_links.md`
+   - `backend-train-model/person-train-model/train-result/review/person_fullframe_with_new_labels_hard_sample_review/review_stage_index.md`
+   - `backend-train-model/person-train-model/train-result/review/person_fullframe_with_new_labels_hard_sample_review/sequence_D15_20260119061405/`（删除）
+   - `backend-train-model/person-train-model/train-result/review/person_fullframe_with_new_labels_hard_sample_review/sequence_D15_20260119203927/`（删除）
+   - `backend-train-model/person-train-model/train-result/review/person_fullframe_with_new_labels_hard_sample_review/sequence_D02_20260123070624/`（删除）
+   - `backend-train-model/person-train-model/train-result/review/person_fullframe_with_new_labels_hard_sample_review/sequence_D02_20260123074836/`（删除）
+   - `backend-train-model/person-train-model/train-result/review/person_fullframe_with_new_labels_hard_sample_review/sequence_D05_20260123074841/`（删除）
+   - `backend-train-model/docs/update_log.md`
+4. 新增 / 变更配置项：
+   - 无新增训练配置、数据配置或脚本参数。
+   - 本轮仅清理 review 目录中的冗余索引层并更新文档入口，不修改训练代码、prepare 流程、评估命令、数据集切分或模型权重。
+5. 兼容性注意：
+   - 当前全仓库历史 `update_log.md` 仍保留旧路径文本，作为历史记录的一部分；这些文本不再代表当前实际使用路径，也不应继续作为操作入口。
+   - 从本轮之后，若有人再按旧路径寻找 `sequence_*/notes.md`，应统一改为：先看 `review_stage_index.md` / `active_stage.json`，再进入对应 `stage_reviews/stage_*/sequence_notes/`。
+   - 根级 `semantic_bucket_summary.md` 与 `semantic_bucket_manifest.json` 仍保留为兼容入口，因此删除顶层 `sequence_*` 后，不影响当前阶段 summary / manifest 的定位方式。
+6. 本轮明确不改动的部分：
+   - 不修改 `stage_reviews/` 下两轮已归档 notes / summary / manifest 的正文内容。
+   - 不修改 `by_source/` 共享素材、`review_asset_manifest.json`、训练脚本、prepared 数据集、评估报告、模型权重和在线链路代码。
+
+## 2026-05-08 细化分阶段人工复核操作说明并明确顶层 sequence 索引目录处置策略
+
+1. 变更来源：用户要求继续修改 `backend-train-model/person-train-model/train-docs/人工复核.md`，让每个阶段下“当前阶段人工复核具体怎么做”写得更具体，必须包含目录结构、实际操作顺序与工具使用方式；同时询问在 `stage_reviews/` 已具备两轮完整 notes / summary / manifest 后，顶层 `sequence_*` 目录是否仍有保留必要。
+2. 变更总览：
+   - 进一步细化 `人工复核.md` 中 `5.7 crowded/overlap机械复盘及双主线推进` 的执行步骤，新增当前激活阶段目录结构示意、逐张复核顺序、三层记录方法、修框触发条件和双主线落地要求。
+   - 同步细化 `人工复核.md` 中 `5.6 第一轮代表帧语义复核与结构化回填` 的执行步骤，新增历史阶段目录结构、第一批代表帧的实际回填流程、多人协作分工和“不要把新阶段发现回写到 5.6”的限制说明。
+   - 把手册中残留的旧单例写法继续替换为新的阶段写法，例如明确要求把观察写到当前阶段 `5-xnotes.md`，把结构化记录写到当前阶段目录下的 `semantic_bucket_manifest.json`，把总结写到当前阶段目录下的 `semantic_bucket_summary.md`。
+   - 更新 review 根目录 `README.md`，明确判断：顶层 `sequence_*` 目录从结构纯度上看已经成为“冗余兼容层”；当前暂时保留只是为了避免文档链接、组员习惯路径或外部脚本失效，后续确认无依赖后可以整体删除。
+3. 涉及文件：
+   - `backend-train-model/person-train-model/train-docs/人工复核.md`
+   - `backend-train-model/person-train-model/train-result/review/person_fullframe_with_new_labels_hard_sample_review/README.md`
+   - `backend-train-model/docs/update_log.md`
+4. 新增 / 变更配置项：
+   - 无新增训练配置、数据配置或脚本参数。
+   - 本轮仅细化人工复核手册与 review 总入口说明，不修改训练代码、prepare 流程、评估命令、数据集切分或模型权重。
+5. 兼容性注意：
+   - 当前顶层 `sequence_*` 目录虽然已被判断为结构性冗余，但本轮**没有直接删除**，仍保留为兼容层；这样可以避免已有相对路径、外部脚本或协作者本地使用习惯立刻失效。
+   - 如果后续要真正删除顶层 `sequence_*` 目录，建议先统一检查：`人工复核.md`、`README.md`、其他 review 文档、组员说明文本以及可能引用这些路径的脚本是否都已经完全切到 `stage_reviews/` 结构。
+6. 本轮明确不改动的部分：
+   - 不删除当前顶层 `sequence_*` 索引目录。
+   - 不修改 `stage_reviews/` 下两轮已归档 notes / summary / manifest 的正文结论内容。
+
+## 2026-05-08 将人工复核产物改造成按阶段归档结构并补齐兼容入口
+
+1. 变更来源：用户指出当前多轮人工复核反复覆盖同一个 `notes.md`、`semantic_bucket_summary.md`、`semantic_bucket_manifest.json`，不利于回溯，并要求我按阶段重新设计 review 工作台，直接落地目录结构、阶段索引、兼容入口和手册说明。
+2. 变更总览：
+   - 在 `backend-train-model/person-train-model/train-result/review/person_fullframe_with_new_labels_hard_sample_review/` 下正式引入 `stage_reviews/` 分阶段归档结构，每一轮人工复核单独一个 `stage_*/` 子目录。
+   - 新增阶段总索引 `review_stage_index.md` 与机器可读入口 `active_stage.json`，明确当前激活阶段、历史阶段顺序（最新在前）以及每轮的 summary / manifest / notes 位置。
+   - 新增两轮阶段元信息文件：
+     - `stage_reviews/stage_2026-05-07_crowded_overlap_dual_lines/stage_meta.json`
+     - `stage_reviews/stage_2026-05-06_first_semantic_review/stage_meta.json`
+   - 将原先根目录里持续覆盖的 summary / manifest 内容拆分为两轮阶段产物：
+     - `stage_reviews/stage_2026-05-07_crowded_overlap_dual_lines/semantic_bucket_summary.md`
+     - `stage_reviews/stage_2026-05-07_crowded_overlap_dual_lines/semantic_bucket_manifest.json`
+     - `stage_reviews/stage_2026-05-06_first_semantic_review/semantic_bucket_summary.md`
+     - `stage_reviews/stage_2026-05-06_first_semantic_review/semantic_bucket_manifest.json`
+   - 将 5 条重点序列的人工复核正文改成按阶段单独存放，新增：
+     - 5.7 阶段：`sequence_notes/sequence_*/5-7notes.md`
+     - 5.6 阶段：`sequence_notes/sequence_*/5-6notes.md`
+   - 把顶层 5 个 `sequence_*/notes.md` 全部改造成“阶段 notes 索引页”，不再继续承载新阶段正文。
+   - 把根级 `semantic_bucket_summary.md` 改成兼容入口 Markdown，把根级 `semantic_bucket_manifest.json` 改成兼容入口 JSON，不再继续保存某一轮的真实 records。
+   - 更新根目录 `README.md`，明确区分：共享素材目录、分阶段真实产物目录、以及顶层兼容 / 索引入口。
+   - 同步更新 `backend-train-model/person-train-model/train-docs/人工复核.md`，把“当前阶段怎么写记录、写到哪里、多人怎么协作”的说明改成基于 `stage_reviews/` 的新结构，并把旧的单例写法改成阶段写法。
+3. 涉及文件：
+   - `backend-train-model/person-train-model/train-result/review/person_fullframe_with_new_labels_hard_sample_review/README.md`
+   - `backend-train-model/person-train-model/train-result/review/person_fullframe_with_new_labels_hard_sample_review/review_stage_index.md`
+   - `backend-train-model/person-train-model/train-result/review/person_fullframe_with_new_labels_hard_sample_review/active_stage.json`
+   - `backend-train-model/person-train-model/train-result/review/person_fullframe_with_new_labels_hard_sample_review/semantic_bucket_summary.md`
+   - `backend-train-model/person-train-model/train-result/review/person_fullframe_with_new_labels_hard_sample_review/semantic_bucket_manifest.json`
+   - `backend-train-model/person-train-model/train-result/review/person_fullframe_with_new_labels_hard_sample_review/sequence_D15_20260119061405/notes.md`
+   - `backend-train-model/person-train-model/train-result/review/person_fullframe_with_new_labels_hard_sample_review/sequence_D15_20260119203927/notes.md`
+   - `backend-train-model/person-train-model/train-result/review/person_fullframe_with_new_labels_hard_sample_review/sequence_D02_20260123070624/notes.md`
+   - `backend-train-model/person-train-model/train-result/review/person_fullframe_with_new_labels_hard_sample_review/sequence_D02_20260123074836/notes.md`
+   - `backend-train-model/person-train-model/train-result/review/person_fullframe_with_new_labels_hard_sample_review/sequence_D05_20260123074841/notes.md`
+   - `backend-train-model/person-train-model/train-result/review/person_fullframe_with_new_labels_hard_sample_review/stage_reviews/stage_2026-05-07_crowded_overlap_dual_lines/stage_meta.json`
+   - `backend-train-model/person-train-model/train-result/review/person_fullframe_with_new_labels_hard_sample_review/stage_reviews/stage_2026-05-07_crowded_overlap_dual_lines/semantic_bucket_summary.md`
+   - `backend-train-model/person-train-model/train-result/review/person_fullframe_with_new_labels_hard_sample_review/stage_reviews/stage_2026-05-07_crowded_overlap_dual_lines/semantic_bucket_manifest.json`
+   - `backend-train-model/person-train-model/train-result/review/person_fullframe_with_new_labels_hard_sample_review/stage_reviews/stage_2026-05-07_crowded_overlap_dual_lines/sequence_notes/**/5-7notes.md`
+   - `backend-train-model/person-train-model/train-result/review/person_fullframe_with_new_labels_hard_sample_review/stage_reviews/stage_2026-05-06_first_semantic_review/stage_meta.json`
+   - `backend-train-model/person-train-model/train-result/review/person_fullframe_with_new_labels_hard_sample_review/stage_reviews/stage_2026-05-06_first_semantic_review/semantic_bucket_summary.md`
+   - `backend-train-model/person-train-model/train-result/review/person_fullframe_with_new_labels_hard_sample_review/stage_reviews/stage_2026-05-06_first_semantic_review/semantic_bucket_manifest.json`
+   - `backend-train-model/person-train-model/train-result/review/person_fullframe_with_new_labels_hard_sample_review/stage_reviews/stage_2026-05-06_first_semantic_review/sequence_notes/**/5-6notes.md`
+   - `backend-train-model/person-train-model/train-docs/人工复核.md`
+   - `backend-train-model/docs/update_log.md`
+4. 新增 / 变更配置项：
+   - 无新增训练配置、数据配置或脚本参数。
+   - 本轮新增的是 review 归档结构与文档入口，不修改训练脚本、prepare 流程、评估命令、数据集切分或模型权重。
+5. 兼容性注意：
+   - 根级 `semantic_bucket_summary.md` 与 `semantic_bucket_manifest.json` 现在都只作为兼容入口，不再代表某一轮人工复核的真实正文与真实 records；真实内容必须进入 `stage_reviews/stage_*/` 查看。
+   - 顶层 `sequence_*/notes.md` 现在也只作为阶段 notes 索引页，不能再继续把新一轮观察直接写回这些单例文件。
+   - `5.6` 阶段目录中的内容属于基于当前已知旧 notes / 旧 summary / 旧 manifest 重建后的历史阶段归档，其中 `stage_meta.json` 已明确写入 `reconstructed_from_root_snapshot=true`；后续如果拿到更原始的 5.6 快照，可以再替换。
+   - 当前 `active_stage.json` 指向的是 `5.7 crowded/overlap机械复盘及双主线推进`；后续进入 `5.8` 或更高阶段时，应先更新 `人工复核.md` 中的最新阶段 H2，再同步新增 stage 目录并切换 active stage 指针。
+6. 本轮明确不改动的部分：
+   - 不修改 `by_source/` 下的共享复核素材和 `review_asset_manifest.json` 内容。
+   - 不修改训练脚本、prepared 数据集、评估报告、模型权重、在线链路代码和既有实验指标口径。
+
+## 2026-05-07 修订当前阶段汇报 PPT 中的问题与缺陷 / 解决方案页
+
+1. 变更来源：用户要求继续修改 `backend-train-model/docs/PPT/workwear-stage-report-20260507/output.pptx`，将“问题与缺陷”“关键 FN 样例展示”“解决方案”三页改为基于 `person_fullframe_with_new_labels_baseline` 与 `person_fullframe_with_new_labels_img768` 的最新分桶与人工复核结论，不再沿用旧版 ROI-aware hard FN 口径。
+2. 变更总览：
+   - 将问题页改写为 `baseline 640` 与 `img768` 的 test FN 分桶对比，明确写出：当前主矛盾不是“贴边小人”，真正占大头的是 `medium_large_pose_or_appearance` 与 `small_interior_person`。
+   - 将样例页改为 fullframe hard sample review 目录中的代表帧对照，使用 `D15_20260119061405_frame_0346` 与 `D15_20260119203927_frame_0180` 的 `baseline 640 / img768` overlay 图，直接展示“可见性弱型”和“crowded / overlap 型”两条主线。
+   - 将解决方案页改写为最新执行顺序：先做 crowded / overlap 机理复盘，再按“可见性弱型 / crowded 型”两条主线推进，最后在需要时补正式复盘台账；同时明确“不优先把贴边小人当主因，不优先继续单纯放大 imgsz，也不在机制未明前直接跳到 NMS 调参”。
+   - 同步更新本次 PPT 的 `narrative_plan.md`，让其素材来源与问题定义和最新版本保持一致。
+3. 涉及文件：
+   - `backend-train-model/docs/PPT/workwear-stage-report-20260507/output.pptx`
+   - `backend-train-model/docs/PPT/workwear-stage-report-20260507/narrative_plan.md`
+   - `tmp/slides/workwear-stage-report-20260507/build/build_deck.mjs`
+   - `backend-train-model/docs/update_log.md`
+4. 新增 / 变更配置项：
+   - 无新的训练配置项、数据配置项或评估脚本参数。
+   - 本轮仅修订 PPT 叙事、示例图片与结论表达，不改动训练代码、模型权重、复盘脚本或数据集内容。
+5. 兼容性注意：
+   - 本轮汇报口径明确以 `person分桶.md` 与 `人工复核.md` 为准，避免继续沿用“ROI 边界过硬是唯一主矛盾”这一过时表述。
+   - 新版问题页与解决方案页强调的是 fullframe baseline/img768 分桶后的真实结论，并不等于否定 ROI-aware 主线训练本身的阶段成果；二者在汇报中分别承担“当前效果展示”和“问题归因 / 下一步动作”两个不同角色。
+6. 本轮明确不改动的部分：
+   - 不修改任何训练脚本、prepared 数据集、评估报告、模型权重或在线链路代码。
+   - 不覆盖旧版 `大创PPT汇报.pptx`，继续只维护 `workwear-stage-report-20260507/output.pptx` 这一当前阶段汇报版本。
+
+## 2026-05-07 基于上一阶段模板生成当前阶段汇报 PPT
+
+1. 变更来源：用户要求基于 `backend-train-model/docs/PPT/大创PPT汇报.pptx` 的背景和大体内容，按当前阶段已完成工作重新归纳汇报主线，并生成新的 `.pptx` 文件，且需要包含训练结果图展示。
+2. 变更总览：
+   - 新增当前阶段汇报输出目录 `backend-train-model/docs/PPT/workwear-stage-report-20260507/`，产出新的阶段汇报文件 `output.pptx`。
+   - 新增 `narrative_plan.md`，明确这次 PPT 的受众、叙事主线、页码结构、素材来源和版式复用策略。
+   - 新 PPT 继续沿用上一阶段的封面 / 目录 / 三段式章节结构和整体配色，但正文内容已改为“承接 ROI-aware 初版后的增量进展”，重点覆盖 `v2 -> v3` 迭代、对照实验、FP/FN 复盘、hard sample 语义归因和下一阶段推进顺序。
+   - 在新 PPT 中加入当前主线 run 的训练结果图与 PR 曲线图，并加入两张关键 FN 复盘样例图，避免只保留文字总结。
+3. 涉及文件：
+   - `backend-train-model/docs/PPT/workwear-stage-report-20260507/narrative_plan.md`
+   - `backend-train-model/docs/PPT/workwear-stage-report-20260507/output.pptx`
+   - `backend-train-model/docs/update_log.md`
+4. 新增 / 变更配置项：
+   - 无新的训练配置项、数据配置项或评估脚本参数。
+   - 本轮仅新增阶段汇报材料及其叙事规划文件，不改动训练代码、数据集、模型权重或实验结论口径。
+5. 兼容性注意：
+   - 新 PPT 的叙事边界继续遵守 `backend-train-model/docs/阶段PPT汇报.md` 已收紧后的口径：上阶段已覆盖 ROI-aware 初版，本阶段默认从 `person_roi_aware_v2_from_fullframe` 之后继续汇报。
+   - 文中关于当前主线、问题定义和下一步顺序的表述，统一以根 `AGENTS.md`、`backend-train-model/AGENTS.md` 以及 `person_train_compare.md / roi_next_iteration_plan.md / 人工复核.md` 的最新口径为准，避免回退到旧版“ROI 边界过硬是唯一主矛盾”的表述。
+6. 本轮明确不改动的部分：
+   - 不修改任何训练脚本、prepared 数据集、评估报告、模型权重或在线链路代码。
+   - 不覆盖旧版 `大创PPT汇报.pptx`，仅在新目录中新增当前阶段汇报版本。
+
+## 2026-05-07 调整人工复核手册中的 5.7 更新标题层级
+
+1. 变更来源：用户要求修改 `backend-train-model/person-train-model/train-docs/人工复核.md`，不要在每个 H3 标题里重复写日期，而是把时间提升为单独的 H2 标题，作为阶段更新分隔。
+2. 变更总览：
+   - 调整 `backend-train-model/person-train-model/train-docs/人工复核.md` 的 5.7 更新结构。
+   - 将原先写在两个 H3 标题中的 `5.7 更新` 提升为单独的 H2 标题：`## 5.7 更新`。
+   - 保留原有两块内容，但将其改成该 H2 下的普通 H3 小节，分别用于记录“阶段性结论”和“当前下一步应该做什么”。
+   - 补充一句层级说明，明确后续新增阶段更新时，继续按“日期 H2 -> 具体内容 H3”的方式追加。
+3. 涉及文件：
+   - `backend-train-model/person-train-model/train-docs/人工复核.md`
+   - `backend-train-model/docs/update_log.md`
+4. 新增 / 变更配置项：
+   - 无新增训练配置、数据配置或脚本参数。
+   - 本轮仅调整文档标题层级与写法，不修改训练代码、prepare 流程、评估命令、数据集切分或模型权重。
+5. 兼容性注意：
+   - 本轮只调整文档结构，不改变 5.7 更新段落本身承载的结论和执行优先级。
+   - 后续如果继续追加新的阶段更新，建议沿用相同层级：先新增日期 H2，再在其下使用 H3 写具体结论与下一步动作，避免同一日期在多个小标题里重复出现。
+6. 本轮明确不改动的部分：
+   - 不修改 `semantic_bucket_summary.md`、`semantic_bucket_manifest.json` 的当前结论内容。
+   - 不修改 `sequence_*/notes.md`、`by_source/` 素材、训练脚本、prepared 数据集与当前主线配置。
+
+## 2026-05-07 根据 D15_20260119203927 新版 notes 同步更新语义汇总与人工复核下一步
+
+1. 变更来源：用户补充并修订了 `backend-train-model/person-train-model/train-result/review/person_fullframe_with_new_labels_hard_sample_review/sequence_D15_20260119203927/notes.md`，明确这条序列的 3 张代表帧分别属于“围栏遮挡”与“两人重叠”类型，并要求我重新同步 `semantic_bucket_summary.md`、`semantic_bucket_manifest.json`，再把新的下一步动作写入 `backend-train-model/person-train-model/train-docs/人工复核.md`，并明确标注为 5.7 更新。
+2. 变更总览：
+   - 更新 `backend-train-model/person-train-model/train-result/review/person_fullframe_with_new_labels_hard_sample_review/semantic_bucket_manifest.json`，把 `D15_20260119203927_frame_0142 / 0143 / 0180` 的 `semantic_primary`、`need_relabel`、`relabel_status` 与备注从 pending 状态正式回填为人工结论。
+   - 更新 `backend-train-model/person-train-model/train-result/review/person_fullframe_with_new_labels_hard_sample_review/semantic_bucket_summary.md`，把本轮已完成记录从 `12 -> 15`，并同步修正语义桶分布：`occluded=5`、`crowded_or_overlap=5`、`partial_body=3`、`pose_or_shape_unusual=2`。
+   - 在 summary 中明确写清：`D15_20260119203927` 与 `D15_20260119061405` 不是同质序列，当前 hardest FN 至少包含两条稳定主类型，即“可见性弱型”和“crowded / overlap 型”。
+   - 同步修订 `backend-train-model/person-train-model/train-docs/人工复核.md`，新增 `2.1 / 2.2` 两个小节，显式标注为“5.7 更新”，把当前阶段结论与下一步工作顺序写清。
+   - 在 `人工复核.md` 中把下一步明确收敛到 crowded / overlap 机制复盘、两条 D15 主线拆分推进，以及后续如需正式台账时再补 `split / gt_index / reviewed_by / reviewed_at` 等元数据。
+3. 涉及文件：
+   - `backend-train-model/person-train-model/train-result/review/person_fullframe_with_new_labels_hard_sample_review/semantic_bucket_manifest.json`
+   - `backend-train-model/person-train-model/train-result/review/person_fullframe_with_new_labels_hard_sample_review/semantic_bucket_summary.md`
+   - `backend-train-model/person-train-model/train-docs/人工复核.md`
+   - `backend-train-model/docs/update_log.md`
+4. 新增 / 变更配置项：
+   - 无新增训练配置、数据配置或脚本参数。
+   - 本轮仅同步人工复核结论与后续执行顺序，不修改训练代码、prepare 流程、评估命令、数据集切分或模型权重。
+5. 兼容性注意：
+   - 当前 `semantic_bucket_manifest.json` 与 `semantic_bucket_summary.md` 仍然严格依据五个 `sequence_*/notes.md` 已写内容回填，不额外读取图片或 overlay 去推断未写明字段；因此 `split`、`gt_index`、`reviewed_by`、`reviewed_at` 依旧保持空字符串或 `null`，这不代表这些字段不存在，只是当前 notes 尚未统一沉淀。
+   - 本轮把 crowded / overlap 从“可能只是次要子问题”上调为“稳定主子类型之一”，但这仍然是基于当前 15 张代表帧人工复核得到的阶段结论，不等于已经完成更细粒度的机制归因；是否属于“合框 / 漏响应 / 匹配不过线”，仍需下一步继续复盘。
+   - `人工复核.md` 中新增的 5.7 更新段落，属于当前阶段的执行优先级说明；如果后续 crowded / overlap 机制复盘得出新结论，应继续回写这份手册和 summary，避免文档口径落后于实际进展。
+6. 本轮明确不改动的部分：
+   - 不修改五个 `sequence_*/notes.md` 的原始人工文字记录。
+   - 不修改 `by_source/` 下的复核素材、`review_asset_manifest.json`、训练脚本、prepared 数据集、现有实验结论和当前主线配置。
+
+## 2026-05-07 按五个 sequence notes 回填 hardest FN 语义汇总与 manifest
+
+1. 变更来源：用户说明已经完成 `person_fullframe_with_new_labels_hard_sample_review` 下五个重点序列的人工复核，要求我根据五个 `sequence_*/notes.md` 回填 `semantic_bucket_summary.md` 和 `semantic_bucket_manifest.json`，并给出本轮结论与下一步建议。
+2. 变更总览：
+   - 正式填写 `backend-train-model/person-train-model/train-result/review/person_fullframe_with_new_labels_hard_sample_review/semantic_bucket_summary.md`，把五个重点序列的人工复核结果整理成可读结论。
+   - 在 summary 中明确写入本轮覆盖范围：`5` 个序列、`15` 张代表帧、`15` 条 FN GT 记录，其中 `12` 条已补齐主/次语义，`3` 条仍待补齐。
+   - 在 summary 中按 `semantic_primary` 汇总当前主桶分布，并补充对 `semantic_secondary` 的解释，强调当前 hardest FN 的主因更偏“可见性不足驱动的复合难例”，而不是纯边界小人或纯极小目标。
+   - 在 summary 中补齐五个序列各自的“主问题 / 代表帧 / 下一步建议”，并把 `D15_20260119203927` 明确标记为当前仍待补齐人工主结论的对照序列。
+   - 正式填写 `backend-train-model/person-train-model/train-result/review/person_fullframe_with_new_labels_hard_sample_review/semantic_bucket_manifest.json`，按五个 `notes.md` 中已经写出的代表帧逐条回填 `records`。
+   - 对 notes 中未统一给出的 `split`、`gt_index`、`reviewed_by`、`reviewed_at` 不做猜测补填，统一保留为空字符串或 `null`；对 `D15_20260119203927` 的 3 条记录以 `relabel_status=pending` 标识其仍待补齐人工语义结论。
+3. 涉及文件：
+   - `backend-train-model/person-train-model/train-result/review/person_fullframe_with_new_labels_hard_sample_review/semantic_bucket_summary.md`
+   - `backend-train-model/person-train-model/train-result/review/person_fullframe_with_new_labels_hard_sample_review/semantic_bucket_manifest.json`
+   - `backend-train-model/docs/update_log.md`
+4. 新增 / 变更配置项：
+   - 无新增训练配置、数据配置或脚本参数。
+   - 本轮仅回填人工复核产物，不修改训练代码、prepare 流程、评估命令、数据集切分或模型权重。
+5. 兼容性注意：
+   - 当前 manifest 和 summary 严格依据五个 `sequence_*/notes.md` 已写内容生成，不额外读取图片或 overlay 去推断未写明字段，因此它们反映的是“本轮 notes 已明确沉淀出的人工结论”，不是全量 15 条记录都已完全闭环。
+   - `D15_20260119203927` 的 3 条代表帧目前仍缺少 `semantic_primary`、`semantic_secondary`、`need_relabel` 等人工回填字段，所以当前桶分布只统计了其余 `12` 条已完成记录；后续若补齐这 3 条，需要同步更新 summary 和 manifest。
+   - notes 中未统一给出 `split`、`gt_index`、`reviewed_by`、`reviewed_at`，因此本轮继续保持空值占位；如果后续需要把这些结果用于更正式的复盘台账，应先回到原始 FN 明细或由复核人补写后再更新。
+6. 本轮明确不改动的部分：
+   - 不修改五个 `sequence_*/notes.md` 的原始人工文字记录。
+   - 不修改 `by_source/` 下的复核素材、`review_asset_manifest.json`、训练脚本、prepared 数据集、现有实验结论和当前主线配置。
+
 ## 2026-05-06 新增 person hardest val/test 分桶复盘文档并沉淀结论
 
 1. 变更来源：用户要求说明 `person_fullframe_with_new_labels` 这条线中“对 hardest val/test 样本做分桶复盘”应该怎么做，并让我实际完成这轮分桶、给出最终结论；随后又要求把这次分桶结果写入 `backend-train-model/person-train-model/train-docs/person分桶.md`，再继续给出更贴近业务语义的二层归纳。
@@ -20,6 +481,7 @@
    - 新增 `backend-train-model/person-train-model/train-code/export_hard_review_assets.py`，用于把当前优先人工复核帧按 `prepare_report.json` 的 8 个来源自动整理到 review 工作台，并为每张图生成按 run 区分的 overlay 图。
    - 实际导出了 `20` 张当前优先人工复核图片，并在 `backend-train-model/person-train-model/train-result/review/person_fullframe_with_new_labels_hard_sample_review/by_source/` 下按 8 个来源建立 `source_*` 目录；每个来源目录内再按 `sequence_*` 拆分，并分别放入 `images/`、`labels/`、`overlays/`。
    - 同步新增 `by_source/README.md` 与 `by_source/review_asset_manifest.json`，用于让组员按来源领取素材，并明确知道每张图对应哪些 run 的 overlay 文件。
+   - 针对“直接发送原始目录 / jpg / txt 给组员时可能出现解析失败”的问题，导出脚本进一步新增 `by_source/send_packages/`，并按用户最新要求改为只生成 **1 个总压缩包** `all_sources__review_bundle.zip`，统一包含全部 `source_*` 顶层目录；不再按每条序列单独生成 zip。
    - 进一步细化 `sequence_D15_20260119203927/notes.md`，补齐当前实际已经导出的 3 张代表帧：`0142 / 0143 / 0180`。
    - 按用户最新要求，进一步把顶层 `sequence_*` 目录调整为“只保留 `notes.md` 记录文件”，不再在这些目录里重复维护图片、标签或 overlay；实际复核素材统一只放在 `by_source/` 下，同时同步修订 `person分桶.md`、`README.md`、相关 `notes.md` 和 `人工复核.md` 的说明口径。
    - 按用户后续要求，在 `人工复核.md` 中新增一版明确的“组员统一填写规范”：补充多人协作时谁改 `notes.md`、谁汇总 `semantic_bucket_manifest.json`、谁最终更新 `semantic_bucket_summary.md` 的推荐流程，并明确 `by_source/review_asset_manifest.json` 只是素材索引文件，人工复核过程中不需要修改。
@@ -49,6 +511,7 @@
    - 当前新增的 `size_bin / pred_mode / crowd_bin / edge` 统计，是为了本轮“先自动做完预筛”而显式定义的辅助 heuristic；后续若继续复用这些统计，必须沿用本文档写清的阈值，不要把它们误当成仓库历史上早已固定的官方桶定义。
    - `person_fullframe_with_new_labels_hard_sample_review/` 下新增的目录骨架和 Markdown 文件，当前主要承担“人工复核工作台”和“模板”作用，其中大部分文件仍属于待填写状态；它们不是已经完成的人工结论本身。
    - `by_source/` 下当前导出的图片集合，是基于这轮自动预筛后的优先人工复核名单整理出来的，不等于“全量 560 个 FN GT 全部拷出”；如果后续人工复核范围扩大，需要重新运行 `export_hard_review_assets.py` 或扩展选择逻辑。
+   - `by_source/send_packages/` 里的 `all_sources__review_bundle.zip` 只是“更稳的传输形态”，不替代 `by_source/source_*/sequence_*/` 下的原始导出目录；人工复核仍以解压后查看素材、并把结论回写到 `notes.md / semantic_bucket_manifest.json / semantic_bucket_summary.md` 为准。
    - 当前推荐的目录职责已经调整为：`by_source/` 专门放实际复核素材，顶层 `sequence_*` 专门写记录；后续不要再把同一批图片 / 标签 / overlay 复制第二份到顶层 `sequence_*`，否则容易造成双份素材不一致。
    - 当前推荐的协作方式是：组员优先修改自己负责序列的 `notes.md`，再由汇总人批量更新 `semantic_bucket_manifest.json`，最后由组长或统一汇总人更新 `semantic_bucket_summary.md`；不要让多人同时直接改同一个 JSON 或 summary 文件。
    - 除非用户或组长明确指定，否则普通组员不应直接修改 `semantic_bucket_manifest.json`、`semantic_bucket_summary.md` 或 `by_source/review_asset_manifest.json`，以减少多人并发编辑带来的冲突风险。

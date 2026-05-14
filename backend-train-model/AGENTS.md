@@ -69,6 +69,11 @@
   - `person_project_config.roi_v3.mask_then_crop_margin64.json`
   - `person_project_config.roi_v3.crop_only_margin64.json`
 - 该 fullframe 扩样数据已完成 prepare：总图 `3009`、总框 `8861`，split 为 `train=2105 / val=453 / test=451`；输出目录为 `train-result/prepared/person_fullframe_with_new_labels/sequence_contiguous/`，对应 summary 为 `train-result/person_source_dataset_summary_fullframe_with_new_labels.json`。
+- 当前 new labels 工服可用基线 run：`clothes_merged_with_new_labels_v1_baseline`；权重为 `backend-train-model/new_clothes_train/train-result/artifacts/runs/clothes_merged_with_new_labels_v1_baseline/weights/best.pt`；split 为 `train=2106 / val=450 / test=453`。Val 指标：Precision `0.9769`，Recall `0.9594`，mAP50 `0.9817`，mAP75 `0.8645`，mAP50-95 `0.7106`；Test 指标：Precision `0.9835`，Recall `0.9683`，mAP50 `0.9924`，mAP75 `0.8491`，mAP50-95 `0.7075`。
+- 当前 new labels person fullframe 可用权重：
+  - 稳健基线：`person_fullframe_with_new_labels_baseline`，权重为 `backend-train-model/person-train-model/train-result/artifacts/runs/person_fullframe_with_new_labels_baseline/weights/best.pt`；Val 指标：Precision `0.9554`，Recall `0.9067`，mAP50 `0.9517`，mAP75 `0.4910`，mAP50-95 `0.5095`；Test 指标：Precision `0.9304`，Recall `0.8552`，mAP50 `0.9054`，mAP75 `0.4527`，mAP50-95 `0.4802`。
+  - 最新候选：`person_fullframe_with_new_labels_img768`，权重为 `backend-train-model/person-train-model/train-result/artifacts/runs/person_fullframe_with_new_labels_img768/weights/best.pt`；Val 指标：Precision `0.9356`，Recall `0.8960`，mAP50 `0.9457`，mAP75 `0.5135`，mAP50-95 `0.5147`；Test 指标：Precision `0.8798`，Recall `0.8446`，mAP50 `0.8948`，mAP75 `0.4968`，mAP50-95 `0.4970`。
+- 当前 person new labels 取舍：`img768` 的 Test mAP50-95 高于 `640` 稳健基线（`0.4970` vs `0.4802`），但 Precision、Recall、mAP50 低于 `640`；因此阶段汇报中可写作“最新候选”，不宜直接表述为已替代稳健基线。
 - 当前 ROI-aware v2 配置：`train-result/working/roi/roi_config.v2.generated.json`，keep rule 为 `bottom_center_inside OR box_ioa >= 0.25`。
 - 当前 ROI-aware v2 数据集输出：`502` 张图，保留框 `1342`，丢弃框 `316`，裁剪框 `54`，ROI 空负样本 `14`。
 - 当前 ROI-aware v3 `mask_then_crop + crop_margin_px=64` 配置：`train-result/working/roi/roi_config.v3.mask_then_crop_margin64.generated.json`。
