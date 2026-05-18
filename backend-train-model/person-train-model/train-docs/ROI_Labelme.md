@@ -12,6 +12,26 @@
 - 建议给 ROI 统一使用一个独立标签名，例如：`roi`。
 - 当前仓库默认训练环境是 `yolo_code`，其 Python 版本是 `3.9.25`；但**最新 `Labelme` 已不再支持 Python 3.9**，所以**不要直接把最新 `Labelme` 装进 `yolo_code`**。
 
+### 1.1 【new_person_labels ROI-aware 专项结论：与旧固定 sequence 明显不同】
+
+下面这几条是针对 `new_person_labels` 做 ROI-aware 时的专项说明，**不要和上面默认的“旧固定 sequence ROI 标注方式”混在一起理解**。
+
+1. 旧 `group3_1 / group3_2 / group3_3` 的 7 条固定 sequence，通常可以继续沿用：
+   - 一条 sequence 抽 3~5 张代表帧；
+   - 画一版较稳定的 ROI；
+   - 再提取 ROI 配置。
+2. `new_person_labels_flat_20260503` 如果内部混有多个摄像头、多个场景或多个视角，**不要默认把整包 flat source 当成一条 sequence，只画一个 ROI**。
+3. 对 `new_person_labels` 更推荐的做法是：
+   - 先按 `摄像头 / 场景 / 视角 / ROI 基本稳定性` 分成若干小组；
+   - 每个小组当成一个“伪 sequence”再做 ROI 标注；
+   - 只有少量实在无法稳定归组的图片，才考虑逐图 ROI。
+4. `new_person_labels` 后续如果要进入 ROI-aware，建议使用：
+   - 独立的 ROI work 目录；
+   - 独立的 ROI config 输出路径；
+   - 独立的 ROI-aware prepared 输出目录；
+   - 独立的版本化 `project_config`；
+   而不是直接覆盖当前 `fullframe_with_new_labels` 的配置和产物。
+
 ---
 
 ## 2. Labelme 是什么
@@ -233,6 +253,18 @@ pip install labelme
 
 在真正打开 `Labelme` 之前，建议先整理一批**代表帧**。
 
+### 8.0 【new_person_labels 专项提醒】先判断能不能按“稳定小组”组织 ROI
+
+对旧固定 sequence，上面这套“抽代表帧 -> 画 ROI”的思路通常直接可用。
+
+但对 `new_person_labels`，开始标注前建议先回答一个问题：
+
+> 这批图片内部的摄像头、场景和 ROI 边界是否基本稳定，能不能分成若干个小组？
+
+如果答案是“能”，就优先先分组，再做后面的代表帧与 ROI 标注。
+
+如果答案是“不能”，说明这批数据很可能不是单一稳定 sequence，这时就不适合直接给整包 flat source 共用一个 ROI。
+
 ### 8.1 建议的选帧方式
 
 对每个固定机位 / 每段序列，先选：
@@ -289,6 +321,43 @@ backend-train-model/person-train-model/roi-work/
 ```
 
 这不是硬性要求，但这样后续最清楚。
+
+### 8.4 【new_person_labels 专项】推荐的分组方式
+
+如果你要为 `new_person_labels` 准备 ROI-aware，建议先按下面任一维度分组：
+
+- 同一摄像头；
+- 同一场景背景；
+- 同一视角；
+- 同一批 ROI 边界大体一致的图片。
+
+分组后，每组可以临时命名成一个“伪 sequence”，例如：
+
+- `new_labels_cam01_day_shiftA`
+- `new_labels_cam01_night_shiftB`
+- `new_labels_hydrogen_zoneA_view1`
+
+这一步的目标不是把目录命名得很完美，而是保证：
+
+> 同一组里的图片，理论上可以共用一版 ROI，或者只需要很小的局部调整。
+
+如果某一组内部仍然差异很大，就继续往下拆；不要勉强合并成一组。
+
+### 8.5 【new_person_labels 专项】什么时候才考虑逐图 ROI
+
+只有在下面这些情况下，才建议对 `new_person_labels` 的一部分图片做逐图 ROI：
+
+- 这一小批图片的视角变化明显；
+- ROI 边界随图片变化较大；
+- 但你仍然认为这部分样本值得进入 ROI-aware；
+- 且数量可控，不会把人工标注成本拉得过高。
+
+更推荐的顺序始终是：
+
+```text
+先尝试分成 ROI 稳定的小组
+-> 只有无法稳定分组的小批样本，才考虑逐图 ROI
+```
 
 ---
 
@@ -608,6 +677,34 @@ D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-
 
 - ROI 配置：`backend-train-model/person-train-model/train-result/working/roi/roi_config.generated.json`
 - ROI-aware 数据集：`backend-train-model/person-train-model/train-result/prepared/person_roi_aware/sequence_contiguous/dataset.yaml`
+
+### 步骤 7：【new_person_labels 专项】不要直接复用“整包 flat source 一个 ROI”
+
+如果你接下来要做的是 `new_person_labels` 的 ROI-aware，请把这一步单独执行：
+
+1. 先把 `new_person_labels` 按场景 / 摄像头 / 视角分组；
+2. 每个小组单独建 `frames/` 与 `roi-json/`；
+3. 每个小组各自用 `Labelme` 画 ROI；
+4. 后续提取 ROI config 时，明确保留这些小组身份，而不是重新并回一个“整包 flat source 单 ROI”的结构。
+
+如果你最后仍然把完全不同场景的图片重新并成一个统一 ROI，前面的分组工作就等于白做了。
+
+---
+
+## 13A. 【new_person_labels ROI-aware 专项工作流】
+
+如果当前目标是给 `new_person_labels` 正式准备 ROI-aware，推荐执行顺序如下：
+
+1. 先看 `person_project_config.fullframe_with_new_labels.json` 里的 `new_person_labels_flat_20260503` 入口，只把它视为当前 fullframe 数据入口，**不要直接把它当成 ROI 已稳定的 sequence**；
+2. 先对 `new_person_labels` 做场景分组，得到若干“伪 sequence”；
+3. 每个伪 sequence 抽代表帧并画 ROI；
+4. 优先保证旧 7 条固定 sequence 与 new labels 各小组的 ROI 语义一致；
+5. 后续为 new labels 新建独立的 ROI-aware 版本化配置，不直接覆盖当前 fullframe 配置；
+6. 再用新配置去跑 `extract-roi-config` 和 `prepare-roi-aware`。
+
+这一套流程和旧固定 sequence 的最大差异就在于：
+
+> **旧固定 sequence 更像“先有稳定 sequence，再画 ROI”；而 `new_person_labels` 更像“先把 flat source 拆成 ROI 稳定的小组，再画 ROI”。**
 
 ---
 

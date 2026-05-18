@@ -1,5 +1,162 @@
 ﻿# Update Log
 
+## 2026-05-18 新增人工分组记录表操作指南
+
+1. 变更来源：用户要求新增一份 Markdown 操作指南，详细解释 `new_person_labels_人工分组记录表模板.xlsx` 中每一个标题的意义，并说明组员实际开展人工分组时应该如何填写信息、按什么顺序推进。
+2. 变更总览：
+   - 新增 `backend-train-model/person-train-model/train-docs/new_person_labels_人工分组记录表操作指南.md`。
+   - 文档系统说明了 Excel 模版 4 个工作表的用途，以及 `填写说明`、`组级台账`、`图片明细`、`ROI标注计划` 中每一个可见标题的意义、推荐填写方式、固定口径和示例。
+   - 文档还补充了组员的实际操作步骤，包括：认领自动组、查看 `group_summary.json` 代表帧、先做组级判断、再补图片明细、最后只对稳定组填写 ROI 标注计划，以及常见错误提醒。
+3. 涉及文件：
+   - `backend-train-model/person-train-model/train-docs/new_person_labels_人工分组记录表操作指南.md`
+   - `backend-train-model/docs/update_log.md`
+4. 新增 / 变更配置项：
+   - 无新增训练脚本参数。
+   - 无新增 `project_config`、ROI 配置或 prepared 数据集。
+   - 本轮只新增人工协作说明文档，不修改训练流程与数据准备逻辑。
+5. 兼容性注意：
+   - 该指南是对 Excel 模版的文字解释与填写规范，不替代 `group_summary.json`、`group_manifest.csv` 以及前面两份分组策略文档。
+   - 文档默认仍以 `t006` 自动粗分组结果作为当前主参考版本；若后续主参考版本切换，应同步检查这份指南中的路径与组编号说明。
+6. 本轮明确不改动：
+   - 不修改 `person_project_config.fullframe_with_new_labels.json`、旧 `person_project_config.roi_*.json`、`roi_config*.generated.json` 或任何现有 prepared 数据集。
+   - 不修改训练脚本主链、评估脚本、模型权重、在线检测链路或人工复核历史台账正文。
+
+## 2026-05-18 新增人工分组 Excel 模版
+
+1. 变更来源：用户要求先生成一份可直接发给队友使用的 `new_person_labels` 人工分组记录表 Excel 模版，用于后续人工逻辑分组、ROI 策略确认和协作分工。
+2. 变更总览：
+   - 新增 Excel 文件 `backend-train-model/person-train-model/train-docs/new_person_labels_人工分组记录表模板.xlsx`。
+   - 模版包含 4 个工作表：
+     - `填写说明`：说明分组目标、填写顺序、A/B/C 类稳定性定义、ROI 策略口径以及当前自动粗分组主参考版本；
+     - `组级台账`：用于记录自动组到人工最终组的映射、组稳定性等级、是否继续细拆、能否共用 ROI、代表帧、负责人、状态等；
+     - `图片明细`：用于记录需要继续细拆或需要逐图 ROI 的图片级补充信息；
+     - `ROI标注计划`：用于安排每个最终组的 ROI scope、工作目录、代表帧数量、抽检数量、标注状态和负责人。
+   - `组级台账` 中已预填当前 `t006` 自动粗分组的 6 个自动组及图片数，便于队友直接从当前主参考版本开始分工。
+3. 涉及文件：
+   - `backend-train-model/person-train-model/train-docs/new_person_labels_人工分组记录表模板.xlsx`
+   - `backend-train-model/docs/update_log.md`
+4. 新增 / 变更配置项：
+   - 无新增训练脚本参数。
+   - 无新增 `project_config` 或 ROI 配置。
+   - 本轮只新增协作使用的 Excel 模版，不修改训练流程与数据准备逻辑。
+5. 兼容性注意：
+   - 该 Excel 仅作为人工协作记录模板，不应替代 `group_summary.json` 与 `group_manifest.csv` 作为自动粗分组原始结果来源。
+   - `组级台账` 里预填的 6 个自动组来源于 `feature_threshold=0.06` 的主参考版本；后续如果主参考版本变化，应同步更新模版或另存新版本。
+6. 本轮明确不改动：
+   - 不修改 `person_project_config.fullframe_with_new_labels.json`、旧 `person_project_config.roi_*.json`、`roi_config*.generated.json` 或任何现有 prepared 数据集。
+   - 不修改训练脚本主链、评估脚本、模型权重、在线检测链路或人工复核历史台账正文。
+
+## 2026-05-18 新增 frames 逻辑分组说明并生成 t006 工作目录结构
+
+1. 变更来源：用户要求在完成自动粗分组后，继续把 `new_person_labels` 的分组依据、人工继续细分的方法、以及已经生成的工作目录结构正式整理成文档，并明确给出最终产物路径。
+2. 变更总览：
+   - 更新 `backend-train-model/person-train-model/train-docs/new_person_labels_frames逻辑分组.md`，系统写入自动粗分组依据、`0.08 / 0.06 / 0.04` 三档阈值的比较理由、为什么当前以 `0.06` 作为主参考、以及人工继续细分时应如何看代表帧、如何判断能否共用 ROI、如何把组划分成 `A / B / C` 三类。
+   - 在文档中显式写入自动粗分组主结果路径：`new_person_labels_roi_grouping_t006/group_summary.json` 与 `group_manifest.csv`，并同步写入已创建的物理分组目录模板路径：`new_person_labels_frames_grouping_t006/grouped/`。
+   - 已创建 `backend-train-model/person-train-model/train-result/working/new_person_labels_frames_grouping_t006/grouped/` 下的 6 组物理目录模板：`group_0001` 到 `group_0006`，每组均包含 `images/` 与 `labels/` 两级目录，用作后续人工继续细拆、放图与放标签的工作区。
+   - 更新 `backend-train-model/person-train-model/train-result/working/new_person_labels_frames_grouping_t006/README.md`，说明该目录与自动粗分组结果目录的关系、当前结构和后续使用方式。
+3. 涉及文件：
+   - `backend-train-model/person-train-model/train-docs/new_person_labels_frames逻辑分组.md`
+   - `backend-train-model/person-train-model/train-result/working/new_person_labels_frames_grouping_t006/README.md`
+   - `backend-train-model/person-train-model/train-result/working/new_person_labels_frames_grouping_t006/grouped/group_0001/images/`
+   - `backend-train-model/person-train-model/train-result/working/new_person_labels_frames_grouping_t006/grouped/group_0001/labels/`
+   - `backend-train-model/person-train-model/train-result/working/new_person_labels_frames_grouping_t006/grouped/group_0002/images/`
+   - `backend-train-model/person-train-model/train-result/working/new_person_labels_frames_grouping_t006/grouped/group_0002/labels/`
+   - `backend-train-model/person-train-model/train-result/working/new_person_labels_frames_grouping_t006/grouped/group_0003/images/`
+   - `backend-train-model/person-train-model/train-result/working/new_person_labels_frames_grouping_t006/grouped/group_0003/labels/`
+   - `backend-train-model/person-train-model/train-result/working/new_person_labels_frames_grouping_t006/grouped/group_0004/images/`
+   - `backend-train-model/person-train-model/train-result/working/new_person_labels_frames_grouping_t006/grouped/group_0004/labels/`
+   - `backend-train-model/person-train-model/train-result/working/new_person_labels_frames_grouping_t006/grouped/group_0005/images/`
+   - `backend-train-model/person-train-model/train-result/working/new_person_labels_frames_grouping_t006/grouped/group_0005/labels/`
+   - `backend-train-model/person-train-model/train-result/working/new_person_labels_frames_grouping_t006/grouped/group_0006/images/`
+   - `backend-train-model/person-train-model/train-result/working/new_person_labels_frames_grouping_t006/grouped/group_0006/labels/`
+   - `backend-train-model/docs/update_log.md`
+4. 新增 / 变更配置项：
+   - 无新增训练脚本参数。
+   - 无新增 `project_config`。
+   - 本轮新增的是基于 `t006` 自动粗分组结果的说明文档和物理目录模板，不直接修改现有训练配置、ROI 配置或 prepared 数据集。
+5. 兼容性注意：
+   - `new_person_labels_frames_grouping_t006/grouped/` 当前只是**工作目录模板**，目录已创建，但并不意味着所有图片与标签都已经人工确认并放入到最终组中。
+   - `new_person_labels_roi_grouping_t006/` 与 `new_person_labels_frames_grouping_t006/` 的角色不同：前者保存自动粗分组结果，后者保存后续人工物理分组工作区；不要把两者混用。
+   - 当前以 `0.06` 为主参考，不代表 `0.04` 与 `0.08` 结果无效；它们仍可作为“偏细参考”和“偏粗参考”辅助人工判断。
+6. 本轮明确不改动：
+   - 不修改 `person_project_config.fullframe_with_new_labels.json`、旧 `person_project_config.roi_*.json`、`roi_config*.generated.json` 或任何现有 prepared 数据集。
+   - 不修改训练脚本主链、评估脚本、模型权重、在线检测链路或人工复核历史台账正文。
+
+## 2026-05-18 新增 ROI 自动粗分组脚本并落地首轮 new_person_labels 结果
+
+1. 变更来源：用户询问能否先对 `new_person_labels` 做自动化分组，以降低 `3000+` 图片 ROI-aware 标注前的纯手工分组成本，并希望把自动分组思路与结果纳入当前 ROI 分组方案。
+2. 变更总览：
+   - 新增 `backend-train-model/person-train-model/train-code/auto_group_new_person_labels_roi.py`，用于对 `new_person_labels_flat_20260503` 先按图片分辨率与粗视觉特征生成第一轮自动粗分组结果。脚本支持输出 `group_manifest.csv`、`group_summary.json`、`README.md`，并可选生成 `grouped/` 物理分组目录；当前默认阈值已调整为 `0.08`，同时新增 `--clean-output` 选项，避免旧分组残留污染新结果。
+   - 已在 `backend-train-model/person-train-model/train-result/working/` 下落地一版首轮自动粗分组结果（当前用于结果解读的是 `new_person_labels_roi_grouping_t008/` 这版 `feature_threshold=0.08` 输出），并在 `new_person_labels_ROI分组标记.md` 中补充脚本入口、推荐命令和当前结果解读。
+   - 当前 `feature_threshold=0.08` 下的首轮自动粗分组结果为：`2507` 张图被拆成 `5` 组，其中 `1280x720` 一组 `272` 张，`1920x1080` 四组共 `2235` 张；这说明该批数据并非一个统一稳定 ROI 场景，但这些自动组仍然只是第一轮候选组，后续仍需按代表帧继续人工复核和细拆。
+3. 涉及文件：
+   - `backend-train-model/person-train-model/train-code/auto_group_new_person_labels_roi.py`
+   - `backend-train-model/person-train-model/train-docs/new_person_labels_ROI分组标记.md`
+   - `backend-train-model/person-train-model/train-result/working/new_person_labels_roi_grouping_t008/group_manifest.csv`
+   - `backend-train-model/person-train-model/train-result/working/new_person_labels_roi_grouping_t008/group_summary.json`
+   - `backend-train-model/docs/update_log.md`
+4. 新增 / 变更配置项：
+   - 新增自动粗分组脚本参数：
+     - `--feature-threshold`
+     - `--representatives-per-group`
+     - `--materialize-mode`
+     - `--create-empty-missing-labels`
+     - `--clean-output`
+   - 默认自动分组阈值设置为 `0.08`，用于生成更有区分度的第一轮候选组。
+5. 兼容性注意：
+   - 自动分组结果当前只应被视为“ROI-aware 前的第一轮候选物理 / 逻辑分组建议”，**不等于最终人工确认后的 ROI 逻辑组**。
+   - `new_person_labels_roi_grouping/` 下当前落地的 `grouped/` 目录是为后续 ROI-aware 分组标注服务的中间产物，不应直接替代当前 `new_person_labels/images` 与 `person_labels` 作为 fullframe 训练主线的原始入口。
+   - 当前 5 组里仍然存在大组（如 `group_0002`、`group_0005`），后续应优先回看 `group_summary.json` 中的代表帧，再决定是否需要继续人工细拆；不要把自动粗分组结果直接当作最终组级 ROI 单位。
+6. 本轮明确不改动：
+   - 不修改 `person_project_config.fullframe_with_new_labels.json`、旧 `person_project_config.roi_*.json`、`roi_config*.generated.json` 或任何现有 prepared 数据集。
+   - 不修改训练脚本主链、评估脚本、模型权重、在线检测链路或人工复核历史台账正文。
+
+## 2026-05-18 新增 new_person_labels ROI 分组与标记方案文档
+
+1. 变更来源：用户要求把“针对当前 `3000+` 张 `new_person_labels` 图片，ROI-aware 标注到底该怎么做、是否应该全量逐图、如果不逐图应该如何分组和实施”的完整方案，正式写入 `backend-train-model/person-train-model/train-docs/new_person_labels_ROI分组标记.md`。
+2. 变更总览：
+   - 新增 `backend-train-model/person-train-model/train-docs/new_person_labels_ROI分组标记.md`，系统整理 `new_person_labels` 当前更适合采用的 ROI 标注方案。
+   - 文档明确区分了：物理分组、逻辑分组、组级 ROI、逐图 ROI 各自的含义，并给出针对 `3000+` 图片的推荐策略：优先采用“组级 ROI 为主、逐图 ROI 为辅”的分层混合方案，而不是默认整包 flat source 共用一个 ROI，也不是默认全量逐图 ROI。
+   - 文档进一步细化了 `A 类稳定组 / B 类半稳定组 / C 类不稳定组` 的判断口径、代表帧抽取建议、组级 ROI 的抽检标准、什么时候应继续细分、什么时候才建议逐图 ROI，以及为什么 ROI-aware 第一版不必强求覆盖 `3000+` 全量图片。
+   - 同步写清了后续如何把这套分组与标注结果衔接到 `ROI_Labelme.md`、`extract-roi-config`、`prepare-roi-aware` 和后续 new labels ROI-aware 版本化配置中。
+3. 涉及文件：
+   - `backend-train-model/person-train-model/train-docs/new_person_labels_ROI分组标记.md`
+   - `backend-train-model/docs/update_log.md`
+4. 新增 / 变更配置项：
+   - 无新增训练脚本参数。
+   - 无新增已落盘的 `person_project_config*.json`。
+   - 本轮只新增 ROI 分组与标记方案文档，用于指导后续物理分组、逻辑分组和 ROI-aware 标注实施，不直接修改现有训练配置、ROI 配置或 prepared 数据集。
+5. 兼容性注意：
+   - 文档中提到的“物理分组”建议优先在新目录下完成，不应直接破坏当前 `new_person_labels/images` 与 `person_labels` 作为 fullframe 主线原始入口的结构。
+   - 文档中提出的 `70%~85% 组级 ROI / 10%~20% 细分后组级 ROI / 5%~15% 逐图 ROI 或暂缓` 是工程推荐比例，不是强制阈值；实际仍应以 ROI 稳定性和人工可维护性为准。
+   - 本轮并没有直接创建 grouped 数据目录、ROI JSON、ROI config 或新的 ROI-aware 版本化配置；后续只有在实际分组和标注开始后，才建议继续新增正式配置文件和 prepared 数据产物。
+6. 本轮明确不改动：
+   - 不修改 `person_project_config.fullframe_with_new_labels.json`、旧 `person_project_config.roi_*.json`、`roi_config*.generated.json` 或任何现有 prepared 数据集。
+   - 不修改训练脚本、评估脚本、模型权重、在线检测链路或人工复核历史台账正文。
+
+## 2026-05-18 新增 fullframe 修正方案并补充 new labels ROI-aware 标注说明
+
+1. 变更来源：用户要求把 `person_with_new_labels` 当前 fullframe 上游修正方式单独整理成正式文档，并把 `new_person_labels` 做 ROI-aware 时与旧固定 sequence 不同的标注要点写入 `ROI_Labelme.md`，同时明确回答“mixed 场景 flat source 是否必须切成多个场景序列”这一问题的工程口径。
+2. 变更总览：
+   - 新增 `backend-train-model/person-train-model/train-docs/person_with_new_labels_fullframe_fix_plan.md`，把 `人工复核.md` 当前 `5.13` 阶段已收口的 hardest FN 结论，转成可执行的 fullframe 修正方案。文档明确区分了：当前优先应先做的数据治理动作、何时适合从 `seed7` best 继续 fine-tune、何时应按 `640` 稳健配方重训，以及进入 new labels ROI-aware 正式训练前需要满足的条件。
+   - 更新 `backend-train-model/person-train-model/train-docs/ROI_Labelme.md`，新增 `new_person_labels ROI-aware` 专项说明，明确把它与旧 `group3_1 / group3_2 / group3_3` 固定 sequence 的 ROI 标注方式区分开：旧固定 sequence 通常可按“一条 sequence 抽代表帧 -> 一版 ROI”推进，而 `new_person_labels_flat_20260503` 若内部混有多个摄像头 / 场景 / 视角，则不应默认整包只画一个 ROI，而应优先先拆成 ROI 稳定的小组，再做 Labelme 标注与后续 ROI-aware 数据准备。
+   - 在 ROI 文档中补充了 `new_person_labels` 的推荐分组方法、何时才需要逐图 ROI、以及独立 `ROI work / ROI config / ROI-aware prepared output / project_config` 的版本化建议，避免后续直接覆盖当前 `fullframe_with_new_labels` 产物。
+3. 涉及文件：
+   - `backend-train-model/person-train-model/train-docs/person_with_new_labels_fullframe_fix_plan.md`
+   - `backend-train-model/person-train-model/train-docs/ROI_Labelme.md`
+   - `backend-train-model/docs/update_log.md`
+4. 新增 / 变更配置项：
+   - 无新增训练脚本参数。
+   - 无新增已落盘的 `person_project_config*.json`。
+   - 本轮新增的是 fullframe 修正方案文档，并在 ROI 标注文档中补充 `new_person_labels ROI-aware` 的工程约束与目录组织建议；这些内容用于指导后续数据治理与配置版本化，不直接修改现有训练配置、ROI 配置或 prepared 数据集。
+5. 兼容性注意：
+   - `person_with_new_labels_fullframe_fix_plan.md` 当前提供的是工程执行方案，不等于仓库已经自动完成 `must_relabel_list / hard_positive_expand_list / defer_list` 三张动作清单；后续仍需由人工复核结果回填到源标签修正与补样动作中。
+   - `ROI_Labelme.md` 新增的 `new_person_labels` 专项说明，并不是说 mixed 场景 flat source 在 fullframe 训练中绝对不能作为一个入口存在；它强调的是：**当目标变成 ROI-aware 时，不应默认给整包 flat source 共用一个 ROI**，否则 ROI 语义、场景边界与后续 prepared 数据质量都可能失真。
+   - 本轮没有直接创建 new labels ROI-aware 的正式版本化 `project_config`，也没有落盘新的 `roi_config*.generated.json`；后续只有在 ROI 分组与标注实际完成后，才建议继续新增正式配置文件。
+6. 本轮明确不改动：
+   - 不修改 `person_project_config.fullframe_with_new_labels.json`、旧 `person_project_config.roi_*.json`、`roi_config*.generated.json` 或任何现有 prepared 数据集。
+   - 不修改训练脚本、评估脚本、模型权重、在线检测链路或人工复核历史台账正文。
+
 ## 2026-05-14 新增 person_with_new_labels 决策与运行文档
 
 1. 变更来源：用户要求把“新增 `new_person_labels` 之后，当前应先继续 fullframe 训练还是先等 ROI 补齐”的判断整理成正式文档，并把对应训练 / 评估命令单独沉淀为 runbook，统一放到 `backend-train-model/person-train-model/train-docs/` 下。
