@@ -1,6 +1,6 @@
 # 运行前置条件
 
-本文档用于统一记录 `person` 六条训练分支的运行方式：`person_fullframe_with_new_labels`、`person_roi_aware_v3_mask_then_crop_margin64`、`person_roi_aware_v3_crop_only_margin64`、`person_roi_aware_v2`、`person_roi_aware`、`person_fullframe`。当前训练默认在另一台带 GPU 的电脑上执行；除非用户明确要求回退到本机 CPU，否则本文件中的训练 / 评估命令默认按 GPU 训练编写。
+本文档用于统一记录 `person` 七条训练分支的运行方式：`person_roi_aware_with_new_labels_v1_mask_then_crop_margin64`、`person_fullframe_with_new_labels`、`person_roi_aware_v3_mask_then_crop_margin64`、`person_roi_aware_v3_crop_only_margin64`、`person_roi_aware_v2`、`person_roi_aware`、`person_fullframe`。当前训练默认在另一台带 GPU 的电脑上执行；除非用户明确要求回退到本机 CPU，否则本文件中的训练 / 评估命令默认按 GPU 训练编写。
 
 ## 通用环境检查
 
@@ -34,13 +34,56 @@ Test-Path backend-train-model\person-train-model\train-result\artifacts\runs\per
 - 所有版本的训练与评估命令都建议显式传入 `--project-config`、`--dataset-yaml` 与 `--run-name`，避免误用默认数据集、默认配置或默认 run 名；当前 wrapper 已会从 `project-config -> training.default_train_args` 读取默认训练参数，但关键实验尤其是非默认输入尺寸评估，仍建议显式传 `--imgsz / --batch / --workers / --device`。
 - 所有 ROI-aware 派生版本都必须使用独立输出目录，不要把不同版本的 prepared 数据集写到同一路径。
 - 如果只是刷新某一版 ROI-aware 数据集，只覆盖该版本自己的 `output-root`，不要顺手覆盖其他版本产物。
+- 所有训练、评估、导出和全流程 JSON 报告都必须按 run 名分目录保存，目录结构固定为：`backend-train-model/person-train-model/train-result/artifacts/reports/<run_name>/<report_file>.json`。例如 `person_fullframe_baseline` 的训练和评估报告分别放在 `.../reports/person_fullframe_baseline/person_fullframe_baseline_train.json` 与 `.../reports/person_fullframe_baseline/person_fullframe_baseline_eval.json`。
+- `reports/` 根目录只允许放 run 子目录或少量全局审计日志；不要再把 `*_train.json`、`*_eval.json`、`*_export.json`、`*_all.json` 直接平铺到 `reports/` 根目录。新增脚本、手工整理历史报告或编写复盘命令时，都必须使用上面的分层路径，以便和 `artifacts/runs/<run_name>/` 一一对应、方便维护和回溯。
 - 当前所有 ROI-aware `from_fullframe` 分支都默认把 `person_fullframe_baseline/weights/best.pt` 作为初始化来源。
 - 现在 `extract-roi-config` 与 `prepare-roi-aware` 都支持显式传 `--roi-mode` 与 `--crop-margin-px`；如果要做版本化 ROI-aware 数据集，两个阶段都建议显式传这两个参数，保证 ROI 配置元数据与 prepare 行为一致。
 - 当前正式建议使用的版本化 ROI-aware 配置入口：
+  - `backend-train-model/person-train-model/person_project_config.roi_with_new_labels.v1.mask_then_crop_margin64.json`
   - `backend-train-model/person-train-model/person_project_config.roi_v3.mask_then_crop_margin64.json`
   - `backend-train-model/person-train-model/person_project_config.roi_v3.crop_only_margin64.json`
   - `backend-train-model/person-train-model/person_project_config.roi_v2.mask_then_crop_ioa25.json`
   - `backend-train-model/person-train-model/person_project_config.roi_v1.center_inside.json`
+
+# ROI-aware随机性训练
+
+## seed=7
+
+### 当前定位
+
+- 用于对 `person_roi_aware_with_new_labels_v1_mask_then_crop_margin64_from_fullframe` 做随机性复核，只变更 `seed=7`，其余训练口径保持一致。
+- 保持相同的 ROI-aware prepared 数据集、上游初始化权重、输入尺寸与 batch 设置，重点观察随机种子对指标波动的影响。
+
+### 训练命令
+
+```powershell
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py train --project-config backend-train-model\person-train-model\person_project_config.roi_with_new_labels.v1.mask_then_crop_margin64.json --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_roi_aware_with_new_labels_v1_mask_then_crop_margin64\sequence_contiguous\dataset.yaml --run-name person_roi_aware_with_new_labels_v1_mask_then_crop_margin64_seed7_from_fullframe --device 0 --workers 4 --batch 4 --imgsz 640 --epochs 180 --patience 60 --base-model backend-train-model\person-train-model\train-result\artifacts\runs\person_fullframe_with_new_labels_baseline\weights\best.pt --seed 7
+```
+
+### 评估命令
+
+```powershell
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py evaluate --project-config backend-train-model\person-train-model\person_project_config.roi_with_new_labels.v1.mask_then_crop_margin64.json --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_roi_aware_with_new_labels_v1_mask_then_crop_margin64\sequence_contiguous\dataset.yaml --weights backend-train-model\person-train-model\train-result\artifacts\runs\person_roi_aware_with_new_labels_v1_mask_then_crop_margin64_seed7_from_fullframe\weights\best.pt --run-name person_roi_aware_with_new_labels_v1_mask_then_crop_margin64_seed7_from_fullframe --imgsz 640 --batch 4 --workers 4 --device 0 --report-name person_roi_aware_with_new_labels_v1_mask_then_crop_margin64_seed7_from_fullframe_eval
+```
+
+## seed=13
+
+### 当前定位
+
+- 用于对 `person_roi_aware_with_new_labels_v1_mask_then_crop_margin64_from_fullframe` 做随机性复核，只变更 `seed=13`，其余训练口径保持一致。
+- 与 `seed=7` 保持相同的数据集、初始化权重和训练超参，便于对比随机性波动。
+
+### 训练命令
+
+```powershell
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py train --project-config backend-train-model\person-train-model\person_project_config.roi_with_new_labels.v1.mask_then_crop_margin64.json --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_roi_aware_with_new_labels_v1_mask_then_crop_margin64\sequence_contiguous\dataset.yaml --run-name person_roi_aware_with_new_labels_v1_mask_then_crop_margin64_seed13_from_fullframe --device 0 --workers 4 --batch 4 --imgsz 640 --epochs 180 --patience 60 --base-model backend-train-model\person-train-model\train-result\artifacts\runs\person_fullframe_with_new_labels_baseline\weights\best.pt --seed 13
+```
+
+### 评估命令
+
+```powershell
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py evaluate --project-config backend-train-model\person-train-model\person_project_config.roi_with_new_labels.v1.mask_then_crop_margin64.json --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_roi_aware_with_new_labels_v1_mask_then_crop_margin64\sequence_contiguous\dataset.yaml --weights backend-train-model\person-train-model\train-result\artifacts\runs\person_roi_aware_with_new_labels_v1_mask_then_crop_margin64_seed13_from_fullframe\weights\best.pt --run-name person_roi_aware_with_new_labels_v1_mask_then_crop_margin64_seed13_from_fullframe --imgsz 640 --batch 4 --workers 4 --device 0 --report-name person_roi_aware_with_new_labels_v1_mask_then_crop_margin64_seed13_from_fullframe_eval
+```
 
 ## 文档迭代约束
 
@@ -49,6 +92,81 @@ Test-Path backend-train-model\person-train-model\train-result\artifacts\runs\per
 - 不要把旧版本段直接改写成新版本；新版本应单独新增，旧版本保留为历史对照。
 - 每个版本段尽量保持同一结构：`当前定位`、`数据集与产物`、`如需重生成数据集`、`训练命令`、`评估命令`、`备注`。
 - 如果当前需求不是“如何跑这条命令”，而是“下一轮该优先做什么改进”，优先看 `backend-train-model/person-train-model/train-docs/roi_next_iteration_plan.md`。
+
+# person_roi_aware_with_new_labels_v1_mask_then_crop_margin64
+
+## 当前定位
+
+- 当前 `new_person_labels` 完成 `group_0001 ~ group_0006` 组级 ROI 核验后的第一版 ROI-aware 训练入口。
+- 适用于：6 个新组都已确认 `A` 类稳定组、且同组 ROI 模板可以稳定复用于组内其他图片的情况。
+- 当前推荐 run 名：`person_roi_aware_with_new_labels_v1_mask_then_crop_margin64_from_fullframe`。
+- 当前更推荐沿用已验证更稳的 ROI 图像处理口径：`mask_then_crop + crop_margin_px=64`。
+- 当前已新增独立配置入口：`backend-train-model/person-train-model/person_project_config.roi_with_new_labels.v1.mask_then_crop_margin64.json`。
+- 后续这条 ROI-aware new labels v1 线，优先直接使用上述独立配置文件，不再继续借用 `person_project_config.fullframe_with_new_labels.json` 作为临时入口。
+
+## 数据集与产物
+
+- person 项目配置：
+  - `backend-train-model/person-train-model/person_project_config.roi_with_new_labels.v1.mask_then_crop_margin64.json`
+- 当前 ROI JSON 根目录：
+  - `D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\roi-json`
+- 当前已完成 ROI 核验的新增组：
+  - `group_0001`
+  - `group_0002`
+  - `group_0003`
+  - `group_0004`
+  - `group_0005`
+  - `group_0006`
+- 当前建议使用的版本化 ROI 配置输出：
+  - `backend-train-model/person-train-model/train-result/working/roi/roi_config.fullframe_with_new_labels.v1.mask_then_crop_margin64.generated.json`
+- 当前建议使用的 ROI-aware prepared 输出目录：
+  - `backend-train-model/person-train-model/train-result/prepared/person_roi_aware_with_new_labels_v1_mask_then_crop_margin64/sequence_contiguous`
+- 对应数据集 YAML：
+  - `backend-train-model/person-train-model/train-result/prepared/person_roi_aware_with_new_labels_v1_mask_then_crop_margin64/sequence_contiguous/dataset.yaml`
+- 对应 prepare 报告：
+  - `backend-train-model/person-train-model/train-result/prepared/person_roi_aware_with_new_labels_v1_mask_then_crop_margin64/sequence_contiguous/prepare_report.json`
+
+## 如需重生成数据集
+
+先提取当前 new labels ROI-aware v1 的 ROI 配置：
+
+```powershell
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py extract-roi-config --project-config backend-train-model\person-train-model\person_project_config.roi_with_new_labels.v1.mask_then_crop_margin64.json --roi-config backend-train-model\person-train-model\train-result\working\roi\roi_config.fullframe_with_new_labels.v1.mask_then_crop_margin64.generated.json --roi-mode mask_then_crop --crop-margin-px 64 --overwrite
+```
+
+再生成独立的 ROI-aware prepared 数据集：
+
+```powershell
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py prepare-roi-aware --project-config backend-train-model\person-train-model\person_project_config.roi_with_new_labels.v1.mask_then_crop_margin64.json --roi-config backend-train-model\person-train-model\train-result\working\roi\roi_config.fullframe_with_new_labels.v1.mask_then_crop_margin64.generated.json --output-root backend-train-model\person-train-model\train-result\prepared\person_roi_aware_with_new_labels_v1_mask_then_crop_margin64\sequence_contiguous --roi-mode mask_then_crop --crop-margin-px 64 --overwrite
+```
+
+## 训练命令
+
+当前推荐先直接以稳健 fullframe 扩样权重作为初始化来源，启动第一版 ROI-aware new labels 训练：
+
+```powershell
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py train --project-config backend-train-model\person-train-model\person_project_config.roi_with_new_labels.v1.mask_then_crop_margin64.json --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_roi_aware_with_new_labels_v1_mask_then_crop_margin64\sequence_contiguous\dataset.yaml --run-name person_roi_aware_with_new_labels_v1_mask_then_crop_margin64_from_fullframe --device 0 --workers 4 --batch 4 --imgsz 640 --epochs 180 --patience 60 --base-model backend-train-model\person-train-model\train-result\artifacts\runs\person_fullframe_with_new_labels_baseline\weights\best.pt
+```
+
+如果训练机显存或 DataLoader 稳定性有压力，可先用更保守的 batch：
+
+```powershell
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py train --project-config backend-train-model\person-train-model\person_project_config.roi_with_new_labels.v1.mask_then_crop_margin64.json --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_roi_aware_with_new_labels_v1_mask_then_crop_margin64\sequence_contiguous\dataset.yaml --run-name person_roi_aware_with_new_labels_v1_mask_then_crop_margin64_from_fullframe_batch2 --device 0 --workers 4 --batch 2 --imgsz 640 --epochs 180 --patience 60 --base-model backend-train-model\person-train-model\train-result\artifacts\runs\person_fullframe_with_new_labels_baseline\weights\best.pt
+```
+
+## 评估命令
+
+```powershell
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py evaluate --project-config backend-train-model\person-train-model\person_project_config.roi_with_new_labels.v1.mask_then_crop_margin64.json --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_roi_aware_with_new_labels_v1_mask_then_crop_margin64\sequence_contiguous\dataset.yaml --weights backend-train-model\person-train-model\train-result\artifacts\runs\person_roi_aware_with_new_labels_v1_mask_then_crop_margin64_from_fullframe\weights\best.pt --run-name person_roi_aware_with_new_labels_v1_mask_then_crop_margin64_from_fullframe --imgsz 640 --batch 4 --workers 4 --device 0 --report-name person_roi_aware_with_new_labels_v1_mask_then_crop_margin64_from_fullframe_eval
+```
+
+## 备注
+
+- 严格说，当前不是“ROI 核验完成后直接跳过数据准备只跑 train”，而是：**先 `extract-roi-config`，再 `prepare-roi-aware`，最后再 `train / evaluate`。**
+- 当前正式建议优先使用独立配置文件 `person_project_config.roi_with_new_labels.v1.mask_then_crop_margin64.json`；不要再把这条新线继续写成“借用 fullframe 配置的临时方案”。
+- 如果 `extract-roi-config` 之后发现某个 `group_000X` 没有进入 `per_sequence`，优先检查的不是训练参数，而是该组 `roi-json/` 下是否保留了多份顶点略有差异的 JSON。
+- 当前这一版的上游初始化更推荐锁到 `person_fullframe_with_new_labels_baseline/weights/best.pt`，不要回退到旧 `person_fullframe_baseline`，否则新组 fullframe 扩样收益不会完整传递到 ROI-aware v1。
+- 当前这条分支更适合先作为“new labels ROI-aware 第一版正式对照实验”使用；在看到 test 指标与逐图抽检结果前，不建议直接把它写成已经替代 fullframe 主线的默认唯一版本。
 
 # person_fullframe_with_new_labels
 
@@ -250,7 +368,7 @@ D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-
 当前已经新增逐图 `FP/FN` 复盘脚本 `backend-train-model/person-train-model/train-code/analyze_person_fpfn.py`。若要复盘当前主线 run 在 test split 上的单帧误检 / 漏检，直接运行：
 
 ```powershell
-D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\analyze_person_fpfn.py --eval-report backend-train-model\person-train-model\train-result\artifacts\reports\person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_eval.json --split test --conf-threshold 0.25 --nms-iou 0.7 --match-iou 0.5 --device 0 --output-root backend-train-model\person-train-model\train-result\review\person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_fpfn_test_conf025 --overwrite
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\analyze_person_fpfn.py --eval-report backend-train-model\person-train-model\train-result\artifacts\reports\person_roi_aware_v3_mask_then_crop_margin64_from_fullframe\person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_eval.json --split test --conf-threshold 0.25 --nms-iou 0.7 --match-iou 0.5 --device 0 --output-root backend-train-model\person-train-model\train-result\review\person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_fpfn_test_conf025 --overwrite
 ```
 
 重点看输出：

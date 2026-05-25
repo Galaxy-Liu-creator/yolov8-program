@@ -24,8 +24,8 @@
 
 对应报告入口：
 
-- `backend-train-model/person-train-model/train-result/artifacts/reports/person_fullframe_with_new_labels_baseline_train.json`
-- `backend-train-model/person-train-model/train-result/artifacts/reports/person_fullframe_with_new_labels_baseline_eval.json`
+- `backend-train-model/person-train-model/train-result/artifacts/reports/person_fullframe_with_new_labels_baseline/person_fullframe_with_new_labels_baseline_train.json`
+- `backend-train-model/person-train-model/train-result/artifacts/reports/person_fullframe_with_new_labels_baseline/person_fullframe_with_new_labels_baseline_eval.json`
 - `backend-train-model/person-train-model/train-result/prepared/person_fullframe_with_new_labels/sequence_contiguous/prepare_report.json`
 - `backend-train-model/person-train-model/train-result/person_source_dataset_summary_fullframe_with_new_labels.json`
 
@@ -113,12 +113,12 @@
 
 对应报告入口：
 
-- `backend-train-model/person-train-model/train-result/artifacts/reports/person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_img768_train.json`
-- `backend-train-model/person-train-model/train-result/artifacts/reports/person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_img768_eval.json`
-- `backend-train-model/person-train-model/train-result/artifacts/reports/person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_eval.json`
-- `backend-train-model/person-train-model/train-result/artifacts/reports/person_roi_aware_v2_from_fullframe_eval.json`
-- `backend-train-model/person-train-model/train-result/artifacts/reports/person_roi_aware_v3_crop_only_margin64_from_fullframe_eval.json`
-- `backend-train-model/person-train-model/train-result/artifacts/reports/person_fullframe_baseline_eval.json`
+- `backend-train-model/person-train-model/train-result/artifacts/reports/person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_img768/person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_img768_train.json`
+- `backend-train-model/person-train-model/train-result/artifacts/reports/person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_img768/person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_img768_eval.json`
+- `backend-train-model/person-train-model/train-result/artifacts/reports/person_roi_aware_v3_mask_then_crop_margin64_from_fullframe/person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_eval.json`
+- `backend-train-model/person-train-model/train-result/artifacts/reports/person_roi_aware_v2_from_fullframe/person_roi_aware_v2_from_fullframe_eval.json`
+- `backend-train-model/person-train-model/train-result/artifacts/reports/person_roi_aware_v3_crop_only_margin64_from_fullframe/person_roi_aware_v3_crop_only_margin64_from_fullframe_eval.json`
+- `backend-train-model/person-train-model/train-result/artifacts/reports/person_fullframe_baseline/person_fullframe_baseline_eval.json`
 - `backend-train-model/person-train-model/train-result/prepared/person_roi_aware_v3_mask_then_crop_margin64/sequence_contiguous/prepare_report.json`
 
 ### 2. 结果解读边界
@@ -272,14 +272,14 @@
 
 对应报告入口：
 
-- `backend-train-model/person-train-model/train-result/artifacts/reports/person_roi_aware_v3_crop_only_margin64_from_fullframe_train.json`
-- `backend-train-model/person-train-model/train-result/artifacts/reports/person_roi_aware_v3_crop_only_margin64_from_fullframe_eval.json`
+- `backend-train-model/person-train-model/train-result/artifacts/reports/person_roi_aware_v3_crop_only_margin64_from_fullframe/person_roi_aware_v3_crop_only_margin64_from_fullframe_train.json`
+- `backend-train-model/person-train-model/train-result/artifacts/reports/person_roi_aware_v3_crop_only_margin64_from_fullframe/person_roi_aware_v3_crop_only_margin64_from_fullframe_eval.json`
 - `backend-train-model/person-train-model/train-result/prepared/person_roi_aware_v3_crop_only_margin64/sequence_contiguous/prepare_report.json`
-- `backend-train-model/person-train-model/train-result/artifacts/reports/person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_eval.json`
+- `backend-train-model/person-train-model/train-result/artifacts/reports/person_roi_aware_v3_mask_then_crop_margin64_from_fullframe/person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_eval.json`
 - `backend-train-model/person-train-model/train-result/prepared/person_roi_aware_v3_mask_then_crop_margin64/sequence_contiguous/prepare_report.json`
-- `backend-train-model/person-train-model/train-result/artifacts/reports/person_roi_aware_v2_from_fullframe_eval.json`
-- `backend-train-model/person-train-model/train-result/artifacts/reports/person_roi_aware_baseline_eval.json`
-- `backend-train-model/person-train-model/train-result/artifacts/reports/person_fullframe_baseline_eval.json`
+- `backend-train-model/person-train-model/train-result/artifacts/reports/person_roi_aware_v2_from_fullframe/person_roi_aware_v2_from_fullframe_eval.json`
+- `backend-train-model/person-train-model/train-result/artifacts/reports/person_roi_aware_baseline/person_roi_aware_baseline_eval.json`
+- `backend-train-model/person-train-model/train-result/artifacts/reports/person_fullframe_baseline/person_fullframe_baseline_eval.json`
 
 ### 2. 结果解读边界
 
@@ -427,12 +427,12 @@
 
 对应报告入口：
 
-- `backend-train-model/person-train-model/train-result/artifacts/reports/person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_train.json`
-- `backend-train-model/person-train-model/train-result/artifacts/reports/person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_eval.json`
+- `backend-train-model/person-train-model/train-result/artifacts/reports/person_roi_aware_v3_mask_then_crop_margin64_from_fullframe/person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_train.json`
+- `backend-train-model/person-train-model/train-result/artifacts/reports/person_roi_aware_v3_mask_then_crop_margin64_from_fullframe/person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_eval.json`
 - `backend-train-model/person-train-model/train-result/prepared/person_roi_aware_v3_mask_then_crop_margin64/sequence_contiguous/prepare_report.json`
-- `backend-train-model/person-train-model/train-result/artifacts/reports/person_roi_aware_v2_from_fullframe_eval.json`
-- `backend-train-model/person-train-model/train-result/artifacts/reports/person_roi_aware_baseline_eval.json`
-- `backend-train-model/person-train-model/train-result/artifacts/reports/person_fullframe_baseline_eval.json`
+- `backend-train-model/person-train-model/train-result/artifacts/reports/person_roi_aware_v2_from_fullframe/person_roi_aware_v2_from_fullframe_eval.json`
+- `backend-train-model/person-train-model/train-result/artifacts/reports/person_roi_aware_baseline/person_roi_aware_baseline_eval.json`
+- `backend-train-model/person-train-model/train-result/artifacts/reports/person_fullframe_baseline/person_fullframe_baseline_eval.json`
 
 ### 2. 结果解读边界
 
@@ -550,11 +550,11 @@
 
 对应报告入口：
 
-- `backend-train-model/person-train-model/train-result/artifacts/reports/person_fullframe_baseline_eval.json`
-- `backend-train-model/person-train-model/train-result/artifacts/reports/person_roi_aware_baseline_eval.json`
-- `backend-train-model/person-train-model/train-result/artifacts/reports/person_roi_aware_v2_from_fullframe_eval.json`
-- `backend-train-model/person-train-model/train-result/artifacts/reports/person_roi_aware_baseline_train.json`
-- `backend-train-model/person-train-model/train-result/artifacts/reports/person_roi_aware_v2_from_fullframe_train.json`
+- `backend-train-model/person-train-model/train-result/artifacts/reports/person_fullframe_baseline/person_fullframe_baseline_eval.json`
+- `backend-train-model/person-train-model/train-result/artifacts/reports/person_roi_aware_baseline/person_roi_aware_baseline_eval.json`
+- `backend-train-model/person-train-model/train-result/artifacts/reports/person_roi_aware_v2_from_fullframe/person_roi_aware_v2_from_fullframe_eval.json`
+- `backend-train-model/person-train-model/train-result/artifacts/reports/person_roi_aware_baseline/person_roi_aware_baseline_train.json`
+- `backend-train-model/person-train-model/train-result/artifacts/reports/person_roi_aware_v2_from_fullframe/person_roi_aware_v2_from_fullframe_train.json`
 
 ### 2. 结果解读边界
 
@@ -655,3 +655,4 @@
    - `person_fullframe_baseline` 继续保留为稳定上游初始化来源；
    - `person_roi_aware_v2_from_fullframe` 作为当前最佳 ROI-aware person 模型；
    - `person_roi_aware_baseline` 保留为历史对照，不再建议作为默认 ROI-aware 上游。
+

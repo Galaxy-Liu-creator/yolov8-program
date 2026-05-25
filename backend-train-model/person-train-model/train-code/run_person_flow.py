@@ -6,7 +6,7 @@ import shutil
 import subprocess
 import sys
 from pathlib import Path
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 from prepare_person_dataset import (
     DEFAULT_PROJECT_CONFIG,
@@ -298,6 +298,78 @@ def apply_roi_cli_overrides(
     )
 
 
+def build_runtime_project_config_payload(
+    context: PersonProjectContext,
+) -> Dict[str, object]:
+    try:
+        payload = json.loads(context.config_path.read_text(encoding="utf-8")) or {}
+    except OSError as exc:
+        raise RuntimeError(
+            "读取 person project-config 失败，无法生成运行时训练配置: {0}".format(
+                context.config_path
+            )
+        ) from exc
+    except json.JSONDecodeError as exc:
+        raise RuntimeError(
+            "person project-config JSON 无效，无法生成运行时训练配置: {0}".format(
+                context.config_path
+            )
+        ) from exc
+
+    if not isinstance(payload, dict):
+        raise RuntimeError(
+            "person project-config 顶层必须是对象，无法生成运行时训练配置: {0}".format(
+                context.config_path
+            )
+        )
+
+    data_section = payload.get("data")
+    if data_section is None:
+        data_section = {}
+        payload["data"] = data_section
+    if not isinstance(data_section, dict):
+        raise RuntimeError(
+            "person project-config 中的 `data` 段必须是对象: {0}".format(
+                context.config_path
+            )
+        )
+
+    ignored_label_filenames: List[str] = []
+    raw_ignored = data_section.get("ignored_label_filenames", [])
+    if isinstance(raw_ignored, list):
+        for item in raw_ignored:
+            name = str(item).strip()
+            if name and name not in ignored_label_filenames:
+                ignored_label_filenames.append(name)
+    elif raw_ignored not in (None, ""):
+        ignored_label_filenames.append(str(raw_ignored).strip())
+    if "classes.txt" not in {name.lower() for name in ignored_label_filenames}:
+        ignored_label_filenames.append("classes.txt")
+
+    data_section["image_roots"] = [str(path) for path in context.image_roots]
+    data_section["label_root"] = str(context.aggregated_label_root)
+    data_section["image_extensions"] = list(context.image_extensions)
+    data_section["class_names"] = {
+        str(class_id): name for class_id, name in sorted(context.class_names.items())
+    }
+    data_section["ignored_label_filenames"] = ignored_label_filenames
+    data_section["split_ratios"] = dict(context.split_ratios)
+    data_section["default_split_strategy"] = context.default_split_strategy
+    return payload
+
+
+def materialize_runtime_project_config(context: PersonProjectContext) -> Path:
+    runtime_root = (PERSON_ROOT / "train-result" / "working" / "runtime-configs").resolve()
+    runtime_root.mkdir(parents=True, exist_ok=True)
+    runtime_path = runtime_root / "{0}.runtime.json".format(context.config_path.stem)
+    runtime_payload = build_runtime_project_config_payload(context)
+    runtime_path.write_text(
+        json.dumps(runtime_payload, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
+    return runtime_path
+
+
 def best_weight_path_for(context: PersonProjectContext, run_name: str, raw_weights: Optional[str]) -> Path:
     if raw_weights:
         return Path(raw_weights).expanduser().resolve()
@@ -325,12 +397,13 @@ def prepare_command(
     context: PersonProjectContext,
     args: argparse.Namespace,
 ) -> List[str]:
+    runtime_project_config = materialize_runtime_project_config(context)
     command = [
         args.python_exe,
         str(TRAIN_SCRIPT),
         "prepare",
         "--project-config",
-        str(context.config_path),
+        str(runtime_project_config),
         "--mode",
         "fullframe",
         "--output-root",
@@ -389,12 +462,13 @@ def audit_command(
     context: PersonProjectContext,
     args: argparse.Namespace,
 ) -> List[str]:
+    runtime_project_config = materialize_runtime_project_config(context)
     command = [
         args.python_exe,
         str(TRAIN_SCRIPT),
         "audit",
         "--project-config",
-        str(context.config_path),
+        str(runtime_project_config),
     ]
     if args.limit_per_sequence is not None:
         command.extend(["--limit-per-sequence", str(args.limit_per_sequence)])
@@ -408,12 +482,13 @@ def train_command(
     dataset_yaml: Path,
 ) -> List[str]:
     run_name = args.run_name or default_run_name_for(context)
+    runtime_project_config = materialize_runtime_project_config(context)
     command = [
         args.python_exe,
         str(TRAIN_SCRIPT),
         "train",
         "--project-config",
-        str(context.config_path),
+        str(runtime_project_config),
         "--dataset-yaml",
         str(dataset_yaml),
         "--name",
@@ -453,12 +528,13 @@ def evaluate_command(
 ) -> List[str]:
     run_name = args.run_name or default_run_name_for(context)
     report_name = args.report_name or train_report_name_for(run_name)
+    runtime_project_config = materialize_runtime_project_config(context)
     return [
         args.python_exe,
         str(TRAIN_SCRIPT),
         "evaluate",
         "--project-config",
-        str(context.config_path),
+        str(runtime_project_config),
         "--dataset-yaml",
         str(dataset_yaml),
         "--weights",
@@ -482,12 +558,13 @@ def export_command(
     args: argparse.Namespace,
     weight_path: Path,
 ) -> List[str]:
+    runtime_project_config = materialize_runtime_project_config(context)
     command = [
         args.python_exe,
         str(TRAIN_SCRIPT),
         "export",
         "--project-config",
-        str(context.config_path),
+        str(runtime_project_config),
         "--weights",
         str(weight_path),
     ]

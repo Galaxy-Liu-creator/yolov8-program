@@ -25,6 +25,7 @@ DEFAULT_EVAL_REPORT = (
     / "train-result"
     / "artifacts"
     / "reports"
+    / "person_roi_aware_v3_mask_then_crop_margin64_from_fullframe"
     / "person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_eval.json"
 )
 DEFAULT_OUTPUT_PARENT = PERSON_ROOT / "train-result" / "review"

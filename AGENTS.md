@@ -57,6 +57,7 @@
 ## 6. `person` 与 ROI-aware person 现状
 
 - `person` 源数据共 `502` 张图、`1658` 个 person 框；最终训练标签文件 `502` 个，其中空标注 `8` 个。
+- `person` 训练 / 评估 JSON 报告按 run 名分层保存：`backend-train-model/person-train-model/train-result/artifacts/reports/<run_name>/<report_file>.json`，与 `artifacts/runs/<run_name>/` 一一对应；后续不要再把 `*_train.json`、`*_eval.json`、`*_export.json`、`*_all.json` 平铺到 `reports/` 根目录。
 - `person_fullframe` 数据集切分：`train=350 / val=77 / test=75`；框数：`train=1258 / val=219 / test=181`。
 - `person_fullframe_baseline` test 指标：Precision `0.9228`，Recall `0.6740`，mAP50 `0.7606`，mAP50-95 `0.4102`。
 - ROI JSON 根目录：`D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\roi-json`。
@@ -71,6 +72,7 @@
 - 当前 ROI-aware v3 `crop_only + crop_margin_px=64` 数据集输出 `502` 张图，保留 person 框 `1335` 个，丢弃 `316` 个，裁剪边界框 `23` 个，ROI 空负样本 `15` 张。
 - 当前 person 正式配置入口已版本化：
   - fullframe 扩样：`backend-train-model/person-train-model/person_project_config.fullframe_with_new_labels.json`
+  - new labels ROI-aware v1：`backend-train-model/person-train-model/person_project_config.roi_with_new_labels.v1.mask_then_crop_margin64.json`
   - ROI-aware v1：`backend-train-model/person-train-model/person_project_config.roi_v1.center_inside.json`
   - ROI-aware v2：`backend-train-model/person-train-model/person_project_config.roi_v2.mask_then_crop_ioa25.json`
   - ROI-aware v3 mask：`backend-train-model/person-train-model/person_project_config.roi_v3.mask_then_crop_margin64.json`

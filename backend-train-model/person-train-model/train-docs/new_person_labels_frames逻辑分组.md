@@ -422,3 +422,4 @@ grouped/
 ## 8. 一句话执行口径
 
 > **当前 `new_person_labels` 的 frames 逻辑分组，应优先以 `feature_threshold=0.06` 这版自动粗分组结果作为主参考：先按分辨率和粗视觉特征形成第一轮候选组，再通过代表帧人工判断哪些组可以共用 ROI、哪些组还要继续细拆，最后把确认后的稳定组落到 `new_person_labels_frames_grouping_t006/grouped/` 目录中，作为后续 ROI 标注和 ROI-aware 数据准备的正式工作目录。**
+

@@ -113,6 +113,29 @@ def resolve_report_filename(raw_value: Optional[str], default_filename: str) -> 
     return candidate.name
 
 
+def resolve_run_report_path(run_name: str, report_filename: str) -> Path:
+    """按 run 名把报告写入 `reports/<run_name>/`，与 `runs/<run_name>/` 对齐。"""
+
+    run_dir_name = Path(str(run_name).strip()).name
+    if not run_dir_name:
+        raise DatasetToolError("报告所属 run 名不能为空。")
+    if run_dir_name != str(run_name).strip():
+        raise DatasetToolError("报告所属 run 名不能包含目录: {0}".format(run_name))
+    report_name = resolve_report_filename(report_filename, report_filename)
+    return config.REPORTS_ROOT / run_dir_name / report_name
+
+
+def iter_report_candidates(pattern: str) -> List[Path]:
+    """同时兼容新版分层报告和旧版平铺报告的查找。"""
+
+    candidates = {path.resolve() for path in config.REPORTS_ROOT.rglob(pattern) if path.is_file()}
+    return sorted(
+        candidates,
+        key=lambda path: path.stat().st_mtime,
+        reverse=True,
+    )
+
+
 def normalize_names_mapping(raw_value: object) -> Dict[int, str]:
     """把 dataset.yaml 中的 `names` 字段规范化为 `Dict[int, str]`。"""
 
@@ -749,11 +772,7 @@ def resolve_best_weight_path_and_source(raw_path: Optional[str]) -> Tuple[Path, 
             raise DatasetToolError("权重文件不存在: {0}".format(best_weight))
         return best_weight, "explicit_weights_path", None
 
-    report_candidates = sorted(
-        config.REPORTS_ROOT.glob("*_train.json"),
-        key=lambda path: path.stat().st_mtime,
-        reverse=True,
-    )
+    report_candidates = iter_report_candidates("*_train.json")
     for report_path in report_candidates:
         payload = load_report_dict(report_path)
         if payload is None:
@@ -842,11 +861,7 @@ def resolve_resume_checkpoint_path_and_source(raw_path: Optional[str]) -> Tuple[
         return resume_checkpoint, "explicit_resume_path", None
 
     latest_non_resumable_candidate: Optional[Path] = None
-    report_candidates = sorted(
-        config.REPORTS_ROOT.glob("*_train.json"),
-        key=lambda path: path.stat().st_mtime,
-        reverse=True,
-    )
+    report_candidates = iter_report_candidates("*_train.json")
     for report_path in report_candidates:
         payload = load_report_dict(report_path)
         if payload is None:
@@ -1042,7 +1057,10 @@ def train_model(args) -> Dict[str, object]:
             "seed": getattr(trainer_args, "seed", None) if trainer_args is not None else None,
             "single_cls": single_cls,
         }
-        report_path = config.REPORTS_ROOT / "{0}_train.json".format(actual_run_name)
+        report_path = resolve_run_report_path(
+            actual_run_name,
+            "{0}_train.json".format(actual_run_name),
+        )
         summary["report_path"] = str(report_path)
         write_json(report_path, summary)
         return summary
@@ -1180,7 +1198,10 @@ def train_model(args) -> Dict[str, object]:
         "seed": args.seed,
         "single_cls": single_cls,
     }
-    report_path = config.REPORTS_ROOT / "{0}_train.json".format(actual_run_name)
+    report_path = resolve_run_report_path(
+        actual_run_name,
+        "{0}_train.json".format(actual_run_name),
+    )
     summary["report_path"] = str(report_path)
     write_json(report_path, summary)
     return summary
@@ -1278,7 +1299,7 @@ def evaluate_model(args) -> Dict[str, object]:
         getattr(args, "report_name", None),
         "{0}_eval.json".format(weight_path.parent.parent.name),
     )
-    report_path = config.REPORTS_ROOT / report_name
+    report_path = resolve_run_report_path(weight_path.parent.parent.name, report_name)
     summary["report_name"] = report_name
     summary["report_path"] = str(report_path)
     write_json(report_path, summary)
@@ -1328,7 +1349,9 @@ def export_model(args) -> Dict[str, object]:
     summary["metadata_path"] = str(metadata_path)
 
     report_name = "{0}_export.json".format(weight_path.parent.parent.name)
-    write_json(config.REPORTS_ROOT / report_name, summary)
+    report_path = resolve_run_report_path(weight_path.parent.parent.name, report_name)
+    summary["report_path"] = str(report_path)
+    write_json(report_path, summary)
     return summary
 
 
@@ -1642,7 +1665,10 @@ def cmd_all(args) -> int:
         "evaluate": evaluate_summary,
         "export": export_summary,
     }
-    summary_path = config.REPORTS_ROOT / "{0}_all.json".format(train_summary["run_name"])
+    summary_path = resolve_run_report_path(
+        str(train_summary["run_name"]),
+        "{0}_all.json".format(train_summary["run_name"]),
+    )
     write_json(summary_path, final_summary)
     print("总报告   : {0}".format(summary_path))
     return 0

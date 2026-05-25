@@ -78,17 +78,130 @@
  - NMS 调参；
  - 直接切 ROI-aware 正式训练。
 
- ## 4.2 当前真正要改的是“实验顺序”
+## 4.2 当前真正要改的是“实验顺序”
 
- 正确顺序应是：
+ 当前更正确的顺序，不是：
+
+ - 先改 `imgsz`；
+ - 先换更大模型；
+ - 先切 ROI-aware；
+ - 或者一边修数据一边同时改很多训练变量。
+
+ 当前真正应该做的是：
 
  ```text
- 先把人工复核结论转成修标 / 补样动作
- -> 再刷新 fullframe prepared 数据集
- -> 再继续 640 fullframe 修正训练
- -> 确认上游是否改善
- -> 然后才决定是否进入 new labels ROI-aware 正式训练
+ 先把人工复核结论转成三张动作清单
+ -> 先回到源标签目录修框 / 重标
+ -> 再围绕 crowded / overlap、second_person_no_response、visibility weak 补邻近帧或同问题样本
+ -> 再检查标签语义与框风格是否一致
+ -> 再重跑 prepare-labels / prepare，刷新 fullframe prepared 数据集
+ -> 再根据这轮数据改动大小，决定是从 seed7 best 继续 fine-tune，还是按 640 稳健配方干净重训
+ -> 再评估上游是否真的改善
+ -> 只有这时才决定是否进入 new labels ROI-aware 正式训练
  ```
+
+ ### 4.2.1 把上面这条顺序翻成真正可执行的阶段
+
+ #### 阶段 A：先把人工复核结果变成训练前动作
+
+ 这一阶段先不要急着训练，先把 `人工复核.md` 当前 active stage 的结论整理成：
+
+ - `must_relabel_list`
+ - `hard_positive_expand_list`
+ - `defer_list`
+
+ 对应目标分别是：
+
+ - 哪些图片必须先修标签；
+ - 哪些 hardest 正样本要补邻近帧；
+ - 哪些问题先不抢当前主线节奏。
+
+ 这一阶段的最小交付是：
+
+ 1. 关键 `annotation_problem` 样本已列清；
+ 2. crowded / overlap 与可见性弱型的补样目标序列已列清；
+ 3. 明确当前哪些问题先不做。
+
+ #### 阶段 B：先修源标签、再补 hardest 样本
+
+ 这一阶段所有修改都应回到原始标签入口，而不是改 prepared 中间产物。
+
+ 优先处理：
+
+ - crowded / overlap 主线；
+ - `second_person_no_response` 主线；
+ - 明确的 `annotation_problem`。
+
+ 然后按 hardest 序列补邻近帧或同问题样本，重点不是“泛泛扩图”，而是：
+
+ > **提高当前主失败机制在训练数据中的密度。**
+
+ 这一阶段的最小交付是：
+
+ 1. 源标签修正完成；
+ 2. 邻近帧 / hardest 样本补齐完成；
+ 3. 新旧样本框语义没有继续漂移。
+
+ #### 阶段 C：刷新 fullframe prepared 数据集
+
+ 只有在阶段 B 做完后，才建议刷新 fullframe prepared 数据。
+
+ 先重跑：
+
+ - `prepare-labels`
+ - `prepare`
+
+ 这一阶段的目标是：
+
+ - 让新的修标与补样正式进入训练数据；
+ - 保证后续训练不是在旧 prepared 数据上继续跑。
+
+ #### 阶段 D：再决定 fine-tune 还是重训
+
+ 这一阶段不要凭感觉选。
+
+ 建议按下面口径判断：
+
+ - **如果改动小**：
+  - 只修了一批关键标签；
+  - 只补了一批 hardest 邻近帧；
+  - 数据分布没有明显重构；
+  - 则优先从 `person_fullframe_with_new_labels_baseline_seed7/weights/best.pt` 继续 fine-tune。
+- **如果改动大**：
+  - 修了较多标签；
+  - 补了较多 hardest 样本；
+  - 数据分布已经明显变化；
+  - 则优先按 `640` 稳健配方从 `yolov8n.pt` 干净重训。
+
+ 这一步的核心目标不是“立刻追更高分”，而是：
+
+ > **让修正后的 fullframe 成为下一步最可信的上游基线。**
+
+ #### 阶段 E：先判断上游是否改善，再谈 ROI-aware
+
+ 当前评估重点应放在：
+
+ 1. Recall；
+ 2. mAP50；
+ 3. crowded / overlap 代表序列的漏人是否下降；
+ 4. 可见性弱型对照序列是否仍明显漏人；
+ 5. 后续用于 person crop 的人框是否更完整。
+
+ 也就是说，先确认：
+
+ > **上游 person 对 downstream 最致命的“没框 / 框不稳”问题是否真的改善了。**
+
+ #### 阶段 F：最后才进入 new labels ROI-aware
+
+ 只有下面三个条件都成立时，才建议正式进入 new labels ROI-aware：
+
+ 1. hardest FN 的主机制已经转成数据治理动作，并完成一轮 fullframe 修正训练；
+ 2. 修正后的 fullframe 结果证明：上游没有明显退化，或已经改善；
+ 3. `new_person_labels` 的 ROI 已补齐到可独立 prepare ROI-aware 数据集的程度。
+
+ 这一步的目的，不是“因为 ROI-aware 听起来更高级就先切过去”，而是：
+
+ > **在一个更稳的 fullframe 上游基础上，正式比较 ROI-aware 是否值得升级。**
 
  ---
 
@@ -339,3 +452,4 @@
  ## 11. 一句话执行口径
 
  > **先把人工复核结果转成“修标 + 补 hardest 邻近帧”的 fullframe 数据治理动作，再用 640 单因子 fullframe 修正上游 person 主线；不要把当前 hardest FN 还没转成训练动作的状态，直接跳进 new labels ROI-aware 正式训练。**
+

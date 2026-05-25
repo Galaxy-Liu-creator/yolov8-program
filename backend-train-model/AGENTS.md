@@ -64,6 +64,7 @@
 - `person_roi_aware_baseline` test：Precision `0.9390`，Recall `0.5950`，mAP50 `0.6738`，mAP50-95 `0.3867`，当前作为历史对照保留。
 - 已新增 fullframe 扩样配置：`person_project_config.fullframe_with_new_labels.json`；它把原有 `502` 张图与 `new_person_labels` 的 `2507` 张图合并用于 fullframe person，但当前显式设置 `roi.enabled=false`，避免在新样本尚未补齐 ROI 前误接入 ROI-aware 流程。
 - 当前正式 ROI-aware 配置入口已版本化：
+  - `person_project_config.roi_with_new_labels.v1.mask_then_crop_margin64.json`
   - `person_project_config.roi_v1.center_inside.json`
   - `person_project_config.roi_v2.mask_then_crop_ioa25.json`
   - `person_project_config.roi_v3.mask_then_crop_margin64.json`
@@ -73,6 +74,7 @@
 - 当前 new labels person fullframe 可用权重：
   - 稳健基线：`person_fullframe_with_new_labels_baseline`，权重为 `backend-train-model/person-train-model/train-result/artifacts/runs/person_fullframe_with_new_labels_baseline/weights/best.pt`；Val 指标：Precision `0.9554`，Recall `0.9067`，mAP50 `0.9517`，mAP75 `0.4910`，mAP50-95 `0.5095`；Test 指标：Precision `0.9304`，Recall `0.8552`，mAP50 `0.9054`，mAP75 `0.4527`，mAP50-95 `0.4802`。
   - 最新候选：`person_fullframe_with_new_labels_img768`，权重为 `backend-train-model/person-train-model/train-result/artifacts/runs/person_fullframe_with_new_labels_img768/weights/best.pt`；Val 指标：Precision `0.9356`，Recall `0.8960`，mAP50 `0.9457`，mAP75 `0.5135`，mAP50-95 `0.5147`；Test 指标：Precision `0.8798`，Recall `0.8446`，mAP50 `0.8948`，mAP75 `0.4968`，mAP50-95 `0.4970`。
+- 当前 person 训练 / 评估 JSON 报告目录已按 run 名分层：`person-train-model/train-result/artifacts/reports/<run_name>/<report_file>.json`，与 `artifacts/runs/<run_name>/` 一一对应；后续不要再把 `*_train.json`、`*_eval.json`、`*_export.json`、`*_all.json` 平铺到 `reports/` 根目录。
 - 当前 person new labels 取舍：`img768` 的 Test mAP50-95 高于 `640` 稳健基线（`0.4970` vs `0.4802`），但 Precision、Recall、mAP50 低于 `640`；因此阶段汇报中可写作“最新候选”，不宜直接表述为已替代稳健基线。
 - 当前 ROI-aware v2 配置：`train-result/working/roi/roi_config.v2.generated.json`，keep rule 为 `bottom_center_inside OR box_ioa >= 0.25`。
 - 当前 ROI-aware v2 数据集输出：`502` 张图，保留框 `1342`，丢弃框 `316`，裁剪框 `54`，ROI 空负样本 `14`。

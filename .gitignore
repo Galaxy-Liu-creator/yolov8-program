@@ -30,3 +30,11 @@ smoke/
 PPT/
 /.idea
 backend-train-model.zip
+
+# Large local archives
+*.zip
+*.7z
+*.rar
+*.tar
+*.tar.gz
+*.tgz

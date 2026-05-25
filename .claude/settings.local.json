@@ -11,7 +11,11 @@
       "Bash(python:*)",
       "WebFetch(domain:www.firecrawl.dev)",
       "Bash(dir \"D:\\\\University-Competition\\\\Innovation_Entrepreneurship\\\\MyProgram\\\\yolov8-program\\\\backend-train-model\\\\All-train-model\\\\\" 2>&1:*)",
-      "Bash(dir /s /b \"D:\\\\University-Competition\\\\Innovation_Entrepreneurship\\\\MyProgram\\\\yolov8-program\\\\backend-train-model\\\\new_clothes_train\")"
+      "Bash(dir /s /b \"D:\\\\University-Competition\\\\Innovation_Entrepreneurship\\\\MyProgram\\\\yolov8-program\\\\backend-train-model\\\\new_clothes_train\")",
+      "Bash(Test-Path:*)",
+      "Bash(D:\\\\Miniconda3_python\\\\envs\\\\yolo_code\\\\python.exe:*)",
+      "Bash(cmd:*)",
+      "Bash(powershell:*)"
     ]
   }
 }

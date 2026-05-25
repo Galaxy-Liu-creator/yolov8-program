@@ -210,3 +210,4 @@ fullframe person detect
 - 更容易和当前 v2 做单因素比较；
 - 更不容易把 ROI 外 person 可见区域大规模重新引回训练图；
 - 更适合作为当前 ROI-aware person 的默认保守升级方向。
+

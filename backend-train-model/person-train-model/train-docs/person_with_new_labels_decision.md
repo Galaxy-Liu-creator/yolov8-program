@@ -257,3 +257,4 @@
  如果只用一句话压缩当前口径：
 
  > **先把 `person_fullframe_with_new_labels` 训稳，再把 ROI 补齐后的 new labels 版本推进到 ROI-aware；不要为了等 ROI 而先停掉当前已经能跑的 fullframe 主线。**
+

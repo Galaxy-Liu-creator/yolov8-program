@@ -379,6 +379,7 @@ def _coerce_train_args(raw_value: object) -> Dict[str, object]:
     merged: Dict[str, object] = dict(DEFAULT_TRAIN_ARGS)
     integer_keys = {"imgsz", "epochs", "batch", "patience", "workers", "seed"}
     string_keys = {"device"}
+    optional_path_like_keys = {"base_model", "init_weights"}
 
     for key, value in raw_value.items():
         if key in integer_keys:
@@ -391,6 +392,13 @@ def _coerce_train_args(raw_value: object) -> Dict[str, object]:
             continue
         if key in string_keys:
             merged[key] = str(value)
+            continue
+        if key in optional_path_like_keys:
+            if value is None:
+                merged[key] = None
+            else:
+                text = str(value).strip()
+                merged[key] = text or None
             continue
         raise ConfigError(
             "training.default_train_args 中包含当前脚本未支持的键: {0}".format(key)

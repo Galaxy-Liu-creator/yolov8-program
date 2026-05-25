@@ -18,14 +18,14 @@
 
 - run 名称：`person_roi_aware_baseline`
 - run 目录：`backend-train-model/person-train-model/train-result/artifacts/runs/person_roi_aware_baseline`
-- 训练报告：`backend-train-model/person-train-model/train-result/artifacts/reports/person_roi_aware_baseline_train.json`
-- 评估报告：`backend-train-model/person-train-model/train-result/artifacts/reports/person_roi_aware_baseline_eval.json`
+- 训练报告：`backend-train-model/person-train-model/train-result/artifacts/reports/person_roi_aware_baseline/person_roi_aware_baseline_train.json`
+- 评估报告：`backend-train-model/person-train-model/train-result/artifacts/reports/person_roi_aware_baseline/person_roi_aware_baseline_eval.json`
 
 ### 1.2 Fullframe 对照 run
 
 - run 名称：`person_fullframe_baseline`
-- 训练报告：`backend-train-model/person-train-model/train-result/artifacts/reports/person_fullframe_baseline_train.json`
-- 评估报告：`backend-train-model/person-train-model/train-result/artifacts/reports/person_fullframe_baseline_eval.json`
+- 训练报告：`backend-train-model/person-train-model/train-result/artifacts/reports/person_fullframe_baseline/person_fullframe_baseline_train.json`
+- 评估报告：`backend-train-model/person-train-model/train-result/artifacts/reports/person_fullframe_baseline/person_fullframe_baseline_eval.json`
 
 ### 1.3 ROI-aware 数据集
 
@@ -389,3 +389,4 @@ D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-
 因此下一步最优先不是继续硬训同一版，而是：
 
 **用 fullframe person best 权重作为 ROI-aware 初始化重新微调。**
+

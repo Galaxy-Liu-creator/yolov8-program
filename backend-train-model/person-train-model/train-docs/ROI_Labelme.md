@@ -813,3 +813,4 @@ uvx labelme
 - “当前最新稳定版 `labelme 6.1.0`、发布时间 `2026-04-16`、要求 `Python >= 3.10`”来自 `PyPI`；
 - “官方当前推荐使用 `uv` 安装 Labelme”来自 Labelme 官方安装文档；
 - “推荐本项目优先使用独立 `Python 3.10` Conda 环境”是结合当前仓库 `yolo_code = Python 3.9.25` 的工程建议。
+

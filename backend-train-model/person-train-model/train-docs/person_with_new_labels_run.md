@@ -252,3 +252,4 @@ D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-
 3. **`img768` 只在 640 稳定后，作为条件对照继续补 seed；**
 4. **ROI 补齐作为并行工作流推进，而不是继续训练的阻塞条件；**
 5. **ROI 补齐并形成独立配置后，再新开 new labels 的 ROI-aware 正式版本。**
+
