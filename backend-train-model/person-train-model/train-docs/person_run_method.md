@@ -1,6 +1,6 @@
 # 运行前置条件
 
-本文档用于统一记录 `person` 七条训练分支的运行方式：`person_roi_aware_with_new_labels_v1_mask_then_crop_margin64`、`person_fullframe_with_new_labels`、`person_roi_aware_v3_mask_then_crop_margin64`、`person_roi_aware_v3_crop_only_margin64`、`person_roi_aware_v2`、`person_roi_aware`、`person_fullframe`。当前训练默认在另一台带 GPU 的电脑上执行；除非用户明确要求回退到本机 CPU，否则本文件中的训练 / 评估命令默认按 GPU 训练编写。
+本文档用于统一记录 `person` 当前多条训练分支的运行方式，包含 `person_fullframe_with_new_labels_and_hard_examples_v1`、`person_new_hard_examples_v1_sequence_holdout`、`person_new_hard_examples_v1`、`person_roi_aware_with_new_labels_v1_mask_then_crop_margin64`、`person_fullframe_with_new_labels`、`person_roi_aware_v3_mask_then_crop_margin64`、`person_roi_aware_v3_crop_only_margin64`、`person_roi_aware_v2`、`person_roi_aware`、`person_fullframe`。当前训练默认在另一台带 GPU 的电脑上执行；除非用户明确要求回退到本机 CPU，否则本文件中的训练 / 评估命令默认按 GPU 训练编写。
 
 ## 通用环境检查
 
@@ -45,6 +45,197 @@ Test-Path backend-train-model\person-train-model\train-result\artifacts\runs\per
   - `backend-train-model/person-train-model/person_project_config.roi_v2.mask_then_crop_ioa25.json`
   - `backend-train-model/person-train-model/person_project_config.roi_v1.center_inside.json`
 
+## 文档迭代约束
+
+- 以后每新增一个训练版本，直接在本文档中新增一个新的 H1 版本段。
+- 版本段顺序固定为：**最新在前，历史在后**。
+- 不要把旧版本段直接改写成新版本；新版本应单独新增，旧版本保留为历史对照。
+- 每个版本段尽量保持同一结构：`当前定位`、`数据集与产物`、`如需重生成数据集`、`训练命令`、`评估命令`、`备注`。
+- 如果当前需求不是“如何跑这条命令”，而是“下一轮该优先做什么改进”，优先看 `backend-train-model/person-train-model/train-docs/roi_next_iteration_plan.md`。
+
+# person_fullframe_with_new_labels_and_hard_examples_v1
+
+## 当前定位
+
+- 本版本用于落地方案 C：把 `person_fullframe_with_new_labels` 的原有全量 fullframe person 数据，与 `all_labels\new_hard_examples` 的拥挤困难样本一起并回 fullframe 主训练集。
+- 这条线不再把 hard examples 只当作独立 hard-only 微调集，而是把它们作为正式 fullframe person 增量来源，优先回答“并回主训练集后，能否在不丢掉常规场景的前提下补强拥挤近邻漏检”。
+- 当前 hard examples 仍然只有 `frames/labels`，没有配套 ROI JSON；因此本版本明确只覆盖 fullframe person 主线，不直接把 hard examples 接入 ROI-aware prepared 数据集。
+- 当前推荐 run 名：`person_fullframe_with_new_labels_and_hard_examples_v1_from_baseline`。
+
+## 数据集与产物
+
+- person 项目配置：
+  - `backend-train-model/person-train-model/person_project_config.fullframe_with_new_labels_and_hard_examples.v1.json`
+- 标签汇总目录：
+  - `backend-train-model/person-train-model/train-result/working/aggregated_labels_fullframe_with_new_labels_and_hard_examples_v1`
+- 数据集摘要：
+  - `backend-train-model/person-train-model/train-result/person_source_dataset_summary_fullframe_with_new_labels_and_hard_examples_v1.json`
+- prepared 输出目录：
+  - `backend-train-model/person-train-model/train-result/prepared/person_fullframe_with_new_labels_and_hard_examples_v1/sequence_contiguous`
+- 数据集 YAML：
+  - `backend-train-model/person-train-model/train-result/prepared/person_fullframe_with_new_labels_and_hard_examples_v1/sequence_contiguous/dataset.yaml`
+- 当前 prepare 摘要：
+  - 总图片：`4517`
+  - 复制已有标签：`4510`
+  - 自动补空白负样本标签：`7`
+  - 原始已为空白的负样本标签：`6`
+  - 最终空白负样本标签：`13`
+
+## 如需重生成数据集
+
+在仓库 `yolov8-program` 目录下运行：
+
+```powershell
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py prepare --project-config backend-train-model\person-train-model\person_project_config.fullframe_with_new_labels_and_hard_examples.v1.json --overwrite --split-strategy sequence_contiguous
+```
+
+## 训练命令
+
+推荐先沿用当前更稳的 `person_fullframe_with_new_labels_baseline` 权重作为初始化来源，再观察 hard examples 并回后是否改善拥挤近邻样本：
+
+```powershell
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py train --project-config backend-train-model\person-train-model\person_project_config.fullframe_with_new_labels_and_hard_examples.v1.json --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_fullframe_with_new_labels_and_hard_examples_v1\sequence_contiguous\dataset.yaml --run-name person_fullframe_with_new_labels_and_hard_examples_v1_from_baseline --device 0 --workers 4 --batch 4 --imgsz 640 --epochs 180 --patience 40 --base-model backend-train-model\person-train-model\train-result\artifacts\runs\person_fullframe_with_new_labels_baseline\weights\best.pt
+```
+
+## 评估命令
+
+```powershell
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py evaluate --project-config backend-train-model\person-train-model\person_project_config.fullframe_with_new_labels_and_hard_examples.v1.json --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_fullframe_with_new_labels_and_hard_examples_v1\sequence_contiguous\dataset.yaml --weights backend-train-model\person-train-model\train-result\artifacts\runs\person_fullframe_with_new_labels_and_hard_examples_v1_from_baseline\weights\best.pt --run-name person_fullframe_with_new_labels_and_hard_examples_v1_from_baseline --imgsz 640 --batch 4 --workers 4 --device 0 --report-name person_fullframe_with_new_labels_and_hard_examples_v1_from_baseline_eval
+```
+
+## 备注
+
+- 这条线是 fullframe 主训练集扩样入口，不替代下面的 hard-only 困难样本专项对照。
+- 由于 hard examples 尚未补齐 ROI JSON，这里先不直接派生新的 ROI-aware hard examples 数据集；后续若补齐 ROI，再单独版本化对应 ROI-aware 入口。
+
+# person_new_hard_examples_v1_sequence_holdout
+
+## 当前定位
+
+- 本版本用于给 `person_new_hard_examples_v1` 增加一条更严格的 `sequence_holdout` 切分线，避免同一条 hard sequence 同时出现在 train / val / test 中。
+- 与 `sequence_contiguous` 相比，这条线更适合作为 hard benchmark 或更严格的拥挤场景回归检查，不建议直接拿它替代 fullframe 主训练集。
+- 当前推荐 run 名：`person_new_hard_examples_v1_holdout_finetune_from_roi_aware_with_new_labels`。
+
+## 数据集与产物
+
+- person 项目配置：
+  - `backend-train-model/person-train-model/person_project_config.new_hard_examples.v1.sequence_holdout.json`
+- 数据集输出目录：
+  - `backend-train-model/person-train-model/train-result/prepared/person_new_hard_examples_v1/sequence_holdout`
+- 数据集 YAML：
+  - `backend-train-model/person-train-model/train-result/prepared/person_new_hard_examples_v1/sequence_holdout/dataset.yaml`
+- prepare 报告：
+  - `backend-train-model/person-train-model/train-result/prepared/person_new_hard_examples_v1/sequence_holdout/prepare_report.json`
+- split manifest：
+  - `backend-train-model/person-train-model/train-result/prepared/person_new_hard_examples_v1/sequence_holdout/split_manifest.jsonl`
+- 当前 prepare 统计：
+  - train：`988` 张图片，`3271` 个 person 框
+  - val：`231` 张图片，`811` 个 person 框
+  - test：`289` 张图片，`2007` 个 person 框
+  - 合计：`1508` 张配对图片，`6089` 个 person 框
+  - 当前 `missing labels=0`、`extra labels=0`
+
+## 如需重生成数据集
+
+在仓库 `yolov8-program` 目录下运行：
+
+```powershell
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\prepare_new_hard_examples_dataset.py --split-strategy sequence_holdout --overwrite
+```
+
+如需在后续接入时开启更严格的源数据配对校验，可额外追加：
+
+```powershell
+--strict-pairing
+```
+
+## 训练命令
+
+```powershell
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py train --project-config backend-train-model\person-train-model\person_project_config.new_hard_examples.v1.sequence_holdout.json --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_new_hard_examples_v1\sequence_holdout\dataset.yaml --run-name person_new_hard_examples_v1_holdout_finetune_from_roi_aware_with_new_labels --device 0 --workers 4 --batch 4 --imgsz 640 --epochs 120 --patience 40 --base-model backend-train-model\person-train-model\train-result\artifacts\runs\person_roi_aware_with_new_labels_v1_mask_then_crop_margin64_from_fullframe\weights\best.pt
+```
+
+## 评估命令
+
+```powershell
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py evaluate --project-config backend-train-model\person-train-model\person_project_config.new_hard_examples.v1.sequence_holdout.json --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_new_hard_examples_v1\sequence_holdout\dataset.yaml --weights backend-train-model\person-train-model\train-result\artifacts\runs\person_new_hard_examples_v1_holdout_finetune_from_roi_aware_with_new_labels\weights\best.pt --run-name person_new_hard_examples_v1_holdout_finetune_from_roi_aware_with_new_labels --imgsz 640 --batch 4 --workers 4 --device 0 --report-name person_new_hard_examples_v1_holdout_finetune_from_roi_aware_with_new_labels_eval
+```
+
+## 备注
+
+- 这条线更适合作为 hard sequence 的严格对照，不应单独拿来替代 fullframe 主线升级结论。
+- `sequence_holdout` 与 `sequence_contiguous` 的 prepared 输出目录已独立，后续不要把两条线的 `dataset.yaml`、run 名或报告路径混用。
+
+# person_new_hard_examples_v1
+
+## 当前定位
+
+- 本版本用于把 `all_labels\new_hard_examples` 中针对拥挤场景“一框合两人”和“第二人无响应”问题补充的困难样本整理为独立 YOLO person 数据集。
+- 数据集目录结构与现有 `person` prepared 数据集保持一致：`images/train|val|test`、`labels/train|val|test`、`dataset.yaml`、`prepare_report.json`。
+- 切分口径沿用 `person_roi_aware_with_new_labels_v1_mask_then_crop_margin64_from_fullframe` 的 `sequence_contiguous`，比例为 `train=0.70 / val=0.15 / test=0.15`。
+- 当前 hard examples 只有 `frames/labels`，没有对应 ROI JSON；因此本数据集不做 `mask_then_crop + margin64` 二次 ROI 变换，只复用最新主线的切分方式和 YOLO 目录结构。
+
+## 数据集与产物
+
+- person 项目配置：
+  - `backend-train-model/person-train-model/person_project_config.new_hard_examples.v1.json`
+- 数据源：
+  - `D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\new_hard_examples`
+- 数据集输出目录：
+  - `backend-train-model/person-train-model/train-result/prepared/person_new_hard_examples_v1/sequence_contiguous`
+- 数据集 YAML：
+  - `backend-train-model/person-train-model/train-result/prepared/person_new_hard_examples_v1/sequence_contiguous/dataset.yaml`
+- prepare 报告：
+  - `backend-train-model/person-train-model/train-result/prepared/person_new_hard_examples_v1/sequence_contiguous/prepare_report.json`
+- split manifest：
+  - `backend-train-model/person-train-model/train-result/prepared/person_new_hard_examples_v1/sequence_contiguous/split_manifest.jsonl`
+- 当前 prepare 统计：
+  - train：`1056` 张图片，`4390` 个 person 框
+  - val：`229` 张图片，`901` 个 person 框
+  - test：`223` 张图片，`798` 个 person 框
+  - 合计：`1508` 张配对图片，`6089` 个 person 框
+  - 当前 `missing labels=0`、`extra labels=0`
+
+## 如需重生成数据集
+
+在仓库 `yolov8-program` 目录下运行：
+
+```powershell
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\prepare_new_hard_examples_dataset.py --split-strategy sequence_contiguous --overwrite
+```
+
+如需在后续接入时开启更严格的源数据配对校验，可额外追加：
+
+```powershell
+--strict-pairing
+```
+
+## 训练命令
+
+推荐从最新 ROI-aware 主线权重继续微调，重点增强拥挤和多人近邻样本：
+
+```powershell
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py train --project-config backend-train-model\person-train-model\person_project_config.new_hard_examples.v1.json --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_new_hard_examples_v1\sequence_contiguous\dataset.yaml --run-name person_new_hard_examples_v1_finetune_from_roi_aware_with_new_labels --device 0 --workers 4 --batch 4 --imgsz 640 --epochs 120 --patience 40 --base-model backend-train-model\person-train-model\train-result\artifacts\runs\person_roi_aware_with_new_labels_v1_mask_then_crop_margin64_from_fullframe\weights\best.pt
+```
+
+如果显存或 DataLoader 稳定性有压力，可先用 batch=2：
+
+```powershell
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py train --project-config backend-train-model\person-train-model\person_project_config.new_hard_examples.v1.json --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_new_hard_examples_v1\sequence_contiguous\dataset.yaml --run-name person_new_hard_examples_v1_finetune_from_roi_aware_with_new_labels_batch2 --device 0 --workers 4 --batch 2 --imgsz 640 --epochs 120 --patience 40 --base-model backend-train-model\person-train-model\train-result\artifacts\runs\person_roi_aware_with_new_labels_v1_mask_then_crop_margin64_from_fullframe\weights\best.pt
+```
+
+## 评估命令
+
+```powershell
+D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py evaluate --project-config backend-train-model\person-train-model\person_project_config.new_hard_examples.v1.json --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_new_hard_examples_v1\sequence_contiguous\dataset.yaml --weights backend-train-model\person-train-model\train-result\artifacts\runs\person_new_hard_examples_v1_finetune_from_roi_aware_with_new_labels\weights\best.pt --run-name person_new_hard_examples_v1_finetune_from_roi_aware_with_new_labels --imgsz 640 --batch 4 --workers 4 --device 0 --report-name person_new_hard_examples_v1_finetune_from_roi_aware_with_new_labels_eval
+```
+
+## 备注
+
+- 这批样本是困难场景强化集，不直接替代 `person_roi_aware_with_new_labels_v1_mask_then_crop_margin64` 的全量训练集。
+- 当前专用 prepare 脚本会按 split 输出 `split_manifest.jsonl`，并在 `prepare_report.json` 中显式记录 `strict_pairing`、missing / extra label 统计；后续复盘应优先引用这两类产物。
+- 如果后续补齐 hard examples 的 ROI JSON，再新增 ROI-aware hard examples 版本，不要覆盖当前 fullframe hard examples prepared 输出。
+
 # ROI-aware随机性训练
 
 ## seed=7
@@ -84,14 +275,6 @@ D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-
 ```powershell
 D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py evaluate --project-config backend-train-model\person-train-model\person_project_config.roi_with_new_labels.v1.mask_then_crop_margin64.json --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_roi_aware_with_new_labels_v1_mask_then_crop_margin64\sequence_contiguous\dataset.yaml --weights backend-train-model\person-train-model\train-result\artifacts\runs\person_roi_aware_with_new_labels_v1_mask_then_crop_margin64_seed13_from_fullframe\weights\best.pt --run-name person_roi_aware_with_new_labels_v1_mask_then_crop_margin64_seed13_from_fullframe --imgsz 640 --batch 4 --workers 4 --device 0 --report-name person_roi_aware_with_new_labels_v1_mask_then_crop_margin64_seed13_from_fullframe_eval
 ```
-
-## 文档迭代约束
-
-- 以后每新增一个训练版本，直接在本文档中新增一个新的 H1 版本段。
-- 版本段顺序固定为：**最新在前，历史在后**。
-- 不要把旧版本段直接改写成新版本；新版本应单独新增，旧版本保留为历史对照。
-- 每个版本段尽量保持同一结构：`当前定位`、`数据集与产物`、`如需重生成数据集`、`训练命令`、`评估命令`、`备注`。
-- 如果当前需求不是“如何跑这条命令”，而是“下一轮该优先做什么改进”，优先看 `backend-train-model/person-train-model/train-docs/roi_next_iteration_plan.md`。
 
 # person_roi_aware_with_new_labels_v1_mask_then_crop_margin64
 

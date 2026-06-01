@@ -1,0 +1,6 @@
+path: D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/backend-train-model/person-train-model/train-result/prepared/person_new_hard_examples_v1/sequence_holdout
+train: images/train
+val: images/val
+test: images/test
+names:
+  0: person

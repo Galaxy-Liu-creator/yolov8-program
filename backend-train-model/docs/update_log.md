@@ -1,5 +1,43 @@
 # Update Log
 
+## 2026-06-01 新增 hard examples fullframe 并回方案与 holdout 变体
+
+1. 变更来源：用户确认执行方案 C，并要求同时补充 `new_hard_examples` 的 `sequence_holdout` 变体，以及审改 `backend-train-model/person-train-model/train-code/prepare_new_hard_examples_dataset.py` 的配对、冲突和审计能力。
+2. 变更总览：
+   - 新增 `backend-train-model/person-train-model/person_project_config.fullframe_with_new_labels_and_hard_examples.v1.json`，把 `person_fullframe_with_new_labels` 与 `all_labels/new_hard_examples` 一并纳入新的 fullframe 主训练集配置，并默认从 `person_fullframe_with_new_labels_baseline` 权重继续训练。
+   - 新增 `backend-train-model/person-train-model/person_project_config.new_hard_examples.v1.sequence_holdout.json`，把 hard-only 数据集的严格 `sequence_holdout` 版本独立配置化，避免和现有 `sequence_contiguous` 产物混用。
+   - 更新 `backend-train-model/config.py` 的 `resolve_sequence_name_from_image_root(...)`，对 `all_labels/new_hard_examples/*/*/frames` 解析出 `hard_<group>_<sequence>` 风格序列名，解决方案 C fullframe prepare 时与历史 `group3_2/1` 这类目录名冲突的问题。
+   - 审改 `backend-train-model/person-train-model/train-code/prepare_new_hard_examples_dataset.py`：输出根目录改为按 `split-strategy` 自动落到 `.../person_new_hard_examples_v1/<split-strategy>`；新增 `--strict-pairing`；把跨序列冲突校验从 filename 扩到 stem；新增 `split_manifest.jsonl`；并把这些元数据写回 `prepare_report.json`。
+   - 重新生成 `person_new_hard_examples_v1/sequence_contiguous` 与 `person_new_hard_examples_v1/sequence_holdout` 两套 prepared 数据；同时执行 `person_fullframe_with_new_labels_and_hard_examples.v1` 的 fullframe prepare，产出新的汇总标签与 prepared 输出目录。
+   - 更新 `backend-train-model/person-train-model/train-docs/person_run_method.md`，新增 `person_fullframe_with_new_labels_and_hard_examples_v1` 与 `person_new_hard_examples_v1_sequence_holdout` 两个版本段，并同步刷新 `person_new_hard_examples_v1` 的 regenerate 命令与 manifest 说明。
+3. 涉及文件：
+   - `backend-train-model/config.py`
+   - `backend-train-model/person-train-model/train-code/prepare_new_hard_examples_dataset.py`
+   - `backend-train-model/person-train-model/person_project_config.fullframe_with_new_labels_and_hard_examples.v1.json`
+   - `backend-train-model/person-train-model/person_project_config.new_hard_examples.v1.sequence_holdout.json`
+   - `backend-train-model/person-train-model/train-docs/person_run_method.md`
+   - `backend-train-model/person-train-model/train-result/prepared/person_new_hard_examples_v1/sequence_contiguous/*`
+   - `backend-train-model/person-train-model/train-result/prepared/person_new_hard_examples_v1/sequence_holdout/*`
+   - `backend-train-model/person-train-model/train-result/working/aggregated_labels_fullframe_with_new_labels_and_hard_examples_v1/*`
+   - `backend-train-model/person-train-model/train-result/person_source_dataset_summary_fullframe_with_new_labels_and_hard_examples_v1.json`
+   - `backend-train-model/docs/update_log.md`
+4. 新增 / 变更配置项：
+   - 新增 fullframe 配置入口：`backend-train-model/person-train-model/person_project_config.fullframe_with_new_labels_and_hard_examples.v1.json`
+   - 新增 hard holdout 配置入口：`backend-train-model/person-train-model/person_project_config.new_hard_examples.v1.sequence_holdout.json`
+   - `backend-train-model/config.py` 的 `resolve_sequence_name_from_image_root(...)` 现在会把 `new_hard_examples/*/*/frames` 解析成 `hard_<group>_<sequence>`，避免和已有非 `frames` 目录的短名称冲突。
+   - `prepare_new_hard_examples_dataset.py` 新增 CLI：`--strict-pairing`
+   - `prepare_new_hard_examples_dataset.py` 新增产物：`split_manifest.jsonl`
+   - `prepare_new_hard_examples_dataset.py` 的默认输出目录从固定 `sequence_contiguous` 改为根据 `--split-strategy` 自动映射到对应子目录
+5. 兼容性注意：
+   - `person_new_hard_examples_v1` 的 `sequence_contiguous` 与 `sequence_holdout` 现在拥有各自独立的 `dataset.yaml`、`prepare_report.json`、`split_manifest.jsonl` 与 project-config；后续训练和评估不要混用。
+   - `run_person_flow.py` 会校验显式传入的 `dataset.yaml` 是否落在当前 project-config 预期的 prepared 根目录内，因此 holdout 版必须配套使用新的 `person_project_config.new_hard_examples.v1.sequence_holdout.json`。
+   - 方案 C 当前只覆盖 fullframe 主线；由于 `new_hard_examples` 仍无 ROI JSON，本轮没有新增 ROI-aware hard examples 版本。
+   - `prepare_new_hard_examples_dataset.py` 目前仍默认允许非严格配对，只是在 `prepare_report.json` 中记录并提供 `--strict-pairing` 供后续 fail-fast；这样可以避免在源数据临时波动时直接打断现有 hard-only 流程。
+6. 本轮明确不改动：
+   - 不启动新的训练、评估或导出；本轮只完成配置、prepared 数据和运行文档更新。
+   - 不修改任何 ROI JSON、人工作业台账、在线检测链路或 `inspection-flask/` 下的实现。
+   - 不修改当前已确定的 ROI-aware v2/v3 主线配置、权重选择或业务阈值。
+
 # 2026-05-25 写入 new_person_labels 复盘总结
 
 1. 变更来源：用户要求把本次 `person_roi_aware_with_new_labels_v1_mask_then_crop_margin64_from_fullframe` 的 FP/FN 复盘结果、改进做法和重点关注项整理到 `backend-train-model/person-train-model/train-docs/new_person_labels复盘.md`。

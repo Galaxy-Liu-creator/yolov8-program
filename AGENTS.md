@@ -72,11 +72,14 @@
 - 当前 ROI-aware v3 `crop_only + crop_margin_px=64` 数据集输出 `502` 张图，保留 person 框 `1335` 个，丢弃 `316` 个，裁剪边界框 `23` 个，ROI 空负样本 `15` 张。
 - 当前 person 正式配置入口已版本化：
   - fullframe 扩样：`backend-train-model/person-train-model/person_project_config.fullframe_with_new_labels.json`
+  - fullframe 扩样 + hard examples 方案 C：`backend-train-model/person-train-model/person_project_config.fullframe_with_new_labels_and_hard_examples.v1.json`
+  - hard-only holdout：`backend-train-model/person-train-model/person_project_config.new_hard_examples.v1.sequence_holdout.json`
   - new labels ROI-aware v1：`backend-train-model/person-train-model/person_project_config.roi_with_new_labels.v1.mask_then_crop_margin64.json`
   - ROI-aware v1：`backend-train-model/person-train-model/person_project_config.roi_v1.center_inside.json`
   - ROI-aware v2：`backend-train-model/person-train-model/person_project_config.roi_v2.mask_then_crop_ioa25.json`
   - ROI-aware v3 mask：`backend-train-model/person-train-model/person_project_config.roi_v3.mask_then_crop_margin64.json`
   - ROI-aware v3 crop：`backend-train-model/person-train-model/person_project_config.roi_v3.crop_only_margin64.json`
+- 当前 `backend-train-model/person-train-model/train-code/prepare_new_hard_examples_dataset.py` 已支持 `sequence_contiguous` 与 `sequence_holdout` 独立输出，并额外写出 `split_manifest.jsonl`；如需对源数据做 fail-fast 配对校验，可显式传 `--strict-pairing`。
 - `backend-train-model/person-train-model/person_project_config.json` 当前保留为兼容 / 历史入口，不再作为 ROI-aware v2/v3 的正式唯一配置来源。
 - 已完成 `roi_cropped_keep_positive_v3_margin64` 复盘：无 margin 时原本会裁边的 `54` 个 keep-positive 框里，`margin64` 已完整救回 `31` 个；剩余 `23` 个全部只是贴原图下/右边界的 `0.001 px` 级残留裁边，说明 ROI crop 已不再是当前主瓶颈。复盘输出目录：`backend-train-model/person-train-model/train-result/review/roi_cropped_keep_positive_v3_margin64/`。
 - 当前 native test 领先的 ROI-aware run（优势很小）：`person_roi_aware_v3_mask_then_crop_margin64_from_fullframe`。

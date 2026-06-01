@@ -214,6 +214,9 @@ def resolve_sequence_name_from_image_root(image_root: Union[str, Path]) -> str:
     candidate = Path(image_root)
     sequence_name = candidate.name
     if sequence_name.lower() == "frames" and candidate.parent.name:
+        lower_parts = {part.lower() for part in candidate.parts}
+        if "new_hard_examples" in lower_parts and candidate.parent.parent.name:
+            return "hard_{0}_{1}".format(candidate.parent.parent.name, candidate.parent.name)
         return candidate.parent.name
     return sequence_name
 
