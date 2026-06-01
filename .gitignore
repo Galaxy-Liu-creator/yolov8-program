@@ -30,7 +30,7 @@ smoke/
 PPT/
 /.idea
 backend-train-model.zip
-backend-python/
+
 
 # Large local archives
 *.zip
