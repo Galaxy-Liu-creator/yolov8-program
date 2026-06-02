@@ -1,0 +1,132 @@
+{
+  "runtime": {
+    "command": "evaluate",
+    "argv": [
+      "evaluate",
+      "--project-config",
+      "new_clothes_train\\new_clothes_train_project_config.json",
+      "--dataset-yaml",
+      "new_clothes_train\\datasets\\clothes_merged_with_new_labels_v1\\dataset.yaml",
+      "--weights",
+      "new_clothes_train\\artifacts\\runs\\clothes_merged_with_new_labels_v1_baseline\\weights\\best.pt"
+    ],
+    "generated_at": "2026-05-06T13:15:18",
+    "config": {
+      "project_config_path": "E:\\Competition\\yolov8-program\\new_clothes_train\\new_clothes_train_project_config.json",
+      "image_roots": [
+        "E:\\Competition\\frame_label\\clothes_labels\\group3_1\\clo\\D04_20260123074846",
+        "E:\\Competition\\frame_label\\clothes_labels\\group3_1\\clo\\D05_20260123074841",
+        "E:\\Competition\\frame_label\\clothes_labels\\group3_1\\clo\\D15_20260123074848"
+      ],
+      "label_root": "E:\\Competition\\frame_label\\clothes_labels\\group3_1\\clo\\label-clo",
+      "image_extensions": [
+        ".jpg",
+        ".jpeg",
+        ".png"
+      ],
+      "class_names": {
+        "0": "clothes"
+      },
+      "ignored_label_filenames": [
+        "classes.txt"
+      ],
+      "split_ratios": {
+        "train": 0.7,
+        "val": 0.15,
+        "test": 0.15
+      },
+      "default_split_strategy": "sequence_contiguous",
+      "default_prepare_mode": "auto",
+      "default_include_empty_person_crops": false,
+      "default_limit_per_sequence": null,
+      "default_monitored_person_labels": [
+        "person"
+      ],
+      "default_person_conf": 0.2,
+      "default_person_imgsz": 640,
+      "default_assignment_min_ioa": 0.35,
+      "default_fallback_to_fullframe": true,
+      "default_allow_remote_model_download": false,
+      "default_person_model_candidates": [
+        "E:\\Competition\\yolov8-program\\backend-train-model\\weights\\person_detect_yolov8.pt",
+        "E:\\Competition\\yolov8-program\\inspection-flask\\weights\\person_detect_yolov8.pt"
+      ],
+      "default_python_candidates": [
+        "E:\\Miniconda3\\envs\\yolo_Code\\python.exe"
+      ],
+      "default_train_args": {
+        "imgsz": 640,
+        "epochs": 180,
+        "batch": 4,
+        "patience": 40,
+        "workers": 0,
+        "device": "0",
+        "seed": 42
+      },
+      "artifacts_root": "E:\\Competition\\yolov8-program\\new_clothes_train\\artifacts",
+      "prepared_root": "E:\\Competition\\yolov8-program\\new_clothes_train\\artifacts\\prepared",
+      "runs_root": "E:\\Competition\\yolov8-program\\new_clothes_train\\artifacts\\runs",
+      "reports_root": "E:\\Competition\\yolov8-program\\new_clothes_train\\artifacts\\reports",
+      "export_root": "E:\\Competition\\yolov8-program\\new_clothes_train\\artifacts\\export"
+    }
+  },
+  "report_name": "clothes_merged_with_new_labels_v1_baseline_eval.json",
+  "weights": "E:\\Competition\\yolov8-program\\new_clothes_train\\artifacts\\runs\\clothes_merged_with_new_labels_v1_baseline\\weights\\best.pt",
+  "weights_resolution_mode": "explicit_weights_path",
+  "weights_report_source": null,
+  "dataset_yaml": "E:\\Competition\\yolov8-program\\new_clothes_train\\datasets\\clothes_merged_with_new_labels_v1\\dataset.yaml",
+  "comparison_dataset_name": "clothes_merged_with_new_labels_v1",
+  "dataset_metadata": {
+    "dataset_name": "clothes_merged_with_new_labels_v1",
+    "dataset_yaml": "E:\\Competition\\yolov8-program\\new_clothes_train\\datasets\\clothes_merged_with_new_labels_v1\\dataset.yaml",
+    "dataset_root": "E:\\Competition\\yolov8-program\\new_clothes_train\\datasets\\clothes_merged_with_new_labels_v1",
+    "class_names": {
+      "0": "clothes"
+    },
+    "class_count": 1,
+    "split_image_counts": {
+      "train": 2106,
+      "val": 450,
+      "test": 453
+    },
+    "prepare_report_path": null,
+    "prepare_mode": null,
+    "prepare_split_strategy": null
+  },
+  "evaluated_splits": [
+    "val",
+    "test"
+  ],
+  "skipped_splits": [],
+  "native_eval": {
+    "val": {
+      "results_dict": {
+        "metrics/precision(B)": 0.9769445812509655,
+        "metrics/recall(B)": 0.95940601023502,
+        "metrics/mAP50(B)": 0.9817128689945767,
+        "metrics/mAP50-95(B)": 0.7106213546632484,
+        "fitness": 0.7106213546632484
+      },
+      "precision": 0.9769445812509655,
+      "recall": 0.95940601023502,
+      "map50": 0.9817128689945767,
+      "map75": 0.8645052763140135,
+      "map50_95": 0.7106213546632484
+    },
+    "test": {
+      "results_dict": {
+        "metrics/precision(B)": 0.98349530479347,
+        "metrics/recall(B)": 0.9683186768749213,
+        "metrics/mAP50(B)": 0.9924124850353914,
+        "metrics/mAP50-95(B)": 0.7075236179519682,
+        "fitness": 0.7075236179519682
+      },
+      "precision": 0.98349530479347,
+      "recall": 0.9683186768749213,
+      "map50": 0.9924124850353914,
+      "map75": 0.8490502048432083,
+      "map50_95": 0.7075236179519682
+    }
+  },
+  "report_path": "E:\\Competition\\yolov8-program\\new_clothes_train\\artifacts\\reports\\clothes_merged_with_new_labels_v1_baseline_eval.json"
+}

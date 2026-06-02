@@ -1,0 +1,145 @@
+{
+  "runtime": {
+    "command": "train",
+    "argv": [
+      "train",
+      "--project-config",
+      "E:\\Competition\\yolov8-program\\backend-train-model\\person-train-model\\person_project_config.json",
+      "--dataset-yaml",
+      "E:\\Competition\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\prepared\\person_fullframe_with_new_labels\\sequence_contiguous\\dataset.yaml",
+      "--name",
+      "person_fullframe_with_new_labels_img768",
+      "--imgsz",
+      "768",
+      "--epochs",
+      "180",
+      "--batch",
+      "4",
+      "--patience",
+      "40",
+      "--workers",
+      "4",
+      "--device",
+      "0",
+      "--seed",
+      "42",
+      "--base-model",
+      "backend-train-model\\weights\\yolov8n.pt"
+    ],
+    "generated_at": "2026-05-04T19:38:44",
+    "config": {
+      "project_config_path": "E:\\Competition\\yolov8-program\\backend-train-model\\person-train-model\\person_project_config.json",
+      "image_roots": [
+        "E:\\Competition\\frame_label\\person_labels\\group3_1\\D04_20260123074846",
+        "E:\\Competition\\frame_label\\person_labels\\group3_1\\D05_20260123074841",
+        "E:\\Competition\\frame_label\\person_labels\\group3_1\\D15_20260123074848",
+        "E:\\Competition\\frame_label\\person_labels\\group3_2\\1",
+        "E:\\Competition\\frame_label\\person_labels\\group3_2\\D15_20260119203927",
+        "E:\\Competition\\frame_label\\person_labels\\group3_3\\D02_20260123070624",
+        "E:\\Competition\\frame_label\\person_labels\\group3_3\\D02_20260123074836"
+      ],
+      "label_root": "E:\\Competition\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\working\\aggregated_labels",
+      "image_extensions": [
+        ".jpg"
+      ],
+      "class_names": {
+        "0": "person"
+      },
+      "ignored_label_filenames": [
+        "classes.txt"
+      ],
+      "split_ratios": {
+        "train": 0.7,
+        "val": 0.15,
+        "test": 0.15
+      },
+      "default_split_strategy": "sequence_contiguous",
+      "default_prepare_mode": "fullframe",
+      "default_include_empty_person_crops": false,
+      "default_limit_per_sequence": null,
+      "default_monitored_person_labels": [
+        "person"
+      ],
+      "default_person_conf": 0.2,
+      "default_person_imgsz": 640,
+      "default_assignment_min_ioa": 0.35,
+      "default_fallback_to_fullframe": true,
+      "default_allow_remote_model_download": false,
+      "default_person_model_candidates": [
+        "E:\\Competition\\yolov8-program\\backend-train-model\\weights\\person_detect_yolov8.pt",
+        "E:\\Competition\\yolov8-program\\inspection-flask\\weights\\person_detect_yolov8.pt"
+      ],
+      "default_python_candidates": [
+        "D:\\Miniconda3_python\\envs\\yolo_code\\python.exe"
+      ],
+      "default_train_args": {
+        "imgsz": 640,
+        "epochs": 180,
+        "batch": 4,
+        "patience": 40,
+        "workers": 0,
+        "device": "cpu",
+        "seed": 42
+      },
+      "artifacts_root": "E:\\Competition\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\artifacts",
+      "prepared_root": "E:\\Competition\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\artifacts\\prepared",
+      "runs_root": "E:\\Competition\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\artifacts\\runs",
+      "reports_root": "E:\\Competition\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\artifacts\\reports",
+      "export_root": "E:\\Competition\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\artifacts\\export"
+    }
+  },
+  "dataset_yaml": "E:\\Competition\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\prepared\\person_fullframe_with_new_labels\\sequence_contiguous\\dataset.yaml",
+  "dataset_metadata": {
+    "dataset_name": "sequence_contiguous",
+    "dataset_yaml": "E:\\Competition\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\prepared\\person_fullframe_with_new_labels\\sequence_contiguous\\dataset.yaml",
+    "dataset_root": "E:\\Competition\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\prepared\\person_fullframe_with_new_labels\\sequence_contiguous",
+    "class_names": {
+      "0": "person"
+    },
+    "class_count": 1,
+    "split_image_counts": {
+      "train": 2105,
+      "val": 453,
+      "test": 451
+    },
+    "prepare_report_path": "E:\\Competition\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\prepared\\person_fullframe_with_new_labels\\sequence_contiguous\\prepare_report.json",
+    "prepare_mode": "fullframe",
+    "prepare_split_strategy": "sequence_contiguous"
+  },
+  "base_model": "E:\\Competition\\yolov8-program\\backend-train-model\\weights\\yolov8n.pt",
+  "base_model_source": "explicit_local_path",
+  "initial_base_model": "E:\\Competition\\yolov8-program\\backend-train-model\\weights\\yolov8n.pt",
+  "initial_base_model_source": "explicit_local_path",
+  "allow_remote_model_download": false,
+  "from_scratch": false,
+  "pretrained": true,
+  "init_weights": null,
+  "init_weights_source": null,
+  "training_lineage": [
+    {
+      "event": "start",
+      "generated_at": "2026-05-04T19:38:44",
+      "base_model": "E:\\Competition\\yolov8-program\\backend-train-model\\weights\\yolov8n.pt",
+      "base_model_source": "explicit_local_path",
+      "from_scratch": false,
+      "init_weights": null,
+      "init_weights_source": null
+    }
+  ],
+  "run_project": "E:\\Competition\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\artifacts\\runs",
+  "requested_run_name": "person_fullframe_with_new_labels_img768",
+  "actual_run_name": "person_fullframe_with_new_labels_img768",
+  "run_name": "person_fullframe_with_new_labels_img768",
+  "run_dir": "E:\\Competition\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\artifacts\\runs\\person_fullframe_with_new_labels_img768",
+  "best_weight": "E:\\Competition\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\artifacts\\runs\\person_fullframe_with_new_labels_img768\\weights\\best.pt",
+  "last_weight": "E:\\Competition\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\artifacts\\runs\\person_fullframe_with_new_labels_img768\\weights\\last.pt",
+  "imgsz": 768,
+  "epochs": 180,
+  "batch": 4,
+  "patience": 40,
+  "workers": 4,
+  "device": "0",
+  "seed": 42,
+  "single_cls": true,
+  "report_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\artifacts\\reports\\person_fullframe_with_new_labels_img768\\person_fullframe_with_new_labels_img768_train.json"
+}

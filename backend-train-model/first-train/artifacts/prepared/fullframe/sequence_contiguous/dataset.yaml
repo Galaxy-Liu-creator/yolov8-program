@@ -1,0 +1,6 @@
+path: D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/backend-train-model/first-train/artifacts/prepared/fullframe/sequence_contiguous
+train: images/train
+val: images/val
+test: images/test
+names:
+  0: clothes

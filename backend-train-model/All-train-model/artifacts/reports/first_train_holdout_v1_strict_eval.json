@@ -1,0 +1,129 @@
+{
+  "runtime": {
+    "command": "evaluate",
+    "argv": [
+      "evaluate",
+      "--project-config",
+      "All-train-model\\merged_train_project_config.json",
+      "--dataset-yaml",
+      "All-train-model\\datasets\\unified_holdout_v1\\dataset.yaml",
+      "--weights",
+      "All-train-model\\artifacts\\runs\\clothes_first_train_holdout_v1\\weights\\best.pt",
+      "--imgsz",
+      "640",
+      "--batch",
+      "4",
+      "--workers",
+      "0",
+      "--device",
+      "cpu",
+      "--report-name",
+      "first_train_holdout_v1_strict_eval"
+    ],
+    "generated_at": "2026-04-11T12:09:21",
+    "config": {
+      "project_config_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\All-train-model\\merged_train_project_config.json",
+      "image_roots": [
+        "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\clothes\\group3_1\\clo\\D04_20260123074846",
+        "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\clothes\\group3_1\\clo\\D05_20260123074841",
+        "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\clothes\\group3_1\\clo\\D15_20260123074848"
+      ],
+      "label_root": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\clothes\\group3_1\\clo\\label-clo",
+      "image_extensions": [
+        ".jpg",
+        ".jpeg",
+        ".png"
+      ],
+      "class_names": {
+        "0": "clothes"
+      },
+      "ignored_label_filenames": [
+        "classes.txt"
+      ],
+      "split_ratios": {
+        "train": 0.7,
+        "val": 0.15,
+        "test": 0.15
+      },
+      "default_split_strategy": "sequence_contiguous",
+      "default_prepare_mode": "auto",
+      "default_include_empty_person_crops": false,
+      "default_limit_per_sequence": null,
+      "default_monitored_person_labels": [
+        "person"
+      ],
+      "default_person_conf": 0.2,
+      "default_person_imgsz": 640,
+      "default_assignment_min_ioa": 0.35,
+      "default_fallback_to_fullframe": true,
+      "default_allow_remote_model_download": false,
+      "default_person_model_candidates": [
+        "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\weights\\person_detect_yolov8.pt",
+        "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\inspection-flask\\weights\\person_detect_yolov8.pt"
+      ],
+      "default_python_candidates": [
+        "D:\\Miniconda3_python\\envs\\yolo_code\\python.exe"
+      ],
+      "default_train_args": {
+        "imgsz": 640,
+        "epochs": 180,
+        "batch": 4,
+        "patience": 40,
+        "workers": 0,
+        "device": "cpu",
+        "seed": 42
+      },
+      "artifacts_root": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\All-train-model\\artifacts",
+      "prepared_root": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\All-train-model\\artifacts\\prepared",
+      "runs_root": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\All-train-model\\artifacts\\runs",
+      "reports_root": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\All-train-model\\artifacts\\reports",
+      "export_root": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\All-train-model\\artifacts\\export"
+    }
+  },
+  "report_name": "first_train_holdout_v1_strict_eval.json",
+  "weights": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\All-train-model\\artifacts\\runs\\clothes_first_train_holdout_v1\\weights\\best.pt",
+  "weights_resolution_mode": "explicit_weights_path",
+  "weights_report_source": null,
+  "dataset_yaml": "All-train-model\\datasets\\unified_holdout_v1\\dataset.yaml",
+  "comparison_dataset_name": "unified_holdout_v1",
+  "dataset_metadata": {
+    "dataset_name": "unified_holdout_v1",
+    "dataset_yaml": "All-train-model\\datasets\\unified_holdout_v1\\dataset.yaml",
+    "dataset_root": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\All-train-model\\datasets\\unified_holdout_v1",
+    "class_names": {
+      "0": "clothes"
+    },
+    "class_count": 1,
+    "split_image_counts": {
+      "train": 0,
+      "val": 0,
+      "test": 75
+    },
+    "prepare_report_path": null,
+    "prepare_mode": null,
+    "prepare_split_strategy": null
+  },
+  "evaluated_splits": [
+    "test"
+  ],
+  "skipped_splits": [
+    "val"
+  ],
+  "native_eval": {
+    "test": {
+      "results_dict": {
+        "metrics/precision(B)": 0.8783676812100685,
+        "metrics/recall(B)": 0.82,
+        "metrics/mAP50(B)": 0.8581328650199707,
+        "metrics/mAP50-95(B)": 0.6366672438663711,
+        "fitness": 0.6366672438663711
+      },
+      "precision": 0.8783676812100685,
+      "recall": 0.82,
+      "map50": 0.8581328650199707,
+      "map75": 0.7232628625302504,
+      "map50_95": 0.6366672438663711
+    }
+  },
+  "report_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\All-train-model\\artifacts\\reports\\first_train_holdout_v1_strict_eval.json"
+}

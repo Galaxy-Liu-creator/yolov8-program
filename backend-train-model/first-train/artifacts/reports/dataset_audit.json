@@ -1,0 +1,189 @@
+{
+  "runtime": {
+    "command": "audit",
+    "argv": [
+      "audit"
+    ],
+    "generated_at": "2026-04-06T07:02:42",
+    "config": {
+      "project_config_path": "E:\\University_competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\project_config.json",
+      "image_roots": [
+        "E:\\University_competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\clothes\\group3_1\\clo\\D04_20260123074846",
+        "E:\\University_competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\clothes\\group3_1\\clo\\D05_20260123074841",
+        "E:\\University_competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\clothes\\group3_1\\clo\\D15_20260123074848"
+      ],
+      "label_root": "E:\\University_competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\clothes\\group3_1\\clo\\label-clo",
+      "image_extensions": [
+        ".jpg",
+        ".jpeg",
+        ".png"
+      ],
+      "class_names": {
+        "0": "clothes"
+      },
+      "ignored_label_filenames": [
+        "classes.txt"
+      ],
+      "split_ratios": {
+        "train": 0.7,
+        "val": 0.15,
+        "test": 0.15
+      },
+      "default_split_strategy": "sequence_contiguous",
+      "default_prepare_mode": "auto",
+      "default_include_empty_person_crops": false,
+      "default_limit_per_sequence": null,
+      "default_monitored_person_labels": [
+        "person"
+      ],
+      "default_person_conf": 0.2,
+      "default_person_imgsz": 640,
+      "default_assignment_min_ioa": 0.35,
+      "default_fallback_to_fullframe": true,
+      "default_allow_remote_model_download": false,
+      "default_person_model_candidates": [
+        "E:\\University_competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\weights\\person_detect_yolov8.pt",
+        "E:\\University_competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\inspection-flask\\weights\\person_detect_yolov8.pt"
+      ],
+      "default_python_candidates": [
+        "D:\\Miniconda3_python\\envs\\yolo_code\\python.exe"
+      ],
+      "default_train_args": {
+        "imgsz": 640,
+        "epochs": 180,
+        "batch": 4,
+        "patience": 40,
+        "workers": 0,
+        "device": "cpu",
+        "seed": 42
+      },
+      "artifacts_root": "E:\\University_competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\artifacts",
+      "prepared_root": "E:\\University_competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\artifacts\\prepared",
+      "runs_root": "E:\\University_competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\artifacts\\runs",
+      "reports_root": "E:\\University_competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\artifacts\\reports",
+      "export_root": "E:\\University_competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\artifacts\\export"
+    }
+  },
+  "audit": {
+    "image_roots": [
+      "E:\\University_competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\clothes\\group3_1\\clo\\D04_20260123074846",
+      "E:\\University_competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\clothes\\group3_1\\clo\\D05_20260123074841",
+      "E:\\University_competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\clothes\\group3_1\\clo\\D15_20260123074848"
+    ],
+    "label_root": "E:\\University_competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\clothes\\group3_1\\clo\\label-clo",
+    "total_images": 95,
+    "total_labels": 95,
+    "total_boxes": 319,
+    "boxes_by_sequence": {
+      "D04_20260123074846": 66,
+      "D05_20260123074841": 141,
+      "D15_20260123074848": 112
+    },
+    "samples_by_sequence": {
+      "D04_20260123074846": [
+        "D04_20260123074846_frame_0000.jpg",
+        "D04_20260123074846_frame_0001.jpg",
+        "D04_20260123074846_frame_0002.jpg",
+        "D04_20260123074846_frame_0003.jpg",
+        "D04_20260123074846_frame_0004.jpg",
+        "D04_20260123074846_frame_0005.jpg",
+        "D04_20260123074846_frame_0006.jpg",
+        "D04_20260123074846_frame_0007.jpg",
+        "D04_20260123074846_frame_0008.jpg",
+        "D04_20260123074846_frame_0009.jpg",
+        "D04_20260123074846_frame_0010.jpg",
+        "D04_20260123074846_frame_0011.jpg",
+        "D04_20260123074846_frame_0012.jpg",
+        "D04_20260123074846_frame_0013.jpg",
+        "D04_20260123074846_frame_0014.jpg",
+        "D04_20260123074846_frame_0015.jpg",
+        "D04_20260123074846_frame_0016.jpg",
+        "D04_20260123074846_frame_0017.jpg",
+        "D04_20260123074846_frame_0018.jpg",
+        "D04_20260123074846_frame_0019.jpg",
+        "D04_20260123074846_frame_0020.jpg",
+        "D04_20260123074846_frame_0021.jpg",
+        "D04_20260123074846_frame_0022.jpg",
+        "D04_20260123074846_frame_0023.jpg",
+        "D04_20260123074846_frame_0024.jpg"
+      ],
+      "D05_20260123074841": [
+        "D05_20260123074841_frame_0000.jpg",
+        "D05_20260123074841_frame_0001.jpg",
+        "D05_20260123074841_frame_0002.jpg",
+        "D05_20260123074841_frame_0003.jpg",
+        "D05_20260123074841_frame_0004.jpg",
+        "D05_20260123074841_frame_0005.jpg",
+        "D05_20260123074841_frame_0006.jpg",
+        "D05_20260123074841_frame_0007.jpg",
+        "D05_20260123074841_frame_0008.jpg",
+        "D05_20260123074841_frame_0009.jpg",
+        "D05_20260123074841_frame_0010.jpg",
+        "D05_20260123074841_frame_0011.jpg",
+        "D05_20260123074841_frame_0012.jpg",
+        "D05_20260123074841_frame_0013.jpg",
+        "D05_20260123074841_frame_0014.jpg",
+        "D05_20260123074841_frame_0015.jpg",
+        "D05_20260123074841_frame_0016.jpg",
+        "D05_20260123074841_frame_0017.jpg",
+        "D05_20260123074841_frame_0018.jpg",
+        "D05_20260123074841_frame_0019.jpg",
+        "D05_20260123074841_frame_0020.jpg",
+        "D05_20260123074841_frame_0021.jpg",
+        "D05_20260123074841_frame_0022.jpg",
+        "D05_20260123074841_frame_0023.jpg",
+        "D05_20260123074841_frame_0024.jpg",
+        "D05_20260123074841_frame_0025.jpg",
+        "D05_20260123074841_frame_0026.jpg",
+        "D05_20260123074841_frame_0027.jpg",
+        "D05_20260123074841_frame_0028.jpg",
+        "D05_20260123074841_frame_0029.jpg",
+        "D05_20260123074841_frame_0030.jpg",
+        "D05_20260123074841_frame_0031.jpg",
+        "D05_20260123074841_frame_0032.jpg"
+      ],
+      "D15_20260123074848": [
+        "D15_20260123074848_frame_0000.jpg",
+        "D15_20260123074848_frame_0001.jpg",
+        "D15_20260123074848_frame_0002.jpg",
+        "D15_20260123074848_frame_0003.jpg",
+        "D15_20260123074848_frame_0004.jpg",
+        "D15_20260123074848_frame_0005.jpg",
+        "D15_20260123074848_frame_0006.jpg",
+        "D15_20260123074848_frame_0007.jpg",
+        "D15_20260123074848_frame_0008.jpg",
+        "D15_20260123074848_frame_0009.jpg",
+        "D15_20260123074848_frame_0010.jpg",
+        "D15_20260123074848_frame_0011.jpg",
+        "D15_20260123074848_frame_0012.jpg",
+        "D15_20260123074848_frame_0013.jpg",
+        "D15_20260123074848_frame_0014.jpg",
+        "D15_20260123074848_frame_0015.jpg",
+        "D15_20260123074848_frame_0016.jpg",
+        "D15_20260123074848_frame_0017.jpg",
+        "D15_20260123074848_frame_0018.jpg",
+        "D15_20260123074848_frame_0019.jpg",
+        "D15_20260123074848_frame_0020.jpg",
+        "D15_20260123074848_frame_0021.jpg",
+        "D15_20260123074848_frame_0022.jpg",
+        "D15_20260123074848_frame_0023.jpg",
+        "D15_20260123074848_frame_0024.jpg",
+        "D15_20260123074848_frame_0025.jpg",
+        "D15_20260123074848_frame_0026.jpg",
+        "D15_20260123074848_frame_0027.jpg",
+        "D15_20260123074848_frame_0028.jpg",
+        "D15_20260123074848_frame_0029.jpg",
+        "D15_20260123074848_frame_0030.jpg",
+        "D15_20260123074848_frame_0031.jpg",
+        "D15_20260123074848_frame_0032.jpg",
+        "D15_20260123074848_frame_0033.jpg",
+        "D15_20260123074848_frame_0034.jpg",
+        "D15_20260123074848_frame_0035.jpg",
+        "D15_20260123074848_frame_0036.jpg"
+      ]
+    },
+    "ignored_label_files": [
+      "E:\\University_competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\clothes\\group3_1\\clo\\label-clo\\classes.txt"
+    ]
+  }
+}

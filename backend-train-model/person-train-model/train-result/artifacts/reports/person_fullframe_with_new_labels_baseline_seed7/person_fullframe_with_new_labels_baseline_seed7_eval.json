@@ -1,0 +1,145 @@
+{
+  "runtime": {
+    "command": "evaluate",
+    "argv": [
+      "evaluate",
+      "--project-config",
+      "E:\\Competition\\backend-train-model\\backend-train-model\\person-train-model\\person_project_config.fullframe_with_new_labels.json",
+      "--dataset-yaml",
+      "E:\\Competition\\backend-train-model\\backend-train-model\\person-train-model\\train-result\\prepared\\person_fullframe_with_new_labels\\sequence_contiguous\\dataset.yaml",
+      "--weights",
+      "E:\\Competition\\backend-train-model\\backend-train-model\\person-train-model\\train-result\\artifacts\\runs\\person_fullframe_with_new_labels_baseline_seed7\\weights\\best.pt",
+      "--imgsz",
+      "640",
+      "--batch",
+      "4",
+      "--workers",
+      "4",
+      "--device",
+      "0",
+      "--report-name",
+      "person_fullframe_with_new_labels_baseline_seed7_eval"
+    ],
+    "generated_at": "2026-05-15T09:09:22",
+    "config": {
+      "project_config_path": "E:\\Competition\\backend-train-model\\backend-train-model\\person-train-model\\person_project_config.fullframe_with_new_labels.json",
+      "image_roots": [
+        "E:\\Competition\\frame_label\\person_labels\\group3_1\\D04_20260123074846",
+        "E:\\Competition\\frame_label\\person_labels\\group3_1\\D05_20260123074841",
+        "E:\\Competition\\frame_label\\person_labels\\group3_1\\D15_20260123074848",
+        "E:\\Competition\\frame_label\\person_labels\\group3_2\\1",
+        "E:\\Competition\\frame_label\\person_labels\\group3_2\\D15_20260119203927",
+        "E:\\Competition\\frame_label\\person_labels\\group3_3\\D02_20260123070624",
+        "E:\\Competition\\frame_label\\person_labels\\group3_3\\D02_20260123074836",
+        "E:\\Competition\\frame_label\\new_person_labels\\images"
+      ],
+      "label_root": "E:\\Competition\\backend-train-model\\backend-train-model\\person-train-model\\train-result\\working\\aggregated_labels_fullframe_with_new_labels",
+      "image_extensions": [
+        ".jpg"
+      ],
+      "class_names": {
+        "0": "person"
+      },
+      "ignored_label_filenames": [
+        "classes.txt"
+      ],
+      "split_ratios": {
+        "train": 0.7,
+        "val": 0.15,
+        "test": 0.15
+      },
+      "default_split_strategy": "sequence_contiguous",
+      "default_prepare_mode": "fullframe",
+      "default_include_empty_person_crops": false,
+      "default_limit_per_sequence": null,
+      "default_monitored_person_labels": [
+        "person"
+      ],
+      "default_person_conf": 0.2,
+      "default_person_imgsz": 640,
+      "default_assignment_min_ioa": 0.35,
+      "default_fallback_to_fullframe": true,
+      "default_allow_remote_model_download": false,
+      "default_person_model_candidates": [
+        "E:\\Competition\\backend-train-model\\backend-train-model\\weights\\person_detect_yolov8.pt",
+        "E:\\Competition\\backend-train-model\\inspection-flask\\weights\\person_detect_yolov8.pt"
+      ],
+      "default_python_candidates": [
+        "E:\\Miniconda3\\envs\\yolo_Code\\python.exe"
+      ],
+      "default_train_args": {
+        "imgsz": 640,
+        "epochs": 180,
+        "batch": 4,
+        "patience": 40,
+        "workers": 4,
+        "device": "0",
+        "seed": 42
+      },
+      "artifacts_root": "E:\\Competition\\backend-train-model\\backend-train-model\\person-train-model\\train-result\\artifacts",
+      "prepared_root": "E:\\Competition\\backend-train-model\\backend-train-model\\person-train-model\\train-result\\artifacts\\prepared",
+      "runs_root": "E:\\Competition\\backend-train-model\\backend-train-model\\person-train-model\\train-result\\artifacts\\runs",
+      "reports_root": "E:\\Competition\\backend-train-model\\backend-train-model\\person-train-model\\train-result\\artifacts\\reports",
+      "export_root": "E:\\Competition\\backend-train-model\\backend-train-model\\person-train-model\\train-result\\artifacts\\export"
+    }
+  },
+  "report_name": "person_fullframe_with_new_labels_baseline_seed7_eval.json",
+  "weights": "E:\\Competition\\backend-train-model\\backend-train-model\\person-train-model\\train-result\\artifacts\\runs\\person_fullframe_with_new_labels_baseline_seed7\\weights\\best.pt",
+  "weights_resolution_mode": "explicit_weights_path",
+  "weights_report_source": null,
+  "dataset_yaml": "E:\\Competition\\backend-train-model\\backend-train-model\\person-train-model\\train-result\\prepared\\person_fullframe_with_new_labels\\sequence_contiguous\\dataset.yaml",
+  "comparison_dataset_name": "sequence_contiguous",
+  "dataset_metadata": {
+    "dataset_name": "sequence_contiguous",
+    "dataset_yaml": "E:\\Competition\\backend-train-model\\backend-train-model\\person-train-model\\train-result\\prepared\\person_fullframe_with_new_labels\\sequence_contiguous\\dataset.yaml",
+    "dataset_root": "E:\\Competition\\backend-train-model\\backend-train-model\\person-train-model\\train-result\\prepared\\person_fullframe_with_new_labels\\sequence_contiguous",
+    "class_names": {
+      "0": "person"
+    },
+    "class_count": 1,
+    "split_image_counts": {
+      "train": 2105,
+      "val": 453,
+      "test": 451
+    },
+    "prepare_report_path": "E:\\Competition\\backend-train-model\\backend-train-model\\person-train-model\\train-result\\prepared\\person_fullframe_with_new_labels\\sequence_contiguous\\prepare_report.json",
+    "prepare_mode": "fullframe",
+    "prepare_split_strategy": "sequence_contiguous"
+  },
+  "evaluated_splits": [
+    "val",
+    "test"
+  ],
+  "skipped_splits": [],
+  "native_eval": {
+    "val": {
+      "results_dict": {
+        "metrics/precision(B)": 0.9471696817052944,
+        "metrics/recall(B)": 0.8930350737267944,
+        "metrics/mAP50(B)": 0.9337789808137906,
+        "metrics/mAP50-95(B)": 0.504230302381546,
+        "fitness": 0.504230302381546
+      },
+      "precision": 0.9471696817052944,
+      "recall": 0.8930350737267944,
+      "map50": 0.9337789808137906,
+      "map75": 0.5040787925623749,
+      "map50_95": 0.504230302381546
+    },
+    "test": {
+      "results_dict": {
+        "metrics/precision(B)": 0.9291316029027765,
+        "metrics/recall(B)": 0.8636715724244771,
+        "metrics/mAP50(B)": 0.914007497021889,
+        "metrics/mAP50-95(B)": 0.4902250609070345,
+        "fitness": 0.4902250609070345
+      },
+      "precision": 0.9291316029027765,
+      "recall": 0.8636715724244771,
+      "map50": 0.914007497021889,
+      "map75": 0.46512660360249625,
+      "map50_95": 0.4902250609070345
+    }
+  },
+  "report_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\artifacts\\reports\\person_fullframe_with_new_labels_baseline_seed7\\person_fullframe_with_new_labels_baseline_seed7_eval.json"
+}

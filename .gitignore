@@ -5,7 +5,7 @@ docs/工服检测预定方案/
 *.jpeg
 *.txt
 *.csv
-**/artifacts/reports/
+
 !*.pt
 datasets/
 review/

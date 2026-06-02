@@ -1,0 +1,78 @@
+{
+  "runtime": {
+    "command": "export",
+    "argv": [
+      "export",
+      "--project-config",
+      "All-train-model\\merged_train_project_config.json",
+      "--weights",
+      "All-train-model\\artifacts\\runs\\clothes_merged_v2_from_first\\weights\\best.pt",
+      "--overwrite"
+    ],
+    "generated_at": "2026-04-10T16:02:29",
+    "config": {
+      "project_config_path": "E:\\University_competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\All-train-model\\merged_train_project_config.json",
+      "image_roots": [
+        "E:\\University_competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\clothes\\group3_1\\clo\\D04_20260123074846",
+        "E:\\University_competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\clothes\\group3_1\\clo\\D05_20260123074841",
+        "E:\\University_competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\clothes\\group3_1\\clo\\D15_20260123074848"
+      ],
+      "label_root": "E:\\University_competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\clothes\\group3_1\\clo\\label-clo",
+      "image_extensions": [
+        ".jpg",
+        ".jpeg",
+        ".png"
+      ],
+      "class_names": {
+        "0": "clothes"
+      },
+      "ignored_label_filenames": [
+        "classes.txt"
+      ],
+      "split_ratios": {
+        "train": 0.7,
+        "val": 0.15,
+        "test": 0.15
+      },
+      "default_split_strategy": "sequence_contiguous",
+      "default_prepare_mode": "auto",
+      "default_include_empty_person_crops": false,
+      "default_limit_per_sequence": null,
+      "default_monitored_person_labels": [
+        "person"
+      ],
+      "default_person_conf": 0.2,
+      "default_person_imgsz": 640,
+      "default_assignment_min_ioa": 0.35,
+      "default_fallback_to_fullframe": true,
+      "default_allow_remote_model_download": false,
+      "default_person_model_candidates": [
+        "E:\\University_competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\weights\\person_detect_yolov8.pt",
+        "E:\\University_competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\inspection-flask\\weights\\person_detect_yolov8.pt"
+      ],
+      "default_python_candidates": [
+        "D:\\Miniconda3_python\\envs\\yolo_code\\python.exe"
+      ],
+      "default_train_args": {
+        "imgsz": 640,
+        "epochs": 180,
+        "batch": 4,
+        "patience": 40,
+        "workers": 0,
+        "device": "cpu",
+        "seed": 42
+      },
+      "artifacts_root": "E:\\University_competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\All-train-model\\artifacts",
+      "prepared_root": "E:\\University_competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\All-train-model\\artifacts\\prepared",
+      "runs_root": "E:\\University_competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\All-train-model\\artifacts\\runs",
+      "reports_root": "E:\\University_competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\All-train-model\\artifacts\\reports",
+      "export_root": "E:\\University_competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\All-train-model\\artifacts\\export"
+    }
+  },
+  "source_weight": "E:\\University_competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\All-train-model\\artifacts\\runs\\clothes_merged_v2_from_first\\weights\\best.pt",
+  "weights_resolution_mode": "explicit_weights_path",
+  "weights_report_source": null,
+  "export_target": "E:\\University_competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\All-train-model\\artifacts\\export\\workwear_detect_yolov8.pt",
+  "deployed_target": null,
+  "metadata_path": "E:\\University_competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\All-train-model\\artifacts\\export\\workwear_detect_yolov8.metadata.json"
+}

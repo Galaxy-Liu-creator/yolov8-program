@@ -1,0 +1,129 @@
+{
+  "runtime": {
+    "command": "train",
+    "argv": [
+      "train",
+      "--project-config",
+      "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\person_project_config.json",
+      "--resume",
+      "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\artifacts\\runs\\person_fullframe_baseline\\weights\\last.pt"
+    ],
+    "generated_at": "2026-04-17T10:14:45",
+    "config": {
+      "project_config_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\person_project_config.json",
+      "image_roots": [
+        "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_1\\D04_20260123074846",
+        "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_1\\D05_20260123074841",
+        "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_1\\D15_20260123074848",
+        "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_2\\1",
+        "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_2\\D15_20260119203927",
+        "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_3\\D02_20260123070624",
+        "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_3\\D02_20260123074836"
+      ],
+      "label_root": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\working\\aggregated_labels",
+      "image_extensions": [
+        ".jpg"
+      ],
+      "class_names": {
+        "0": "person"
+      },
+      "ignored_label_filenames": [
+        "classes.txt"
+      ],
+      "split_ratios": {
+        "train": 0.7,
+        "val": 0.15,
+        "test": 0.15
+      },
+      "default_split_strategy": "sequence_contiguous",
+      "default_prepare_mode": "fullframe",
+      "default_include_empty_person_crops": false,
+      "default_limit_per_sequence": null,
+      "default_monitored_person_labels": [
+        "person"
+      ],
+      "default_person_conf": 0.2,
+      "default_person_imgsz": 640,
+      "default_assignment_min_ioa": 0.35,
+      "default_fallback_to_fullframe": true,
+      "default_allow_remote_model_download": false,
+      "default_person_model_candidates": [
+        "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\weights\\person_detect_yolov8.pt",
+        "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\inspection-flask\\weights\\person_detect_yolov8.pt"
+      ],
+      "default_python_candidates": [
+        "D:\\Miniconda3_python\\envs\\yolo_code\\python.exe"
+      ],
+      "default_train_args": {
+        "imgsz": 640,
+        "epochs": 180,
+        "batch": 4,
+        "patience": 40,
+        "workers": 0,
+        "device": "cpu",
+        "seed": 42
+      },
+      "artifacts_root": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\artifacts",
+      "prepared_root": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\artifacts\\prepared",
+      "runs_root": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\artifacts\\runs",
+      "reports_root": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\artifacts\\reports",
+      "export_root": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\artifacts\\export"
+    }
+  },
+  "dataset_yaml": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\prepared\\person_fullframe\\sequence_contiguous\\dataset.yaml",
+  "dataset_metadata": {
+    "dataset_name": "sequence_contiguous",
+    "dataset_yaml": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\prepared\\person_fullframe\\sequence_contiguous\\dataset.yaml",
+    "dataset_root": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\prepared\\person_fullframe\\sequence_contiguous",
+    "class_names": {
+      "0": "person"
+    },
+    "class_count": 1,
+    "split_image_counts": {
+      "train": 350,
+      "val": 77,
+      "test": 75
+    },
+    "prepare_report_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\prepared\\person_fullframe\\sequence_contiguous\\prepare_report.json",
+    "prepare_mode": "fullframe",
+    "prepare_split_strategy": "sequence_contiguous"
+  },
+  "base_model": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\artifacts\\runs\\person_fullframe_baseline\\weights\\last.pt",
+  "base_model_source": "resume_checkpoint",
+  "initial_base_model": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\artifacts\\runs\\person_fullframe_baseline\\weights\\last.pt",
+  "initial_base_model_source": "resume_checkpoint",
+  "allow_remote_model_download": false,
+  "from_scratch": false,
+  "pretrained": true,
+  "init_weights": null,
+  "init_weights_source": null,
+  "training_lineage": [
+    {
+      "event": "resume",
+      "generated_at": "2026-04-17T08:58:56",
+      "resume_checkpoint": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\artifacts\\runs\\person_fullframe_baseline\\weights\\last.pt",
+      "resume_source": "explicit_resume_path",
+      "resume_report_source": null
+    }
+  ],
+  "resume": true,
+  "resume_checkpoint": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\artifacts\\runs\\person_fullframe_baseline\\weights\\last.pt",
+  "resume_source": "explicit_resume_path",
+  "resume_report_source": null,
+  "run_project": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\artifacts\\runs",
+  "requested_run_name": "person_fullframe_baseline",
+  "actual_run_name": "person_fullframe_baseline",
+  "run_name": "person_fullframe_baseline",
+  "run_dir": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\artifacts\\runs\\person_fullframe_baseline",
+  "best_weight": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\artifacts\\runs\\person_fullframe_baseline\\weights\\best.pt",
+  "last_weight": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\artifacts\\runs\\person_fullframe_baseline\\weights\\last.pt",
+  "imgsz": 640,
+  "epochs": 180,
+  "batch": 4,
+  "patience": 40,
+  "workers": 0,
+  "device": "cpu",
+  "seed": 42,
+  "single_cls": true,
+  "report_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\artifacts\\reports\\person_fullframe_baseline\\person_fullframe_baseline_train.json"
+}
