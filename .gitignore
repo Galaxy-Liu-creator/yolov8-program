@@ -1,7 +1,12 @@
 inspection-flask_old/
-backend-train-model/weights/yolov8n.pt
 docs/工服检测预定方案/
-artifacts/
+*.png
+*.jpg
+*.jpeg
+*.txt
+*.csv
+**/artifacts/reports/
+!*.pt
 datasets/
 review/
 __pycache__/
