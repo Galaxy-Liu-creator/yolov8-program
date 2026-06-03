@@ -377,7 +377,7 @@ labelme
 例如：
 
 ```powershell
-labelme D:\University-Competition\Innovation_Entrepreneurship\MyProgram\yolov8-program\backend-train-model\person-train-model\roi-work\D15_20260119203927\frames
+labelme backend-train-model\person-train-model\roi-work\D15_20260119203927\frames
 ```
 
 ### 9.3 指定标注输出目录
@@ -385,7 +385,7 @@ labelme D:\University-Competition\Innovation_Entrepreneurship\MyProgram\yolov8-p
 更推荐直接指定一个单独输出目录，例如：
 
 ```powershell
-labelme D:\University-Competition\Innovation_Entrepreneurship\MyProgram\yolov8-program\backend-train-model\person-train-model\roi-work\D15_20260119203927\frames --output D:\University-Competition\Innovation_Entrepreneurship\MyProgram\yolov8-program\backend-train-model\person-train-model\roi-work\D15_20260119203927\roi-json
+labelme backend-train-model\person-train-model\roi-work\D15_20260119203927\frames --output backend-train-model\person-train-model\roi-work\D15_20260119203927\roi-json
 ```
 
 这样图片和 `json` 会分开，比较干净。
@@ -637,13 +637,13 @@ D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-
 如果已经有现成目录，也可以直接复用。例如当前逐图 ROI JSON 可直接放在 / 读取自：
 
 ```text
-D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\roi-json\group3_1\D04_20260123074846\roi-json
-D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\roi-json\group3_1\D05_20260123074841\roi-json
-D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\roi-json\group3_1\D15_20260123074848\roi-json
-D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\roi-json\group3_2\1\roi-json
-D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\roi-json\group3_2\D15_20260119203927\roi-json
-D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\roi-json\group3_3\D02_20260123070624\roi-json
-D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\roi-json\group3_3\D02_20260123074836\roi-json
+../frame_label/roi-json/group3_1/D04_20260123074846/roi-json
+../frame_label/roi-json/group3_1/D05_20260123074841/roi-json
+../frame_label/roi-json/group3_1/D15_20260123074848/roi-json
+../frame_label/roi-json/group3_2/1/roi-json
+../frame_label/roi-json/group3_2/D15_20260119203927/roi-json
+../frame_label/roi-json/group3_3/D02_20260123070624/roi-json
+../frame_label/roi-json/group3_3/D02_20260123074836/roi-json
 ```
 
 此时不用复制到 `backend-train-model/person-train-model/roi-work/`，直接在提取命令里传公共根目录即可：
@@ -813,4 +813,3 @@ uvx labelme
 - “当前最新稳定版 `labelme 6.1.0`、发布时间 `2026-04-16`、要求 `Python >= 3.10`”来自 `PyPI`；
 - “官方当前推荐使用 `uv` 安装 Labelme”来自 Labelme 官方安装文档；
 - “推荐本项目优先使用独立 `Python 3.10` Conda 环境”是结合当前仓库 `yolo_code = Python 3.9.25` 的工程建议。
-

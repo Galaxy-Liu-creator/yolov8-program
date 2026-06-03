@@ -19,6 +19,7 @@ from __future__ import annotations
 """
 
 import json
+import os
 import sys
 from pathlib import Path
 from typing import Any, Dict, Iterable, Mapping, Optional, Sequence, Union
@@ -27,6 +28,31 @@ from typing import Any, Dict, Iterable, Mapping, Optional, Sequence, Union
 SCRIPT_ROOT = Path(__file__).resolve().parent
 # 项目根目录，即 `yolov8-program/`。
 PROJECT_ROOT = SCRIPT_ROOT.parent
+# 仓库外原始数据默认与仓库同级放置在 `../frame_label`，也允许通过环境变量覆盖。
+FRAME_LABEL_ROOT_ENV = "YOLO_FRAME_LABEL_ROOT"
+
+
+def _resolve_external_data_root() -> Path:
+    """解析仓库外原始数据根目录。"""
+
+    raw_value = os.environ.get(FRAME_LABEL_ROOT_ENV, "").strip()
+    if not raw_value:
+        return (PROJECT_ROOT.parent / "frame_label").resolve()
+
+    candidate = Path(raw_value).expanduser()
+    if candidate.is_absolute():
+        return candidate.resolve()
+    return (PROJECT_ROOT / candidate).resolve()
+
+
+EXTERNAL_DATA_ROOT = _resolve_external_data_root()
+
+
+def _external_data_path(*parts: str) -> Path:
+    """在仓库外原始数据根目录下拼接子路径。"""
+
+    return (EXTERNAL_DATA_ROOT.joinpath(*parts)).resolve()
+
 # 后端训练默认读取的项目化配置文件。
 DEFAULT_PROJECT_CONFIG_PATH = SCRIPT_ROOT / "project_config.json"
 
@@ -73,15 +99,13 @@ INSPECTION_WORKWEAR_TARGET = INSPECTION_WEIGHTS_ROOT / "workwear_detect_yolov8.p
 # 因此默认单源入口直接指向这些序列目录。
 # 如需多源 merged 训练，请改用 `backend-train-model/All-train-model/*.build.json`。
 IMAGE_ROOTS = [
-    Path(r"D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes_labels\group3_1\clo\D04_20260123074846"),
-    Path(r"D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes_labels\group3_1\clo\D05_20260123074841"),
-    Path(r"D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes_labels\group3_1\clo\D15_20260123074848"),
+    _external_data_path("clothes_labels", "group3_1", "clo", "D04_20260123074846"),
+    _external_data_path("clothes_labels", "group3_1", "clo", "D05_20260123074841"),
+    _external_data_path("clothes_labels", "group3_1", "clo", "D15_20260123074848"),
 ]
 
 # 当前项目使用统一标签目录，标签文件通过“同名 stem”与图片配对。
-LABEL_ROOT = Path(
-    r"D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes_labels\group3_1\clo\label-clo"
-)
+LABEL_ROOT = _external_data_path("clothes_labels", "group3_1", "clo", "label-clo")
 
 # 支持识别为训练图片的扩展名。
 IMAGE_EXTENSIONS = (".jpg", ".jpeg", ".png")
@@ -153,6 +177,7 @@ DEFAULT_PERSON_MODEL_CANDIDATES = [
 # 优先使用仓库约定的 Conda 环境；如果找不到，再退回当前解释器。
 DEFAULT_PYTHON_CANDIDATES = [
     Path(r"D:\Miniconda3_python\envs\yolo_code\python.exe"),
+    Path(r"E:\Miniconda3\envs\yolo_Code\python.exe"),
     Path(sys.executable),
 ]
 

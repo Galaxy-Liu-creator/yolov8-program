@@ -12,7 +12,8 @@
   },
   "models": {
     "python_candidates": [
-      "D:\\Miniconda3_python\\envs\\yolo_code\\python.exe"
+      "D:\\Miniconda3_python\\envs\\yolo_code\\python.exe",
+      "E:\\Miniconda3\\envs\\yolo_Code\\python.exe"
     ]
   },
   "training": {

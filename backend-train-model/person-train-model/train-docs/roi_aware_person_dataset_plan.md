@@ -306,7 +306,7 @@ ROI 边缘的人最容易出现：
 
 当前真实数据已采用逐图 ROI JSON：
 
-- ROI JSON 来源：`D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\roi-json\...\roi-json`
+- ROI JSON 来源：`../frame_label/roi-json/.../roi-json`
 - 已生成逐图 ROI 配置：`train-result/working/roi/roi_config.generated.json`
 - 已生成 ROI-aware 数据集：`train-result/prepared/person_roi_aware/sequence_contiguous/`
 
@@ -330,4 +330,3 @@ ROI 边缘的人最容易出现：
 因此下一步推荐不是“少标一些人”，而是：
 
 **保留母标注，新增 ROI-aware 派生数据集。**
-

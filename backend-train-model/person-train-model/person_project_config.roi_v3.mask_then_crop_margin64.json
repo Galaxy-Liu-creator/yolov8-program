@@ -4,13 +4,13 @@
   },
   "data": {
     "image_roots": [
-      "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_1\\D04_20260123074846",
-      "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_1\\D05_20260123074841",
-      "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_1\\D15_20260123074848",
-      "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_2\\1",
-      "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_2\\D15_20260119203927",
-      "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_3\\D02_20260123070624",
-      "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_3\\D02_20260123074836"
+      "../../../frame_label/person_labels/group3_1/D04_20260123074846",
+      "../../../frame_label/person_labels/group3_1/D05_20260123074841",
+      "../../../frame_label/person_labels/group3_1/D15_20260123074848",
+      "../../../frame_label/person_labels/group3_2/1",
+      "../../../frame_label/person_labels/group3_2/D15_20260119203927",
+      "../../../frame_label/person_labels/group3_3/D02_20260123070624",
+      "../../../frame_label/person_labels/group3_3/D02_20260123074836"
     ],
     "image_extensions": [
       ".jpg"
@@ -44,7 +44,7 @@
     "enabled": true,
     "mode": "mask_then_crop",
     "crop_margin_px": 64,
-    "json_root": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\roi-json",
+    "json_root": "../../../frame_label/roi-json",
     "work_root": "roi-work-v3-mask-then-crop-margin64",
     "keep_rule": {
       "center_inside": false,
@@ -56,7 +56,8 @@
   "models": {
     "allow_remote_model_download": false,
     "python_candidates": [
-      "D:\\Miniconda3_python\\envs\\yolo_code\\python.exe"
+      "D:\\Miniconda3_python\\envs\\yolo_code\\python.exe",
+      "E:\\Miniconda3\\envs\\yolo_Code\\python.exe"
     ]
   },
   "training": {
@@ -86,50 +87,50 @@
         "source_id": "g31",
         "group": "group3_1",
         "sequence_name": "D04_20260123074846",
-        "image_root": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_1\\D04_20260123074846",
-        "label_root": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_1\\labels"
+        "image_root": "../../../frame_label/person_labels/group3_1/D04_20260123074846",
+        "label_root": "../../../frame_label/person_labels/group3_1/labels"
       },
       {
         "source_id": "g31",
         "group": "group3_1",
         "sequence_name": "D05_20260123074841",
-        "image_root": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_1\\D05_20260123074841",
-        "label_root": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_1\\labels"
+        "image_root": "../../../frame_label/person_labels/group3_1/D05_20260123074841",
+        "label_root": "../../../frame_label/person_labels/group3_1/labels"
       },
       {
         "source_id": "g31",
         "group": "group3_1",
         "sequence_name": "D15_20260123074848",
-        "image_root": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_1\\D15_20260123074848",
-        "label_root": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_1\\labels"
+        "image_root": "../../../frame_label/person_labels/group3_1/D15_20260123074848",
+        "label_root": "../../../frame_label/person_labels/group3_1/labels"
       },
       {
         "source_id": "g32",
         "group": "group3_2",
         "sequence_name": "D15_20260119061405",
-        "image_root": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_2\\1",
-        "label_root": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_2\\labels"
+        "image_root": "../../../frame_label/person_labels/group3_2/1",
+        "label_root": "../../../frame_label/person_labels/group3_2/labels"
       },
       {
         "source_id": "g32",
         "group": "group3_2",
         "sequence_name": "D15_20260119203927",
-        "image_root": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_2\\D15_20260119203927",
-        "label_root": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_2\\labels"
+        "image_root": "../../../frame_label/person_labels/group3_2/D15_20260119203927",
+        "label_root": "../../../frame_label/person_labels/group3_2/labels"
       },
       {
         "source_id": "g33",
         "group": "group3_3",
         "sequence_name": "D02_20260123070624",
-        "image_root": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_3\\D02_20260123070624",
-        "label_root": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_3\\labels"
+        "image_root": "../../../frame_label/person_labels/group3_3/D02_20260123070624",
+        "label_root": "../../../frame_label/person_labels/group3_3/labels"
       },
       {
         "source_id": "g33",
         "group": "group3_3",
         "sequence_name": "D02_20260123074836",
-        "image_root": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_3\\D02_20260123074836",
-        "label_root": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_3\\labels"
+        "image_root": "../../../frame_label/person_labels/group3_3/D02_20260123074836",
+        "label_root": "../../../frame_label/person_labels/group3_3/labels"
       }
     ]
   }

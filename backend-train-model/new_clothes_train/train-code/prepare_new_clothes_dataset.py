@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import csv
 import json
+import os
 import random
 import re
 import shutil
@@ -15,17 +16,28 @@ REPO_ROOT = Path(__file__).resolve().parents[3]
 BACKEND_ROOT = REPO_ROOT / "backend-train-model"
 NEW_CLOTHES_ROOT = BACKEND_ROOT / "new_clothes_train"
 ALL_TRAIN_ROOT = BACKEND_ROOT / "All-train-model"
+FRAME_LABEL_ROOT_ENV = "YOLO_FRAME_LABEL_ROOT"
+
+
+def resolve_frame_label_root() -> Path:
+    """解析仓库外 frame_label 根目录。"""
+
+    raw_value = os.environ.get(FRAME_LABEL_ROOT_ENV, "").strip()
+    if not raw_value:
+        return (REPO_ROOT.parent / "frame_label").resolve()
+
+    candidate = Path(raw_value).expanduser()
+    if candidate.is_absolute():
+        return candidate.resolve()
+    return (REPO_ROOT / candidate).resolve()
 
 OLD_BUILD_CONFIG_PATH = ALL_TRAIN_ROOT / "merged_clothes_v2_balanced.build.json"
 OLD_TRAINVAL_SPLIT_PATH = ALL_TRAIN_ROOT / "splits" / "trainval_balanced_v1.split.csv"
 OLD_HOLDOUT_SPLIT_PATH = ALL_TRAIN_ROOT / "splits" / "unified_holdout_v1.split.csv"
 
-NEW_IMAGE_ROOT = Path(
-    r"D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\new_clothes_labels\images"
-)
-NEW_RAW_LABEL_ROOT = Path(
-    r"D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\new_clothes_labels\clothes_labels"
-)
+FRAME_LABEL_ROOT = resolve_frame_label_root()
+NEW_IMAGE_ROOT = FRAME_LABEL_ROOT / "new_clothes_labels" / "images"
+NEW_RAW_LABEL_ROOT = FRAME_LABEL_ROOT / "new_clothes_labels" / "clothes_labels"
 
 NEW_SOURCE_ID = "gnew"
 NEW_SEQUENCE_NAME = "new_clothes_flat_2507"

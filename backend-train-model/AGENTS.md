@@ -43,6 +43,7 @@
 - 其中 `backend-train-model/person-train-model/person_project_config.json` 当前只保留为兼容 / 历史入口；正式 ROI-aware 版本应优先使用独立版本化配置文件。
 - person 扩样但尚未补齐 ROI 时，优先使用独立 fullframe 配置：`backend-train-model/person-train-model/person_project_config.fullframe_with_new_labels.json`，不要直接覆盖当前 ROI-aware 主配置。
 - 新增配置项后，同步检查 CLI 默认值、训练 / 评估 / 导出报告、文档和 update log 是否一致。
+- 当前仓库外原始数据默认采用 sibling layout：父目录下同时存在 `yolov8-program/` 与 `frame_label/`；配置文件内优先使用各自目录可解析的相对路径，默认数据根可统一理解为相对于仓库根的 `../frame_label`，如需兼容特殊机器可通过环境变量 `YOLO_FRAME_LABEL_ROOT` 覆盖。
 - 历史 `build_report.json` 只记录当时构建状态，可能包含旧绝对路径；当前路径以配置文件为准。
 
 ## 5. 工服训练现状
@@ -63,7 +64,7 @@
 - 历史 ROI-aware v1 数据集输出：`502` 张图，保留框 `1343`，丢弃框 `315`，裁剪框 `49`，ROI 空负样本 `12`。
 - `person_roi_aware_baseline` test：Precision `0.9390`，Recall `0.5950`，mAP50 `0.6738`，mAP50-95 `0.3867`，当前作为历史对照保留。
 - 已新增 fullframe 扩样配置：`person_project_config.fullframe_with_new_labels.json`；它把原有 `502` 张图与 `new_person_labels` 的 `2507` 张图合并用于 fullframe person，但当前显式设置 `roi.enabled=false`，避免在新样本尚未补齐 ROI 前误接入 ROI-aware 流程。
-- 已新增方案 C fullframe 配置：`person_project_config.fullframe_with_new_labels_and_hard_examples.v1.json`；它把 `person_fullframe_with_new_labels` 与 `all_labels\new_hard_examples` 一并并回 fullframe person 主训练集，当前默认初始化权重为 `person_fullframe_with_new_labels_baseline/weights/best.pt`；当前 prepare 汇总为总图 `4517`、最终空白负样本标签 `13`。
+- 已新增方案 C fullframe 配置：`person_project_config.fullframe_with_new_labels_and_hard_examples.v1.json`；它把 `person_fullframe_with_new_labels` 与 `../frame_label/new_hard_examples` 一并并回 fullframe person 主训练集，当前默认初始化权重为 `person_fullframe_with_new_labels_baseline/weights/best.pt`；当前 prepare 汇总为总图 `4517`、最终空白负样本标签 `13`。
 - 当前正式 ROI-aware 配置入口已版本化：
   - `person_project_config.roi_with_new_labels.v1.mask_then_crop_margin64.json`
   - `person_project_config.roi_v1.center_inside.json`

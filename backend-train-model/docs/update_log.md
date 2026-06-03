@@ -1,5 +1,43 @@
 # Update Log
 
+## 2026-06-03 统一 sibling layout 路径体系
+
+1. 变更来源：用户把本机原始图片与标注目录统一调整为 `frame_label`，并要求将项目中的路径体系改造为开发机 / 训练机共用的 sibling layout，避免继续依赖旧的 `all_labels` 与机器绝对路径。
+2. 变更总览：
+   - 将 `backend-train-model/config.py`、`project_config.json`、`All-train-model/*.build.json`、`new_clothes_train/clothes_merged_with_new_labels_v1.build.json`、`person_project_config*.json` 中的原始数据路径统一改为相对 `frame_label` 的写法。
+   - 在 `config.py`、`prepare_new_hard_examples_dataset.py`、`prepare_new_clothes_dataset.py`、`validate_new_clothes_source.py` 中新增 `YOLO_FRAME_LABEL_ROOT` 覆盖能力；默认按父目录下同时存在 `yolov8-program/` 与 `frame_label/` 的 sibling layout 解析外部数据根。
+   - 同步更新根 `AGENTS.md`、`backend-train-model/AGENTS.md`、`docs/dataset.md`、`docs/目录结构说明.md` 以及多份训练运行文档，统一文档默认口径为 `../frame_label`，并把仓库位置相关命令改成相对进入方式。
+3. 涉及文件：
+   - `backend-train-model/config.py`
+   - `backend-train-model/project_config.json`
+   - `backend-train-model/All-train-model/*.build.json`
+   - `backend-train-model/new_clothes_train/clothes_merged_with_new_labels_v1.build.json`
+   - `backend-train-model/new_clothes_train/train-code/prepare_new_clothes_dataset.py`
+   - `backend-train-model/new_clothes_train/train-code/validate_new_clothes_source.py`
+   - `backend-train-model/person-train-model/person_project_config*.json`
+   - `backend-train-model/person-train-model/train-code/prepare_new_hard_examples_dataset.py`
+   - `AGENTS.md`
+   - `backend-train-model/AGENTS.md`
+   - `docs/dataset.md`
+   - `docs/目录结构说明.md`
+   - `backend-train-model/docs/README.md`
+   - `backend-train-model/docs/total-run-method.md`
+   - `backend-train-model/new_clothes_train/train-docs/new_clothes_run_method.md`
+   - `backend-train-model/person-train-model/train-docs/*.md`
+   - `backend-train-model/docs/update_log.md`
+4. 新增 / 变更配置项：
+   - 新增环境变量约定：`YOLO_FRAME_LABEL_ROOT`
+   - 默认仓库外数据根目录：相对于仓库根的 `../frame_label`
+   - 配置文件中的原始数据目录统一改为相对路径；其解析锚点仍保持“相对于各自配置文件所在目录”。
+5. 兼容性注意：
+   - 历史 `args.yaml`、历史训练 / 评估报告、旧 `build_report.json` 中保留的绝对路径属于历史快照，本轮不回写篡改，避免破坏可追溯性；当前实际执行口径以配置文件和更新后的文档为准。
+   - 若特殊机器无法满足 sibling layout，可显式设置 `YOLO_FRAME_LABEL_ROOT` 覆盖默认外部数据根。
+   - 本轮没有统一改写 `python_candidates` 中的解释器绝对路径；如训练机解释器位置不同，应优先通过实际激活环境运行，或后续再单独版本化该部分环境配置。
+6. 本轮明确不改动：
+   - 不重跑任何训练、评估、导出或 ROI-aware 数据集生成流程。
+   - 不修改历史训练产物、在线检测链路实现或 ROI JSON 标注内容。
+   - 不把历史日志条目中的旧机器绝对路径批量改写为新口径。
+
 ## 2026-06-01 新增 hard examples fullframe 并回方案与 holdout 变体
 
 1. 变更来源：用户确认执行方案 C，并要求同时补充 `new_hard_examples` 的 `sequence_holdout` 变体，以及审改 `backend-train-model/person-train-model/train-code/prepare_new_hard_examples_dataset.py` 的配对、冲突和审计能力。

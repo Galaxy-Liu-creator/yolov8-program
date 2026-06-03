@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import os
 import shutil
 from dataclasses import dataclass
 from datetime import datetime
@@ -12,9 +13,24 @@ from typing import Dict, List, Mapping, Optional, Sequence, Tuple
 from prepare_person_dataset import PERSON_ROOT, assert_directory_within_root
 
 
-DEFAULT_SOURCE_ROOT = (
-    PERSON_ROOT.parents[2] / "all_labels" / "new_hard_examples"
-).resolve()
+REPO_ROOT = PERSON_ROOT.parents[1]
+FRAME_LABEL_ROOT_ENV = "YOLO_FRAME_LABEL_ROOT"
+
+
+def resolve_frame_label_root() -> Path:
+    """解析仓库外 frame_label 根目录。"""
+
+    raw_value = os.environ.get(FRAME_LABEL_ROOT_ENV, "").strip()
+    if not raw_value:
+        return (REPO_ROOT.parent / "frame_label").resolve()
+
+    candidate = Path(raw_value).expanduser()
+    if candidate.is_absolute():
+        return candidate.resolve()
+    return (REPO_ROOT / candidate).resolve()
+
+
+DEFAULT_SOURCE_ROOT = (resolve_frame_label_root() / "new_hard_examples").resolve()
 DEFAULT_OUTPUT_PARENT_ROOT = (
     PERSON_ROOT
     / "train-result"
@@ -49,7 +65,7 @@ def default_output_root_for(split_strategy: str) -> Path:
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Prepare all_labels/new_hard_examples as a YOLO person dataset."
+        description="Prepare ../frame_label/new_hard_examples as a YOLO person dataset."
     )
     parser.add_argument(
         "--source-root",

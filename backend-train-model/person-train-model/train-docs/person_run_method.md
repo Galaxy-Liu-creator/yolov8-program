@@ -7,7 +7,7 @@
 在仓库根目录运行命令：
 
 ```powershell
-cd D:\University-Competition\Innovation_Entrepreneurship\MyProgram\yolov8-program
+Set-Location .
 ```
 
 确认使用 Conda 环境 `yolo_code` 的 Python：
@@ -57,7 +57,7 @@ Test-Path backend-train-model\person-train-model\train-result\artifacts\runs\per
 
 ## 当前定位
 
-- 本版本用于落地方案 C：把 `person_fullframe_with_new_labels` 的原有全量 fullframe person 数据，与 `all_labels\new_hard_examples` 的拥挤困难样本一起并回 fullframe 主训练集。
+- 本版本用于落地方案 C：把 `person_fullframe_with_new_labels` 的原有全量 fullframe person 数据，与 `../frame_label/new_hard_examples` 的拥挤困难样本一起并回 fullframe 主训练集。
 - 这条线不再把 hard examples 只当作独立 hard-only 微调集，而是把它们作为正式 fullframe person 增量来源，优先回答“并回主训练集后，能否在不丢掉常规场景的前提下补强拥挤近邻漏检”。
 - 当前 hard examples 仍然只有 `frames/labels`，没有配套 ROI JSON；因此本版本明确只覆盖 fullframe person 主线，不直接把 hard examples 接入 ROI-aware prepared 数据集。
 - 当前推荐 run 名：`person_fullframe_with_new_labels_and_hard_examples_v1_from_baseline`。
@@ -170,7 +170,7 @@ D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-
 
 ## 当前定位
 
-- 本版本用于把 `all_labels\new_hard_examples` 中针对拥挤场景“一框合两人”和“第二人无响应”问题补充的困难样本整理为独立 YOLO person 数据集。
+- 本版本用于把 `../frame_label/new_hard_examples` 中针对拥挤场景“一框合两人”和“第二人无响应”问题补充的困难样本整理为独立 YOLO person 数据集。
 - 数据集目录结构与现有 `person` prepared 数据集保持一致：`images/train|val|test`、`labels/train|val|test`、`dataset.yaml`、`prepare_report.json`。
 - 切分口径沿用 `person_roi_aware_with_new_labels_v1_mask_then_crop_margin64_from_fullframe` 的 `sequence_contiguous`，比例为 `train=0.70 / val=0.15 / test=0.15`。
 - 当前 hard examples 只有 `frames/labels`，没有对应 ROI JSON；因此本数据集不做 `mask_then_crop + margin64` 二次 ROI 变换，只复用最新主线的切分方式和 YOLO 目录结构。
@@ -180,7 +180,7 @@ D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-
 - person 项目配置：
   - `backend-train-model/person-train-model/person_project_config.new_hard_examples.v1.json`
 - 数据源：
-  - `D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\new_hard_examples`
+  - `../frame_label/new_hard_examples`
 - 数据集输出目录：
   - `backend-train-model/person-train-model/train-result/prepared/person_new_hard_examples_v1/sequence_contiguous`
 - 数据集 YAML：
@@ -292,7 +292,7 @@ D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-
 - person 项目配置：
   - `backend-train-model/person-train-model/person_project_config.roi_with_new_labels.v1.mask_then_crop_margin64.json`
 - 当前 ROI JSON 根目录：
-  - `D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\roi-json`
+  - `../frame_label/roi-json`
 - 当前已完成 ROI 核验的新增组：
   - `group_0001`
   - `group_0002`

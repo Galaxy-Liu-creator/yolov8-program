@@ -21,22 +21,22 @@
     {
       "source_id": "g31",
       "sequence_name": "D04_20260123074846",
-      "image_root": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\clothes_labels\\group3_1\\clo\\D04_20260123074846",
-      "label_root": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\clothes_labels\\group3_1\\clo\\label-clo",
+      "image_root": "../../../frame_label/clothes_labels/group3_1/clo/D04_20260123074846",
+      "label_root": "../../../frame_label/clothes_labels/group3_1/clo/label-clo",
       "split": "train"
     },
     {
       "source_id": "g31",
       "sequence_name": "D05_20260123074841",
-      "image_root": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\clothes_labels\\group3_1\\clo\\D05_20260123074841",
-      "label_root": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\clothes_labels\\group3_1\\clo\\label-clo",
+      "image_root": "../../../frame_label/clothes_labels/group3_1/clo/D05_20260123074841",
+      "label_root": "../../../frame_label/clothes_labels/group3_1/clo/label-clo",
       "split": "train"
     },
     {
       "source_id": "g31",
       "sequence_name": "D15_20260123074848",
-      "image_root": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\clothes_labels\\group3_1\\clo\\D15_20260123074848",
-      "label_root": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\clothes_labels\\group3_1\\clo\\label-clo",
+      "image_root": "../../../frame_label/clothes_labels/group3_1/clo/D15_20260123074848",
+      "label_root": "../../../frame_label/clothes_labels/group3_1/clo/label-clo",
       "split": "train"
     }
   ]

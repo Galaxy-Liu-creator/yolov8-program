@@ -15,24 +15,24 @@
 
 ## 2. 路径约定
 
-以下路径请按你的真实项目结构修改。
+本文档默认采用 sibling layout：父目录下同时存在 `yolov8-program/` 与 `frame_label/`，因此仓库外数据根目录统一写作相对于仓库根的 `../frame_label`。如果某台机器的绝对路径不同，只做本地映射，不改本文档默认口径；如需特殊兼容，可通过环境变量 `YOLO_FRAME_LABEL_ROOT` 覆盖。
 
 ### 默认单源训练入口（`backend-train-model/config.py` / `backend-train-model/project_config.json`）
 
-- 图片根目录 1：`D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes_labels\group3_1\clo\D04_20260123074846`
-- 图片根目录 2：`D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes_labels\group3_1\clo\D05_20260123074841`
-- 图片根目录 3：`D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes_labels\group3_1\clo\D15_20260123074848`
-- 标注根目录：`D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes_labels\group3_1\clo\label-clo`
+- 图片根目录 1：`../frame_label/clothes_labels/group3_1/clo/D04_20260123074846`
+- 图片根目录 2：`../frame_label/clothes_labels/group3_1/clo/D05_20260123074841`
+- 图片根目录 3：`../frame_label/clothes_labels/group3_1/clo/D15_20260123074848`
+- 标注根目录：`../frame_label/clothes_labels/group3_1/clo/label-clo`
 
 ### 多源 merged / All-train-model 入口（`backend-train-model/All-train-model/*.build.json`）
 
-- 图片根目录 4：`D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes_labels\group3_2\clo\1`
-- 图片根目录 5：`D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes_labels\group3_2\clo\D15_20260119203927`
-- 图片根目录 6：`D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes_labels\group3_3\clo\D02_20260123070624`
-- 图片根目录 7：`D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes_labels\group3_3\clo\D02_20260123074836`
-- `group3_1` 标注根目录：`D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes_labels\group3_1\clo\label-clo`
-- `group3_2` 标注根目录：`D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes_labels\group3_2\clo\label_clothes`
-- `group3_3` 标注根目录：`D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\clothes_labels\group3_3\clo\labels`
+- 图片根目录 4：`../frame_label/clothes_labels/group3_2/clo/1`
+- 图片根目录 5：`../frame_label/clothes_labels/group3_2/clo/D15_20260119203927`
+- 图片根目录 6：`../frame_label/clothes_labels/group3_3/clo/D02_20260123070624`
+- 图片根目录 7：`../frame_label/clothes_labels/group3_3/clo/D02_20260123074836`
+- `group3_1` 标注根目录：`../frame_label/clothes_labels/group3_1/clo/label-clo`
+- `group3_2` 标注根目录：`../frame_label/clothes_labels/group3_2/clo/label_clothes`
+- `group3_3` 标注根目录：`../frame_label/clothes_labels/group3_3/clo/labels`
 - 数据集配置文件：
   - 单源 clothes 入口：`backend-train-model/project_config.json`
   - merged 公共训练入口：`backend-train-model/All-train-model/merged_train_project_config.json`
@@ -49,6 +49,7 @@
 - 当前 clothes 图片文件实际直接位于各序列目录本身；更新配置时应把 `image_root` 指向序列目录，而不是额外拼接 `frames/`。
 - 当前单源 clothes 入口仍未单独沉淀仓库内 `dataset.yaml`，训练、校验、转换脚本仍需以本文档中的路径约定和配对规则为准。
 - merged clothes 与 person 训练线已经存在项目配置 / build 配置文件；更新这些配置时，也需要保证其内容与本文档保持一致。
+- 配置文件内部的相对路径会相对于各自所在目录解析，例如：`backend-train-model/project_config.json` 相对于 `backend-train-model/`，`backend-train-model/person-train-model/person_project_config*.json` 相对于 `backend-train-model/person-train-model/`。
 
 ## 3. 文件配对规则
 

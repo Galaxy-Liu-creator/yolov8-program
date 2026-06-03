@@ -4,6 +4,7 @@ import argparse
 import csv
 import json
 import shutil
+import sys
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, Iterable, List, Mapping, Optional, Sequence, Set, Tuple
@@ -617,7 +618,7 @@ def build_training_commands(
     recommended_run_name: str,
     output_root: Path,
 ) -> Dict[str, str]:
-    python_exe = r"D:\Miniconda3_python\envs\yolo_code\python.exe"
+    python_exe = sys.executable
     script_path = Path("backend-train-model") / "train_workwear.py"
     project_config_flag = ""
     if project_config is not None:

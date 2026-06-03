@@ -276,8 +276,8 @@
 
  所有修框 / 重标都应优先回到原始标签入口完成，例如：
 
- - `D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\person_labels\...`
- - `D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\new_person_labels\person_labels`
+ - `../frame_label/person_labels/...`
+ - `../frame_label/new_person_labels/person_labels`
 
  不要把修正直接打在：
 
@@ -452,4 +452,3 @@
  ## 11. 一句话执行口径
 
  > **先把人工复核结果转成“修标 + 补 hardest 邻近帧”的 fullframe 数据治理动作，再用 640 单因子 fullframe 修正上游 person 主线；不要把当前 hardest FN 还没转成训练动作的状态，直接跳进 new labels ROI-aware 正式训练。**
-

@@ -13,11 +13,11 @@
 
 ### 2.1 新增图片根目录
 
-- `D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\new_clothes_labels\images`
+- `../frame_label/new_clothes_labels/images`
 
 ### 2.2 新增标注根目录
 
-- `D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\new_clothes_labels\clothes_labels`
+- `../frame_label/new_clothes_labels/clothes_labels`
 
 ### 2.3 标注补全规则
 

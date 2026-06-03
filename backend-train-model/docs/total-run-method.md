@@ -26,7 +26,7 @@
 - 2026-04-11 起，`train_workwear.py` 已禁用长参数缩写；`--project` 不会再被误判为 `--project-config`，下面命令可以直接照抄执行。
 
 ```powershell
-Set-Location D:\University-Competition\Innovation_Entrepreneurship\MyProgram\yolov8-program\backend-train-model
+Set-Location .\backend-train-model
 ```
 
 ## 1. 构建三套统一对比数据集

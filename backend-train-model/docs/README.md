@@ -40,7 +40,7 @@
 ### 1. 进入项目根目录
 
 ```powershell
-cd D:\University-Competition\Innovation_Entrepreneurship\MyProgram\yolov8-program
+Set-Location .
 ```
 
 ### 2. 使用约定的 Python 环境

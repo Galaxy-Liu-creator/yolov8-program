@@ -101,8 +101,8 @@ new_person_labels_grouped/
 ## 5. 推荐执行顺序
 ### 5.1 第一步：先保留原始入口，不要直接改坏当前 fullframe 主线
 当前建议把原始数据入口先视为只读：
-- `D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\new_person_labels\images`
-- `D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\new_person_labels\person_labels`
+- `../frame_label/new_person_labels/images`
+- `../frame_label/new_person_labels/person_labels`
 不要直接在这套原始目录上剪切 / 搬动 / 改名。更推荐：
 - 新建一套 grouped 目录；
 - 通过复制、软链接或后续 manifest 管理去组织 ROI-aware 版本。
@@ -136,8 +136,8 @@ D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-
 - `group_manifest.csv`：逐图分组结果；
 - `group_summary.json`：每组统计与代表帧；
 - `grouped/`：自动生成的物理分组目录（图片和标签）。
-### 5.2B 当前 `all_labels/roi-json` 目录审核结论
-截至 `2026-05-21`，对 `D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\roi-json` 当前目录结构做完抽样审核后，可以把它明确理解成两部分：
+### 5.2B 当前 `../frame_label/roi-json` 目录审核结论
+截至 `2026-05-21`，对 `../frame_label/roi-json` 当前目录结构做完抽样审核后，可以把它明确理解成两部分：
 1. 旧固定 sequence 的已完成 ROI 样例：
    - `group3_1 / group3_2 / group3_3`
    - 这部分目录下已经有完整 `frames/ + roi-json/`
@@ -251,7 +251,7 @@ new_person_labels_grouped/
 对 `group_0001 ~ group_0006`，当前建议严格按下面顺序做：
 1. 逐组打开 `frames/` 目录，输出到对应的 `roi-json/` 目录，例如：
 ```powershell
-labelme D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\roi-json\group_0001\frames --output D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\roi-json\group_0001\roi-json --labels roi
+labelme ..\frame_label\roi-json\group_0001\frames --output ..\frame_label\roi-json\group_0001\roi-json --labels roi
 ```
 2. 先在该组的“主标注帧”上画出第一版 ROI 模板：
    - `group_0001 -> 02372.jpg`
@@ -382,5 +382,4 @@ D:\Miniconda3_python\envs\yolo_code\python.exe backend-train-model\person-train-
 ---
 ## 14. 一句话执行口径
 > **当前 `new_person_labels` 做 ROI-aware 时，优先使用“组级 ROI 为主、逐图 ROI 为辅”的分层混合方案：先按摄像头 / 场景 / 视角 / ROI 稳定性分组，稳定组用组级 ROI，半稳定组继续细分，只有少量实在无法稳定归组的图片才逐图 ROI；不要默认全量逐图，也不要默认整包 flat source 共用一个 ROI。**
-
 

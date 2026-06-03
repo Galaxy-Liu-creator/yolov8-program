@@ -4,6 +4,7 @@ import argparse
 import json
 import re
 import shutil
+import sys
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Sequence
@@ -233,14 +234,15 @@ def write_root_readme(
             "## 后续命令\n\n"
             "完成全部 ROI JSON 后，在仓库根目录运行：\n\n"
             "```powershell\n"
-            "D:\\Miniconda3_python\\envs\\yolo_code\\python.exe backend-train-model\\person-train-model\\train-code\\run_person_flow.py extract-roi-config --roi-json-root {roi_work_root} --overwrite\n"
-            "D:\\Miniconda3_python\\envs\\yolo_code\\python.exe backend-train-model\\person-train-model\\train-code\\run_person_flow.py prepare-roi-aware --overwrite\n"
+            "{python_exe} backend-train-model\\person-train-model\\train-code\\run_person_flow.py extract-roi-config --roi-json-root {roi_work_root} --overwrite\n"
+            "{python_exe} backend-train-model\\person-train-model\\train-code\\run_person_flow.py prepare-roi-aware --overwrite\n"
             "```\n"
         ).format(
             sequence_count=sequence_count,
             frames_per_sequence=frames_per_sequence,
             roi_config_path=context.roi.config_path,
             roi_work_root=roi_work_root,
+            python_exe=sys.executable,
         ),
         encoding="utf-8",
     )
@@ -258,12 +260,12 @@ def write_roi_config_readme(context: PersonProjectContext) -> None:
             "```\n\n"
             "生成命令：\n\n"
             "```powershell\n"
-            "D:\\Miniconda3_python\\envs\\yolo_code\\python.exe backend-train-model\\person-train-model\\train-code\\run_person_flow.py extract-roi-config --overwrite\n"
+            "{python_exe} backend-train-model\\person-train-model\\train-code\\run_person_flow.py extract-roi-config --overwrite\n"
             "```\n\n"
             "默认 ROI JSON 根目录读取 `person_project_config.json` 中的 `roi.json_root`；\n"
             "如需从手工工作区提取，显式追加 `--roi-json-root <roi-work-root>`。\n\n"
             "如果当前 `roi_config.generated.json` 是空文件或旧文件，使用 `--overwrite` 重新生成即可。\n"
-        ).format(roi_config_path=context.roi.config_path),
+        ).format(roi_config_path=context.roi.config_path, python_exe=sys.executable),
         encoding="utf-8",
     )
 

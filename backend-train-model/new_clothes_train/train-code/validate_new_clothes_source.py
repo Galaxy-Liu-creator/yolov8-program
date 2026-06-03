@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 from collections import Counter
 from pathlib import Path
 from typing import Dict, List
@@ -11,13 +12,25 @@ import cv2
 REPO_ROOT = Path(__file__).resolve().parents[3]
 BACKEND_ROOT = REPO_ROOT / "backend-train-model"
 NEW_CLOTHES_ROOT = BACKEND_ROOT / "new_clothes_train"
+FRAME_LABEL_ROOT_ENV = "YOLO_FRAME_LABEL_ROOT"
 
-IMAGE_ROOT = Path(
-    r"D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\new_clothes_labels\images"
-)
-RAW_LABEL_ROOT = Path(
-    r"D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\new_clothes_labels\clothes_labels"
-)
+
+def resolve_frame_label_root() -> Path:
+    """解析仓库外 frame_label 根目录。"""
+
+    raw_value = os.environ.get(FRAME_LABEL_ROOT_ENV, "").strip()
+    if not raw_value:
+        return (REPO_ROOT.parent / "frame_label").resolve()
+
+    candidate = Path(raw_value).expanduser()
+    if candidate.is_absolute():
+        return candidate.resolve()
+    return (REPO_ROOT / candidate).resolve()
+
+
+FRAME_LABEL_ROOT = resolve_frame_label_root()
+IMAGE_ROOT = FRAME_LABEL_ROOT / "new_clothes_labels" / "images"
+RAW_LABEL_ROOT = FRAME_LABEL_ROOT / "new_clothes_labels" / "clothes_labels"
 COMPLETED_LABEL_ROOT = NEW_CLOTHES_ROOT / "train-result" / "working" / "new_source_completed_labels"
 REPORT_JSON_PATH = NEW_CLOTHES_ROOT / "train-result" / "working" / "new_source_validation_report.json"
 REPORT_MD_PATH = NEW_CLOTHES_ROOT / "train-result" / "working" / "new_source_validation_report.md"

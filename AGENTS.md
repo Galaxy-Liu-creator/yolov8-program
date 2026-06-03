@@ -41,6 +41,7 @@
 - 代码默认切分比例：`train=0.70 / val=0.15 / test=0.15`；但当前主实验可能用显式 split manifest 覆盖默认比例。
 - 代码默认切分策略：`sequence_contiguous`，用于默认单源 `clothes` prepare 与当前 `person_fullframe / person_roi_aware` 数据集。
 - 当前 `clothes` merged baseline 不是简单默认切分，而是以 `All-train-model/splits/*.split.csv` 为准：`trainval_balanced_v1.split.csv` 构建训练/验证集，`unified_holdout_v1.split.csv` 构建统一 test holdout。
+- 当前仓库外原始数据默认采用 sibling layout：父目录下同时存在 `yolov8-program/` 与 `frame_label/`；文档默认写法统一为相对于仓库根的 `../frame_label`，如需兼容特殊机器可通过环境变量 `YOLO_FRAME_LABEL_ROOT` 覆盖。
 - 当前真实路径以配置文件为准：`backend-train-model/project_config.json`、`backend-train-model/All-train-model/*.build.json`、`backend-train-model/person-train-model/person_project_config*.json`。
 - 部分历史 `build_report.json` 可能保留旧绝对路径记录；更新路径或重新构建时不要反向以旧报告覆盖当前配置。
 
@@ -60,7 +61,7 @@
 - `person` 训练 / 评估 JSON 报告按 run 名分层保存：`backend-train-model/person-train-model/train-result/artifacts/reports/<run_name>/<report_file>.json`，与 `artifacts/runs/<run_name>/` 一一对应；后续不要再把 `*_train.json`、`*_eval.json`、`*_export.json`、`*_all.json` 平铺到 `reports/` 根目录。
 - `person_fullframe` 数据集切分：`train=350 / val=77 / test=75`；框数：`train=1258 / val=219 / test=181`。
 - `person_fullframe_baseline` test 指标：Precision `0.9228`，Recall `0.6740`，mAP50 `0.7606`，mAP50-95 `0.4102`。
-- ROI JSON 根目录：`D:\University-Competition\Innovation_Entrepreneurship\MyProgram\all_labels\roi-json`。
+- ROI JSON 根目录默认写法：`../frame_label/roi-json`。
 - 当前已生成 ROI 配置：`backend-train-model/person-train-model/train-result/working/roi/roi_config.generated.json`，共 `502` 个 JSON，`scope=per_image`，`mode=mask_then_crop`。
 - 历史 ROI-aware v1 数据集输出 `502` 张图，保留 person 框 `1343` 个，丢弃 `315` 个，裁剪边界框 `49` 个，ROI 空负样本 `12` 张。
 - `person_roi_aware_baseline` test 指标：Precision `0.9390`，Recall `0.5950`，mAP50 `0.6738`，mAP50-95 `0.3867`，当前作为历史对照保留。
