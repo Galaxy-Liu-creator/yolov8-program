@@ -1,5 +1,30 @@
 # Update Log
 
+## 2026-06-03 补充方案 C 交叉回评命令
+
+1. 变更来源：用户完成 `person_fullframe_with_new_labels_and_hard_examples_v1_from_baseline` 训练后，要求把后续交叉回评命令补入 `person_run_method.md`，用于判断方案 C 是否值得继续替代旧 fullframe 主线。
+2. 变更总览：
+   - 更新 `backend-train-model/person-train-model/train-docs/person_run_method.md`。
+   - 在 `person_fullframe_with_new_labels_and_hard_examples_v1` 版本段中新增 `交叉回评命令` 小节，补入两条评估命令：
+     - 用方案 C 权重回评 `person_fullframe_with_new_labels` 旧 fullframe 数据集；
+     - 用方案 C 权重回评 `person_new_hard_examples_v1/sequence_holdout` hard-only 严格 holdout 数据集。
+   - 同步在该版本段的 `备注` 中明确：建议先完成这两次交叉回评，再决定是否继续进入 hard-only 专项训练。
+3. 涉及文件：
+   - `backend-train-model/person-train-model/train-docs/person_run_method.md`
+   - `backend-train-model/docs/update_log.md`
+4. 新增 / 变更配置项：
+   - 无新增 JSON 配置项。
+   - 仅新增两条交叉回评命令及对应 report-name 约定：
+     - `person_fullframe_with_new_labels_and_hard_examples_v1_from_baseline_eval_on_fullframe_with_new_labels`
+     - `person_fullframe_with_new_labels_and_hard_examples_v1_from_baseline_eval_on_hard_holdout`
+5. 兼容性注意：
+   - 交叉回评使用的是已训练完成的方案 C 权重，不会改动任何 prepared 数据集内容。
+   - 旧 fullframe 数据集回评与 hard-only holdout 回评必须分别使用各自匹配的 `project-config` 与 `dataset.yaml`，不要混用。
+   - 本轮只补运行文档，不改变当前主线配置、训练超参或 ROI 相关口径。
+6. 本轮明确不改动：
+   - 不重跑训练、评估、导出或 FP/FN 复盘。
+   - 不修改 `person_project_config*.json`、prepared 数据集、ROI JSON、在线检测链路或其他模块实现。
+
 ## 2026-06-03 统一 sibling layout 路径体系
 
 1. 变更来源：用户把本机原始图片与标注目录统一调整为 `frame_label`，并要求将项目中的路径体系改造为开发机 / 训练机共用的 sibling layout，避免继续依赖旧的 `all_labels` 与机器绝对路径。
