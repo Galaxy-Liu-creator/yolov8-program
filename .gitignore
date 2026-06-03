@@ -11,6 +11,7 @@ datasets/
 review/
 __pycache__/
 tmp_review_overlays/
+person_roi_aware_v1/
 
 # person
 images/
@@ -35,7 +36,7 @@ smoke/
 PPT/
 /.idea
 backend-train-model.zip
-
+yolo26n.pt
 
 # Large local archives
 *.zip

@@ -50,6 +50,7 @@
 - 当前单源 clothes 入口仍未单独沉淀仓库内 `dataset.yaml`，训练、校验、转换脚本仍需以本文档中的路径约定和配对规则为准。
 - merged clothes 与 person 训练线已经存在项目配置 / build 配置文件；更新这些配置时，也需要保证其内容与本文档保持一致。
 - 配置文件内部的相对路径会相对于各自所在目录解析，例如：`backend-train-model/project_config.json` 相对于 `backend-train-model/`，`backend-train-model/person-train-model/person_project_config*.json` 相对于 `backend-train-model/person-train-model/`。
+- `person` prepared 数据集的 `dataset.yaml` 应避免写入机器绝对 `path:`；`train: images/train`、`val: images/val`、`test: images/test` 默认按 `dataset.yaml` 所在目录解析，便于在不同盘符或训练机之间迁移。
 
 ## 3. 文件配对规则
 

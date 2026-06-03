@@ -1118,13 +1118,12 @@ def write_dataset_yaml(dataset_root: Path) -> Path:
         for class_id, class_name in sorted(config.CLASS_NAMES.items())
     )
     yaml_text = (
-        "path: {0}\n"
         "train: images/train\n"
         "val: images/val\n"
         "test: images/test\n"
         "names:\n"
-        "{1}"
-    ).format(dataset_root.as_posix(), names_yaml)
+        "{0}"
+    ).format(names_yaml)
     dataset_yaml.write_text(yaml_text, encoding="utf-8")
     return dataset_yaml
 

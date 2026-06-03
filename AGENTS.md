@@ -44,6 +44,7 @@
 - 当前仓库外原始数据默认采用 sibling layout：父目录下同时存在 `yolov8-program/` 与 `frame_label/`；文档默认写法统一为相对于仓库根的 `../frame_label`，如需兼容特殊机器可通过环境变量 `YOLO_FRAME_LABEL_ROOT` 覆盖。
 - 当前真实路径以配置文件为准：`backend-train-model/project_config.json`、`backend-train-model/All-train-model/*.build.json`、`backend-train-model/person-train-model/person_project_config*.json`。
 - 部分历史 `build_report.json` 可能保留旧绝对路径记录；更新路径或重新构建时不要反向以旧报告覆盖当前配置。
+- `person` prepared 数据集的 `dataset.yaml` 默认不写机器绝对 `path:`，让 `train/val/test` 按 `dataset.yaml` 所在目录解析；不要重新生成带旧盘符或本机绝对路径的 YAML。
 
 ## 5. `clothes` / 工服训练现状
 

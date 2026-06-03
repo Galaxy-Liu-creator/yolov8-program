@@ -1,4 +1,3 @@
-path: D:/University-Competition/Innovation_Entrepreneurship/MyProgram/yolov8-program/backend-train-model/person-train-model/train-result/prepared/person_roi_aware_v3_crop_only_margin64/sequence_contiguous
 train: images/train
 val: images/val
 test: images/test

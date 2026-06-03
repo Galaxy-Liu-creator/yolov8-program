@@ -323,6 +323,18 @@ def build_runtime_project_config_payload(
             )
         )
 
+    artifacts_section = payload.get("artifacts")
+    if artifacts_section is None:
+        artifacts_section = {}
+        payload["artifacts"] = artifacts_section
+    if not isinstance(artifacts_section, dict):
+        raise RuntimeError(
+            "person project-config 中的 `artifacts` 段必须是对象: {0}".format(
+                context.config_path
+            )
+        )
+    artifacts_section["root"] = str(context.artifacts_root)
+
     data_section = payload.get("data")
     if data_section is None:
         data_section = {}

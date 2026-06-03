@@ -1611,6 +1611,7 @@ def cmd_evaluate(args) -> int:
                 aggregate["f1"],
             )
         )
+    print("报告文件 : {0}".format(summary["report_path"]))
     return 0
 
 

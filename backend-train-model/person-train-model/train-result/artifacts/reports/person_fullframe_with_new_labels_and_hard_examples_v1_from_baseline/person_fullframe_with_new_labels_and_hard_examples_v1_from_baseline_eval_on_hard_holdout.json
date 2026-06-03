@@ -1,0 +1,153 @@
+{
+  "runtime": {
+    "command": "evaluate",
+    "argv": [
+      "evaluate",
+      "--project-config",
+      "E:\\Competition\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\working\\runtime-configs\\person_project_config.new_hard_examples.v1.sequence_holdout.runtime.json",
+      "--dataset-yaml",
+      "E:\\Competition\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\prepared\\person_new_hard_examples_v1\\sequence_holdout\\dataset.yaml",
+      "--weights",
+      "E:\\Competition\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\artifacts\\runs\\person_fullframe_with_new_labels_and_hard_examples_v1_from_baseline\\weights\\best.pt",
+      "--imgsz",
+      "640",
+      "--batch",
+      "4",
+      "--workers",
+      "4",
+      "--device",
+      "0",
+      "--report-name",
+      "person_fullframe_with_new_labels_and_hard_examples_v1_from_baseline_eval_on_hard_holdout"
+    ],
+    "generated_at": "2026-06-03T21:12:35",
+    "config": {
+      "project_config_path": "E:\\Competition\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\working\\runtime-configs\\person_project_config.new_hard_examples.v1.sequence_holdout.runtime.json",
+      "image_roots": [
+        "E:\\Competition\\frame_label\\new_hard_examples\\1\\1\\frames",
+        "E:\\Competition\\frame_label\\new_hard_examples\\1\\2\\frames",
+        "E:\\Competition\\frame_label\\new_hard_examples\\1\\3\\frames",
+        "E:\\Competition\\frame_label\\new_hard_examples\\1\\4\\frames",
+        "E:\\Competition\\frame_label\\new_hard_examples\\1\\5\\frames",
+        "E:\\Competition\\frame_label\\new_hard_examples\\1\\6\\frames",
+        "E:\\Competition\\frame_label\\new_hard_examples\\1\\7\\frames",
+        "E:\\Competition\\frame_label\\new_hard_examples\\1\\8\\frames",
+        "E:\\Competition\\frame_label\\new_hard_examples\\2\\9\\frames",
+        "E:\\Competition\\frame_label\\new_hard_examples\\2\\10\\frames",
+        "E:\\Competition\\frame_label\\new_hard_examples\\2\\11\\frames",
+        "E:\\Competition\\frame_label\\new_hard_examples\\2\\12\\frames",
+        "E:\\Competition\\frame_label\\new_hard_examples\\2\\13\\frames",
+        "E:\\Competition\\frame_label\\new_hard_examples\\2\\14\\frames"
+      ],
+      "label_root": "E:\\Competition\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\working\\aggregated_labels_new_hard_examples_v1_sequence_holdout",
+      "image_extensions": [
+        ".jpg"
+      ],
+      "class_names": {
+        "0": "person"
+      },
+      "ignored_label_filenames": [
+        "classes.txt"
+      ],
+      "split_ratios": {
+        "train": 0.7,
+        "val": 0.15,
+        "test": 0.15
+      },
+      "default_split_strategy": "sequence_holdout",
+      "default_prepare_mode": "fullframe",
+      "default_include_empty_person_crops": false,
+      "default_limit_per_sequence": null,
+      "default_monitored_person_labels": [
+        "person"
+      ],
+      "default_person_conf": 0.2,
+      "default_person_imgsz": 640,
+      "default_assignment_min_ioa": 0.35,
+      "default_fallback_to_fullframe": true,
+      "default_allow_remote_model_download": false,
+      "default_person_model_candidates": [
+        "E:\\Competition\\yolov8-program\\backend-train-model\\weights\\person_detect_yolov8.pt",
+        "E:\\Competition\\yolov8-program\\inspection-flask\\weights\\person_detect_yolov8.pt"
+      ],
+      "default_python_candidates": [
+        "D:\\Miniconda3_python\\envs\\yolo_code\\python.exe",
+        "E:\\Miniconda3\\envs\\yolo_Code\\python.exe"
+      ],
+      "default_train_args": {
+        "imgsz": 640,
+        "epochs": 120,
+        "batch": 4,
+        "patience": 40,
+        "workers": 4,
+        "device": "0",
+        "seed": 42,
+        "base_model": "train-result/artifacts/runs/person_roi_aware_with_new_labels_v1_mask_then_crop_margin64_from_fullframe/weights/best.pt"
+      },
+      "artifacts_root": "E:\\Competition\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\artifacts",
+      "prepared_root": "E:\\Competition\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\artifacts\\prepared",
+      "runs_root": "E:\\Competition\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\artifacts\\runs",
+      "reports_root": "E:\\Competition\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\artifacts\\reports",
+      "export_root": "E:\\Competition\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\artifacts\\export"
+    }
+  },
+  "report_name": "person_fullframe_with_new_labels_and_hard_examples_v1_from_baseline_eval_on_hard_holdout.json",
+  "weights": "E:\\Competition\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\artifacts\\runs\\person_fullframe_with_new_labels_and_hard_examples_v1_from_baseline\\weights\\best.pt",
+  "weights_resolution_mode": "explicit_weights_path",
+  "weights_report_source": null,
+  "dataset_yaml": "E:\\Competition\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\prepared\\person_new_hard_examples_v1\\sequence_holdout\\dataset.yaml",
+  "comparison_dataset_name": "sequence_holdout",
+  "dataset_metadata": {
+    "dataset_name": "sequence_holdout",
+    "dataset_yaml": "E:\\Competition\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\prepared\\person_new_hard_examples_v1\\sequence_holdout\\dataset.yaml",
+    "dataset_root": "E:\\Competition\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\prepared\\person_new_hard_examples_v1\\sequence_holdout",
+    "class_names": {
+      "0": "person"
+    },
+    "class_count": 1,
+    "split_image_counts": {
+      "train": 988,
+      "val": 231,
+      "test": 289
+    },
+    "prepare_report_path": "E:\\Competition\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\prepared\\person_new_hard_examples_v1\\sequence_holdout\\prepare_report.json",
+    "prepare_mode": null,
+    "prepare_split_strategy": null
+  },
+  "evaluated_splits": [
+    "val",
+    "test"
+  ],
+  "skipped_splits": [],
+  "native_eval": {
+    "val": {
+      "results_dict": {
+        "metrics/precision(B)": 0.9661680929233295,
+        "metrics/recall(B)": 0.9556103575832305,
+        "metrics/mAP50(B)": 0.982567014211414,
+        "metrics/mAP50-95(B)": 0.7570126127109849,
+        "fitness": 0.7570126127109849
+      },
+      "precision": 0.9661680929233295,
+      "recall": 0.9556103575832305,
+      "map50": 0.982567014211414,
+      "map75": 0.8664809243214134,
+      "map50_95": 0.7570126127109849
+    },
+    "test": {
+      "results_dict": {
+        "metrics/precision(B)": 0.9586320143414145,
+        "metrics/recall(B)": 0.8775134726774593,
+        "metrics/mAP50(B)": 0.943050253623906,
+        "metrics/mAP50-95(B)": 0.6108894184510102,
+        "fitness": 0.6108894184510102
+      },
+      "precision": 0.9586320143414145,
+      "recall": 0.8775134726774593,
+      "map50": 0.943050253623906,
+      "map75": 0.6675308910774929,
+      "map50_95": 0.6108894184510102
+    }
+  },
+  "report_path": "E:\\Competition\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\artifacts\\reports\\person_fullframe_with_new_labels_and_hard_examples_v1_from_baseline\\person_fullframe_with_new_labels_and_hard_examples_v1_from_baseline_eval_on_hard_holdout.json"
+}
