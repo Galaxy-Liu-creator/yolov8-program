@@ -1,5 +1,25 @@
 # Update Log
 
+## 2026-06-03 补充旧 fullframe 基线在 hard holdout 上的对照回评命令
+
+1. 变更来源：用户要求把 `person_fullframe_with_new_labels_baseline` 在 `person_new_hard_examples_v1/sequence_holdout` 上的对照回评命令补入 `person_run_method.md`，用于和方案 C 做同口径 hard holdout 对比。
+2. 变更总览：
+   - 更新 `backend-train-model/person-train-model/train-docs/person_run_method.md`。
+   - 在 `person_fullframe_with_new_labels_and_hard_examples_v1` 的 `交叉回评命令` 小节中新增一条“旧 fullframe 稳健基线回评 hard-only holdout 数据集”命令。
+   - 补充对应报告输出位置：`person_fullframe_with_new_labels_baseline_eval_on_hard_holdout.json`，方便后续和方案 C 的 hard holdout 回评结果直接对照。
+3. 涉及文件：
+   - `backend-train-model/person-train-model/train-docs/person_run_method.md`
+   - `backend-train-model/docs/update_log.md`
+4. 新增 / 变更配置项：
+   - 无新增 JSON 配置项。
+   - 新增对照回评 report-name 约定：`person_fullframe_with_new_labels_baseline_eval_on_hard_holdout`
+5. 兼容性注意：
+   - 该命令仍使用 `person_project_config.new_hard_examples.v1.sequence_holdout.json` 与 holdout `dataset.yaml`，仅将权重切换为 `person_fullframe_with_new_labels_baseline/weights/best.pt`。
+   - 本轮只补运行文档，不修改训练主线、prepared 数据集、模型权重或 ROI 相关配置。
+6. 本轮明确不改动：
+   - 不重跑训练、评估、导出或 FP/FN 复盘。
+   - 不修改 `person_project_config*.json`、prepared 数据集、ROI JSON、在线检测链路或其他模块实现。
+
 ## 2026-06-03 补充方案 C 交叉回评命令
 
 1. 变更来源：用户完成 `person_fullframe_with_new_labels_and_hard_examples_v1_from_baseline` 训练后，要求把后续交叉回评命令补入 `person_run_method.md`，用于判断方案 C 是否值得继续替代旧 fullframe 主线。

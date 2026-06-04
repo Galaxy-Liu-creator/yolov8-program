@@ -132,6 +132,18 @@ E:\Miniconda3\envs\yolo_Code\python.exe backend-train-model\person-train-model\t
 
 - `backend-train-model/person-train-model/train-result/artifacts/reports/person_fullframe_with_new_labels_and_hard_examples_v1_from_baseline/person_fullframe_with_new_labels_and_hard_examples_v1_from_baseline_eval_on_hard_holdout.json`
 
+### 旧 fullframe 稳健基线回评 hard-only holdout 数据集
+
+用于和方案 C 权重在同一 `hard holdout` 数据集上做同口径对照，判断 `person_fullframe_with_new_labels_baseline` 相比方案 C 是否确实在 hardest sequences 上偏弱。
+
+```powershell
+E:\Miniconda3\envs\yolo_Code\python.exe backend-train-model\person-train-model\train-code\run_person_flow.py evaluate --project-config backend-train-model\person-train-model\person_project_config.new_hard_examples.v1.sequence_holdout.json --dataset-yaml backend-train-model\person-train-model\train-result\prepared\person_new_hard_examples_v1\sequence_holdout\dataset.yaml --weights backend-train-model\person-train-model\train-result\artifacts\runs\person_fullframe_with_new_labels_baseline\weights\best.pt --run-name person_fullframe_with_new_labels_baseline --imgsz 640 --batch 4 --workers 4 --device 0 --report-name person_fullframe_with_new_labels_baseline_eval_on_hard_holdout
+```
+
+评估报告输出位置：
+
+- `backend-train-model/person-train-model/train-result/artifacts/reports/person_fullframe_with_new_labels_baseline/person_fullframe_with_new_labels_baseline_eval_on_hard_holdout.json`
+
 ### 回评后导出命令
 
 上面两条 `evaluate` 只生成评估报告，不会导出权重。如果两次交叉回评结果都确认方案 C 可以继续作为候选主线，再单独执行下面的导出命令。这里必须使用方案 C 自己的 project config，避免把导出 alias 写成旧 fullframe 或 hard-only 配置的名字。
