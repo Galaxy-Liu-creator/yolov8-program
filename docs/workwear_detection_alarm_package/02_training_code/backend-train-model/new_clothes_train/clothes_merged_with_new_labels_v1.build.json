@@ -1,0 +1,77 @@
+{
+  "dataset_name": "clothes_merged_with_new_labels_v1",
+  "output_root": "train-result/datasets/clothes_merged_with_new_labels_v1",
+  "review_root": "train-result/review/clothes_merged_with_new_labels_v1",
+  "split_manifest_csv": "train-result/splits/clothes_merged_with_new_labels_v1.split.csv",
+  "strict_split_manifest": true,
+  "train_project_config": "new_clothes_train_project_config.json",
+  "recommended_run_name": "clothes_merged_with_new_labels_v1_baseline",
+  "class_names": {
+    "0": "clothes"
+  },
+  "image_extensions": [
+    ".jpg",
+    ".jpeg",
+    ".png"
+  ],
+  "missing_label_policy": "skip",
+  "require_review_completion": false,
+  "sequences": [
+    {
+      "source_id": "g31",
+      "sequence_name": "D04_20260123074846",
+      "image_root": "../../../frame_label/clothes_labels/group3_1/clo/D04_20260123074846",
+      "label_root": "../../../frame_label/clothes_labels/group3_1/clo/label-clo",
+      "split": "train"
+    },
+    {
+      "source_id": "g31",
+      "sequence_name": "D05_20260123074841",
+      "image_root": "../../../frame_label/clothes_labels/group3_1/clo/D05_20260123074841",
+      "label_root": "../../../frame_label/clothes_labels/group3_1/clo/label-clo",
+      "split": "train"
+    },
+    {
+      "source_id": "g31",
+      "sequence_name": "D15_20260123074848",
+      "image_root": "../../../frame_label/clothes_labels/group3_1/clo/D15_20260123074848",
+      "label_root": "../../../frame_label/clothes_labels/group3_1/clo/label-clo",
+      "split": "train"
+    },
+    {
+      "source_id": "g32",
+      "sequence_name": "D15_20260119061405",
+      "image_root": "../../../frame_label/clothes_labels/group3_2/clo/1",
+      "label_root": "../../../frame_label/clothes_labels/group3_2/clo/label_clothes",
+      "split": "train"
+    },
+    {
+      "source_id": "g32",
+      "sequence_name": "D15_20260119203927",
+      "image_root": "../../../frame_label/clothes_labels/group3_2/clo/D15_20260119203927",
+      "label_root": "../../../frame_label/clothes_labels/group3_2/clo/label_clothes",
+      "split": "train"
+    },
+    {
+      "source_id": "g33",
+      "sequence_name": "D02_20260123070624",
+      "image_root": "../../../frame_label/clothes_labels/group3_3/clo/D02_20260123070624",
+      "label_root": "../../../frame_label/clothes_labels/group3_3/clo/labels",
+      "split": "train"
+    },
+    {
+      "source_id": "g33",
+      "sequence_name": "D02_20260123074836",
+      "image_root": "../../../frame_label/clothes_labels/group3_3/clo/D02_20260123074836",
+      "label_root": "../../../frame_label/clothes_labels/group3_3/clo/labels",
+      "split": "train"
+    },
+    {
+      "source_id": "gnew",
+      "sequence_name": "new_clothes_flat_2507",
+      "image_root": "../../../frame_label/new_clothes_labels/images",
+      "label_root": "train-result/working/new_source_completed_labels",
+      "split": "train"
+    }
+  ]
+}

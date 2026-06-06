@@ -1,0 +1,30 @@
+{
+  "artifacts": {
+    "root": "artifacts"
+  },
+  "data": {
+    "class_names": {
+      "0": "clothes"
+    },
+    "ignored_label_filenames": [
+      "classes.txt"
+    ]
+  },
+  "models": {
+    "python_candidates": [
+      "D:\\Miniconda3_python\\envs\\yolo_code\\python.exe",
+      "E:\\Miniconda3\\envs\\yolo_Code\\python.exe"
+    ]
+  },
+  "training": {
+    "default_train_args": {
+      "imgsz": 640,
+      "epochs": 180,
+      "batch": 4,
+      "patience": 40,
+      "workers": 4,
+      "device": "0",
+      "seed": 42
+    }
+  }
+}

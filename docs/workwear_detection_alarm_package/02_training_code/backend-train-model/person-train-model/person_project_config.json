@@ -1,0 +1,137 @@
+{
+  "artifacts": {
+    "root": "train-result/artifacts"
+  },
+  "data": {
+    "image_roots": [
+      "../../../frame_label/person_labels/group3_1/D04_20260123074846",
+      "../../../frame_label/person_labels/group3_1/D05_20260123074841",
+      "../../../frame_label/person_labels/group3_1/D15_20260123074848",
+      "../../../frame_label/person_labels/group3_2/1",
+      "../../../frame_label/person_labels/group3_2/D15_20260119203927",
+      "../../../frame_label/person_labels/group3_3/D02_20260123070624",
+      "../../../frame_label/person_labels/group3_3/D02_20260123074836"
+    ],
+    "image_extensions": [
+      ".jpg"
+    ],
+    "class_names": {
+      "0": "person"
+    },
+    "ignored_label_filenames": [
+      "classes.txt"
+    ],
+    "split_ratios": {
+      "train": 0.7,
+      "val": 0.15,
+      "test": 0.15
+    },
+    "default_split_strategy": "sequence_contiguous"
+  },
+  "prepare": {
+    "default_mode": "fullframe",
+    "include_empty_person_crops": false,
+    "limit_per_sequence": null,
+    "monitored_person_labels": [
+      "person"
+    ],
+    "person_conf": 0.2,
+    "person_imgsz": 640,
+    "assignment_min_ioa": 0.35,
+    "fallback_to_fullframe": true
+  },
+  "roi": {
+    "enabled": false,
+    "mode": "mask_then_crop",
+    "crop_margin_px": 0,
+    "json_root": "../../../frame_label/roi-json",
+    "work_root": "roi-work",
+    "keep_rule": {
+      "center_inside": false,
+      "bottom_center_inside": true,
+      "min_box_ioa": 0.25
+    },
+    "config_path": "train-result/working/roi/roi_config.generated.json"
+  },
+  "models": {
+    "allow_remote_model_download": false,
+    "python_candidates": [
+      "D:\\Miniconda3_python\\envs\\yolo_code\\python.exe",
+      "E:\\Miniconda3\\envs\\yolo_Code\\python.exe"
+    ]
+  },
+  "training": {
+    "default_train_args": {
+      "imgsz": 640,
+      "epochs": 180,
+      "batch": 4,
+      "patience": 40,
+      "workers": 4,
+      "device": "0",
+      "seed": 42,
+      "base_model": "../weights/yolov8n.pt"
+    }
+  },
+  "person_dataset": {
+    "default_dataset_variant": "fullframe",
+    "recommended_run_name": "person_fullframe_baseline",
+    "aggregated_label_root": "train-result/working/aggregated_labels",
+    "summary_path": "train-result/person_source_dataset_summary.json",
+    "prepared_output_root": "train-result/prepared/person_fullframe/sequence_contiguous",
+    "roi_aware_prepared_output_root": "train-result/prepared/person_roi_aware/sequence_contiguous",
+    "roi_aware_recommended_run_name": "person_roi_aware_v2_from_fullframe",
+    "export_alias_path": "train-result/export/person_detect_yolov8.pt",
+    "export_alias_metadata_path": "train-result/export/person_detect_yolov8.metadata.json",
+    "sequences": [
+      {
+        "source_id": "g31",
+        "group": "group3_1",
+        "sequence_name": "D04_20260123074846",
+        "image_root": "../../../frame_label/person_labels/group3_1/D04_20260123074846",
+        "label_root": "../../../frame_label/person_labels/group3_1/labels"
+      },
+      {
+        "source_id": "g31",
+        "group": "group3_1",
+        "sequence_name": "D05_20260123074841",
+        "image_root": "../../../frame_label/person_labels/group3_1/D05_20260123074841",
+        "label_root": "../../../frame_label/person_labels/group3_1/labels"
+      },
+      {
+        "source_id": "g31",
+        "group": "group3_1",
+        "sequence_name": "D15_20260123074848",
+        "image_root": "../../../frame_label/person_labels/group3_1/D15_20260123074848",
+        "label_root": "../../../frame_label/person_labels/group3_1/labels"
+      },
+      {
+        "source_id": "g32",
+        "group": "group3_2",
+        "sequence_name": "D15_20260119061405",
+        "image_root": "../../../frame_label/person_labels/group3_2/1",
+        "label_root": "../../../frame_label/person_labels/group3_2/labels"
+      },
+      {
+        "source_id": "g32",
+        "group": "group3_2",
+        "sequence_name": "D15_20260119203927",
+        "image_root": "../../../frame_label/person_labels/group3_2/D15_20260119203927",
+        "label_root": "../../../frame_label/person_labels/group3_2/labels"
+      },
+      {
+        "source_id": "g33",
+        "group": "group3_3",
+        "sequence_name": "D02_20260123070624",
+        "image_root": "../../../frame_label/person_labels/group3_3/D02_20260123070624",
+        "label_root": "../../../frame_label/person_labels/group3_3/labels"
+      },
+      {
+        "source_id": "g33",
+        "group": "group3_3",
+        "sequence_name": "D02_20260123074836",
+        "image_root": "../../../frame_label/person_labels/group3_3/D02_20260123074836",
+        "label_root": "../../../frame_label/person_labels/group3_3/labels"
+      }
+    ]
+  }
+}

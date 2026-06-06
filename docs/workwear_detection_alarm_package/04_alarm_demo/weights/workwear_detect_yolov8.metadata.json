@@ -1,0 +1,15 @@
+{
+  "generated_at": "2026-06-05T18:52:07",
+  "source_weights": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\new_clothes_train\\train-result\\artifacts\\runs\\clothes_merged_with_new_labels_v1_baseline\\weights\\best.pt",
+  "alias_weights": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\docs\\workwear_detection_alarm_package\\04_alarm_demo\\weights\\workwear_detect_yolov8.pt",
+  "original_model_names": {
+    "0": "item"
+  },
+  "alias_model_names": {
+    "0": "clothes"
+  },
+  "verification_names": {
+    "0": "clothes"
+  },
+  "note": "Original best.pt was left untouched; this alias only normalizes class names."
+}

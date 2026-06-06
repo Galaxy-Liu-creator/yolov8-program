@@ -1,0 +1,61 @@
+{
+  "data": {
+    "image_roots": [
+      "../../frame_label/clothes_labels/group3_1/clo/D04_20260123074846",
+      "../../frame_label/clothes_labels/group3_1/clo/D05_20260123074841",
+      "../../frame_label/clothes_labels/group3_1/clo/D15_20260123074848"
+    ],
+    "label_root": "../../frame_label/clothes_labels/group3_1/clo/label-clo",
+    "image_extensions": [
+      ".jpg",
+      ".jpeg",
+      ".png"
+    ],
+    "class_names": {
+      "0": "clothes"
+    },
+    "ignored_label_filenames": [
+      "classes.txt"
+    ],
+    "split_ratios": {
+      "train": 0.7,
+      "val": 0.15,
+      "test": 0.15
+    },
+    "default_split_strategy": "sequence_contiguous"
+  },
+  "prepare": {
+    "default_mode": "auto",
+    "include_empty_person_crops": false,
+    "limit_per_sequence": null,
+    "monitored_person_labels": [
+      "person"
+    ],
+    "person_conf": 0.2,
+    "person_imgsz": 640,
+    "assignment_min_ioa": 0.35,
+    "fallback_to_fullframe": true
+  },
+  "models": {
+    "allow_remote_model_download": false,
+    "person_model_candidates": [
+      "weights\\person_detect_yolov8.pt",
+      "..\\inspection-flask\\weights\\person_detect_yolov8.pt"
+    ],
+    "python_candidates": [
+      "D:\\Miniconda3_python\\envs\\yolo_code\\python.exe",
+      "E:\\Miniconda3\\envs\\yolo_Code\\python.exe"
+    ]
+  },
+  "training": {
+    "default_train_args": {
+      "imgsz": 640,
+      "epochs": 180,
+      "batch": 4,
+      "patience": 40,
+      "workers": 4,
+      "device": "0",
+      "seed": 42
+    }
+  }
+}

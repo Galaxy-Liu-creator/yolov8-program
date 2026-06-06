@@ -1,0 +1,50 @@
+[
+  {
+    "sample_id": "sample_001",
+    "image": "images/sample_001.jpg",
+    "label": "labels/sample_001.txt",
+    "source_image": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\frame_label\\clothes_labels\\group3_1\\clo\\D04_20260123074846\\D04_20260123074846_frame_0023.jpg",
+    "source_label": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\frame_label\\clothes_labels\\group3_1\\clo\\label-clo\\D04_20260123074846_frame_0023.txt",
+    "label_lines": 1
+  },
+  {
+    "sample_id": "sample_002",
+    "image": "images/sample_002.jpg",
+    "label": "labels/sample_002.txt",
+    "source_image": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\frame_label\\clothes_labels\\group3_1\\clo\\D04_20260123074846\\D04_20260123074846_frame_0017.jpg",
+    "source_label": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\frame_label\\clothes_labels\\group3_1\\clo\\label-clo\\D04_20260123074846_frame_0017.txt",
+    "label_lines": 2
+  },
+  {
+    "sample_id": "sample_003",
+    "image": "images/sample_003.jpg",
+    "label": "labels/sample_003.txt",
+    "source_image": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\frame_label\\clothes_labels\\group3_1\\clo\\D04_20260123074846\\D04_20260123074846_frame_0018.jpg",
+    "source_label": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\frame_label\\clothes_labels\\group3_1\\clo\\label-clo\\D04_20260123074846_frame_0018.txt",
+    "label_lines": 2
+  },
+  {
+    "sample_id": "sample_004",
+    "image": "images/sample_004.jpg",
+    "label": "labels/sample_004.txt",
+    "source_image": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\frame_label\\clothes_labels\\group3_1\\clo\\D04_20260123074846\\D04_20260123074846_frame_0020.jpg",
+    "source_label": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\frame_label\\clothes_labels\\group3_1\\clo\\label-clo\\D04_20260123074846_frame_0020.txt",
+    "label_lines": 2
+  },
+  {
+    "sample_id": "sample_005",
+    "image": "images/sample_005.jpg",
+    "label": "labels/sample_005.txt",
+    "source_image": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\frame_label\\clothes_labels\\group3_1\\clo\\D04_20260123074846\\D04_20260123074846_frame_0021.jpg",
+    "source_label": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\frame_label\\clothes_labels\\group3_1\\clo\\label-clo\\D04_20260123074846_frame_0021.txt",
+    "label_lines": 2
+  },
+  {
+    "sample_id": "sample_006",
+    "image": "images/sample_006.jpg",
+    "label": "labels/sample_006.txt",
+    "source_image": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\frame_label\\clothes_labels\\group3_1\\clo\\D04_20260123074846\\D04_20260123074846_frame_0022.jpg",
+    "source_label": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\frame_label\\clothes_labels\\group3_1\\clo\\label-clo\\D04_20260123074846_frame_0022.txt",
+    "label_lines": 2
+  }
+]

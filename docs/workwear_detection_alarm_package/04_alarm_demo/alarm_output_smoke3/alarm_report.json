@@ -1,0 +1,220 @@
+{
+  "generated_at": "2026-06-05T18:45:47",
+  "input": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\docs\\workwear_detection_alarm_package\\03_sample_data\\clothes_samples\\images",
+  "roi": null,
+  "weights": {
+    "person": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\docs\\workwear_detection_alarm_package\\04_alarm_demo\\weights\\person_detect_yolov8.pt",
+    "workwear": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\docs\\workwear_detection_alarm_package\\04_alarm_demo\\weights\\workwear_detect_yolov8.pt"
+  },
+  "settings": {
+    "PERSON_CONF": 0.55,
+    "WORKWEAR_CONF": 0.45,
+    "ROI_MIN_OVERLAP_RATIO": 0.5,
+    "TEMPORAL_WINDOW_SIZE": 5,
+    "TEMPORAL_TRIGGER_RATIO": 0.6,
+    "MIN_TRACK_APPEAR_FRAMES": 2,
+    "TRACKER_MAX_AGE": 2,
+    "TRACKER_IOU_THRESHOLD": 0.3
+  },
+  "frames": [
+    {
+      "frame_idx": 0,
+      "source": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\docs\\workwear_detection_alarm_package\\03_sample_data\\clothes_samples\\images\\sample_001.jpg",
+      "person_count": 1,
+      "roi_person_count": 1,
+      "suspect_count": 1,
+      "tracks": [
+        {
+          "track_id": 0,
+          "bbox": [
+            354,
+            674,
+            484,
+            982
+          ],
+          "in_roi": true,
+          "has_workwear": false,
+          "workwear_count": 0
+        }
+      ]
+    },
+    {
+      "frame_idx": 1,
+      "source": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\docs\\workwear_detection_alarm_package\\03_sample_data\\clothes_samples\\images\\sample_002.jpg",
+      "person_count": 2,
+      "roi_person_count": 2,
+      "suspect_count": 2,
+      "tracks": [
+        {
+          "track_id": 1,
+          "bbox": [
+            275,
+            533,
+            381,
+            768
+          ],
+          "in_roi": true,
+          "has_workwear": false,
+          "workwear_count": 0
+        },
+        {
+          "track_id": 2,
+          "bbox": [
+            0,
+            749,
+            118,
+            1080
+          ],
+          "in_roi": true,
+          "has_workwear": false,
+          "workwear_count": 0
+        }
+      ]
+    },
+    {
+      "frame_idx": 2,
+      "source": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\docs\\workwear_detection_alarm_package\\03_sample_data\\clothes_samples\\images\\sample_003.jpg",
+      "person_count": 2,
+      "roi_person_count": 2,
+      "suspect_count": 2,
+      "tracks": [
+        {
+          "track_id": 1,
+          "bbox": [
+            256,
+            561,
+            368,
+            821
+          ],
+          "in_roi": true,
+          "has_workwear": false,
+          "workwear_count": 0
+        },
+        {
+          "track_id": 2,
+          "bbox": [
+            0,
+            833,
+            93,
+            1080
+          ],
+          "in_roi": true,
+          "has_workwear": false,
+          "workwear_count": 0
+        }
+      ]
+    },
+    {
+      "frame_idx": 3,
+      "source": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\docs\\workwear_detection_alarm_package\\03_sample_data\\clothes_samples\\images\\sample_004.jpg",
+      "person_count": 2,
+      "roi_person_count": 2,
+      "suspect_count": 2,
+      "tracks": [
+        {
+          "track_id": 1,
+          "bbox": [
+            287,
+            637,
+            402,
+            916
+          ],
+          "in_roi": true,
+          "has_workwear": false,
+          "workwear_count": 0
+        },
+        {
+          "track_id": 6,
+          "bbox": [
+            1131,
+            931,
+            1258,
+            1080
+          ],
+          "in_roi": true,
+          "has_workwear": false,
+          "workwear_count": 0
+        }
+      ]
+    },
+    {
+      "frame_idx": 4,
+      "source": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\docs\\workwear_detection_alarm_package\\03_sample_data\\clothes_samples\\images\\sample_005.jpg",
+      "person_count": 2,
+      "roi_person_count": 2,
+      "suspect_count": 2,
+      "tracks": [
+        {
+          "track_id": 1,
+          "bbox": [
+            321,
+            661,
+            456,
+            957
+          ],
+          "in_roi": true,
+          "has_workwear": false,
+          "workwear_count": 0
+        },
+        {
+          "track_id": 8,
+          "bbox": [
+            1196,
+            952,
+            1320,
+            1080
+          ],
+          "in_roi": true,
+          "has_workwear": false,
+          "workwear_count": 0
+        }
+      ]
+    },
+    {
+      "frame_idx": 5,
+      "source": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\docs\\workwear_detection_alarm_package\\03_sample_data\\clothes_samples\\images\\sample_006.jpg",
+      "person_count": 1,
+      "roi_person_count": 1,
+      "suspect_count": 1,
+      "tracks": [
+        {
+          "track_id": 0,
+          "bbox": [
+            349,
+            675,
+            483,
+            983
+          ],
+          "in_roi": true,
+          "has_workwear": false,
+          "workwear_count": 0
+        }
+      ]
+    }
+  ],
+  "events": [
+    {
+      "frame_idx": 4,
+      "source": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\docs\\workwear_detection_alarm_package\\03_sample_data\\clothes_samples\\images\\sample_005.jpg",
+      "rule": "workwear_missing",
+      "rule_name": "作业区人员疑似未穿工服",
+      "triggered_tracks": [
+        {
+          "track_id": 1,
+          "appear": 4,
+          "violation": 4,
+          "violation_ratio": 1.0,
+          "best_conf": 0.8035141229629517
+        },
+        {
+          "track_id": 2,
+          "appear": 2,
+          "violation": 2,
+          "violation_ratio": 1.0,
+          "best_conf": 0.7565463185310364
+        }
+      ],
+      "evidence": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\docs\\workwear_detection_alarm_package\\04_alarm_demo\\alarm_output_smoke3\\evidence\\alarm_frame_000004.jpg"
+    }
+  ]
+}

@@ -1,5 +1,151 @@
 # Update Log
 
+## 2026-06-06 将 personcrop 正式下游切换到 clothes 扩样主线并新增重建脚本
+
+1. 变更来源：用户要求把 `personcrop` 从默认 `95` 图单源 clothes 入口切换到正式的 `clothes` 扩样主线，并重新生成双上游 A/B 的 `personcrop` prepared 数据集，同时澄清 `person` 额外 hard examples 是否应直接并入 `clothes` / `personcrop` 下游训练。
+2. 变更总览：
+   - 新增脚本 `backend-train-model/personcrop-train/train-code/prepare_personcrop_from_dataset_yaml.py`，用于从已有 YOLO `dataset.yaml`（保留原 `train / val / test` 切分）直接生成 `personcrop clothes` prepared 数据集。
+   - 将 `backend-train-model/personcrop-train/train-docs/双上游personcrop执行方案.md` 的正式 source dataset 口径切换为：`backend-train-model/new_clothes_train/train-result/datasets/clothes_merged_with_new_labels_v1/dataset.yaml`。
+   - 同步把文档中的 A / B prepare 命令从默认 `train_workwear.py prepare --mode personcrop`（隐式落到 `backend-train-model/project_config.json` 的 `95` 图单源 clothes）改为显式走新脚本，从 `3009` 图 clothes 扩样主线出发。
+   - 更新 `backend-train-model/AGENTS.md`，明确：`personcrop` 正式下游应对齐 `clothes_merged_with_new_labels_v1`，而 `person` 额外 hard examples 当前只用于提升上游 person，不应在未补齐 clothes 标注前直接并入 `clothes` / `personcrop` 下游。
+   - 本轮已把 `pred_pc_person_base` / `pred_pc_person_hardv1` 的重建入口切换到新脚本与新 source dataset；当前会话内未把“两套 prepared 产物均已完整落盘”写成既成事实，后续应以新命令实际跑出的 `prepare_report.json` 为准。
+3. 涉及文件：
+   - `backend-train-model/personcrop-train/train-code/prepare_personcrop_from_dataset_yaml.py`
+   - `backend-train-model/personcrop-train/train-docs/双上游personcrop执行方案.md`
+   - `backend-train-model/AGENTS.md`
+   - `backend-train-model/docs/update_log.md`
+4. 新增 / 变更配置项：
+   - 新增从已有 YOLO `dataset.yaml` 生成 `personcrop` 数据集的脚本入口：`prepare_personcrop_from_dataset_yaml.py`。
+   - 当前正式 `personcrop` 下游 source dataset 口径切换为：`backend-train-model/new_clothes_train/train-result/datasets/clothes_merged_with_new_labels_v1/dataset.yaml`。
+   - A / B prepared 目标输出目录暂仍保持：
+     - `backend-train-model/personcrop-train/train-result/prepared/pred_pc_person_base`
+     - `backend-train-model/personcrop-train/train-result/prepared/pred_pc_person_hardv1`
+5. 兼容性注意：
+   - 本轮切换后，`pred_pc_person_base` / `pred_pc_person_hardv1` 的**目标语义**不再是默认 `95` 图单源 clothes prepared，而是对齐 `3009` 图 clothes 扩样主线的正式 `personcrop` prepared 数据集；实际是否已完整重建，应以对应目录下最终生成的 `dataset.yaml` 与 `prepare_report.json` 为准。
+   - `backend-train-model/project_config.json` 与 `train_workwear.py prepare --mode personcrop` 的默认单源 clothes 入口仍保留，但仅建议用于历史轻量验证，不再作为正式 A/B 的默认 source dataset。
+   - `person` 额外 hard examples 目前仍然只影响上游 person 模型；在未补齐对应 clothes 标注前，不应把这些样本直接混入 `clothes` / `personcrop` 下游监督训练。
+6. 本轮明确不改动：
+   - 不修改 `backend-train-model/train_workwear.py`、`config.py`、`project_config.json`、`new_clothes_train` 既有 build/split 配置或任何在线链路代码。
+   - 不直接把 `person` hard examples 扩展成 `clothes` 新训练集；若后续需要，再基于明确的下游收益证据单独版本化。
+
+## 2026-06-06 缩短双上游 personcrop 文档中的 run 名与报告名
+
+1. 变更来源：用户要求把 `backend-train-model/personcrop-train/train-docs/双上游personcrop执行方案.md` 中训练命令对应的 run 名和评估报告名改短一些，并尽量参考已经缩短过的 prepared 数据集命名。
+2. 变更总览：
+   - 更新 `双上游personcrop执行方案.md` 中的推荐 run 命名。
+   - 将上游 A 的 run 名从 `clothes_personcrop_from_person_fullframe_with_new_labels_baseline` 统一缩短为 `pred_pc_clo_base`。
+   - 将上游 B 的 run 名从 `clothes_personcrop_from_person_fullframe_with_new_labels_and_hard_examples_v1_from_baseline` 统一缩短为 `pred_pc_clo_hardv1`。
+   - 同步缩短对应训练权重路径、`evaluate --report-name`、默认报告落盘路径，以及报告复制归档命令中的目录名与文件名。
+3. 涉及文件：
+   - `backend-train-model/personcrop-train/train-docs/双上游personcrop执行方案.md`
+   - `backend-train-model/docs/update_log.md`
+4. 新增 / 变更配置项：
+   - 无新增 JSON 配置项。
+   - 文档层面的 run / report 命名约定调整为：
+     - 上游 A：`pred_pc_clo_base` / `pred_pc_clo_base_eval`
+     - 上游 B：`pred_pc_clo_hardv1` / `pred_pc_clo_hardv1_eval`
+5. 兼容性注意：
+   - 本轮仅修改执行文档中的命名示例，不改 `train_workwear.py` 的行为，也不自动重命名任何历史 run、历史报告或现有训练产物。
+   - 如果后续继续沿用旧长命名 run，脚本本身仍可正常工作；当前只是把后续推荐执行口径切换为更短的命名。
+   - 新短命名与现有 prepared 数据集 `pred_pc_person_base`、`pred_pc_person_hardv1` 保持同一风格，便于后续归档和人工复盘。
+6. 本轮明确不改动：
+   - 不修改 `backend-train-model/train_workwear.py`、任何 `project_config*.json`、prepared 数据集内容或模型权重。
+   - 不启动新的训练、评估、导出，也不改动 `inspection-flask/` 在线链路。
+
+## 2026-06-05 生成 person 命名 alias 权重并切回默认 person 口径
+
+1. 变更来源：用户确认采用“方案一”——不修改原始 `best.pt`，额外生成 `person` 命名 alias 权重，以避免后续 `personcrop` 继续受 `{0: 'item'}` 类别名污染。
+2. 变更总览：
+   - 新增脚本 `backend-train-model/person-train-model/train-code/create_person_alias_weights.py`，用于在不改动原始 checkpoint 的前提下，生成别名权重并写出对应 metadata JSON。
+   - 基于该脚本为两条 fullframe person 上游分别生成 alias 权重：
+     - `backend-train-model/person-train-model/train-result/export/person_detect_yolov8_with_new_labels.pt`
+     - `backend-train-model/person-train-model/train-result/export/person_detect_yolov8_with_new_labels_and_hard_examples_v1.pt`
+   - 同步生成 metadata：
+     - `person_detect_yolov8_with_new_labels.metadata.json`
+     - `person_detect_yolov8_with_new_labels_and_hard_examples_v1.metadata.json`
+   - 通过脚本内置校验确认：两份 alias 权重对外读取的类别名都已从 `{0: 'item'}` 规范化为 `{0: 'person'}`。
+   - 使用 alias 权重重新覆盖生成 `pred_pc_person_base` 与 `pred_pc_person_hardv1` 两套 prepared 数据集，使其重新回到默认 `person` 监控标签口径；重建后结果保持稳定：
+     - 上游 A：`positive_crops=310`、`fallback_fullframes=6`、`unmatched_boxes=6`
+     - 上游 B：`positive_crops=313`、`fallback_fullframes=3`、`unmatched_boxes=3`
+   - 更新 `backend-train-model/personcrop-train/train-docs/双上游personcrop执行方案.md` 与 `backend-train-model/AGENTS.md`，把 `personcrop` 推荐上游从“原始 best.pt + item 兼容口径”切换为“alias 权重 + 默认 person 口径”。
+3. 涉及文件：
+   - `backend-train-model/person-train-model/train-code/create_person_alias_weights.py`
+   - `backend-train-model/person-train-model/train-result/export/person_detect_yolov8_with_new_labels.pt`
+   - `backend-train-model/person-train-model/train-result/export/person_detect_yolov8_with_new_labels.metadata.json`
+   - `backend-train-model/person-train-model/train-result/export/person_detect_yolov8_with_new_labels_and_hard_examples_v1.pt`
+   - `backend-train-model/person-train-model/train-result/export/person_detect_yolov8_with_new_labels_and_hard_examples_v1.metadata.json`
+   - `backend-train-model/personcrop-train/train-result/prepared/pred_pc_person_base/*`
+   - `backend-train-model/personcrop-train/train-result/prepared/pred_pc_person_hardv1/*`
+   - `backend-train-model/personcrop-train/train-docs/双上游personcrop执行方案.md`
+   - `backend-train-model/AGENTS.md`
+   - `backend-train-model/docs/update_log.md`
+4. 新增 / 变更配置项：
+   - 新增 alias 权重产物路径：
+     - `backend-train-model/person-train-model/train-result/export/person_detect_yolov8_with_new_labels.pt`
+     - `backend-train-model/person-train-model/train-result/export/person_detect_yolov8_with_new_labels_and_hard_examples_v1.pt`
+   - 后续 `personcrop` 路线默认优先使用上述 alias 权重；直接使用原始 `best.pt` 时，才需要额外兼容 `item` 标签名。
+5. 兼容性注意：
+   - 原始 `best.pt` 完全未被改动；alias 权重只是对 checkpoint 中的类别名字典做了规范化，并保留了来源 metadata 以便回溯。
+   - 当前短命名 prepared 数据集已基于 alias 权重重新生成，因此后续可直接沿用默认 `person` 监控标签；无需再显式传 `--monitored-person-labels item`。
+   - 如果将来要复核历史问题或对比原始权重行为，仍可继续使用 run 目录下原始 `best.pt`；但 personcrop 主线不建议再默认直接接原始权重。
+6. 本轮明确不改动：
+   - 不修改 `backend-train-model/train_workwear.py`、`config.py`、任何 `project_config*.json`、ROI 配置或在线链路代码。
+   - 不启动 `personcrop clothes` 的训练、评估或导出；本轮只完成 alias 权重生成、prepared 重建和文档/规则同步。
+
+## 2026-06-05 排查双上游 personcrop 首轮 0 检出并改用短命名 prepared 目录
+
+1. 变更来源：用户要求先按“选项 A”排查当前 `personcrop` 首轮 prepare 出现的 `无 person 检出 / 全量 fallback fullframe` 问题，并要求把 `backend-train-model/personcrop-train/train-result/prepared/` 下的目录名改得更短但仍有标识度。
+2. 变更总览：
+   - 抽样核对 `group3_1` 的 clothes 原图后确认：两条上游 `person` 权重在原图上并非真实 0 检出，手工单图推理可以正常打出多个框。
+   - 进一步确认根因：`person_fullframe_with_new_labels_baseline` 与 `person_fullframe_with_new_labels_and_hard_examples_v1_from_baseline` 这两条权重通过 Ultralytics 读取时的类别名都是 `{0: 'item'}`，而 `train_workwear.py prepare --mode personcrop` 默认监控标签仍是 `person`，导致真实检出被全部过滤。
+   - 按修正口径重新执行两条上游的 prepare：显式传入 `--monitored-person-labels item`，并改用更短的 prepared 目录名：
+     - `pred_pc_person_base`
+     - `pred_pc_person_hardv1`
+   - 修正后 prepare 已恢复正常：
+     - 上游 A：`positive_crops=310`、`fallback_fullframes=6`、`unmatched_boxes=6`、`images_without_person_detection=0`
+     - 上游 B：`positive_crops=313`、`fallback_fullframes=3`、`unmatched_boxes=3`、`images_without_person_detection=0`
+   - 同步更新 `backend-train-model/personcrop-train/train-docs/双上游personcrop执行方案.md` 与 `backend-train-model/AGENTS.md`，写清该标签名兼容性问题以及新的短目录命名。
+3. 涉及文件：
+   - `backend-train-model/personcrop-train/train-docs/双上游personcrop执行方案.md`
+   - `backend-train-model/personcrop-train/train-result/prepared/pred_pc_person_base/*`
+   - `backend-train-model/personcrop-train/train-result/prepared/pred_pc_person_hardv1/*`
+   - `backend-train-model/AGENTS.md`
+   - `backend-train-model/docs/update_log.md`
+4. 新增 / 变更配置项：
+   - 当前 `personcrop` prepare 对这两条 fullframe person 上游权重，必须显式传 `--monitored-person-labels item`。
+   - prepared 目录短命名约定更新为：
+     - 上游 A：`backend-train-model/personcrop-train/train-result/prepared/pred_pc_person_base`
+     - 上游 B：`backend-train-model/personcrop-train/train-result/prepared/pred_pc_person_hardv1`
+5. 兼容性注意：
+   - 本轮排查说明“95/95 全量 fallback”是**标签名过滤造成的假象**，不是 person 权重本身完全失效。
+   - 旧的长目录 prepared 产物保留为历史排查痕迹，但不应再作为当前有效输入；后续以新的短目录 prepared 数据集为准。
+   - 本轮没有修改 `train_workwear.py` 的默认监控标签逻辑；因此后续凡是继续用这两条上游权重跑 `prepare --mode personcrop`，仍需显式传 `--monitored-person-labels item`。
+6. 本轮明确不改动：
+   - 不修改 `backend-train-model/train_workwear.py`、`config.py`、`project_config*.json`、ROI 配置或任何在线链路代码。
+   - 不启动 `personcrop clothes` 的训练、评估或导出；本轮只完成问题排查、prepared 重建和文档/规则同步。
+
+## 2026-06-05 补齐双上游 personcrop 执行方案第 6 节细节
+
+1. 变更来源：用户指出 `backend-train-model/personcrop-train/train-docs/双上游personcrop执行方案.md` 的第 6 节“具体执行步骤”内容不够完整，要求补齐实际落地时需要的目录创建、prepared 核对、报告落盘与归档细节。
+2. 变更总览：
+   - 更新 `backend-train-model/personcrop-train/train-docs/双上游personcrop执行方案.md` 的第 6 节。
+   - 将原来的 `6.1 ~ 6.6` 扩展为更完整的执行链：创建目录、确认权重、分别 prepare 两条上游、核对 prepared 产物、分别训练两条上游、评估与报告归档、补最小 G0/G1/G2 对照表。
+   - 明确写出 `person_conf=0.20` 的显式 CLI 传参，避免文档里“默认值”和执行命令口径分离。
+   - 补充评估报告默认落盘路径，以及把仓库级 `backend-train-model/artifacts/reports/<run_name>/` 中的评估报告复制回 `personcrop-train/train-result/artifacts/reports/<run_name>/` 的建议命令。
+3. 涉及文件：
+   - `backend-train-model/personcrop-train/train-docs/双上游personcrop执行方案.md`
+   - `backend-train-model/docs/update_log.md`
+4. 新增 / 变更配置项：
+   - 无新增 JSON 配置字段。
+   - 文档中补充的执行细节继续沿用当前 `train_workwear.py` 的现有 CLI 参数与默认报告写入逻辑，不改脚本行为。
+5. 兼容性注意：
+   - 本轮只是把执行手册写完整，不代表 `personcrop` 已升级为默认训练主线。
+   - 文档中新增的报告复制命令属于实验产物归档建议，不改变 `train_workwear.py` 当前默认把报告写到 `backend-train-model/artifacts/reports/<run_name>/` 的实现。
+   - `G0` 对照表仍允许先手工整理为 Markdown 结论文件，后续若补自动汇总脚本再单独版本化。
+6. 本轮明确不改动：
+   - 不修改 `backend-train-model/train_workwear.py`、`config.py`、任何 `project_config*.json`、prepared 数据集或现有模型权重。
+   - 不启动新的训练、评估、导出或在线链路修改。
+
 ## 2026-06-03 补充旧 fullframe 基线在 hard holdout 上的对照回评命令
 
 1. 变更来源：用户要求把 `person_fullframe_with_new_labels_baseline` 在 `person_new_hard_examples_v1/sequence_holdout` 上的对照回评命令补入 `person_run_method.md`，用于和方案 C 做同口径 hard holdout 对比。
@@ -1126,6 +1272,29 @@
 6. 本轮明确不改动的部分：
    - 不修改 `All-train-model/` 下现有 baseline、历史 runs、旧 split manifest 和既有基线结论。
    - 不修改 `inspection-flask/` 在线链路、person 主线或其他监控方向代码。
+
+## 2026-06-04 新增双上游 personcrop 执行方案文档
+
+1. 变更来源：用户要求先把“基于当前两条 person 候选做双上游 `personcrop`”的具体执行方案整理成独立中文文档，放入 `backend-train-model/personcrop-train/train-docs/`，用于后续路线验证落地。
+2. 变更总览：
+   - 新增 `backend-train-model/personcrop-train/train-docs/双上游personcrop执行方案.md`。
+   - 文档明确区分：当前进入的是 `personcrop` 验证阶段，而不是直接把 `pred-personcrop clothes` 升级为默认主线。
+   - 固化第一轮双上游口径：以 `person_fullframe_with_new_labels_baseline` 作为保守型上游 A，以 `person_fullframe_with_new_labels_and_hard_examples_v1_from_baseline` 作为困难样本增强型上游 B。
+   - 明确第一轮先固定下游 `clothes`、暂不把 `new hard examples` 并入 `clothes` 监督训练，并给出 `prepare -> train -> evaluate` 的命令模板、输出目录约定、记录指标与结果解读口径。
+3. 涉及文件：
+   - `backend-train-model/personcrop-train/train-docs/双上游personcrop执行方案.md`
+   - `backend-train-model/docs/update_log.md`
+4. 新增 / 变更配置项：
+   - 无新增 JSON 配置字段。
+   - 本轮仅新增路线执行文档，文档中显式沿用当前 `personcrop` 默认机制：`person_conf=0.20`、`person_imgsz=640`、`assignment_min_ioa=0.35`、`include_empty_person_crops=false`、`fallback_to_fullframe=true`。
+   - 命令模板沿用训练机 Python 路径 `E:\Miniconda3\envs\yolo_Code\python.exe` 与当前推荐训练主超参 `imgsz=640 / batch=4 / epochs=180 / patience=40 / workers=4 / device=0`。
+5. 兼容性注意：
+   - 该文档是“第一轮双上游 `pred-personcrop` 路线验证手册”，不代表当前正式默认主线已从 `fullframe clothes` 切换到 `personcrop clothes`。
+   - 文档明确要求第一轮保持下游 `clothes` 固定，因此后续如果要评估 `new hard examples` 对整链路的最终上限影响，仍需单独规划 `clothes` 端 hard scenes 补标或微调实验。
+   - 文档当前只纳入两条 fullframe `person` 上游，不把 ROI-aware `person` 直接并入首轮候选，避免一次性同时变更多个主变量。
+6. 本轮明确不改动的部分：
+   - 不修改 `backend-train-model/` 下现有 clothes / person 训练脚本、项目配置、prepared 数据集、权重和既有评估报告。
+   - 不修改 `inspection-flask/` 在线链路、`person` 主线结论或其他监控方向代码。
 
 ## 2026-05-05 统一 person 主线分桶与 person-guided clothes 路线验证的优先级
 
