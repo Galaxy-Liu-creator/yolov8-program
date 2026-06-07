@@ -1,5 +1,47 @@
 # Update Log
 
+## 2026-06-07 修正 pred_pc_clo_hardv1 报告内部 report_path
+
+1. 变更来源：用户要求把 `pred_pc_clo_hardv1` 训练 / 评估报告 JSON 内部的 `report_path` 改成当前实际文件路径。
+2. 变更总览：
+   - 修正 `pred_pc_clo_hardv1_train.json` 的 `report_path`，从默认 `backend-train-model/artifacts/reports/...` 改为 `backend-train-model/personcrop-train/train-result/artifacts/reports/...`。
+   - 修正 `pred_pc_clo_hardv1_eval.json` 的 `report_path`，保持与当前实际归档位置一致。
+3. 涉及文件：
+   - `backend-train-model/personcrop-train/train-result/artifacts/reports/pred_pc_clo_hardv1/pred_pc_clo_hardv1_train.json`
+   - `backend-train-model/personcrop-train/train-result/artifacts/reports/pred_pc_clo_hardv1/pred_pc_clo_hardv1_eval.json`
+   - `backend-train-model/docs/update_log.md`
+4. 新增 / 变更配置项：
+   - 无新增配置项；仅修正报告元数据字段。
+5. 兼容性注意：
+   - 本轮不改变训练权重、评估指标、dataset、run 目录或任何脚本行为。
+6. 本轮明确不改动：
+   - 不重新训练、不重新评估、不修改 `train_workwear.py` 或 personcrop prepared 数据集。
+
+## 2026-06-07 本机化重建双上游 personcrop prepared 数据集
+
+1. 变更来源：用户准备开始 `personcrop` 训练，要求根据 `backend-train-model/personcrop-train/train-result/prepared/pred_pc_person_base`、`backend-train-model/personcrop-train/train-result/prepared/pred_pc_person_hardv1` 以及本机 `E:\Competition\frame_label` 下的图片标注路径，重新生成适用于本机的数据集。
+2. 变更总览：
+   - 检查并沿用正式 source dataset：`backend-train-model/new_clothes_train/train-result/datasets/clothes_merged_with_new_labels_v1/dataset.yaml`。
+   - 发现该 source dataset 本机目录图片齐全，但空白负样本缺少 `.txt` 文件；已补齐空标签：`train=225`、`val=48`、`test=49`，使 `images / labels` 数量重新一一匹配。
+   - 重新生成 `pred_pc_person_base`，使用上游权重 `person_detect_yolov8_with_new_labels.pt`，参数为 `person_conf=0.20`、`person_imgsz=640`、`assignment_min_ioa=0.35`、`device=0`。
+   - 重新生成 `pred_pc_person_hardv1`，使用上游权重 `person_detect_yolov8_with_new_labels_and_hard_examples_v1.pt`，其余参数保持一致。
+3. 涉及文件：
+   - `backend-train-model/new_clothes_train/train-result/datasets/clothes_merged_with_new_labels_v1/dataset.yaml`
+   - `backend-train-model/new_clothes_train/train-result/datasets/clothes_merged_with_new_labels_v1/labels/{train,val,test}/*.txt`
+   - `backend-train-model/personcrop-train/train-result/prepared/pred_pc_person_base/*`
+   - `backend-train-model/personcrop-train/train-result/prepared/pred_pc_person_hardv1/*`
+   - `backend-train-model/docs/update_log.md`
+4. 新增 / 变更配置项：
+   - 无新增 JSON 配置项。
+   - source dataset 的训练入口继续使用相对 split：`train: images/train`、`val: images/val`、`test: images/test`，避免依赖旧机器绝对路径。
+5. 兼容性注意：
+   - 本轮没有重新构建 `clothes_merged_with_new_labels_v1` 的图片副本；因为旧目录中的图片已经齐全且 Windows 对批量删除旧图片返回拒绝访问，最终采用补齐空标签与重跑 personcrop 的方式完成本机化。
+   - 重建后的 `pred_pc_person_base` 统计为：`train=3645 / val=792 / test=799`，`positive_crops=5151`，`fallback_fullframes=85`，`unmatched_boxes=86`。
+   - 重建后的 `pred_pc_person_hardv1` 统计为：`train=3651 / val=789 / test=799`，`positive_crops=5177`，`fallback_fullframes=62`，`unmatched_boxes=62`。
+6. 本轮明确不改动：
+   - 不启动 `personcrop clothes` 训练、评估或导出。
+   - 不改动 `train_workwear.py`、`personcrop` 生成脚本、上游 person 权重、`inspection-flask/` 在线链路或 ROI 配置。
+
 ## 2026-06-06 将 personcrop 正式下游切换到 clothes 扩样主线并新增重建脚本
 
 1. 变更来源：用户要求把 `personcrop` 从默认 `95` 图单源 clothes 入口切换到正式的 `clothes` 扩样主线，并重新生成双上游 A/B 的 `personcrop` prepared 数据集，同时澄清 `person` 额外 hard examples 是否应直接并入 `clothes` / `personcrop` 下游训练。

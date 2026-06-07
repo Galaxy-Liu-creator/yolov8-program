@@ -3,9 +3,9 @@
     "command": "prepare_personcrop_from_dataset_yaml",
     "argv": [
       "--source-dataset-yaml",
-      "backend-train-model/new_clothes_train/train-result/datasets/clothes_merged_with_new_labels_v1/dataset.yaml",
+      "backend-train-model\\new_clothes_train\\train-result\\datasets\\clothes_merged_with_new_labels_v1\\dataset.yaml",
       "--person-model",
-      "backend-train-model/person-train-model/train-result/export/person_detect_yolov8_with_new_labels.pt",
+      "backend-train-model\\person-train-model\\train-result\\export\\person_detect_yolov8_with_new_labels.pt",
       "--person-conf",
       "0.20",
       "--person-imgsz",
@@ -13,12 +13,15 @@
       "--assignment-min-ioa",
       "0.35",
       "--output-root",
-      "backend-train-model/personcrop-train/train-result/prepared/pred_pc_person_base"
+      "backend-train-model\\personcrop-train\\train-result\\prepared\\pred_pc_person_base",
+      "--device",
+      "0",
+      "--overwrite"
     ],
-    "generated_at": "2026-06-06T19:07:31"
+    "generated_at": "2026-06-07T08:55:31"
   },
   "source_dataset": {
-    "dataset_yaml": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\new_clothes_train\\train-result\\datasets\\clothes_merged_with_new_labels_v1\\dataset.yaml",
+    "dataset_yaml": "E:\\Competition\\yolov8-program\\backend-train-model\\new_clothes_train\\train-result\\datasets\\clothes_merged_with_new_labels_v1\\dataset.yaml",
     "split_image_counts": {
       "train": 2072,
       "val": 443,
@@ -39,8 +42,8 @@
     "total_boxes": 5265
   },
   "prepare_request": {
-    "output_root": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\personcrop-train\\train-result\\prepared\\pred_pc_person_base",
-    "person_model": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\export\\person_detect_yolov8_with_new_labels.pt",
+    "output_root": "E:\\Competition\\yolov8-program\\backend-train-model\\personcrop-train\\train-result\\prepared\\pred_pc_person_base",
+    "person_model": "E:\\Competition\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\export\\person_detect_yolov8_with_new_labels.pt",
     "person_conf": 0.2,
     "person_imgsz": 640,
     "assignment_min_ioa": 0.35,
@@ -49,13 +52,13 @@
     ],
     "include_empty_person_crops": false,
     "fallback_to_fullframe": true,
-    "device": null
+    "device": "0"
   },
   "prepare": {
     "mode": "personcrop",
     "source_split_strategy": "preserve_existing_split",
-    "dataset_root": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\personcrop-train\\train-result\\prepared\\pred_pc_person_base",
-    "dataset_yaml": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\personcrop-train\\train-result\\prepared\\pred_pc_person_base\\dataset.yaml",
+    "dataset_root": "E:\\Competition\\yolov8-program\\backend-train-model\\personcrop-train\\train-result\\prepared\\pred_pc_person_base",
+    "dataset_yaml": "E:\\Competition\\yolov8-program\\backend-train-model\\personcrop-train\\train-result\\prepared\\pred_pc_person_base\\dataset.yaml",
     "split_image_counts": {
       "train": 3645,
       "val": 792,
@@ -76,6 +79,6 @@
     "fallback_fullframes": 85,
     "unmatched_boxes": 86,
     "images_without_person_detection": 13,
-    "report_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\personcrop-train\\train-result\\prepared\\pred_pc_person_base\\prepare_report.json"
+    "report_path": "E:\\Competition\\yolov8-program\\backend-train-model\\personcrop-train\\train-result\\prepared\\pred_pc_person_base\\prepare_report.json"
   }
 }

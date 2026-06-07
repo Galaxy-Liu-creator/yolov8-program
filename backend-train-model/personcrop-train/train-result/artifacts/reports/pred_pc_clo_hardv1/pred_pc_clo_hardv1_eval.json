@@ -1,0 +1,141 @@
+{
+  "runtime": {
+    "command": "evaluate",
+    "argv": [
+      "evaluate",
+      "--dataset-yaml",
+      "backend-train-model\\personcrop-train\\train-result\\prepared\\pred_pc_person_hardv1\\dataset.yaml",
+      "--weights",
+      "backend-train-model\\personcrop-train\\train-result\\artifacts\\runs\\pred_pc_clo_hardv1\\weights\\best.pt",
+      "--report-name",
+      "pred_pc_clo_hardv1_eval",
+      "--imgsz",
+      "640",
+      "--batch",
+      "4",
+      "--workers",
+      "4",
+      "--device",
+      "0"
+    ],
+    "generated_at": "2026-06-07T16:01:14",
+    "config": {
+      "project_config_path": "E:\\Competition\\yolov8-program\\backend-train-model\\project_config.json",
+      "image_roots": [
+        "E:\\Competition\\frame_label\\clothes_labels\\group3_1\\clo\\D04_20260123074846",
+        "E:\\Competition\\frame_label\\clothes_labels\\group3_1\\clo\\D05_20260123074841",
+        "E:\\Competition\\frame_label\\clothes_labels\\group3_1\\clo\\D15_20260123074848"
+      ],
+      "label_root": "E:\\Competition\\frame_label\\clothes_labels\\group3_1\\clo\\label-clo",
+      "image_extensions": [
+        ".jpg",
+        ".jpeg",
+        ".png"
+      ],
+      "class_names": {
+        "0": "clothes"
+      },
+      "ignored_label_filenames": [
+        "classes.txt"
+      ],
+      "split_ratios": {
+        "train": 0.7,
+        "val": 0.15,
+        "test": 0.15
+      },
+      "default_split_strategy": "sequence_contiguous",
+      "default_prepare_mode": "auto",
+      "default_include_empty_person_crops": false,
+      "default_limit_per_sequence": null,
+      "default_monitored_person_labels": [
+        "person"
+      ],
+      "default_person_conf": 0.2,
+      "default_person_imgsz": 640,
+      "default_assignment_min_ioa": 0.35,
+      "default_fallback_to_fullframe": true,
+      "default_allow_remote_model_download": false,
+      "default_person_model_candidates": [
+        "E:\\Competition\\yolov8-program\\backend-train-model\\weights\\person_detect_yolov8.pt",
+        "E:\\Competition\\yolov8-program\\inspection-flask\\weights\\person_detect_yolov8.pt"
+      ],
+      "default_python_candidates": [
+        "D:\\Miniconda3_python\\envs\\yolo_code\\python.exe",
+        "E:\\Miniconda3\\envs\\yolo_Code\\python.exe"
+      ],
+      "default_train_args": {
+        "imgsz": 640,
+        "epochs": 180,
+        "batch": 4,
+        "patience": 40,
+        "workers": 4,
+        "device": "0",
+        "seed": 42
+      },
+      "artifacts_root": "E:\\Competition\\yolov8-program\\backend-train-model\\artifacts",
+      "prepared_root": "E:\\Competition\\yolov8-program\\backend-train-model\\artifacts\\prepared",
+      "runs_root": "E:\\Competition\\yolov8-program\\backend-train-model\\artifacts\\runs",
+      "reports_root": "E:\\Competition\\yolov8-program\\backend-train-model\\artifacts\\reports",
+      "export_root": "E:\\Competition\\yolov8-program\\backend-train-model\\artifacts\\export"
+    }
+  },
+  "report_name": "pred_pc_clo_hardv1_eval.json",
+  "weights": "E:\\Competition\\yolov8-program\\backend-train-model\\personcrop-train\\train-result\\artifacts\\runs\\pred_pc_clo_hardv1\\weights\\best.pt",
+  "weights_resolution_mode": "explicit_weights_path",
+  "weights_report_source": null,
+  "dataset_yaml": "backend-train-model\\personcrop-train\\train-result\\prepared\\pred_pc_person_hardv1\\dataset.yaml",
+  "comparison_dataset_name": "pred_pc_person_hardv1",
+  "dataset_metadata": {
+    "dataset_name": "pred_pc_person_hardv1",
+    "dataset_yaml": "backend-train-model\\personcrop-train\\train-result\\prepared\\pred_pc_person_hardv1\\dataset.yaml",
+    "dataset_root": "E:\\Competition\\yolov8-program\\backend-train-model\\personcrop-train\\train-result\\prepared\\pred_pc_person_hardv1",
+    "class_names": {
+      "0": "clothes"
+    },
+    "class_count": 1,
+    "split_image_counts": {
+      "train": 3651,
+      "val": 789,
+      "test": 799
+    },
+    "prepare_report_path": "backend-train-model\\personcrop-train\\train-result\\prepared\\pred_pc_person_hardv1\\prepare_report.json",
+    "prepare_mode": "personcrop",
+    "prepare_split_strategy": null
+  },
+  "evaluated_splits": [
+    "val",
+    "test"
+  ],
+  "skipped_splits": [],
+  "native_eval": {
+    "val": {
+      "results_dict": {
+        "metrics/precision(B)": 0.989922377873552,
+        "metrics/recall(B)": 0.9826086956521739,
+        "metrics/mAP50(B)": 0.9941775761520081,
+        "metrics/mAP50-95(B)": 0.751613781683209,
+        "fitness": 0.751613781683209
+      },
+      "precision": 0.989922377873552,
+      "recall": 0.9826086956521739,
+      "map50": 0.9941775761520081,
+      "map75": 0.9120360590359586,
+      "map50_95": 0.751613781683209
+    },
+    "test": {
+      "results_dict": {
+        "metrics/precision(B)": 0.9981807341063955,
+        "metrics/recall(B)": 0.9815950920245399,
+        "metrics/mAP50(B)": 0.9942920265852656,
+        "metrics/mAP50-95(B)": 0.7470574492532991,
+        "fitness": 0.7470574492532991
+      },
+      "precision": 0.9981807341063955,
+      "recall": 0.9815950920245399,
+      "map50": 0.9942920265852656,
+      "map75": 0.8763826932182266,
+      "map50_95": 0.7470574492532991
+    }
+  },
+  "report_path": "E:\\Competition\\yolov8-program\\backend-train-model\\personcrop-train\\train-result\\artifacts\\reports\\pred_pc_clo_hardv1\\pred_pc_clo_hardv1_eval.json"
+}
