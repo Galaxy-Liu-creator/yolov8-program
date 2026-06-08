@@ -105,6 +105,13 @@
 - 上游 B run 名：
   `pred_pc_clo_hardv1`
 
+这里的命名故意把 prepared 数据集和训练产物区分开：
+
+- `pred_pc_person_*` 表示“由某个上游 `person` 模型预测出来的 person crop 数据集”；
+- `pred_pc_clo_*` 表示“在该 personcrop 数据集上训练出来的下游 `clothes` 检测模型”。
+
+也就是说，`pred_pc_person_hardv1` 是上游 B 生成的裁剪数据集，`pred_pc_clo_hardv1` 是用这套裁剪数据训练得到的工服模型 run。
+
  ---
 
 ## 6. 具体执行步骤
@@ -124,6 +131,21 @@ New-Item -ItemType Directory -Force -Path backend-train-model\personcrop-train\t
 New-Item -ItemType Directory -Force -Path backend-train-model\personcrop-train\train-result\artifacts\runs | Out-Null
 New-Item -ItemType Directory -Force -Path backend-train-model\personcrop-train\train-result\artifacts\reports | Out-Null
 New-Item -ItemType Directory -Force -Path backend-train-model\personcrop-train\train-result\review | Out-Null
+```
+
+本轮 `personcrop` 的 `train / evaluate / export` 命令统一显式传入专用项目配置：
+
+```text
+backend-train-model/personcrop-train/personcrop_project_config.json
+```
+
+注意：`train_workwear.py` 会相对 `backend-train-model/` 解析 `--project-config`，因此命令参数应写作 `personcrop-train\personcrop_project_config.json`。
+
+该配置只把 artifacts 根目录切到 `backend-train-model/personcrop-train/train-result/artifacts`，因此训练 run、训练报告、评估报告和导出报告会按 run 名集中写到：
+
+```text
+backend-train-model/personcrop-train/train-result/artifacts/runs/<run_name>/
+backend-train-model/personcrop-train/train-result/artifacts/reports/<run_name>/
 ```
 
 建议本轮先手工固定下面三个变量，并在你自己的实验记录里写清楚：
@@ -272,7 +294,7 @@ backend-train-model/personcrop-train/train-result/prepared/pred_pc_person_hardv1
 假设本轮继续沿用 `clothes_merged_with_new_labels_v1_baseline` 作为初始化来源，则训练命令可以写成：
 
 ```powershell
-E:\Miniconda3\envs\yolo_Code\python.exe backend-train-model\train_workwear.py train --dataset-yaml backend-train-model\personcrop-train\train-result\prepared\pred_pc_person_base\dataset.yaml --mode personcrop --person-model backend-train-model\person-train-model\train-result\export\person_detect_yolov8_with_new_labels.pt --base-model backend-train-model\new_clothes_train\train-result\artifacts\runs\clothes_merged_with_new_labels_v1_baseline\weights\best.pt --project backend-train-model\personcrop-train\train-result\artifacts\runs --name pred_pc_clo_base --imgsz 640 --epochs 180 --batch 4 --patience 40 --workers 4 --device 0 --seed 42
+E:\Miniconda3\envs\yolo_Code\python.exe backend-train-model\train_workwear.py --project-config personcrop-train\personcrop_project_config.json train --dataset-yaml backend-train-model\personcrop-train\train-result\prepared\pred_pc_person_base\dataset.yaml --mode personcrop --person-model backend-train-model\person-train-model\train-result\export\person_detect_yolov8_with_new_labels.pt --base-model backend-train-model\new_clothes_train\train-result\artifacts\runs\clothes_merged_with_new_labels_v1_baseline\weights\best.pt --project backend-train-model\personcrop-train\train-result\artifacts\runs --name pred_pc_clo_base --imgsz 640 --epochs 180 --batch 4 --patience 40 --workers 4 --device 0 --seed 42
 ```
 
 如果你本轮想对齐仓库级旧 baseline，则只替换 `--base-model` 指向的 clothes 权重，不改其他参数。
@@ -283,12 +305,18 @@ E:\Miniconda3\envs\yolo_Code\python.exe backend-train-model\train_workwear.py tr
 backend-train-model/personcrop-train/train-result/artifacts/runs/pred_pc_clo_base/weights/best.pt
 ```
 
+训练报告会直接写入：
+
+```text
+backend-train-model/personcrop-train/train-result/artifacts/reports/pred_pc_clo_base/pred_pc_clo_base_train.json
+```
+
 ---
 
 ### 6.7 训练上游 B 对应的 `personcrop clothes`
 
 ```powershell
-E:\Miniconda3\envs\yolo_Code\python.exe backend-train-model\train_workwear.py train --dataset-yaml backend-train-model\personcrop-train\train-result\prepared\pred_pc_person_hardv1\dataset.yaml --mode personcrop --person-model backend-train-model\person-train-model\train-result\export\person_detect_yolov8_with_new_labels_and_hard_examples_v1.pt --base-model backend-train-model\new_clothes_train\train-result\artifacts\runs\clothes_merged_with_new_labels_v1_baseline\weights\best.pt --project backend-train-model\personcrop-train\train-result\artifacts\runs --name pred_pc_clo_hardv1 --imgsz 640 --epochs 180 --batch 4 --patience 40 --workers 4 --device 0 --seed 42
+E:\Miniconda3\envs\yolo_Code\python.exe backend-train-model\train_workwear.py --project-config personcrop-train\personcrop_project_config.json train --dataset-yaml backend-train-model\personcrop-train\train-result\prepared\pred_pc_person_hardv1\dataset.yaml --mode personcrop --person-model backend-train-model\person-train-model\train-result\export\person_detect_yolov8_with_new_labels_and_hard_examples_v1.pt --base-model backend-train-model\new_clothes_train\train-result\artifacts\runs\clothes_merged_with_new_labels_v1_baseline\weights\best.pt --project backend-train-model\personcrop-train\train-result\artifacts\runs --name pred_pc_clo_hardv1 --imgsz 640 --epochs 180 --batch 4 --patience 40 --workers 4 --device 0 --seed 42
 ```
 
 这里建议 **A / B 两条都使用同一个 clothes 初始化来源**，否则最后无法判断改进到底来自：
@@ -302,6 +330,12 @@ E:\Miniconda3\envs\yolo_Code\python.exe backend-train-model\train_workwear.py tr
 backend-train-model/personcrop-train/train-result/artifacts/runs/pred_pc_clo_hardv1/weights/best.pt
 ```
 
+训练报告会直接写入：
+
+```text
+backend-train-model/personcrop-train/train-result/artifacts/reports/pred_pc_clo_hardv1/pred_pc_clo_hardv1_train.json
+```
+
 ---
 
 ### 6.8 评估、报告落盘与归档整理
@@ -311,37 +345,33 @@ backend-train-model/personcrop-train/train-result/artifacts/runs/pred_pc_clo_har
 #### 评估上游 A 对应模型
 
 ```powershell
-E:\Miniconda3\envs\yolo_Code\python.exe backend-train-model\train_workwear.py evaluate --dataset-yaml backend-train-model\personcrop-train\train-result\prepared\pred_pc_person_base\dataset.yaml --weights backend-train-model\personcrop-train\train-result\artifacts\runs\pred_pc_clo_base\weights\best.pt --report-name pred_pc_clo_base_eval --imgsz 640 --batch 4 --workers 4 --device 0
+E:\Miniconda3\envs\yolo_Code\python.exe backend-train-model\train_workwear.py --project-config personcrop-train\personcrop_project_config.json evaluate --dataset-yaml backend-train-model\personcrop-train\train-result\prepared\pred_pc_person_base\dataset.yaml --weights backend-train-model\personcrop-train\train-result\artifacts\runs\pred_pc_clo_base\weights\best.pt --report-name pred_pc_clo_base_eval --imgsz 640 --batch 4 --workers 4 --device 0
 ```
 
 #### 评估上游 B 对应模型
 
 ```powershell
-E:\Miniconda3\envs\yolo_Code\python.exe backend-train-model\train_workwear.py evaluate --dataset-yaml backend-train-model\personcrop-train\train-result\prepared\pred_pc_person_hardv1\dataset.yaml --weights backend-train-model\personcrop-train\train-result\artifacts\runs\pred_pc_clo_hardv1\weights\best.pt --report-name pred_pc_clo_hardv1_eval --imgsz 640 --batch 4 --workers 4 --device 0
+E:\Miniconda3\envs\yolo_Code\python.exe backend-train-model\train_workwear.py --project-config personcrop-train\personcrop_project_config.json evaluate --dataset-yaml backend-train-model\personcrop-train\train-result\prepared\pred_pc_person_hardv1\dataset.yaml --weights backend-train-model\personcrop-train\train-result\artifacts\runs\pred_pc_clo_hardv1\weights\best.pt --report-name pred_pc_clo_hardv1_eval --imgsz 640 --batch 4 --workers 4 --device 0
 ```
 
-按当前 `train_workwear.py` 的默认行为，评估报告会按 run 名写入仓库级报告目录：
+因为本节命令显式传入了 `personcrop_project_config.json`，评估报告会按 run 名直接写入 `personcrop-train/` 的本轮报告目录：
 
 #### 上游 A 默认报告路径
 
 ```text
-backend-train-model/artifacts/reports/pred_pc_clo_base/pred_pc_clo_base_eval.json
+backend-train-model/personcrop-train/train-result/artifacts/reports/pred_pc_clo_base/pred_pc_clo_base_eval.json
 ```
 
 #### 上游 B 默认报告路径
 
 ```text
-backend-train-model/artifacts/reports/pred_pc_clo_hardv1/pred_pc_clo_hardv1_eval.json
+backend-train-model/personcrop-train/train-result/artifacts/reports/pred_pc_clo_hardv1/pred_pc_clo_hardv1_eval.json
 ```
 
-为了后续在 `personcrop-train/` 目录下集中复盘，建议评估后立刻把两份报告复制一份到本轮专用目录：
+后续若执行导出，也应继续传入同一个 project config，并把导出目录显式放到 `personcrop-train` 下：
 
 ```powershell
-New-Item -ItemType Directory -Force -Path backend-train-model\personcrop-train\train-result\artifacts\reports\pred_pc_clo_base | Out-Null
-New-Item -ItemType Directory -Force -Path backend-train-model\personcrop-train\train-result\artifacts\reports\pred_pc_clo_hardv1 | Out-Null
-
-Copy-Item backend-train-model\artifacts\reports\pred_pc_clo_base\pred_pc_clo_base_eval.json backend-train-model\personcrop-train\train-result\artifacts\reports\pred_pc_clo_base\ -Force
-Copy-Item backend-train-model\artifacts\reports\pred_pc_clo_hardv1\pred_pc_clo_hardv1_eval.json backend-train-model\personcrop-train\train-result\artifacts\reports\pred_pc_clo_hardv1\ -Force
+E:\Miniconda3\envs\yolo_Code\python.exe backend-train-model\train_workwear.py --project-config personcrop-train\personcrop_project_config.json export --weights backend-train-model\personcrop-train\train-result\artifacts\runs\pred_pc_clo_base\weights\best.pt --export-root backend-train-model\personcrop-train\train-result\artifacts\export\pred_pc_clo_base --overwrite
 ```
 
 如果你后续还会补 `train` 报告、FP/FN 复盘或可视化样本，也建议统一按 run 名写回 `personcrop-train/train-result/artifacts/reports/<run_name>/` 与 `personcrop-train/train-result/review/<run_name>/`。

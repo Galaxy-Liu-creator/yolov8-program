@@ -83,6 +83,8 @@
   - `backend-train-model/person-train-model/train-result/export/person_detect_yolov8_with_new_labels_and_hard_examples_v1.pt`
 - 后续凡是走 `backend-train-model/train_workwear.py prepare --mode personcrop` 的上游 person，默认优先使用这两份 alias 权重；只有在明确需要复用原始 `best.pt` 时，才额外显式传 `--monitored-person-labels item`。
 - 当前 `personcrop` 正式下游 source dataset 应对齐 `backend-train-model/new_clothes_train/train-result/datasets/clothes_merged_with_new_labels_v1/dataset.yaml`，即当前 `3009` 图 clothes 扩样主线；旧的 `backend-train-model/project_config.json` 单源 `95` 图 clothes 入口只保留为历史轻量验证口径，不再作为正式 `personcrop` A/B 的默认 source dataset。
+- 当前 `personcrop` 训练 / 评估 / 导出应显式使用 `backend-train-model/personcrop-train/personcrop_project_config.json`；该配置把 artifacts 根目录固定到 `backend-train-model/personcrop-train/train-result/artifacts`，使 run、reports、export 与 `personcrop-train/` 分支一一对应。
+- `personcrop` 命名口径：`pred_pc_person_*` 表示由上游 `person` 模型生成的裁剪数据集，`pred_pc_clo_*` 表示在对应裁剪数据集上训练得到的下游 `clothes` 模型 run。
 - 当前 `person` 额外 hard examples（`4517` 图线）只用于提升上游 person A/B，不应在未补齐 clothes 标注前直接并入 `personcrop` 下游或 `clothes` 主训练集；是否需要补入 `clothes` 端，应以后续 `personcrop` 复盘是否显示“下游 clothes 本身确有稳定收益缺口”为准。
 - 当前 person 训练 / 评估 JSON 报告目录已按 run 名分层：`person-train-model/train-result/artifacts/reports/<run_name>/<report_file>.json`，与 `artifacts/runs/<run_name>/` 一一对应；后续不要再把 `*_train.json`、`*_eval.json`、`*_export.json`、`*_all.json` 平铺到 `reports/` 根目录。
 - 当前 person new labels 取舍：`img768` 的 Test mAP50-95 高于 `640` 稳健基线（`0.4970` vs `0.4802`），但 Precision、Recall、mAP50 低于 `640`；因此阶段汇报中可写作“最新候选”，不宜直接表述为已替代稳健基线。

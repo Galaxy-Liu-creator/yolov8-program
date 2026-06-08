@@ -1,0 +1,38 @@
+{
+  "artifacts": {
+    "root": "train-result/artifacts"
+  },
+  "data": {
+    "class_names": {
+      "0": "clothes"
+    }
+  },
+  "prepare": {
+    "default_mode": "personcrop",
+    "include_empty_person_crops": false,
+    "monitored_person_labels": [
+      "person"
+    ],
+    "person_conf": 0.2,
+    "person_imgsz": 640,
+    "assignment_min_ioa": 0.35,
+    "fallback_to_fullframe": true
+  },
+  "models": {
+    "allow_remote_model_download": false,
+    "python_candidates": [
+      "E:\\Miniconda3\\envs\\yolo_Code\\python.exe"
+    ]
+  },
+  "training": {
+    "default_train_args": {
+      "imgsz": 640,
+      "epochs": 180,
+      "batch": 4,
+      "patience": 40,
+      "workers": 4,
+      "device": "0",
+      "seed": 42
+    }
+  }
+}

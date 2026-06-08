@@ -1,5 +1,27 @@
 # Update Log
 
+## 2026-06-07 为 personcrop 增加专用 project config 并修正 A/B 命令落盘口径
+
+1. 变更来源：用户准备启动 `pred_pc_clo_base` 训练，要求训练结果与报告产物明确落到 `backend-train-model/personcrop-train/train-result/artifacts/runs/pred_pc_clo_base` 与 `backend-train-model/personcrop-train/train-result/artifacts/reports/pred_pc_clo_base`，并询问 `pred_pc_person_hardv1` 与 `pred_pc_clo_hardv1` 命名差异。
+2. 变更总览：
+   - 新增 `backend-train-model/personcrop-train/personcrop_project_config.json`，通过 `artifacts.root=train-result/artifacts` 让 `train_workwear.py` 的 train / evaluate / export 报告直接写入 `personcrop-train/train-result/artifacts/reports/<run_name>/`。
+   - 更新 `backend-train-model/personcrop-train/train-docs/双上游personcrop执行方案.md` 中 A/B 的 train 与 evaluate 命令，统一显式传入 `--project-config personcrop-train\personcrop_project_config.json`。
+   - 在文档中写清：`pred_pc_person_*` 是上游 person 预测裁剪数据集，`pred_pc_clo_*` 是下游 clothes 模型训练 run。
+   - 更新 `backend-train-model/AGENTS.md`，记录 personcrop 专用配置入口和命名口径。
+3. 涉及文件：
+   - `backend-train-model/personcrop-train/personcrop_project_config.json`
+   - `backend-train-model/personcrop-train/train-docs/双上游personcrop执行方案.md`
+   - `backend-train-model/AGENTS.md`
+   - `backend-train-model/docs/update_log.md`
+4. 新增 / 变更配置项：
+   - 新增 `artifacts.root=train-result/artifacts` 的 personcrop 专用 project config。
+   - A/B 训练命令继续显式保留 `--project backend-train-model\personcrop-train\train-result\artifacts\runs`，确保 run 目录不变；报告目录由 project config 的 `REPORTS_ROOT` 控制。
+5. 兼容性注意：
+   - 本轮只改执行文档和配置入口，不移动或重命名已有 `pred_pc_clo_hardv1` 训练产物。
+   - 后续继续用旧命令不传 `--project-config` 时，报告仍会落到默认 `backend-train-model/artifacts/reports`，不符合当前 personcrop 归档口径。
+6. 本轮明确不改动：
+   - 不启动新训练、不重新评估、不修改 `train_workwear.py`、不改已有 prepared 数据集或模型权重。
+
 ## 2026-06-07 修正 pred_pc_clo_hardv1 报告内部 report_path
 
 1. 变更来源：用户要求把 `pred_pc_clo_hardv1` 训练 / 评估报告 JSON 内部的 `report_path` 改成当前实际文件路径。
@@ -4605,3 +4627,23 @@
 - 不修改任何训练代码、prepare 逻辑或配置文件。
 - 不重新生成任何 prepared 数据集。
 - 不在本轮启动 `imgsz=768` 新训练。
+## 2026-06-08 归并 `pred_pc_clo_base-2` 训练产物到正式 run 名
+
+1. 变更来源：用户要求将 `personcrop-train` 下 `pred_pc_clo_base-2` 的 run 与 report 内容移动到 `pred_pc_clo_base`，并同步修正文件内路径。
+2. 变更总览：
+   - 将 `backend-train-model/personcrop-train/train-result/artifacts/runs/pred_pc_clo_base-2/` 内训练产物移动到 `runs/pred_pc_clo_base/`。
+   - 将 `backend-train-model/personcrop-train/train-result/artifacts/reports/pred_pc_clo_base-2/` 内报告移动到 `reports/pred_pc_clo_base/`，并把报告文件名调整为 `pred_pc_clo_base_train.json`。
+   - 修正 `args.yaml` 中的 `name` 与 `save_dir`，修正训练报告 JSON 中的 `actual_run_name`、`run_name`、`run_dir`、权重路径与 `report_path`。
+3. 涉及文件：
+   - `backend-train-model/personcrop-train/train-result/artifacts/runs/pred_pc_clo_base/args.yaml`
+   - `backend-train-model/personcrop-train/train-result/artifacts/reports/pred_pc_clo_base/pred_pc_clo_base_train.json`
+   - `backend-train-model/docs/update_log.md`
+4. 新增 / 变更配置项：
+   - 无新增训练配置项。
+   - 本轮只做产物目录和报告路径归并，不改训练参数。
+5. 兼容性注意：
+   - 原训练命令请求的 run 名本来就是 `pred_pc_clo_base`，本轮把 Ultralytics 自动追加的 `-2` 目录名归并回请求名。
+   - 训练指标、权重文件和图表文件未重算，只移动位置并更新引用路径。
+6. 本轮明确不改动：
+   - 不重新训练、不重新评估、不修改 `personcrop_project_config.json`。
+   - 不改动 `pred_pc_person_base` prepared 数据集或任何上游 person / clothes 权重。
