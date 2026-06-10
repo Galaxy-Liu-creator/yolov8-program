@@ -6,13 +6,14 @@
 
 **已完成工作**：
 - Personcrop 双上游 A/B 训练完成
-- A（pred_pc_clo_base）：Test mAP50-95 **0.7416**
-- B（pred_pc_clo_hardv1）：Test mAP50-95 **0.7471**
+- A（pred_pc_clo_base）：crop 级 Test mAP50-95 **0.7416**
+- B（pred_pc_clo_hardv1）：crop 级 Test mAP50-95 **0.7471**
 - 代表帧复盘显示：70% 代表帧 B 优于 A
 
 **核心问题**：
-- Personcrop (0.74) 相比 Fullframe clothes baseline (0.80) **低了 6 个百分点**
-- 当前只有 crop 级评估，缺少原图级对比
+- 当前 personcrop A/B 的 **0.7416 / 0.7471 是 crop 级指标**，不能直接与 fullframe 原图级指标比较
+- 旧 fullframe clothes baseline 在统一 holdout 上的 mAP50-95 **0.8042** 与当前 `clothes_merged_with_new_labels_v1` 不是同一评估集，不应作为 personcrop 诊断的直接判定基准
+- 当前 new labels fullframe baseline 在 `clothes_merged_with_new_labels_v1` test split 上的 mAP50-95 为 **0.7075**，但 personcrop 仍缺少同一批原图上的原图级映射评估
 - 不清楚性能差距来自：person 召回不足 / clothes 模型容量 / 裁剪策略损失
 
 ### 1.2 诊断目标
@@ -37,7 +38,7 @@
 
 #### **实验设计**
 
-**测试集**：`clothes_merged_with_new_labels_v1` 的 test split（453 张图）
+**测试集**：`clothes_merged_with_new_labels_v1` 的 test split（fullframe baseline 口径为 453 张；当前 personcrop prepared 有效源样本为 446 张 / 800 个 clothes GT，原图级对比必须固定同一批有效原图）
 
 **对比链路**：
 1. **Fullframe baseline**：直接在原图上检测 clothes
@@ -53,10 +54,10 @@
 
 ```bash
 # Step 1: Fullframe baseline 在 test split 上评估
-python backend-train-model/train_workwear.py evaluate --mode fullframe --weights All-train-model/artifacts/runs/clothes_merged_v2_balanced_from_first_holdout_v1/weights/best.pt --data new_clothes_train/train-result/datasets/clothes_merged_with_new_labels_v1/dataset.yaml --split test --conf 0.45
+python backend-train-model/train_workwear.py evaluate --project-config backend-train-model/new_clothes_train/new_clothes_train_project_config.json --weights backend-train-model/new_clothes_train/train-result/artifacts/runs/clothes_merged_with_new_labels_v1_baseline/weights/best.pt --dataset-yaml backend-train-model/new_clothes_train/train-result/datasets/clothes_merged_with_new_labels_v1/dataset.yaml --report-name diag_exp1_fullframe_new_labels_eval.json
 
 # Step 2: Personcrop A/B 映射回原图评估
-python backend-train-model/personcrop-train/train-code/evaluate_personcrop_on_original.py --personcrop-data-a personcrop-train/train-result/prepared/pred_pc_person_base/dataset.yaml --personcrop-weights-a personcrop-train/train-result/artifacts/runs/pred_pc_clo_base/weights/best.pt --personcrop-data-b personcrop-train/train-result/prepared/pred_pc_person_hardv1/dataset.yaml --personcrop-weights-b personcrop-train/train-result/artifacts/runs/pred_pc_clo_hardv1/weights/best.pt --source-dataset new_clothes_train/train-result/datasets/clothes_merged_with_new_labels_v1/dataset.yaml --split test --conf 0.45 --output personcrop-train/train-result/review/diag_exp1_original_compare/
+python backend-train-model/personcrop-train/train-code/evaluate_personcrop_on_original.py --personcrop-data-a backend-train-model/personcrop-train/train-result/prepared/pred_pc_person_base/dataset.yaml --personcrop-weights-a backend-train-model/personcrop-train/train-result/artifacts/runs/pred_pc_clo_base/weights/best.pt --personcrop-data-b backend-train-model/personcrop-train/train-result/prepared/pred_pc_person_hardv1/dataset.yaml --personcrop-weights-b backend-train-model/personcrop-train/train-result/artifacts/runs/pred_pc_clo_hardv1/weights/best.pt --source-dataset backend-train-model/new_clothes_train/train-result/datasets/clothes_merged_with_new_labels_v1/dataset.yaml --split test --conf 0.45 --output backend-train-model/personcrop-train/train-result/review/diag_exp1_original_compare/
 ```
 
 #### **预期产出**
@@ -67,8 +68,9 @@ python backend-train-model/personcrop-train/train-code/evaluate_personcrop_on_or
 - `comparison_summary.md`：可读性总结报告
 
 **判断标准**：
-- 如果 personcrop B 原图级 mAP50-95 **≥ 0.80**：说明 personcrop 确实优于 fullframe
-- 如果 personcrop B 原图级 mAP50-95 **< 0.78**：说明存在显著性能损失，需要进入实验2/3
+- 不再使用旧 unified holdout 的 **0.8042** 作为直接阈值；该数值只作为历史 fullframe 能力参考
+- 如果 personcrop B 在同一批有效原图上的原图级 mAP50-95 **显著高于** `clothes_merged_with_new_labels_v1_baseline` 的同 split fullframe 指标（当前 test 参考值 **0.7075**），且逐图复盘没有明显新增风险，才说明 personcrop 确实优于 fullframe
+- 如果 personcrop B 原图级指标低于或仅持平 fullframe baseline，则说明 crop 级收益未能转化为原图级收益，需要进入实验2/3定位瓶颈
 
 ---
 
@@ -76,27 +78,27 @@ python backend-train-model/personcrop-train/train-code/evaluate_personcrop_on_or
 
 #### **实验目标**
 
-量化：有多少 clothes GT 因为 person 漏检而无法进入下游。
+量化：有多少 clothes GT 因为预测 person 框未覆盖而无法进入下游 crop。当前脚本是 person 覆盖瓶颈的代理分析，不等同于严格的 GT person 漏检统计。
 
 #### **实验设计**
 
 **核心思路**：
-1. 对每张 test 图，加载 GT person 框和 GT clothes 框
+1. 对每张 test 图，加载 GT clothes 框
 2. 用 person 检测器预测 person 框
-3. 统计被漏检的 person 框数量
-4. 分析这些漏检的 person 框对应了多少 clothes GT
-5. 计算：因 person 漏检导致无法进入下游的 clothes 目标占比
+3. 按 `assignment_min_ioa` 判断每个 clothes GT 是否能被某个预测 person 框覆盖
+4. 统计未被预测 person 框覆盖、因此只能走 fallback 或无法进入 crop 的 clothes GT 数
+5. 计算：预测 person 覆盖不足导致的 clothes 目标占比
 
 **关键指标**：
-- `missed_person_count`：漏检的 person 框数
-- `unassigned_clothes_due_to_missed_person`：因 person 漏检而无法分配的 clothes GT 数
-- `bottleneck_ratio = unassigned_clothes_due_to_missed_person / total_clothes_gt`
+- `unassigned_clothes`：未被预测 person 框按 IoA 阈值覆盖的 clothes GT 数
+- `bottleneck_ratio = unassigned_clothes / total_clothes_gt`
+- 若后续要统计严格的 `missed_person_count`，需要额外提供同一批原图的 GT person 标注并补充 GT person 匹配逻辑
 
 #### **执行步骤**
 
 ```bash
 # 实验2：Person 召回瓶颈量化分析
-python backend-train-model/personcrop-train/train-code/analyze_person_bottleneck.py --source-dataset new_clothes_train/train-result/datasets/clothes_merged_with_new_labels_v1/dataset.yaml --person-weights-a person-train-model/train-result/export/person_detect_yolov8_with_new_labels.pt --person-weights-b person-train-model/train-result/export/person_detect_yolov8_with_new_labels_and_hard_examples_v1.pt --split test --person-conf 0.20 --assignment-min-ioa 0.35 --output personcrop-train/train-result/review/diag_exp2_person_bottleneck/
+python backend-train-model/personcrop-train/train-code/analyze_person_bottleneck.py --source-dataset backend-train-model/new_clothes_train/train-result/datasets/clothes_merged_with_new_labels_v1/dataset.yaml --person-weights-a backend-train-model/person-train-model/train-result/export/person_detect_yolov8_with_new_labels.pt --person-weights-b backend-train-model/person-train-model/train-result/export/person_detect_yolov8_with_new_labels_and_hard_examples_v1.pt --split test --person-conf 0.20 --assignment-min-ioa 0.35 --output backend-train-model/personcrop-train/train-result/review/diag_exp2_person_bottleneck/
 ```
 
 #### **预期产出**
@@ -272,10 +274,10 @@ python backend-train-model/train_workwear.py train --mode personcrop --project-c
 
 ### **决策点2（Day 9）**：Personcrop 是否优于 Fullframe？
 
-**判断依据**：优化后的原图级对比实验
+**判断依据**：优化后的原图级对比实验，必须与 `clothes_merged_with_new_labels_v1_baseline` 在同一批有效原图上比较
 
-- **是**（mAP50-95 ≥ 0.80）→ 固化 personcrop 为主线
-- **否**（mAP50-95 < 0.78）→ 回到 fullframe 方向
+- **是**（原图级 mAP50-95 显著高于同 split fullframe baseline，当前 test 参考值为 0.7075）→ 固化 personcrop 为主线候选
+- **否**（低于或仅持平同 split fullframe baseline）→ 回到 fullframe 方向或继续保留 personcrop 为对照
 
 ---
 
@@ -293,7 +295,7 @@ python backend-train-model/train_workwear.py train --mode personcrop --project-c
 **只有满足以下条件，才能固化 personcrop 为主线**：
 
 1. ✅ 完成三个诊断实验
-2. ✅ Personcrop 原图级 mAP50-95 **≥ 0.80**
+2. ✅ Personcrop 原图级 mAP50-95 **显著高于同 split fullframe baseline**（当前 `clothes_merged_with_new_labels_v1` test 参考值为 0.7075）
 3. ✅ 在至少 20-30 个代表帧上验证优势
 4. ✅ 明确记录优化方向和触发条件
 

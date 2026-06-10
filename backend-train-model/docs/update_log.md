@@ -1,5 +1,27 @@
 # Update Log
 
+## 2026-06-10 修正 personcrop 诊断性实验方案命令与基准判断
+
+1. 变更来源：用户要求检查并修正 `personcrop诊断性实验方案.md` 中实验二命令，同时修正方案内的基准判断口径。
+2. 变更总览：
+   - 修正实验二 `analyze_person_bottleneck.py` 命令中的相对路径，统一改为从仓库根目录可运行的 `backend-train-model/...` 路径。
+   - 修正实验一 fullframe baseline 评估命令，改为当前 `clothes_merged_with_new_labels_v1_baseline` 与 `new_clothes_train_project_config.json`，避免继续引用旧 unified holdout baseline。
+   - 明确 `pred_pc_clo_base / pred_pc_clo_hardv1` 的 `0.7416 / 0.7471` 是 crop 级指标，不能直接与 fullframe 原图级指标比较。
+   - 将基准判断从旧 unified holdout 的 `0.8042` 固定阈值，修正为与 `clothes_merged_with_new_labels_v1_baseline` 在同一批有效原图上的原图级对比；当前 test 参考值为 `0.7075`。
+   - 修正实验二统计口径：当前脚本统计的是预测 person 框对 clothes GT 的覆盖不足代理指标，不是严格的 GT person 漏检统计。
+3. 涉及文件：
+   - `backend-train-model/personcrop-train/train-docs/personcrop诊断性实验方案.md`
+   - `backend-train-model/docs/update_log.md`
+4. 新增 / 变更配置项：
+   - 无新增 JSON 配置项。
+   - 文档命令口径统一为从仓库根目录执行。
+5. 兼容性注意：
+   - 本轮仅修正文档，不修改 `analyze_person_bottleneck.py`、`evaluate_personcrop_on_original.py`、`train_workwear.py`、prepared 数据集、模型权重或既有报告。
+   - 实验二仍是代理瓶颈分析；如需严格统计 `missed_person_count`，后续需要补充同一批原图的 GT person 标注与匹配逻辑。
+6. 本轮明确不改动：
+   - 不启动训练、不重跑评估、不生成新的 review 结果。
+   - 不调整 `inspection-flask/` 在线链路，也不改变当前 personcrop A/B 的阶段结论。
+
 ## 2026-06-10 完成 personcrop 首轮代表帧正式人工复盘
 
 1. 变更来源：用户要求根据 `personcrop代表帧人工复盘模板.md` 完成本次正式人工复盘，基于已有四宫格样本和 summary 数据给出明确结论。
