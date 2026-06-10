@@ -1,0 +1,1440 @@
+{
+  "heuristic_definitions": {
+    "size_bin": "? rel_height ?? <0.05 / [0.05,0.10) / [0.10,0.20) / >=0.20",
+    "pred_mode": "??? pred_count ? unmatched_gt ? best_iou ?? 0 ??? / ?????? / ??? <0.3 / ???? [0.3,0.5) / ?????? >=0.5",
+    "crowd_bin": "? GT-GT IoU ? nearby_gt_count ???max_gt_iou>=0.3 ? heavy_overlap_gt??? nearby_gt_count>=2 ? multi_person_nearby?==1 ? single_neighbor??? isolated",
+    "edge": "? GT ????????????? min_edge_px>10 ??? interior"
+  },
+  "per_run": {
+    "baseline_val": {
+      "fn_gt_total": 116,
+      "bucket": {
+        "small_interior_person": 49,
+        "medium_large_pose_or_appearance": 53,
+        "small_boundary_person": 9,
+        "crowded_or_localization": 5
+      },
+      "size_bin": {
+        "tiny_lt_5pct": 5,
+        "small_5_to_10pct": 54,
+        "medium_10_to_20pct": 55,
+        "large_ge_20pct": 2
+      },
+      "pred_mode": {
+        "no_prediction_in_image": 13,
+        "weak_overlap_lt_03": 17,
+        "near_overlap_03_to_05": 40,
+        "predictions_present_but_none_overlap": 41,
+        "matched_nearby_ge_05": 5
+      },
+      "crowd_bin": {
+        "isolated": 85,
+        "single_neighbor": 25,
+        "heavy_overlap_gt": 6
+      },
+      "edge": {
+        "interior": 103,
+        "right": 3,
+        "top": 6,
+        "bottom": 4
+      },
+      "top_sequences": [
+        [
+          "D02_20260123070624",
+          13
+        ],
+        [
+          "D15_20260119061405",
+          11
+        ],
+        [
+          "D15_20260119203927",
+          8
+        ],
+        [
+          "D05_20260123074841",
+          6
+        ],
+        [
+          "01773",
+          2
+        ]
+      ],
+      "top_frames": [
+        [
+          "D02_20260123070624_frame_0061",
+          3
+        ],
+        [
+          "01773",
+          2
+        ],
+        [
+          "01927",
+          2
+        ],
+        [
+          "01984",
+          2
+        ],
+        [
+          "01991",
+          2
+        ],
+        [
+          "02008",
+          2
+        ],
+        [
+          "02013",
+          2
+        ],
+        [
+          "02014",
+          2
+        ]
+      ],
+      "bucket_top_sequences": {
+        "small_interior_person": [
+          [
+            "D15_20260119061405",
+            11
+          ],
+          [
+            "D02_20260123070624",
+            5
+          ],
+          [
+            "D05_20260123074841",
+            5
+          ]
+        ],
+        "medium_large_pose_or_appearance": [
+          [
+            "D15_20260119203927",
+            4
+          ],
+          [
+            "01927",
+            2
+          ],
+          [
+            "01984",
+            2
+          ]
+        ],
+        "small_boundary_person": [
+          [
+            "D02_20260123070624",
+            6
+          ],
+          [
+            "02017",
+            1
+          ],
+          [
+            "02092",
+            1
+          ]
+        ],
+        "crowded_or_localization": [
+          [
+            "D15_20260119203927",
+            3
+          ],
+          [
+            "D05_20260123074841",
+            1
+          ],
+          [
+            "02129",
+            1
+          ]
+        ]
+      },
+      "bucket_top_frames": {
+        "small_interior_person": [
+          [
+            "D02_20260123070624_frame_0061",
+            3
+          ],
+          [
+            "01773",
+            2
+          ],
+          [
+            "01991",
+            2
+          ]
+        ],
+        "medium_large_pose_or_appearance": [
+          [
+            "01927",
+            2
+          ],
+          [
+            "01984",
+            2
+          ],
+          [
+            "02008",
+            2
+          ]
+        ],
+        "small_boundary_person": [
+          [
+            "02017",
+            1
+          ],
+          [
+            "02092",
+            1
+          ],
+          [
+            "D02_20260123070624_frame_0064",
+            1
+          ]
+        ],
+        "crowded_or_localization": [
+          [
+            "D05_20260123074841_frame_0026",
+            1
+          ],
+          [
+            "D15_20260119203927_frame_0142",
+            1
+          ],
+          [
+            "02129",
+            1
+          ]
+        ]
+      }
+    },
+    "baseline_test": {
+      "fn_gt_total": 131,
+      "bucket": {
+        "medium_large_pose_or_appearance": 66,
+        "small_interior_person": 44,
+        "crowded_or_localization": 8,
+        "small_boundary_person": 13
+      },
+      "size_bin": {
+        "medium_10_to_20pct": 66,
+        "small_5_to_10pct": 55,
+        "large_ge_20pct": 6,
+        "tiny_lt_5pct": 4
+      },
+      "pred_mode": {
+        "predictions_present_but_none_overlap": 57,
+        "near_overlap_03_to_05": 37,
+        "matched_nearby_ge_05": 8,
+        "weak_overlap_lt_03": 11,
+        "no_prediction_in_image": 18
+      },
+      "crowd_bin": {
+        "isolated": 89,
+        "heavy_overlap_gt": 13,
+        "single_neighbor": 29
+      },
+      "edge": {
+        "interior": 117,
+        "top": 12,
+        "right": 1,
+        "bottom": 1
+      },
+      "top_sequences": [
+        [
+          "D15_20260119061405",
+          29
+        ],
+        [
+          "D15_20260119203927",
+          20
+        ],
+        [
+          "D02_20260123070624",
+          7
+        ],
+        [
+          "D02_20260123074836",
+          6
+        ],
+        [
+          "D05_20260123074841",
+          3
+        ]
+      ],
+      "top_frames": [
+        [
+          "D15_20260119061405_frame_0346",
+          3
+        ],
+        [
+          "D15_20260119061405_frame_0348",
+          3
+        ],
+        [
+          "02242",
+          2
+        ],
+        [
+          "02411",
+          2
+        ],
+        [
+          "02412",
+          2
+        ],
+        [
+          "02414",
+          2
+        ],
+        [
+          "02415",
+          2
+        ],
+        [
+          "D02_20260123074836_frame_0022",
+          2
+        ]
+      ],
+      "bucket_top_sequences": {
+        "medium_large_pose_or_appearance": [
+          [
+            "D15_20260119061405",
+            11
+          ],
+          [
+            "D15_20260119203927",
+            3
+          ],
+          [
+            "02242",
+            2
+          ]
+        ],
+        "small_interior_person": [
+          [
+            "D15_20260119061405",
+            18
+          ],
+          [
+            "D15_20260119203927",
+            16
+          ],
+          [
+            "02172",
+            1
+          ]
+        ],
+        "crowded_or_localization": [
+          [
+            "D05_20260123074841",
+            2
+          ],
+          [
+            "02411",
+            1
+          ],
+          [
+            "02414",
+            1
+          ]
+        ],
+        "small_boundary_person": [
+          [
+            "D02_20260123070624",
+            7
+          ],
+          [
+            "D02_20260123074836",
+            5
+          ],
+          [
+            "D15_20260119203927",
+            1
+          ]
+        ]
+      },
+      "bucket_top_frames": {
+        "medium_large_pose_or_appearance": [
+          [
+            "D15_20260119061405_frame_0346",
+            2
+          ],
+          [
+            "D15_20260119061405_frame_0348",
+            2
+          ],
+          [
+            "02242",
+            2
+          ]
+        ],
+        "small_interior_person": [
+          [
+            "D15_20260119061405_frame_0352",
+            2
+          ],
+          [
+            "D15_20260119061405_frame_0346",
+            1
+          ],
+          [
+            "D15_20260119061405_frame_0348",
+            1
+          ]
+        ],
+        "crowded_or_localization": [
+          [
+            "02411",
+            1
+          ],
+          [
+            "02414",
+            1
+          ],
+          [
+            "02415",
+            1
+          ]
+        ],
+        "small_boundary_person": [
+          [
+            "D02_20260123074836_frame_0023",
+            2
+          ],
+          [
+            "D02_20260123074836_frame_0024",
+            2
+          ],
+          [
+            "D02_20260123074836_frame_0022",
+            1
+          ]
+        ]
+      }
+    },
+    "img768_val": {
+      "fn_gt_total": 164,
+      "bucket": {
+        "medium_large_pose_or_appearance": 80,
+        "small_boundary_person": 14,
+        "small_interior_person": 66,
+        "crowded_or_localization": 4
+      },
+      "size_bin": {
+        "medium_10_to_20pct": 80,
+        "small_5_to_10pct": 76,
+        "tiny_lt_5pct": 5,
+        "large_ge_20pct": 3
+      },
+      "pred_mode": {
+        "no_prediction_in_image": 17,
+        "predictions_present_but_none_overlap": 67,
+        "matched_nearby_ge_05": 4,
+        "weak_overlap_lt_03": 22,
+        "near_overlap_03_to_05": 54
+      },
+      "crowd_bin": {
+        "single_neighbor": 28,
+        "isolated": 131,
+        "heavy_overlap_gt": 5
+      },
+      "edge": {
+        "interior": 142,
+        "top": 10,
+        "right": 4,
+        "bottom": 8
+      },
+      "top_sequences": [
+        [
+          "D02_20260123070624",
+          15
+        ],
+        [
+          "D15_20260119061405",
+          12
+        ],
+        [
+          "D05_20260123074841",
+          7
+        ],
+        [
+          "D15_20260119203927",
+          6
+        ],
+        [
+          "01773",
+          2
+        ]
+      ],
+      "top_frames": [
+        [
+          "D02_20260123070624_frame_0060",
+          3
+        ],
+        [
+          "D02_20260123070624_frame_0061",
+          3
+        ],
+        [
+          "D05_20260123074841_frame_0026",
+          3
+        ],
+        [
+          "01773",
+          2
+        ],
+        [
+          "01781",
+          2
+        ],
+        [
+          "01927",
+          2
+        ],
+        [
+          "01984",
+          2
+        ],
+        [
+          "01987",
+          2
+        ]
+      ],
+      "bucket_top_sequences": {
+        "medium_large_pose_or_appearance": [
+          [
+            "D15_20260119203927",
+            3
+          ],
+          [
+            "D02_20260123070624",
+            2
+          ],
+          [
+            "01927",
+            2
+          ]
+        ],
+        "small_boundary_person": [
+          [
+            "D02_20260123070624",
+            8
+          ],
+          [
+            "02017",
+            1
+          ],
+          [
+            "01900",
+            1
+          ]
+        ],
+        "small_interior_person": [
+          [
+            "D15_20260119061405",
+            11
+          ],
+          [
+            "D02_20260123070624",
+            5
+          ],
+          [
+            "D05_20260123074841",
+            5
+          ]
+        ],
+        "crowded_or_localization": [
+          [
+            "D15_20260119203927",
+            2
+          ],
+          [
+            "D05_20260123074841",
+            1
+          ],
+          [
+            "02129",
+            1
+          ]
+        ]
+      },
+      "bucket_top_frames": {
+        "medium_large_pose_or_appearance": [
+          [
+            "01927",
+            2
+          ],
+          [
+            "01984",
+            2
+          ],
+          [
+            "02013",
+            2
+          ]
+        ],
+        "small_boundary_person": [
+          [
+            "D02_20260123070624_frame_0060",
+            1
+          ],
+          [
+            "02017",
+            1
+          ],
+          [
+            "01900",
+            1
+          ]
+        ],
+        "small_interior_person": [
+          [
+            "D02_20260123070624_frame_0061",
+            3
+          ],
+          [
+            "01773",
+            2
+          ],
+          [
+            "01987",
+            2
+          ]
+        ],
+        "crowded_or_localization": [
+          [
+            "D05_20260123074841_frame_0026",
+            1
+          ],
+          [
+            "02129",
+            1
+          ],
+          [
+            "D15_20260119203927_frame_0142",
+            1
+          ]
+        ]
+      }
+    },
+    "img768_test": {
+      "fn_gt_total": 149,
+      "bucket": {
+        "small_interior_person": 45,
+        "medium_large_pose_or_appearance": 88,
+        "small_boundary_person": 14,
+        "crowded_or_localization": 2
+      },
+      "size_bin": {
+        "small_5_to_10pct": 57,
+        "medium_10_to_20pct": 76,
+        "large_ge_20pct": 12,
+        "tiny_lt_5pct": 4
+      },
+      "pred_mode": {
+        "predictions_present_but_none_overlap": 60,
+        "near_overlap_03_to_05": 39,
+        "weak_overlap_lt_03": 21,
+        "no_prediction_in_image": 27,
+        "matched_nearby_ge_05": 2
+      },
+      "crowd_bin": {
+        "isolated": 102,
+        "single_neighbor": 33,
+        "heavy_overlap_gt": 14
+      },
+      "edge": {
+        "interior": 134,
+        "top": 13,
+        "right": 1,
+        "bottom": 1
+      },
+      "top_sequences": [
+        [
+          "D15_20260119061405",
+          33
+        ],
+        [
+          "D15_20260119203927",
+          21
+        ],
+        [
+          "D02_20260123074836",
+          7
+        ],
+        [
+          "D02_20260123070624",
+          7
+        ],
+        [
+          "02242",
+          2
+        ]
+      ],
+      "top_frames": [
+        [
+          "D15_20260119061405_frame_0345",
+          5
+        ],
+        [
+          "D15_20260119061405_frame_0346",
+          3
+        ],
+        [
+          "D15_20260119061405_frame_0348",
+          3
+        ],
+        [
+          "D15_20260119061405_frame_0355",
+          3
+        ],
+        [
+          "02242",
+          2
+        ],
+        [
+          "02248",
+          2
+        ],
+        [
+          "02301",
+          2
+        ],
+        [
+          "02400",
+          2
+        ]
+      ],
+      "bucket_top_sequences": {
+        "small_interior_person": [
+          [
+            "D15_20260119061405",
+            17
+          ],
+          [
+            "D15_20260119203927",
+            16
+          ],
+          [
+            "02172",
+            1
+          ]
+        ],
+        "medium_large_pose_or_appearance": [
+          [
+            "D15_20260119061405",
+            16
+          ],
+          [
+            "D15_20260119203927",
+            4
+          ],
+          [
+            "02242",
+            2
+          ]
+        ],
+        "small_boundary_person": [
+          [
+            "D02_20260123070624",
+            7
+          ],
+          [
+            "D02_20260123074836",
+            6
+          ],
+          [
+            "D15_20260119203927",
+            1
+          ]
+        ],
+        "crowded_or_localization": [
+          [
+            "D05_20260123074841",
+            2
+          ]
+        ]
+      },
+      "bucket_top_frames": {
+        "small_interior_person": [
+          [
+            "D15_20260119061405_frame_0345",
+            1
+          ],
+          [
+            "D15_20260119061405_frame_0346",
+            1
+          ],
+          [
+            "D15_20260119061405_frame_0348",
+            1
+          ]
+        ],
+        "medium_large_pose_or_appearance": [
+          [
+            "D15_20260119061405_frame_0345",
+            4
+          ],
+          [
+            "D15_20260119061405_frame_0346",
+            2
+          ],
+          [
+            "D15_20260119061405_frame_0348",
+            2
+          ]
+        ],
+        "small_boundary_person": [
+          [
+            "D02_20260123074836_frame_0023",
+            2
+          ],
+          [
+            "D02_20260123074836_frame_0024",
+            2
+          ],
+          [
+            "D02_20260123074836_frame_0022",
+            1
+          ]
+        ],
+        "crowded_or_localization": [
+          [
+            "D05_20260123074841_frame_0029",
+            1
+          ],
+          [
+            "D05_20260123074841_frame_0030",
+            1
+          ]
+        ]
+      }
+    }
+  },
+  "combined": {
+    "top_sequences": [
+      [
+        "D15_20260119061405",
+        85
+      ],
+      [
+        "D15_20260119203927",
+        55
+      ],
+      [
+        "D02_20260123070624",
+        42
+      ],
+      [
+        "D05_20260123074841",
+        18
+      ],
+      [
+        "D02_20260123074836",
+        15
+      ],
+      [
+        "01773",
+        4
+      ],
+      [
+        "01927",
+        4
+      ],
+      [
+        "01984",
+        4
+      ],
+      [
+        "01991",
+        4
+      ],
+      [
+        "02008",
+        4
+      ]
+    ],
+    "top_frames": [
+      [
+        "D15_20260119061405_frame_0345",
+        7
+      ],
+      [
+        "D02_20260123070624_frame_0061",
+        6
+      ],
+      [
+        "D15_20260119061405_frame_0346",
+        6
+      ],
+      [
+        "D15_20260119061405_frame_0348",
+        6
+      ],
+      [
+        "D02_20260123070624_frame_0060",
+        5
+      ],
+      [
+        "D05_20260123074841_frame_0026",
+        5
+      ],
+      [
+        "D15_20260119061405_frame_0355",
+        5
+      ],
+      [
+        "01773",
+        4
+      ],
+      [
+        "01927",
+        4
+      ],
+      [
+        "01984",
+        4
+      ],
+      [
+        "01991",
+        4
+      ],
+      [
+        "02008",
+        4
+      ]
+    ],
+    "recurrent_frames_at_least_two_runs": [
+      {
+        "stem": "D15_20260119061405_frame_0345",
+        "sequence_name": "D15_20260119061405",
+        "total_fn": 7,
+        "per_run": {
+          "baseline_test": 2,
+          "img768_test": 5
+        },
+        "bucket_mix": {
+          "small_interior_person": 2,
+          "medium_large_pose_or_appearance": 5
+        }
+      },
+      {
+        "stem": "D02_20260123070624_frame_0061",
+        "sequence_name": "D02_20260123070624",
+        "total_fn": 6,
+        "per_run": {
+          "baseline_val": 3,
+          "img768_val": 3
+        },
+        "bucket_mix": {
+          "small_interior_person": 6
+        }
+      },
+      {
+        "stem": "D15_20260119061405_frame_0346",
+        "sequence_name": "D15_20260119061405",
+        "total_fn": 6,
+        "per_run": {
+          "baseline_test": 3,
+          "img768_test": 3
+        },
+        "bucket_mix": {
+          "medium_large_pose_or_appearance": 4,
+          "small_interior_person": 2
+        }
+      },
+      {
+        "stem": "D15_20260119061405_frame_0348",
+        "sequence_name": "D15_20260119061405",
+        "total_fn": 6,
+        "per_run": {
+          "baseline_test": 3,
+          "img768_test": 3
+        },
+        "bucket_mix": {
+          "medium_large_pose_or_appearance": 4,
+          "small_interior_person": 2
+        }
+      },
+      {
+        "stem": "D02_20260123070624_frame_0060",
+        "sequence_name": "D02_20260123070624",
+        "total_fn": 5,
+        "per_run": {
+          "baseline_val": 2,
+          "img768_val": 3
+        },
+        "bucket_mix": {
+          "medium_large_pose_or_appearance": 2,
+          "small_interior_person": 2,
+          "small_boundary_person": 1
+        }
+      },
+      {
+        "stem": "D05_20260123074841_frame_0026",
+        "sequence_name": "D05_20260123074841",
+        "total_fn": 5,
+        "per_run": {
+          "baseline_val": 2,
+          "img768_val": 3
+        },
+        "bucket_mix": {
+          "crowded_or_localization": 2,
+          "small_interior_person": 2,
+          "medium_large_pose_or_appearance": 1
+        }
+      },
+      {
+        "stem": "D15_20260119061405_frame_0355",
+        "sequence_name": "D15_20260119061405",
+        "total_fn": 5,
+        "per_run": {
+          "baseline_test": 2,
+          "img768_test": 3
+        },
+        "bucket_mix": {
+          "medium_large_pose_or_appearance": 3,
+          "small_interior_person": 2
+        }
+      },
+      {
+        "stem": "01773",
+        "sequence_name": "01773",
+        "total_fn": 4,
+        "per_run": {
+          "baseline_val": 2,
+          "img768_val": 2
+        },
+        "bucket_mix": {
+          "small_interior_person": 4
+        }
+      },
+      {
+        "stem": "01927",
+        "sequence_name": "01927",
+        "total_fn": 4,
+        "per_run": {
+          "baseline_val": 2,
+          "img768_val": 2
+        },
+        "bucket_mix": {
+          "medium_large_pose_or_appearance": 4
+        }
+      },
+      {
+        "stem": "01984",
+        "sequence_name": "01984",
+        "total_fn": 4,
+        "per_run": {
+          "baseline_val": 2,
+          "img768_val": 2
+        },
+        "bucket_mix": {
+          "medium_large_pose_or_appearance": 4
+        }
+      },
+      {
+        "stem": "01991",
+        "sequence_name": "01991",
+        "total_fn": 4,
+        "per_run": {
+          "baseline_val": 2,
+          "img768_val": 2
+        },
+        "bucket_mix": {
+          "small_interior_person": 4
+        }
+      },
+      {
+        "stem": "02008",
+        "sequence_name": "02008",
+        "total_fn": 4,
+        "per_run": {
+          "baseline_val": 2,
+          "img768_val": 2
+        },
+        "bucket_mix": {
+          "medium_large_pose_or_appearance": 3,
+          "small_interior_person": 1
+        }
+      },
+      {
+        "stem": "02013",
+        "sequence_name": "02013",
+        "total_fn": 4,
+        "per_run": {
+          "baseline_val": 2,
+          "img768_val": 2
+        },
+        "bucket_mix": {
+          "medium_large_pose_or_appearance": 4
+        }
+      },
+      {
+        "stem": "02014",
+        "sequence_name": "02014",
+        "total_fn": 4,
+        "per_run": {
+          "baseline_val": 2,
+          "img768_val": 2
+        },
+        "bucket_mix": {
+          "medium_large_pose_or_appearance": 2,
+          "small_interior_person": 2
+        }
+      },
+      {
+        "stem": "02017",
+        "sequence_name": "02017",
+        "total_fn": 4,
+        "per_run": {
+          "baseline_val": 2,
+          "img768_val": 2
+        },
+        "bucket_mix": {
+          "medium_large_pose_or_appearance": 2,
+          "small_boundary_person": 2
+        }
+      },
+      {
+        "stem": "02114",
+        "sequence_name": "02114",
+        "total_fn": 4,
+        "per_run": {
+          "baseline_val": 2,
+          "img768_val": 2
+        },
+        "bucket_mix": {
+          "medium_large_pose_or_appearance": 2,
+          "small_interior_person": 2
+        }
+      },
+      {
+        "stem": "D02_20260123070624_frame_0062",
+        "sequence_name": "D02_20260123070624",
+        "total_fn": 4,
+        "per_run": {
+          "baseline_val": 2,
+          "img768_val": 2
+        },
+        "bucket_mix": {
+          "small_interior_person": 2,
+          "medium_large_pose_or_appearance": 2
+        }
+      },
+      {
+        "stem": "02242",
+        "sequence_name": "02242",
+        "total_fn": 4,
+        "per_run": {
+          "baseline_test": 2,
+          "img768_test": 2
+        },
+        "bucket_mix": {
+          "medium_large_pose_or_appearance": 4
+        }
+      },
+      {
+        "stem": "02411",
+        "sequence_name": "02411",
+        "total_fn": 4,
+        "per_run": {
+          "baseline_test": 2,
+          "img768_test": 2
+        },
+        "bucket_mix": {
+          "crowded_or_localization": 1,
+          "medium_large_pose_or_appearance": 3
+        }
+      },
+      {
+        "stem": "02414",
+        "sequence_name": "02414",
+        "total_fn": 4,
+        "per_run": {
+          "baseline_test": 2,
+          "img768_test": 2
+        },
+        "bucket_mix": {
+          "crowded_or_localization": 1,
+          "medium_large_pose_or_appearance": 3
+        }
+      }
+    ],
+    "bucket_top_sequences_across_runs": {
+      "small_interior_person": [
+        [
+          "D15_20260119061405",
+          57
+        ],
+        [
+          "D15_20260119203927",
+          32
+        ],
+        [
+          "D05_20260123074841",
+          11
+        ],
+        [
+          "D02_20260123070624",
+          10
+        ],
+        [
+          "01773",
+          4
+        ]
+      ],
+      "medium_large_pose_or_appearance": [
+        [
+          "D15_20260119061405",
+          28
+        ],
+        [
+          "D15_20260119203927",
+          14
+        ],
+        [
+          "01927",
+          4
+        ],
+        [
+          "01984",
+          4
+        ],
+        [
+          "02013",
+          4
+        ]
+      ],
+      "small_boundary_person": [
+        [
+          "D02_20260123070624",
+          28
+        ],
+        [
+          "D02_20260123074836",
+          12
+        ],
+        [
+          "D15_20260119203927",
+          4
+        ],
+        [
+          "02017",
+          2
+        ],
+        [
+          "02092",
+          1
+        ]
+      ],
+      "crowded_or_localization": [
+        [
+          "D05_20260123074841",
+          6
+        ],
+        [
+          "D15_20260119203927",
+          5
+        ],
+        [
+          "02129",
+          2
+        ],
+        [
+          "02411",
+          1
+        ],
+        [
+          "02414",
+          1
+        ]
+      ]
+    },
+    "suggested_manual_review_frames": [
+      {
+        "stem": "D15_20260119061405_frame_0345",
+        "sequence_name": "D15_20260119061405",
+        "score": 10,
+        "total_fn": 7,
+        "run_count": 2,
+        "per_run": {
+          "baseline_test": 2,
+          "img768_test": 5
+        },
+        "bucket_mix": {
+          "small_interior_person": 2,
+          "medium_large_pose_or_appearance": 5
+        }
+      },
+      {
+        "stem": "D15_20260119061405_frame_0346",
+        "sequence_name": "D15_20260119061405",
+        "score": 9,
+        "total_fn": 6,
+        "run_count": 2,
+        "per_run": {
+          "baseline_test": 3,
+          "img768_test": 3
+        },
+        "bucket_mix": {
+          "medium_large_pose_or_appearance": 4,
+          "small_interior_person": 2
+        }
+      },
+      {
+        "stem": "D15_20260119061405_frame_0348",
+        "sequence_name": "D15_20260119061405",
+        "score": 9,
+        "total_fn": 6,
+        "run_count": 2,
+        "per_run": {
+          "baseline_test": 3,
+          "img768_test": 3
+        },
+        "bucket_mix": {
+          "medium_large_pose_or_appearance": 4,
+          "small_interior_person": 2
+        }
+      },
+      {
+        "stem": "D05_20260123074841_frame_0026",
+        "sequence_name": "D05_20260123074841",
+        "score": 9,
+        "total_fn": 5,
+        "run_count": 2,
+        "per_run": {
+          "baseline_val": 2,
+          "img768_val": 3
+        },
+        "bucket_mix": {
+          "crowded_or_localization": 2,
+          "small_interior_person": 2,
+          "medium_large_pose_or_appearance": 1
+        }
+      },
+      {
+        "stem": "D02_20260123070624_frame_0061",
+        "sequence_name": "D02_20260123070624",
+        "score": 8,
+        "total_fn": 6,
+        "run_count": 2,
+        "per_run": {
+          "baseline_val": 3,
+          "img768_val": 3
+        },
+        "bucket_mix": {
+          "small_interior_person": 6
+        }
+      },
+      {
+        "stem": "D02_20260123070624_frame_0060",
+        "sequence_name": "D02_20260123070624",
+        "score": 8,
+        "total_fn": 5,
+        "run_count": 2,
+        "per_run": {
+          "baseline_val": 2,
+          "img768_val": 3
+        },
+        "bucket_mix": {
+          "medium_large_pose_or_appearance": 2,
+          "small_interior_person": 2,
+          "small_boundary_person": 1
+        }
+      },
+      {
+        "stem": "D15_20260119061405_frame_0355",
+        "sequence_name": "D15_20260119061405",
+        "score": 8,
+        "total_fn": 5,
+        "run_count": 2,
+        "per_run": {
+          "baseline_test": 2,
+          "img768_test": 3
+        },
+        "bucket_mix": {
+          "medium_large_pose_or_appearance": 3,
+          "small_interior_person": 2
+        }
+      },
+      {
+        "stem": "02411",
+        "sequence_name": "02411",
+        "score": 8,
+        "total_fn": 4,
+        "run_count": 2,
+        "per_run": {
+          "baseline_test": 2,
+          "img768_test": 2
+        },
+        "bucket_mix": {
+          "crowded_or_localization": 1,
+          "medium_large_pose_or_appearance": 3
+        }
+      },
+      {
+        "stem": "02414",
+        "sequence_name": "02414",
+        "score": 8,
+        "total_fn": 4,
+        "run_count": 2,
+        "per_run": {
+          "baseline_test": 2,
+          "img768_test": 2
+        },
+        "bucket_mix": {
+          "crowded_or_localization": 1,
+          "medium_large_pose_or_appearance": 3
+        }
+      },
+      {
+        "stem": "02415",
+        "sequence_name": "02415",
+        "score": 8,
+        "total_fn": 4,
+        "run_count": 2,
+        "per_run": {
+          "baseline_test": 2,
+          "img768_test": 2
+        },
+        "bucket_mix": {
+          "crowded_or_localization": 1,
+          "medium_large_pose_or_appearance": 3
+        }
+      },
+      {
+        "stem": "01927",
+        "sequence_name": "01927",
+        "score": 7,
+        "total_fn": 4,
+        "run_count": 2,
+        "per_run": {
+          "baseline_val": 2,
+          "img768_val": 2
+        },
+        "bucket_mix": {
+          "medium_large_pose_or_appearance": 4
+        }
+      },
+      {
+        "stem": "01984",
+        "sequence_name": "01984",
+        "score": 7,
+        "total_fn": 4,
+        "run_count": 2,
+        "per_run": {
+          "baseline_val": 2,
+          "img768_val": 2
+        },
+        "bucket_mix": {
+          "medium_large_pose_or_appearance": 4
+        }
+      }
+    ]
+  }
+}

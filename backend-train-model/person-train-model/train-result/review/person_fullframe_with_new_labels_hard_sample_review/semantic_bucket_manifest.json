@@ -1,0 +1,34 @@
+{
+  "schema_version": "v1",
+  "description": "根级兼容入口。真实阶段 records 不再继续堆叠在本文件中，而是统一写入 stage_reviews/stage_*/semantic_bucket_manifest.json。",
+  "compat_mode": "stage_index",
+  "active_stage": {
+    "stage_id": "stage_2026-05-07_crowded_overlap_dual_lines",
+    "display_title": "5.7 crowded/overlap机械复盘及双主线推进",
+    "manifest_file": "stage_reviews/stage_2026-05-07_crowded_overlap_dual_lines/semantic_bucket_manifest.json",
+    "summary_file": "stage_reviews/stage_2026-05-07_crowded_overlap_dual_lines/semantic_bucket_summary.md",
+    "notes_root": "stage_reviews/stage_2026-05-07_crowded_overlap_dual_lines/sequence_notes"
+  },
+  "stages": [
+    {
+      "stage_id": "stage_2026-05-07_crowded_overlap_dual_lines",
+      "display_title": "5.7 crowded/overlap机械复盘及双主线推进",
+      "date_label": "5.7",
+      "status": "active",
+      "manifest_file": "stage_reviews/stage_2026-05-07_crowded_overlap_dual_lines/semantic_bucket_manifest.json",
+      "summary_file": "stage_reviews/stage_2026-05-07_crowded_overlap_dual_lines/semantic_bucket_summary.md",
+      "notes_root": "stage_reviews/stage_2026-05-07_crowded_overlap_dual_lines/sequence_notes",
+      "reconstructed_from_root_snapshot": false
+    },
+    {
+      "stage_id": "stage_2026-05-06_first_semantic_review",
+      "display_title": "5.6 第一轮代表帧语义复核与结构化回填",
+      "date_label": "5.6",
+      "status": "archived",
+      "manifest_file": "stage_reviews/stage_2026-05-06_first_semantic_review/semantic_bucket_manifest.json",
+      "summary_file": "stage_reviews/stage_2026-05-06_first_semantic_review/semantic_bucket_summary.md",
+      "notes_root": "stage_reviews/stage_2026-05-06_first_semantic_review/sequence_notes",
+      "reconstructed_from_root_snapshot": true
+    }
+  ]
+}

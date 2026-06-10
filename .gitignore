@@ -8,7 +8,6 @@ docs/工服检测预定方案/
 
 !*.pt
 datasets/
-review/
 __pycache__/
 tmp_review_overlays/
 person_roi_aware_v1/

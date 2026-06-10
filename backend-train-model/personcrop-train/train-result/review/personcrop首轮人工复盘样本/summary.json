@@ -1,0 +1,194 @@
+{
+  "frames": [
+    {
+      "frame_stem": "g32__D15_20260119061405_frame_0346",
+      "split": "train",
+      "source_image": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\new_clothes_train\\train-result\\datasets\\clothes_merged_with_new_labels_v1\\images\\train\\g32__D15_20260119061405_frame_0346.jpg",
+      "prepared_a": {
+        "crop": 0,
+        "fallback": 1
+      },
+      "prepared_b": {
+        "crop": 1,
+        "fallback": 0
+      },
+      "fullframe_clothes_det": 1,
+      "person_det_a": 2,
+      "person_det_b": 4,
+      "pipeline_clothes_det_a": 2,
+      "pipeline_clothes_det_b": 2,
+      "review_image": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\personcrop-train\\train-result\\review\\personcrop首轮人工复盘样本\\g32__D15_20260119061405_frame_0346.jpg"
+    },
+    {
+      "frame_stem": "g32__D15_20260119061405_frame_0354",
+      "split": "train",
+      "source_image": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\new_clothes_train\\train-result\\datasets\\clothes_merged_with_new_labels_v1\\images\\train\\g32__D15_20260119061405_frame_0354.jpg",
+      "prepared_a": {
+        "crop": 0,
+        "fallback": 1
+      },
+      "prepared_b": {
+        "crop": 1,
+        "fallback": 0
+      },
+      "fullframe_clothes_det": 1,
+      "person_det_a": 3,
+      "person_det_b": 4,
+      "pipeline_clothes_det_a": 2,
+      "pipeline_clothes_det_b": 3,
+      "review_image": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\personcrop-train\\train-result\\review\\personcrop首轮人工复盘样本\\g32__D15_20260119061405_frame_0354.jpg"
+    },
+    {
+      "frame_stem": "g32__D15_20260119203927_frame_0142",
+      "split": "train",
+      "source_image": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\new_clothes_train\\train-result\\datasets\\clothes_merged_with_new_labels_v1\\images\\train\\g32__D15_20260119203927_frame_0142.jpg",
+      "prepared_a": {
+        "crop": 1,
+        "fallback": 1
+      },
+      "prepared_b": {
+        "crop": 2,
+        "fallback": 0
+      },
+      "fullframe_clothes_det": 2,
+      "person_det_a": 1,
+      "person_det_b": 2,
+      "pipeline_clothes_det_a": 1,
+      "pipeline_clothes_det_b": 2,
+      "review_image": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\personcrop-train\\train-result\\review\\personcrop首轮人工复盘样本\\g32__D15_20260119203927_frame_0142.jpg"
+    },
+    {
+      "frame_stem": "g32__D15_20260119203927_frame_0151",
+      "split": "train",
+      "source_image": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\new_clothes_train\\train-result\\datasets\\clothes_merged_with_new_labels_v1\\images\\train\\g32__D15_20260119203927_frame_0151.jpg",
+      "prepared_a": {
+        "crop": 1,
+        "fallback": 1
+      },
+      "prepared_b": {
+        "crop": 2,
+        "fallback": 0
+      },
+      "fullframe_clothes_det": 2,
+      "person_det_a": 1,
+      "person_det_b": 2,
+      "pipeline_clothes_det_a": 1,
+      "pipeline_clothes_det_b": 3,
+      "review_image": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\personcrop-train\\train-result\\review\\personcrop首轮人工复盘样本\\g32__D15_20260119203927_frame_0151.jpg"
+    },
+    {
+      "frame_stem": "g33__D02_20260123070624_frame_0061",
+      "split": "train",
+      "source_image": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\new_clothes_train\\train-result\\datasets\\clothes_merged_with_new_labels_v1\\images\\train\\g33__D02_20260123070624_frame_0061.jpg",
+      "prepared_a": {
+        "crop": 0,
+        "fallback": 1
+      },
+      "prepared_b": {
+        "crop": 1,
+        "fallback": 0
+      },
+      "fullframe_clothes_det": 0,
+      "person_det_a": 0,
+      "person_det_b": 1,
+      "pipeline_clothes_det_a": 0,
+      "pipeline_clothes_det_b": 1,
+      "review_image": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\personcrop-train\\train-result\\review\\personcrop首轮人工复盘样本\\g33__D02_20260123070624_frame_0061.jpg"
+    },
+    {
+      "frame_stem": "g33__D02_20260123070624_frame_0062",
+      "split": "train",
+      "source_image": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\new_clothes_train\\train-result\\datasets\\clothes_merged_with_new_labels_v1\\images\\train\\g33__D02_20260123070624_frame_0062.jpg",
+      "prepared_a": {
+        "crop": 0,
+        "fallback": 1
+      },
+      "prepared_b": {
+        "crop": 1,
+        "fallback": 0
+      },
+      "fullframe_clothes_det": 1,
+      "person_det_a": 0,
+      "person_det_b": 1,
+      "pipeline_clothes_det_a": 0,
+      "pipeline_clothes_det_b": 1,
+      "review_image": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\personcrop-train\\train-result\\review\\personcrop首轮人工复盘样本\\g33__D02_20260123070624_frame_0062.jpg"
+    },
+    {
+      "frame_stem": "g31__D15_20260123074848_frame_0034",
+      "split": "train",
+      "source_image": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\new_clothes_train\\train-result\\datasets\\clothes_merged_with_new_labels_v1\\images\\train\\g31__D15_20260123074848_frame_0034.jpg",
+      "prepared_a": {
+        "crop": 1,
+        "fallback": 1
+      },
+      "prepared_b": {
+        "crop": 2,
+        "fallback": 0
+      },
+      "fullframe_clothes_det": 2,
+      "person_det_a": 1,
+      "person_det_b": 2,
+      "pipeline_clothes_det_a": 1,
+      "pipeline_clothes_det_b": 2,
+      "review_image": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\personcrop-train\\train-result\\review\\personcrop首轮人工复盘样本\\g31__D15_20260123074848_frame_0034.jpg"
+    },
+    {
+      "frame_stem": "g31__D05_20260123074841_frame_0027",
+      "split": "train",
+      "source_image": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\new_clothes_train\\train-result\\datasets\\clothes_merged_with_new_labels_v1\\images\\train\\g31__D05_20260123074841_frame_0027.jpg",
+      "prepared_a": {
+        "crop": 3,
+        "fallback": 1
+      },
+      "prepared_b": {
+        "crop": 4,
+        "fallback": 0
+      },
+      "fullframe_clothes_det": 4,
+      "person_det_a": 4,
+      "person_det_b": 4,
+      "pipeline_clothes_det_a": 5,
+      "pipeline_clothes_det_b": 4,
+      "review_image": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\personcrop-train\\train-result\\review\\personcrop首轮人工复盘样本\\g31__D05_20260123074841_frame_0027.jpg"
+    },
+    {
+      "frame_stem": "gnew__00475",
+      "split": "train",
+      "source_image": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\new_clothes_train\\train-result\\datasets\\clothes_merged_with_new_labels_v1\\images\\train\\gnew__00475.jpg",
+      "prepared_a": {
+        "crop": 1,
+        "fallback": 0
+      },
+      "prepared_b": {
+        "crop": 0,
+        "fallback": 1
+      },
+      "fullframe_clothes_det": 1,
+      "person_det_a": 2,
+      "person_det_b": 1,
+      "pipeline_clothes_det_a": 2,
+      "pipeline_clothes_det_b": 1,
+      "review_image": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\personcrop-train\\train-result\\review\\personcrop首轮人工复盘样本\\gnew__00475.jpg"
+    },
+    {
+      "frame_stem": "gnew__02095",
+      "split": "test",
+      "source_image": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\new_clothes_train\\train-result\\datasets\\clothes_merged_with_new_labels_v1\\images\\test\\gnew__02095.jpg",
+      "prepared_a": {
+        "crop": 2,
+        "fallback": 0
+      },
+      "prepared_b": {
+        "crop": 1,
+        "fallback": 1
+      },
+      "fullframe_clothes_det": 2,
+      "person_det_a": 2,
+      "person_det_b": 1,
+      "pipeline_clothes_det_a": 2,
+      "pipeline_clothes_det_b": 1,
+      "review_image": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\personcrop-train\\train-result\\review\\personcrop首轮人工复盘样本\\gnew__02095.jpg"
+    }
+  ]
+}

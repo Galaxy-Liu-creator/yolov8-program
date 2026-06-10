@@ -1,0 +1,12 @@
+ {
+   "stage_id": "stage_2026-05-06_first_semantic_review",
+   "display_title": "5.6 第一轮代表帧语义复核与结构化回填",
+   "date_label": "5.6",
+   "status": "archived",
+   "latest_first_order": 2,
+   "reconstructed_from_root_snapshot": true,
+   "summary_file": "semantic_bucket_summary.md",
+   "manifest_file": "semantic_bucket_manifest.json",
+   "notes_root": "sequence_notes",
+   "shared_assets_root": "../../by_source"
+ }

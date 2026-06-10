@@ -1,0 +1,12 @@
+{
+  "stage_id": "stage_2026-05-10_crowded_overlap_mechanism_closeout",
+  "display_title": "5.10 crowded/overlap机制收口与下一阶段启动准备",
+  "date_label": "5.10",
+  "status": "active",
+  "latest_first_order": 1,
+  "reconstructed_from_root_snapshot": false,
+  "summary_file": "semantic_bucket_summary.md",
+  "manifest_file": "semantic_bucket_manifest.json",
+  "notes_root": "sequence_notes",
+  "shared_assets_root": "../../by_source"
+}

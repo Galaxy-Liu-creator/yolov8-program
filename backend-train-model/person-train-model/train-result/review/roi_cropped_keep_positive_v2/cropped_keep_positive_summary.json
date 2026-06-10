@@ -1,0 +1,2830 @@
+{
+  "generated_at": "2026-04-28T18:31:45",
+  "project_config": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\person_project_config.json",
+  "roi_config_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\working\\roi\\roi_config.v2.generated.json",
+  "output_root": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2",
+  "margin_px": 64,
+  "total_scanned_images": 502,
+  "affected_images": 52,
+  "affected_boxes": 54,
+  "trigger_rule_counts": {
+    "bottom_center_inside": 30,
+    "min_box_ioa": 24
+  },
+  "current_cut_side_counts": {
+    "top": 24,
+    "bottom": 24,
+    "left": 2,
+    "right": 4
+  },
+  "margin_recovered_boxes": 31,
+  "margin_still_cropped_boxes": 23,
+  "samples": [
+    {
+      "stem": "D04_20260123074846_frame_0000",
+      "sequence_name": "D04_20260123074846",
+      "split": "train",
+      "image_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_1\\D04_20260123074846\\D04_20260123074846_frame_0000.jpg",
+      "label_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\working\\aggregated_labels\\D04_20260123074846_frame_0000.txt",
+      "overlay_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\overlays\\D04_20260123074846_frame_0000_cropped_keep_overlay.jpg",
+      "current_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\current_mask_crops\\D04_20260123074846_frame_0000_current_mask_crop.jpg",
+      "margin_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\margin64_mask_crops\\D04_20260123074846_frame_0000_margin64_mask_crop.jpg",
+      "current_crop": [
+        4,
+        279,
+        1918,
+        1079
+      ],
+      "margin_crop": [
+        0,
+        215,
+        1920,
+        1080
+      ],
+      "boxes": [
+        {
+          "rule": "bottom_center_inside",
+          "center_inside": true,
+          "bottom_center_inside": true,
+          "box_ioa": 0.967233,
+          "original_box": [
+            153.0,
+            278.001,
+            188.0,
+            407.0
+          ],
+          "clipped_current_box": [
+            153.0,
+            279.0,
+            188.0,
+            407.0
+          ],
+          "clipped_margin_box": [
+            153.0,
+            278.001,
+            188.0,
+            407.0
+          ],
+          "current_cut_sides": [
+            "top"
+          ],
+          "margin_cut_sides": []
+        }
+      ]
+    },
+    {
+      "stem": "D04_20260123074846_frame_0011",
+      "sequence_name": "D04_20260123074846",
+      "split": "train",
+      "image_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_1\\D04_20260123074846\\D04_20260123074846_frame_0011.jpg",
+      "label_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\working\\aggregated_labels\\D04_20260123074846_frame_0011.txt",
+      "overlay_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\overlays\\D04_20260123074846_frame_0011_cropped_keep_overlay.jpg",
+      "current_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\current_mask_crops\\D04_20260123074846_frame_0011_current_mask_crop.jpg",
+      "margin_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\margin64_mask_crops\\D04_20260123074846_frame_0011_margin64_mask_crop.jpg",
+      "current_crop": [
+        2,
+        286,
+        1920,
+        1080
+      ],
+      "margin_crop": [
+        0,
+        222,
+        1920,
+        1080
+      ],
+      "boxes": [
+        {
+          "rule": "min_box_ioa",
+          "center_inside": true,
+          "bottom_center_inside": false,
+          "box_ioa": 1.0,
+          "original_box": [
+            665.0,
+            844.0,
+            840.0,
+            1080.001
+          ],
+          "clipped_current_box": [
+            665.0,
+            844.0,
+            840.0,
+            1080.0
+          ],
+          "clipped_margin_box": [
+            665.0,
+            844.0,
+            840.0,
+            1080.0
+          ],
+          "current_cut_sides": [
+            "bottom"
+          ],
+          "margin_cut_sides": [
+            "bottom"
+          ]
+        }
+      ]
+    },
+    {
+      "stem": "D04_20260123074846_frame_0012",
+      "sequence_name": "D04_20260123074846",
+      "split": "train",
+      "image_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_1\\D04_20260123074846\\D04_20260123074846_frame_0012.jpg",
+      "label_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\working\\aggregated_labels\\D04_20260123074846_frame_0012.txt",
+      "overlay_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\overlays\\D04_20260123074846_frame_0012_cropped_keep_overlay.jpg",
+      "current_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\current_mask_crops\\D04_20260123074846_frame_0012_current_mask_crop.jpg",
+      "margin_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\margin64_mask_crops\\D04_20260123074846_frame_0012_margin64_mask_crop.jpg",
+      "current_crop": [
+        9,
+        292,
+        1920,
+        1079
+      ],
+      "margin_crop": [
+        0,
+        228,
+        1920,
+        1080
+      ],
+      "boxes": [
+        {
+          "rule": "bottom_center_inside",
+          "center_inside": true,
+          "bottom_center_inside": true,
+          "box_ioa": 0.903117,
+          "original_box": [
+            7.0,
+            483.0,
+            74.001,
+            701.0
+          ],
+          "clipped_current_box": [
+            9.0,
+            483.0,
+            74.001,
+            701.0
+          ],
+          "clipped_margin_box": [
+            7.0,
+            483.0,
+            74.001,
+            701.0
+          ],
+          "current_cut_sides": [
+            "left"
+          ],
+          "margin_cut_sides": []
+        },
+        {
+          "rule": "min_box_ioa",
+          "center_inside": true,
+          "bottom_center_inside": false,
+          "box_ioa": 0.998482,
+          "original_box": [
+            621.001,
+            953.0,
+            777.001,
+            1080.001
+          ],
+          "clipped_current_box": [
+            621.001,
+            953.0,
+            777.001,
+            1079.0
+          ],
+          "clipped_margin_box": [
+            621.001,
+            953.0,
+            777.001,
+            1080.0
+          ],
+          "current_cut_sides": [
+            "bottom"
+          ],
+          "margin_cut_sides": [
+            "bottom"
+          ]
+        }
+      ]
+    },
+    {
+      "stem": "D05_20260123074841_frame_0002",
+      "sequence_name": "D05_20260123074841",
+      "split": "train",
+      "image_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_1\\D05_20260123074841\\D05_20260123074841_frame_0002.jpg",
+      "label_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\working\\aggregated_labels\\D05_20260123074841_frame_0002.txt",
+      "overlay_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\overlays\\D05_20260123074841_frame_0002_cropped_keep_overlay.jpg",
+      "current_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\current_mask_crops\\D05_20260123074841_frame_0002_current_mask_crop.jpg",
+      "margin_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\margin64_mask_crops\\D05_20260123074841_frame_0002_margin64_mask_crop.jpg",
+      "current_crop": [
+        0,
+        30,
+        1920,
+        1080
+      ],
+      "margin_crop": [
+        0,
+        0,
+        1920,
+        1080
+      ],
+      "boxes": [
+        {
+          "rule": "min_box_ioa",
+          "center_inside": true,
+          "bottom_center_inside": false,
+          "box_ioa": 1.0,
+          "original_box": [
+            1802.001,
+            958.001,
+            1920.0,
+            1080.001
+          ],
+          "clipped_current_box": [
+            1802.001,
+            958.001,
+            1920.0,
+            1080.0
+          ],
+          "clipped_margin_box": [
+            1802.001,
+            958.001,
+            1920.0,
+            1080.0
+          ],
+          "current_cut_sides": [
+            "bottom"
+          ],
+          "margin_cut_sides": [
+            "bottom"
+          ]
+        }
+      ]
+    },
+    {
+      "stem": "D05_20260123074841_frame_0005",
+      "sequence_name": "D05_20260123074841",
+      "split": "train",
+      "image_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_1\\D05_20260123074841\\D05_20260123074841_frame_0005.jpg",
+      "label_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\working\\aggregated_labels\\D05_20260123074841_frame_0005.txt",
+      "overlay_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\overlays\\D05_20260123074841_frame_0005_cropped_keep_overlay.jpg",
+      "current_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\current_mask_crops\\D05_20260123074841_frame_0005_current_mask_crop.jpg",
+      "margin_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\margin64_mask_crops\\D05_20260123074841_frame_0005_margin64_mask_crop.jpg",
+      "current_crop": [
+        2,
+        39,
+        1920,
+        1076
+      ],
+      "margin_crop": [
+        0,
+        0,
+        1920,
+        1080
+      ],
+      "boxes": [
+        {
+          "rule": "bottom_center_inside",
+          "center_inside": true,
+          "bottom_center_inside": true,
+          "box_ioa": 0.967182,
+          "original_box": [
+            1787.001,
+            38.999,
+            1844.0,
+            140.0
+          ],
+          "clipped_current_box": [
+            1787.001,
+            39.0,
+            1844.0,
+            140.0
+          ],
+          "clipped_margin_box": [
+            1787.001,
+            38.999,
+            1844.0,
+            140.0
+          ],
+          "current_cut_sides": [
+            "top"
+          ],
+          "margin_cut_sides": []
+        }
+      ]
+    },
+    {
+      "stem": "D05_20260123074841_frame_0011",
+      "sequence_name": "D05_20260123074841",
+      "split": "train",
+      "image_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_1\\D05_20260123074841\\D05_20260123074841_frame_0011.jpg",
+      "label_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\working\\aggregated_labels\\D05_20260123074841_frame_0011.txt",
+      "overlay_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\overlays\\D05_20260123074841_frame_0011_cropped_keep_overlay.jpg",
+      "current_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\current_mask_crops\\D05_20260123074841_frame_0011_current_mask_crop.jpg",
+      "margin_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\margin64_mask_crops\\D05_20260123074841_frame_0011_margin64_mask_crop.jpg",
+      "current_crop": [
+        0,
+        9,
+        1920,
+        1080
+      ],
+      "margin_crop": [
+        0,
+        0,
+        1920,
+        1080
+      ],
+      "boxes": [
+        {
+          "rule": "bottom_center_inside",
+          "center_inside": true,
+          "bottom_center_inside": true,
+          "box_ioa": 1.0,
+          "original_box": [
+            1866.001,
+            248.0,
+            1920.001,
+            447.0
+          ],
+          "clipped_current_box": [
+            1866.001,
+            248.0,
+            1920.0,
+            447.0
+          ],
+          "clipped_margin_box": [
+            1866.001,
+            248.0,
+            1920.0,
+            447.0
+          ],
+          "current_cut_sides": [
+            "right"
+          ],
+          "margin_cut_sides": [
+            "right"
+          ]
+        }
+      ]
+    },
+    {
+      "stem": "D05_20260123074841_frame_0012",
+      "sequence_name": "D05_20260123074841",
+      "split": "train",
+      "image_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_1\\D05_20260123074841\\D05_20260123074841_frame_0012.jpg",
+      "label_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\working\\aggregated_labels\\D05_20260123074841_frame_0012.txt",
+      "overlay_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\overlays\\D05_20260123074841_frame_0012_cropped_keep_overlay.jpg",
+      "current_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\current_mask_crops\\D05_20260123074841_frame_0012_current_mask_crop.jpg",
+      "margin_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\margin64_mask_crops\\D05_20260123074841_frame_0012_margin64_mask_crop.jpg",
+      "current_crop": [
+        0,
+        18,
+        1920,
+        1080
+      ],
+      "margin_crop": [
+        0,
+        0,
+        1920,
+        1080
+      ],
+      "boxes": [
+        {
+          "rule": "bottom_center_inside",
+          "center_inside": true,
+          "bottom_center_inside": true,
+          "box_ioa": 1.0,
+          "original_box": [
+            1866.001,
+            221.0,
+            1920.001,
+            411.0
+          ],
+          "clipped_current_box": [
+            1866.001,
+            221.0,
+            1920.0,
+            411.0
+          ],
+          "clipped_margin_box": [
+            1866.001,
+            221.0,
+            1920.0,
+            411.0
+          ],
+          "current_cut_sides": [
+            "right"
+          ],
+          "margin_cut_sides": [
+            "right"
+          ]
+        },
+        {
+          "rule": "bottom_center_inside",
+          "center_inside": true,
+          "bottom_center_inside": true,
+          "box_ioa": 0.960767,
+          "original_box": [
+            1753.001,
+            16.0,
+            1793.001,
+            102.001
+          ],
+          "clipped_current_box": [
+            1753.001,
+            18.0,
+            1793.001,
+            102.001
+          ],
+          "clipped_margin_box": [
+            1753.001,
+            16.0,
+            1793.001,
+            102.001
+          ],
+          "current_cut_sides": [
+            "top"
+          ],
+          "margin_cut_sides": []
+        }
+      ]
+    },
+    {
+      "stem": "D05_20260123074841_frame_0013",
+      "sequence_name": "D05_20260123074841",
+      "split": "train",
+      "image_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_1\\D05_20260123074841\\D05_20260123074841_frame_0013.jpg",
+      "label_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\working\\aggregated_labels\\D05_20260123074841_frame_0013.txt",
+      "overlay_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\overlays\\D05_20260123074841_frame_0013_cropped_keep_overlay.jpg",
+      "current_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\current_mask_crops\\D05_20260123074841_frame_0013_current_mask_crop.jpg",
+      "margin_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\margin64_mask_crops\\D05_20260123074841_frame_0013_margin64_mask_crop.jpg",
+      "current_crop": [
+        0,
+        11,
+        1918,
+        1080
+      ],
+      "margin_crop": [
+        0,
+        0,
+        1920,
+        1080
+      ],
+      "boxes": [
+        {
+          "rule": "bottom_center_inside",
+          "center_inside": true,
+          "bottom_center_inside": true,
+          "box_ioa": 0.951889,
+          "original_box": [
+            1864.0,
+            199.0,
+            1920.001,
+            372.0
+          ],
+          "clipped_current_box": [
+            1864.0,
+            199.0,
+            1918.0,
+            372.0
+          ],
+          "clipped_margin_box": [
+            1864.0,
+            199.0,
+            1920.0,
+            372.0
+          ],
+          "current_cut_sides": [
+            "right"
+          ],
+          "margin_cut_sides": [
+            "right"
+          ]
+        }
+      ]
+    },
+    {
+      "stem": "D05_20260123074841_frame_0017",
+      "sequence_name": "D05_20260123074841",
+      "split": "train",
+      "image_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_1\\D05_20260123074841\\D05_20260123074841_frame_0017.jpg",
+      "label_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\working\\aggregated_labels\\D05_20260123074841_frame_0017.txt",
+      "overlay_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\overlays\\D05_20260123074841_frame_0017_cropped_keep_overlay.jpg",
+      "current_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\current_mask_crops\\D05_20260123074841_frame_0017_current_mask_crop.jpg",
+      "margin_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\margin64_mask_crops\\D05_20260123074841_frame_0017_margin64_mask_crop.jpg",
+      "current_crop": [
+        0,
+        30,
+        1920,
+        1080
+      ],
+      "margin_crop": [
+        0,
+        0,
+        1920,
+        1080
+      ],
+      "boxes": [
+        {
+          "rule": "bottom_center_inside",
+          "center_inside": false,
+          "bottom_center_inside": true,
+          "box_ioa": 0.243272,
+          "original_box": [
+            1544.0,
+            8.0,
+            1590.999,
+            91.0
+          ],
+          "clipped_current_box": [
+            1544.0,
+            30.0,
+            1590.999,
+            91.0
+          ],
+          "clipped_margin_box": [
+            1544.0,
+            8.0,
+            1590.999,
+            91.0
+          ],
+          "current_cut_sides": [
+            "top"
+          ],
+          "margin_cut_sides": []
+        }
+      ]
+    },
+    {
+      "stem": "D05_20260123074841_frame_0018",
+      "sequence_name": "D05_20260123074841",
+      "split": "train",
+      "image_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_1\\D05_20260123074841\\D05_20260123074841_frame_0018.jpg",
+      "label_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\working\\aggregated_labels\\D05_20260123074841_frame_0018.txt",
+      "overlay_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\overlays\\D05_20260123074841_frame_0018_cropped_keep_overlay.jpg",
+      "current_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\current_mask_crops\\D05_20260123074841_frame_0018_current_mask_crop.jpg",
+      "margin_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\margin64_mask_crops\\D05_20260123074841_frame_0018_margin64_mask_crop.jpg",
+      "current_crop": [
+        2,
+        32,
+        1920,
+        1079
+      ],
+      "margin_crop": [
+        0,
+        0,
+        1920,
+        1080
+      ],
+      "boxes": [
+        {
+          "rule": "bottom_center_inside",
+          "center_inside": false,
+          "bottom_center_inside": true,
+          "box_ioa": 0.2131,
+          "original_box": [
+            1507.0,
+            8.0,
+            1553.0,
+            89.0
+          ],
+          "clipped_current_box": [
+            1507.0,
+            32.0,
+            1553.0,
+            89.0
+          ],
+          "clipped_margin_box": [
+            1507.0,
+            8.0,
+            1553.0,
+            89.0
+          ],
+          "current_cut_sides": [
+            "top"
+          ],
+          "margin_cut_sides": []
+        }
+      ]
+    },
+    {
+      "stem": "D05_20260123074841_frame_0022",
+      "sequence_name": "D05_20260123074841",
+      "split": "train",
+      "image_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_1\\D05_20260123074841\\D05_20260123074841_frame_0022.jpg",
+      "label_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\working\\aggregated_labels\\D05_20260123074841_frame_0022.txt",
+      "overlay_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\overlays\\D05_20260123074841_frame_0022_cropped_keep_overlay.jpg",
+      "current_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\current_mask_crops\\D05_20260123074841_frame_0022_current_mask_crop.jpg",
+      "margin_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\margin64_mask_crops\\D05_20260123074841_frame_0022_margin64_mask_crop.jpg",
+      "current_crop": [
+        0,
+        43,
+        1920,
+        1080
+      ],
+      "margin_crop": [
+        0,
+        0,
+        1920,
+        1080
+      ],
+      "boxes": [
+        {
+          "rule": "bottom_center_inside",
+          "center_inside": true,
+          "bottom_center_inside": true,
+          "box_ioa": 0.571944,
+          "original_box": [
+            1735.0,
+            32.999,
+            1780.001,
+            117.0
+          ],
+          "clipped_current_box": [
+            1735.0,
+            43.0,
+            1780.001,
+            117.0
+          ],
+          "clipped_margin_box": [
+            1735.0,
+            32.999,
+            1780.001,
+            117.0
+          ],
+          "current_cut_sides": [
+            "top"
+          ],
+          "margin_cut_sides": []
+        }
+      ]
+    },
+    {
+      "stem": "D15_20260123074848_frame_0004",
+      "sequence_name": "D15_20260123074848",
+      "split": "train",
+      "image_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_1\\D15_20260123074848\\D15_20260123074848_frame_0004.jpg",
+      "label_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\working\\aggregated_labels\\D15_20260123074848_frame_0004.txt",
+      "overlay_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\overlays\\D15_20260123074848_frame_0004_cropped_keep_overlay.jpg",
+      "current_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\current_mask_crops\\D15_20260123074848_frame_0004_current_mask_crop.jpg",
+      "margin_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\margin64_mask_crops\\D15_20260123074848_frame_0004_margin64_mask_crop.jpg",
+      "current_crop": [
+        6,
+        221,
+        2554,
+        1440
+      ],
+      "margin_crop": [
+        0,
+        157,
+        2560,
+        1440
+      ],
+      "boxes": [
+        {
+          "rule": "min_box_ioa",
+          "center_inside": true,
+          "bottom_center_inside": false,
+          "box_ioa": 1.0,
+          "original_box": [
+            279.0,
+            1267.001,
+            517.001,
+            1440.001
+          ],
+          "clipped_current_box": [
+            279.0,
+            1267.001,
+            517.001,
+            1440.0
+          ],
+          "clipped_margin_box": [
+            279.0,
+            1267.001,
+            517.001,
+            1440.0
+          ],
+          "current_cut_sides": [
+            "bottom"
+          ],
+          "margin_cut_sides": [
+            "bottom"
+          ]
+        }
+      ]
+    },
+    {
+      "stem": "D15_20260123074848_frame_0007",
+      "sequence_name": "D15_20260123074848",
+      "split": "train",
+      "image_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_1\\D15_20260123074848\\D15_20260123074848_frame_0007.jpg",
+      "label_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\working\\aggregated_labels\\D15_20260123074848_frame_0007.txt",
+      "overlay_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\overlays\\D15_20260123074848_frame_0007_cropped_keep_overlay.jpg",
+      "current_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\current_mask_crops\\D15_20260123074848_frame_0007_current_mask_crop.jpg",
+      "margin_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\margin64_mask_crops\\D15_20260123074848_frame_0007_margin64_mask_crop.jpg",
+      "current_crop": [
+        6,
+        221,
+        2554,
+        1440
+      ],
+      "margin_crop": [
+        0,
+        157,
+        2560,
+        1440
+      ],
+      "boxes": [
+        {
+          "rule": "bottom_center_inside",
+          "center_inside": false,
+          "bottom_center_inside": true,
+          "box_ioa": 0.008995,
+          "original_box": [
+            578.001,
+            160.0,
+            608.001,
+            223.0
+          ],
+          "clipped_current_box": [
+            578.001,
+            221.0,
+            608.001,
+            223.0
+          ],
+          "clipped_margin_box": [
+            578.001,
+            160.0,
+            608.001,
+            223.0
+          ],
+          "current_cut_sides": [
+            "top"
+          ],
+          "margin_cut_sides": []
+        }
+      ]
+    },
+    {
+      "stem": "D15_20260123074848_frame_0014",
+      "sequence_name": "D15_20260123074848",
+      "split": "train",
+      "image_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_1\\D15_20260123074848\\D15_20260123074848_frame_0014.jpg",
+      "label_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\working\\aggregated_labels\\D15_20260123074848_frame_0014.txt",
+      "overlay_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\overlays\\D15_20260123074848_frame_0014_cropped_keep_overlay.jpg",
+      "current_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\current_mask_crops\\D15_20260123074848_frame_0014_current_mask_crop.jpg",
+      "margin_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\margin64_mask_crops\\D15_20260123074848_frame_0014_margin64_mask_crop.jpg",
+      "current_crop": [
+        6,
+        221,
+        2554,
+        1440
+      ],
+      "margin_crop": [
+        0,
+        157,
+        2560,
+        1440
+      ],
+      "boxes": [
+        {
+          "rule": "bottom_center_inside",
+          "center_inside": true,
+          "bottom_center_inside": true,
+          "box_ioa": 0.585686,
+          "original_box": [
+            2502.999,
+            635.0,
+            2560.0,
+            908.0
+          ],
+          "clipped_current_box": [
+            2502.999,
+            635.0,
+            2554.0,
+            908.0
+          ],
+          "clipped_margin_box": [
+            2502.999,
+            635.0,
+            2560.0,
+            908.0
+          ],
+          "current_cut_sides": [
+            "right"
+          ],
+          "margin_cut_sides": []
+        }
+      ]
+    },
+    {
+      "stem": "D15_20260123074848_frame_0017",
+      "sequence_name": "D15_20260123074848",
+      "split": "train",
+      "image_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_1\\D15_20260123074848\\D15_20260123074848_frame_0017.jpg",
+      "label_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\working\\aggregated_labels\\D15_20260123074848_frame_0017.txt",
+      "overlay_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\overlays\\D15_20260123074848_frame_0017_cropped_keep_overlay.jpg",
+      "current_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\current_mask_crops\\D15_20260123074848_frame_0017_current_mask_crop.jpg",
+      "margin_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\margin64_mask_crops\\D15_20260123074848_frame_0017_margin64_mask_crop.jpg",
+      "current_crop": [
+        6,
+        221,
+        2554,
+        1440
+      ],
+      "margin_crop": [
+        0,
+        157,
+        2560,
+        1440
+      ],
+      "boxes": [
+        {
+          "rule": "min_box_ioa",
+          "center_inside": true,
+          "bottom_center_inside": false,
+          "box_ioa": 1.0,
+          "original_box": [
+            274.999,
+            1182.0,
+            561.0,
+            1440.001
+          ],
+          "clipped_current_box": [
+            274.999,
+            1182.0,
+            561.0,
+            1440.0
+          ],
+          "clipped_margin_box": [
+            274.999,
+            1182.0,
+            561.0,
+            1440.0
+          ],
+          "current_cut_sides": [
+            "bottom"
+          ],
+          "margin_cut_sides": [
+            "bottom"
+          ]
+        }
+      ]
+    },
+    {
+      "stem": "D15_20260119061405_frame_0319",
+      "sequence_name": "D15_20260119061405",
+      "split": "train",
+      "image_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_2\\1\\D15_20260119061405_frame_0319.jpg",
+      "label_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\working\\aggregated_labels\\D15_20260119061405_frame_0319.txt",
+      "overlay_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\overlays\\D15_20260119061405_frame_0319_cropped_keep_overlay.jpg",
+      "current_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\current_mask_crops\\D15_20260119061405_frame_0319_current_mask_crop.jpg",
+      "margin_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\margin64_mask_crops\\D15_20260119061405_frame_0319_margin64_mask_crop.jpg",
+      "current_crop": [
+        0,
+        193,
+        2560,
+        1440
+      ],
+      "margin_crop": [
+        0,
+        129,
+        2560,
+        1440
+      ],
+      "boxes": [
+        {
+          "rule": "min_box_ioa",
+          "center_inside": true,
+          "bottom_center_inside": false,
+          "box_ioa": 0.967742,
+          "original_box": [
+            464.0,
+            1195.001,
+            681.999,
+            1440.001
+          ],
+          "clipped_current_box": [
+            464.0,
+            1195.001,
+            681.999,
+            1440.0
+          ],
+          "clipped_margin_box": [
+            464.0,
+            1195.001,
+            681.999,
+            1440.0
+          ],
+          "current_cut_sides": [
+            "bottom"
+          ],
+          "margin_cut_sides": [
+            "bottom"
+          ]
+        }
+      ]
+    },
+    {
+      "stem": "D15_20260119061405_frame_0322",
+      "sequence_name": "D15_20260119061405",
+      "split": "train",
+      "image_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_2\\1\\D15_20260119061405_frame_0322.jpg",
+      "label_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\working\\aggregated_labels\\D15_20260119061405_frame_0322.txt",
+      "overlay_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\overlays\\D15_20260119061405_frame_0322_cropped_keep_overlay.jpg",
+      "current_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\current_mask_crops\\D15_20260119061405_frame_0322_current_mask_crop.jpg",
+      "margin_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\margin64_mask_crops\\D15_20260119061405_frame_0322_margin64_mask_crop.jpg",
+      "current_crop": [
+        0,
+        203,
+        2560,
+        1440
+      ],
+      "margin_crop": [
+        0,
+        139,
+        2560,
+        1440
+      ],
+      "boxes": [
+        {
+          "rule": "min_box_ioa",
+          "center_inside": true,
+          "bottom_center_inside": false,
+          "box_ioa": 1.0,
+          "original_box": [
+            533.0,
+            1263.0,
+            696.998,
+            1440.001
+          ],
+          "clipped_current_box": [
+            533.0,
+            1263.0,
+            696.998,
+            1440.0
+          ],
+          "clipped_margin_box": [
+            533.0,
+            1263.0,
+            696.998,
+            1440.0
+          ],
+          "current_cut_sides": [
+            "bottom"
+          ],
+          "margin_cut_sides": [
+            "bottom"
+          ]
+        }
+      ]
+    },
+    {
+      "stem": "D15_20260119203927_frame_0097",
+      "sequence_name": "D15_20260119203927",
+      "split": "train",
+      "image_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_2\\D15_20260119203927\\D15_20260119203927_frame_0097.jpg",
+      "label_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\working\\aggregated_labels\\D15_20260119203927_frame_0097.txt",
+      "overlay_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\overlays\\D15_20260119203927_frame_0097_cropped_keep_overlay.jpg",
+      "current_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\current_mask_crops\\D15_20260119203927_frame_0097_current_mask_crop.jpg",
+      "margin_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\margin64_mask_crops\\D15_20260119203927_frame_0097_margin64_mask_crop.jpg",
+      "current_crop": [
+        0,
+        203,
+        2560,
+        1440
+      ],
+      "margin_crop": [
+        0,
+        139,
+        2560,
+        1440
+      ],
+      "boxes": [
+        {
+          "rule": "min_box_ioa",
+          "center_inside": true,
+          "bottom_center_inside": false,
+          "box_ioa": 1.0,
+          "original_box": [
+            378.999,
+            1078.001,
+            607.999,
+            1440.001
+          ],
+          "clipped_current_box": [
+            378.999,
+            1078.001,
+            607.999,
+            1440.0
+          ],
+          "clipped_margin_box": [
+            378.999,
+            1078.001,
+            607.999,
+            1440.0
+          ],
+          "current_cut_sides": [
+            "bottom"
+          ],
+          "margin_cut_sides": [
+            "bottom"
+          ]
+        }
+      ]
+    },
+    {
+      "stem": "D15_20260119203927_frame_0098",
+      "sequence_name": "D15_20260119203927",
+      "split": "train",
+      "image_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_2\\D15_20260119203927\\D15_20260119203927_frame_0098.jpg",
+      "label_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\working\\aggregated_labels\\D15_20260119203927_frame_0098.txt",
+      "overlay_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\overlays\\D15_20260119203927_frame_0098_cropped_keep_overlay.jpg",
+      "current_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\current_mask_crops\\D15_20260119203927_frame_0098_current_mask_crop.jpg",
+      "margin_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\margin64_mask_crops\\D15_20260119203927_frame_0098_margin64_mask_crop.jpg",
+      "current_crop": [
+        0,
+        203,
+        2560,
+        1440
+      ],
+      "margin_crop": [
+        0,
+        139,
+        2560,
+        1440
+      ],
+      "boxes": [
+        {
+          "rule": "min_box_ioa",
+          "center_inside": true,
+          "bottom_center_inside": false,
+          "box_ioa": 1.0,
+          "original_box": [
+            246.001,
+            1294.001,
+            479.002,
+            1440.001
+          ],
+          "clipped_current_box": [
+            246.001,
+            1294.001,
+            479.002,
+            1440.0
+          ],
+          "clipped_margin_box": [
+            246.001,
+            1294.001,
+            479.002,
+            1440.0
+          ],
+          "current_cut_sides": [
+            "bottom"
+          ],
+          "margin_cut_sides": [
+            "bottom"
+          ]
+        }
+      ]
+    },
+    {
+      "stem": "D02_20260123070624_frame_0010",
+      "sequence_name": "D02_20260123070624",
+      "split": "train",
+      "image_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_3\\D02_20260123070624\\D02_20260123070624_frame_0010.jpg",
+      "label_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\working\\aggregated_labels\\D02_20260123070624_frame_0010.txt",
+      "overlay_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\overlays\\D02_20260123070624_frame_0010_cropped_keep_overlay.jpg",
+      "current_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\current_mask_crops\\D02_20260123070624_frame_0010_current_mask_crop.jpg",
+      "margin_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\margin64_mask_crops\\D02_20260123070624_frame_0010_margin64_mask_crop.jpg",
+      "current_crop": [
+        10,
+        15,
+        1914,
+        1080
+      ],
+      "margin_crop": [
+        0,
+        0,
+        1920,
+        1080
+      ],
+      "boxes": [
+        {
+          "rule": "bottom_center_inside",
+          "center_inside": true,
+          "bottom_center_inside": true,
+          "box_ioa": 0.944511,
+          "original_box": [
+            393.0,
+            12.999,
+            432.999,
+            113.0
+          ],
+          "clipped_current_box": [
+            393.0,
+            15.0,
+            432.999,
+            113.0
+          ],
+          "clipped_margin_box": [
+            393.0,
+            12.999,
+            432.999,
+            113.0
+          ],
+          "current_cut_sides": [
+            "top"
+          ],
+          "margin_cut_sides": []
+        }
+      ]
+    },
+    {
+      "stem": "D02_20260123070624_frame_0043",
+      "sequence_name": "D02_20260123070624",
+      "split": "train",
+      "image_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_3\\D02_20260123070624\\D02_20260123070624_frame_0043.jpg",
+      "label_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\working\\aggregated_labels\\D02_20260123070624_frame_0043.txt",
+      "overlay_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\overlays\\D02_20260123070624_frame_0043_cropped_keep_overlay.jpg",
+      "current_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\current_mask_crops\\D02_20260123070624_frame_0043_current_mask_crop.jpg",
+      "margin_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\margin64_mask_crops\\D02_20260123070624_frame_0043_margin64_mask_crop.jpg",
+      "current_crop": [
+        18,
+        0,
+        1906,
+        1069
+      ],
+      "margin_crop": [
+        0,
+        0,
+        1920,
+        1080
+      ],
+      "boxes": [
+        {
+          "rule": "bottom_center_inside",
+          "center_inside": true,
+          "bottom_center_inside": true,
+          "box_ioa": 0.834239,
+          "original_box": [
+            2.999,
+            400.0,
+            105.999,
+            619.0
+          ],
+          "clipped_current_box": [
+            18.0,
+            400.0,
+            105.999,
+            619.0
+          ],
+          "clipped_margin_box": [
+            2.999,
+            400.0,
+            105.999,
+            619.0
+          ],
+          "current_cut_sides": [
+            "left"
+          ],
+          "margin_cut_sides": []
+        }
+      ]
+    },
+    {
+      "stem": "D02_20260123074836_frame_0001",
+      "sequence_name": "D02_20260123074836",
+      "split": "train",
+      "image_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_3\\D02_20260123074836\\D02_20260123074836_frame_0001.jpg",
+      "label_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\working\\aggregated_labels\\D02_20260123074836_frame_0001.txt",
+      "overlay_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\overlays\\D02_20260123074836_frame_0001_cropped_keep_overlay.jpg",
+      "current_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\current_mask_crops\\D02_20260123074836_frame_0001_current_mask_crop.jpg",
+      "margin_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\margin64_mask_crops\\D02_20260123074836_frame_0001_margin64_mask_crop.jpg",
+      "current_crop": [
+        6,
+        3,
+        1910,
+        1065
+      ],
+      "margin_crop": [
+        0,
+        0,
+        1920,
+        1080
+      ],
+      "boxes": [
+        {
+          "rule": "min_box_ioa",
+          "center_inside": true,
+          "bottom_center_inside": false,
+          "box_ioa": 0.96424,
+          "original_box": [
+            1074.999,
+            739.0,
+            1256.0,
+            1080.001
+          ],
+          "clipped_current_box": [
+            1074.999,
+            739.0,
+            1256.0,
+            1065.0
+          ],
+          "clipped_margin_box": [
+            1074.999,
+            739.0,
+            1256.0,
+            1080.0
+          ],
+          "current_cut_sides": [
+            "bottom"
+          ],
+          "margin_cut_sides": [
+            "bottom"
+          ]
+        }
+      ]
+    },
+    {
+      "stem": "D04_20260123074846_frame_0019",
+      "sequence_name": "D04_20260123074846",
+      "split": "val",
+      "image_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_1\\D04_20260123074846\\D04_20260123074846_frame_0019.jpg",
+      "label_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\working\\aggregated_labels\\D04_20260123074846_frame_0019.txt",
+      "overlay_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\overlays\\D04_20260123074846_frame_0019_cropped_keep_overlay.jpg",
+      "current_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\current_mask_crops\\D04_20260123074846_frame_0019_current_mask_crop.jpg",
+      "margin_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\margin64_mask_crops\\D04_20260123074846_frame_0019_margin64_mask_crop.jpg",
+      "current_crop": [
+        0,
+        295,
+        1920,
+        1080
+      ],
+      "margin_crop": [
+        0,
+        231,
+        1920,
+        1080
+      ],
+      "boxes": [
+        {
+          "rule": "min_box_ioa",
+          "center_inside": true,
+          "bottom_center_inside": false,
+          "box_ioa": 0.942223,
+          "original_box": [
+            0.999,
+            927.0,
+            69.0,
+            1080.001
+          ],
+          "clipped_current_box": [
+            0.999,
+            927.0,
+            69.0,
+            1080.0
+          ],
+          "clipped_margin_box": [
+            0.999,
+            927.0,
+            69.0,
+            1080.0
+          ],
+          "current_cut_sides": [
+            "bottom"
+          ],
+          "margin_cut_sides": [
+            "bottom"
+          ]
+        }
+      ]
+    },
+    {
+      "stem": "D05_20260123074841_frame_0023",
+      "sequence_name": "D05_20260123074841",
+      "split": "val",
+      "image_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_1\\D05_20260123074841\\D05_20260123074841_frame_0023.jpg",
+      "label_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\working\\aggregated_labels\\D05_20260123074841_frame_0023.txt",
+      "overlay_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\overlays\\D05_20260123074841_frame_0023_cropped_keep_overlay.jpg",
+      "current_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\current_mask_crops\\D05_20260123074841_frame_0023_current_mask_crop.jpg",
+      "margin_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\margin64_mask_crops\\D05_20260123074841_frame_0023_margin64_mask_crop.jpg",
+      "current_crop": [
+        0,
+        39,
+        1920,
+        1080
+      ],
+      "margin_crop": [
+        0,
+        0,
+        1920,
+        1080
+      ],
+      "boxes": [
+        {
+          "rule": "bottom_center_inside",
+          "center_inside": false,
+          "bottom_center_inside": true,
+          "box_ioa": 0.474158,
+          "original_box": [
+            1758.001,
+            22.0,
+            1798.0,
+            110.0
+          ],
+          "clipped_current_box": [
+            1758.001,
+            39.0,
+            1798.0,
+            110.0
+          ],
+          "clipped_margin_box": [
+            1758.001,
+            22.0,
+            1798.0,
+            110.0
+          ],
+          "current_cut_sides": [
+            "top"
+          ],
+          "margin_cut_sides": []
+        }
+      ]
+    },
+    {
+      "stem": "D05_20260123074841_frame_0024",
+      "sequence_name": "D05_20260123074841",
+      "split": "val",
+      "image_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_1\\D05_20260123074841\\D05_20260123074841_frame_0024.jpg",
+      "label_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\working\\aggregated_labels\\D05_20260123074841_frame_0024.txt",
+      "overlay_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\overlays\\D05_20260123074841_frame_0024_cropped_keep_overlay.jpg",
+      "current_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\current_mask_crops\\D05_20260123074841_frame_0024_current_mask_crop.jpg",
+      "margin_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\margin64_mask_crops\\D05_20260123074841_frame_0024_margin64_mask_crop.jpg",
+      "current_crop": [
+        0,
+        36,
+        1920,
+        1080
+      ],
+      "margin_crop": [
+        0,
+        0,
+        1920,
+        1080
+      ],
+      "boxes": [
+        {
+          "rule": "bottom_center_inside",
+          "center_inside": false,
+          "bottom_center_inside": true,
+          "box_ioa": 0.36714,
+          "original_box": [
+            1776.999,
+            18.0,
+            1816.0,
+            87.0
+          ],
+          "clipped_current_box": [
+            1776.999,
+            36.0,
+            1816.0,
+            87.0
+          ],
+          "clipped_margin_box": [
+            1776.999,
+            18.0,
+            1816.0,
+            87.0
+          ],
+          "current_cut_sides": [
+            "top"
+          ],
+          "margin_cut_sides": []
+        }
+      ]
+    },
+    {
+      "stem": "D05_20260123074841_frame_0025",
+      "sequence_name": "D05_20260123074841",
+      "split": "val",
+      "image_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_1\\D05_20260123074841\\D05_20260123074841_frame_0025.jpg",
+      "label_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\working\\aggregated_labels\\D05_20260123074841_frame_0025.txt",
+      "overlay_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\overlays\\D05_20260123074841_frame_0025_cropped_keep_overlay.jpg",
+      "current_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\current_mask_crops\\D05_20260123074841_frame_0025_current_mask_crop.jpg",
+      "margin_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\margin64_mask_crops\\D05_20260123074841_frame_0025_margin64_mask_crop.jpg",
+      "current_crop": [
+        2,
+        36,
+        1918,
+        1079
+      ],
+      "margin_crop": [
+        0,
+        0,
+        1920,
+        1080
+      ],
+      "boxes": [
+        {
+          "rule": "bottom_center_inside",
+          "center_inside": false,
+          "bottom_center_inside": true,
+          "box_ioa": 0.459134,
+          "original_box": [
+            1788.999,
+            18.0,
+            1816.0,
+            86.0
+          ],
+          "clipped_current_box": [
+            1788.999,
+            36.0,
+            1816.0,
+            86.0
+          ],
+          "clipped_margin_box": [
+            1788.999,
+            18.0,
+            1816.0,
+            86.0
+          ],
+          "current_cut_sides": [
+            "top"
+          ],
+          "margin_cut_sides": []
+        }
+      ]
+    },
+    {
+      "stem": "D05_20260123074841_frame_0026",
+      "sequence_name": "D05_20260123074841",
+      "split": "val",
+      "image_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_1\\D05_20260123074841\\D05_20260123074841_frame_0026.jpg",
+      "label_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\working\\aggregated_labels\\D05_20260123074841_frame_0026.txt",
+      "overlay_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\overlays\\D05_20260123074841_frame_0026_cropped_keep_overlay.jpg",
+      "current_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\current_mask_crops\\D05_20260123074841_frame_0026_current_mask_crop.jpg",
+      "margin_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\margin64_mask_crops\\D05_20260123074841_frame_0026_margin64_mask_crop.jpg",
+      "current_crop": [
+        0,
+        39,
+        1920,
+        1079
+      ],
+      "margin_crop": [
+        0,
+        0,
+        1920,
+        1080
+      ],
+      "boxes": [
+        {
+          "rule": "bottom_center_inside",
+          "center_inside": true,
+          "bottom_center_inside": true,
+          "box_ioa": 0.681626,
+          "original_box": [
+            1806.001,
+            20.001,
+            1836.001,
+            98.0
+          ],
+          "clipped_current_box": [
+            1806.001,
+            39.0,
+            1836.001,
+            98.0
+          ],
+          "clipped_margin_box": [
+            1806.001,
+            20.001,
+            1836.001,
+            98.0
+          ],
+          "current_cut_sides": [
+            "top"
+          ],
+          "margin_cut_sides": []
+        }
+      ]
+    },
+    {
+      "stem": "D15_20260119061405_frame_0325",
+      "sequence_name": "D15_20260119061405",
+      "split": "val",
+      "image_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_2\\1\\D15_20260119061405_frame_0325.jpg",
+      "label_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\working\\aggregated_labels\\D15_20260119061405_frame_0325.txt",
+      "overlay_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\overlays\\D15_20260119061405_frame_0325_cropped_keep_overlay.jpg",
+      "current_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\current_mask_crops\\D15_20260119061405_frame_0325_current_mask_crop.jpg",
+      "margin_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\margin64_mask_crops\\D15_20260119061405_frame_0325_margin64_mask_crop.jpg",
+      "current_crop": [
+        0,
+        201,
+        2560,
+        1440
+      ],
+      "margin_crop": [
+        0,
+        137,
+        2560,
+        1440
+      ],
+      "boxes": [
+        {
+          "rule": "min_box_ioa",
+          "center_inside": true,
+          "bottom_center_inside": false,
+          "box_ioa": 0.998344,
+          "original_box": [
+            574.001,
+            1213.001,
+            757.0,
+            1440.001
+          ],
+          "clipped_current_box": [
+            574.001,
+            1213.001,
+            757.0,
+            1440.0
+          ],
+          "clipped_margin_box": [
+            574.001,
+            1213.001,
+            757.0,
+            1440.0
+          ],
+          "current_cut_sides": [
+            "bottom"
+          ],
+          "margin_cut_sides": [
+            "bottom"
+          ]
+        }
+      ]
+    },
+    {
+      "stem": "D15_20260119061405_frame_0327",
+      "sequence_name": "D15_20260119061405",
+      "split": "val",
+      "image_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_2\\1\\D15_20260119061405_frame_0327.jpg",
+      "label_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\working\\aggregated_labels\\D15_20260119061405_frame_0327.txt",
+      "overlay_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\overlays\\D15_20260119061405_frame_0327_cropped_keep_overlay.jpg",
+      "current_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\current_mask_crops\\D15_20260119061405_frame_0327_current_mask_crop.jpg",
+      "margin_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\margin64_mask_crops\\D15_20260119061405_frame_0327_margin64_mask_crop.jpg",
+      "current_crop": [
+        0,
+        205,
+        2560,
+        1440
+      ],
+      "margin_crop": [
+        0,
+        141,
+        2560,
+        1440
+      ],
+      "boxes": [
+        {
+          "rule": "min_box_ioa",
+          "center_inside": true,
+          "bottom_center_inside": false,
+          "box_ioa": 1.0,
+          "original_box": [
+            503.999,
+            1159.001,
+            642.999,
+            1440.001
+          ],
+          "clipped_current_box": [
+            503.999,
+            1159.001,
+            642.999,
+            1440.0
+          ],
+          "clipped_margin_box": [
+            503.999,
+            1159.001,
+            642.999,
+            1440.0
+          ],
+          "current_cut_sides": [
+            "bottom"
+          ],
+          "margin_cut_sides": [
+            "bottom"
+          ]
+        }
+      ]
+    },
+    {
+      "stem": "D15_20260119061405_frame_0328",
+      "sequence_name": "D15_20260119061405",
+      "split": "val",
+      "image_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_2\\1\\D15_20260119061405_frame_0328.jpg",
+      "label_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\working\\aggregated_labels\\D15_20260119061405_frame_0328.txt",
+      "overlay_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\overlays\\D15_20260119061405_frame_0328_cropped_keep_overlay.jpg",
+      "current_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\current_mask_crops\\D15_20260119061405_frame_0328_current_mask_crop.jpg",
+      "margin_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\margin64_mask_crops\\D15_20260119061405_frame_0328_margin64_mask_crop.jpg",
+      "current_crop": [
+        0,
+        210,
+        2560,
+        1422
+      ],
+      "margin_crop": [
+        0,
+        146,
+        2560,
+        1440
+      ],
+      "boxes": [
+        {
+          "rule": "min_box_ioa",
+          "center_inside": true,
+          "bottom_center_inside": false,
+          "box_ioa": 0.950765,
+          "original_box": [
+            431.0,
+            1172.001,
+            605.999,
+            1436.0
+          ],
+          "clipped_current_box": [
+            431.0,
+            1172.001,
+            605.999,
+            1422.0
+          ],
+          "clipped_margin_box": [
+            431.0,
+            1172.001,
+            605.999,
+            1436.0
+          ],
+          "current_cut_sides": [
+            "bottom"
+          ],
+          "margin_cut_sides": []
+        }
+      ]
+    },
+    {
+      "stem": "D15_20260119061405_frame_0329",
+      "sequence_name": "D15_20260119061405",
+      "split": "val",
+      "image_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_2\\1\\D15_20260119061405_frame_0329.jpg",
+      "label_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\working\\aggregated_labels\\D15_20260119061405_frame_0329.txt",
+      "overlay_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\overlays\\D15_20260119061405_frame_0329_cropped_keep_overlay.jpg",
+      "current_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\current_mask_crops\\D15_20260119061405_frame_0329_current_mask_crop.jpg",
+      "margin_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\margin64_mask_crops\\D15_20260119061405_frame_0329_margin64_mask_crop.jpg",
+      "current_crop": [
+        0,
+        210,
+        2560,
+        1440
+      ],
+      "margin_crop": [
+        0,
+        146,
+        2560,
+        1440
+      ],
+      "boxes": [
+        {
+          "rule": "min_box_ioa",
+          "center_inside": true,
+          "bottom_center_inside": false,
+          "box_ioa": 1.0,
+          "original_box": [
+            465.999,
+            1249.001,
+            686.001,
+            1440.001
+          ],
+          "clipped_current_box": [
+            465.999,
+            1249.001,
+            686.001,
+            1440.0
+          ],
+          "clipped_margin_box": [
+            465.999,
+            1249.001,
+            686.001,
+            1440.0
+          ],
+          "current_cut_sides": [
+            "bottom"
+          ],
+          "margin_cut_sides": [
+            "bottom"
+          ]
+        }
+      ]
+    },
+    {
+      "stem": "D15_20260119061405_frame_0331",
+      "sequence_name": "D15_20260119061405",
+      "split": "val",
+      "image_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_2\\1\\D15_20260119061405_frame_0331.jpg",
+      "label_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\working\\aggregated_labels\\D15_20260119061405_frame_0331.txt",
+      "overlay_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\overlays\\D15_20260119061405_frame_0331_cropped_keep_overlay.jpg",
+      "current_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\current_mask_crops\\D15_20260119061405_frame_0331_current_mask_crop.jpg",
+      "margin_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\margin64_mask_crops\\D15_20260119061405_frame_0331_margin64_mask_crop.jpg",
+      "current_crop": [
+        0,
+        203,
+        2560,
+        1432
+      ],
+      "margin_crop": [
+        0,
+        139,
+        2560,
+        1440
+      ],
+      "boxes": [
+        {
+          "rule": "min_box_ioa",
+          "center_inside": true,
+          "bottom_center_inside": false,
+          "box_ioa": 0.973703,
+          "original_box": [
+            472.0,
+            1053.0,
+            673.999,
+            1440.0
+          ],
+          "clipped_current_box": [
+            472.0,
+            1053.0,
+            673.999,
+            1432.0
+          ],
+          "clipped_margin_box": [
+            472.0,
+            1053.0,
+            673.999,
+            1440.0
+          ],
+          "current_cut_sides": [
+            "bottom"
+          ],
+          "margin_cut_sides": []
+        }
+      ]
+    },
+    {
+      "stem": "D15_20260119061405_frame_0338",
+      "sequence_name": "D15_20260119061405",
+      "split": "val",
+      "image_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_2\\1\\D15_20260119061405_frame_0338.jpg",
+      "label_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\working\\aggregated_labels\\D15_20260119061405_frame_0338.txt",
+      "overlay_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\overlays\\D15_20260119061405_frame_0338_cropped_keep_overlay.jpg",
+      "current_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\current_mask_crops\\D15_20260119061405_frame_0338_current_mask_crop.jpg",
+      "margin_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\margin64_mask_crops\\D15_20260119061405_frame_0338_margin64_mask_crop.jpg",
+      "current_crop": [
+        0,
+        206,
+        2560,
+        1438
+      ],
+      "margin_crop": [
+        0,
+        142,
+        2560,
+        1440
+      ],
+      "boxes": [
+        {
+          "rule": "min_box_ioa",
+          "center_inside": true,
+          "bottom_center_inside": false,
+          "box_ioa": 0.981741,
+          "original_box": [
+            626.001,
+            1222.001,
+            819.002,
+            1440.001
+          ],
+          "clipped_current_box": [
+            626.001,
+            1222.001,
+            819.002,
+            1438.0
+          ],
+          "clipped_margin_box": [
+            626.001,
+            1222.001,
+            819.002,
+            1440.0
+          ],
+          "current_cut_sides": [
+            "bottom"
+          ],
+          "margin_cut_sides": [
+            "bottom"
+          ]
+        }
+      ]
+    },
+    {
+      "stem": "D15_20260119203927_frame_0151",
+      "sequence_name": "D15_20260119203927",
+      "split": "val",
+      "image_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_2\\D15_20260119203927\\D15_20260119203927_frame_0151.jpg",
+      "label_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\working\\aggregated_labels\\D15_20260119203927_frame_0151.txt",
+      "overlay_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\overlays\\D15_20260119203927_frame_0151_cropped_keep_overlay.jpg",
+      "current_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\current_mask_crops\\D15_20260119203927_frame_0151_current_mask_crop.jpg",
+      "margin_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\margin64_mask_crops\\D15_20260119203927_frame_0151_margin64_mask_crop.jpg",
+      "current_crop": [
+        0,
+        193,
+        2560,
+        1440
+      ],
+      "margin_crop": [
+        0,
+        129,
+        2560,
+        1440
+      ],
+      "boxes": [
+        {
+          "rule": "min_box_ioa",
+          "center_inside": true,
+          "bottom_center_inside": false,
+          "box_ioa": 1.0,
+          "original_box": [
+            318.001,
+            1249.001,
+            549.0,
+            1440.001
+          ],
+          "clipped_current_box": [
+            318.001,
+            1249.001,
+            549.0,
+            1440.0
+          ],
+          "clipped_margin_box": [
+            318.001,
+            1249.001,
+            549.0,
+            1440.0
+          ],
+          "current_cut_sides": [
+            "bottom"
+          ],
+          "margin_cut_sides": [
+            "bottom"
+          ]
+        }
+      ]
+    },
+    {
+      "stem": "D15_20260119203927_frame_0152",
+      "sequence_name": "D15_20260119203927",
+      "split": "val",
+      "image_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_2\\D15_20260119203927\\D15_20260119203927_frame_0152.jpg",
+      "label_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\working\\aggregated_labels\\D15_20260119203927_frame_0152.txt",
+      "overlay_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\overlays\\D15_20260119203927_frame_0152_cropped_keep_overlay.jpg",
+      "current_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\current_mask_crops\\D15_20260119203927_frame_0152_current_mask_crop.jpg",
+      "margin_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\margin64_mask_crops\\D15_20260119203927_frame_0152_margin64_mask_crop.jpg",
+      "current_crop": [
+        0,
+        208,
+        2560,
+        1440
+      ],
+      "margin_crop": [
+        0,
+        144,
+        2560,
+        1440
+      ],
+      "boxes": [
+        {
+          "rule": "min_box_ioa",
+          "center_inside": true,
+          "bottom_center_inside": false,
+          "box_ioa": 1.0,
+          "original_box": [
+            896.001,
+            1119.0,
+            1167.0,
+            1440.001
+          ],
+          "clipped_current_box": [
+            896.001,
+            1119.0,
+            1167.0,
+            1440.0
+          ],
+          "clipped_margin_box": [
+            896.001,
+            1119.0,
+            1167.0,
+            1440.0
+          ],
+          "current_cut_sides": [
+            "bottom"
+          ],
+          "margin_cut_sides": [
+            "bottom"
+          ]
+        }
+      ]
+    },
+    {
+      "stem": "D15_20260119203927_frame_0153",
+      "sequence_name": "D15_20260119203927",
+      "split": "val",
+      "image_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_2\\D15_20260119203927\\D15_20260119203927_frame_0153.jpg",
+      "label_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\working\\aggregated_labels\\D15_20260119203927_frame_0153.txt",
+      "overlay_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\overlays\\D15_20260119203927_frame_0153_cropped_keep_overlay.jpg",
+      "current_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\current_mask_crops\\D15_20260119203927_frame_0153_current_mask_crop.jpg",
+      "margin_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\margin64_mask_crops\\D15_20260119203927_frame_0153_margin64_mask_crop.jpg",
+      "current_crop": [
+        0,
+        210,
+        2560,
+        1432
+      ],
+      "margin_crop": [
+        0,
+        146,
+        2560,
+        1440
+      ],
+      "boxes": [
+        {
+          "rule": "min_box_ioa",
+          "center_inside": true,
+          "bottom_center_inside": false,
+          "box_ioa": 0.953496,
+          "original_box": [
+            555.0,
+            1268.001,
+            769.999,
+            1440.0
+          ],
+          "clipped_current_box": [
+            555.0,
+            1268.001,
+            769.999,
+            1432.0
+          ],
+          "clipped_margin_box": [
+            555.0,
+            1268.001,
+            769.999,
+            1440.0
+          ],
+          "current_cut_sides": [
+            "bottom"
+          ],
+          "margin_cut_sides": []
+        }
+      ]
+    },
+    {
+      "stem": "D15_20260119203927_frame_0156",
+      "sequence_name": "D15_20260119203927",
+      "split": "val",
+      "image_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_2\\D15_20260119203927\\D15_20260119203927_frame_0156.jpg",
+      "label_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\working\\aggregated_labels\\D15_20260119203927_frame_0156.txt",
+      "overlay_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\overlays\\D15_20260119203927_frame_0156_cropped_keep_overlay.jpg",
+      "current_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\current_mask_crops\\D15_20260119203927_frame_0156_current_mask_crop.jpg",
+      "margin_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\margin64_mask_crops\\D15_20260119203927_frame_0156_margin64_mask_crop.jpg",
+      "current_crop": [
+        0,
+        213,
+        2560,
+        1438
+      ],
+      "margin_crop": [
+        0,
+        149,
+        2560,
+        1440
+      ],
+      "boxes": [
+        {
+          "rule": "min_box_ioa",
+          "center_inside": true,
+          "bottom_center_inside": false,
+          "box_ioa": 0.998102,
+          "original_box": [
+            150.999,
+            1267.001,
+            406.999,
+            1440.001
+          ],
+          "clipped_current_box": [
+            150.999,
+            1267.001,
+            406.999,
+            1438.0
+          ],
+          "clipped_margin_box": [
+            150.999,
+            1267.001,
+            406.999,
+            1440.0
+          ],
+          "current_cut_sides": [
+            "bottom"
+          ],
+          "margin_cut_sides": [
+            "bottom"
+          ]
+        }
+      ]
+    },
+    {
+      "stem": "D15_20260119061405_frame_0340",
+      "sequence_name": "D15_20260119061405",
+      "split": "test",
+      "image_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_2\\1\\D15_20260119061405_frame_0340.jpg",
+      "label_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\working\\aggregated_labels\\D15_20260119061405_frame_0340.txt",
+      "overlay_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\overlays\\D15_20260119061405_frame_0340_cropped_keep_overlay.jpg",
+      "current_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\current_mask_crops\\D15_20260119061405_frame_0340_current_mask_crop.jpg",
+      "margin_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\margin64_mask_crops\\D15_20260119061405_frame_0340_margin64_mask_crop.jpg",
+      "current_crop": [
+        0,
+        201,
+        2560,
+        1438
+      ],
+      "margin_crop": [
+        0,
+        137,
+        2560,
+        1440
+      ],
+      "boxes": [
+        {
+          "rule": "min_box_ioa",
+          "center_inside": true,
+          "bottom_center_inside": false,
+          "box_ioa": 0.992321,
+          "original_box": [
+            501.0,
+            1164.0,
+            689.001,
+            1440.001
+          ],
+          "clipped_current_box": [
+            501.0,
+            1164.0,
+            689.001,
+            1438.0
+          ],
+          "clipped_margin_box": [
+            501.0,
+            1164.0,
+            689.001,
+            1440.0
+          ],
+          "current_cut_sides": [
+            "bottom"
+          ],
+          "margin_cut_sides": [
+            "bottom"
+          ]
+        }
+      ]
+    },
+    {
+      "stem": "D15_20260119061405_frame_0352",
+      "sequence_name": "D15_20260119061405",
+      "split": "test",
+      "image_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_2\\1\\D15_20260119061405_frame_0352.jpg",
+      "label_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\working\\aggregated_labels\\D15_20260119061405_frame_0352.txt",
+      "overlay_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\overlays\\D15_20260119061405_frame_0352_cropped_keep_overlay.jpg",
+      "current_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\current_mask_crops\\D15_20260119061405_frame_0352_current_mask_crop.jpg",
+      "margin_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\margin64_mask_crops\\D15_20260119061405_frame_0352_margin64_mask_crop.jpg",
+      "current_crop": [
+        0,
+        200,
+        2560,
+        1440
+      ],
+      "margin_crop": [
+        0,
+        136,
+        2560,
+        1440
+      ],
+      "boxes": [
+        {
+          "rule": "min_box_ioa",
+          "center_inside": true,
+          "bottom_center_inside": false,
+          "box_ioa": 1.0,
+          "original_box": [
+            677.001,
+            1069.001,
+            851.002,
+            1440.001
+          ],
+          "clipped_current_box": [
+            677.001,
+            1069.001,
+            851.002,
+            1440.0
+          ],
+          "clipped_margin_box": [
+            677.001,
+            1069.001,
+            851.002,
+            1440.0
+          ],
+          "current_cut_sides": [
+            "bottom"
+          ],
+          "margin_cut_sides": [
+            "bottom"
+          ]
+        }
+      ]
+    },
+    {
+      "stem": "D15_20260119203927_frame_0162",
+      "sequence_name": "D15_20260119203927",
+      "split": "test",
+      "image_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_2\\D15_20260119203927\\D15_20260119203927_frame_0162.jpg",
+      "label_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\working\\aggregated_labels\\D15_20260119203927_frame_0162.txt",
+      "overlay_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\overlays\\D15_20260119203927_frame_0162_cropped_keep_overlay.jpg",
+      "current_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\current_mask_crops\\D15_20260119203927_frame_0162_current_mask_crop.jpg",
+      "margin_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\margin64_mask_crops\\D15_20260119203927_frame_0162_margin64_mask_crop.jpg",
+      "current_crop": [
+        0,
+        215,
+        2560,
+        1428
+      ],
+      "margin_crop": [
+        0,
+        151,
+        2560,
+        1440
+      ],
+      "boxes": [
+        {
+          "rule": "bottom_center_inside",
+          "center_inside": false,
+          "bottom_center_inside": true,
+          "box_ioa": 0.138097,
+          "original_box": [
+            680.001,
+            151.999,
+            711.0,
+            241.0
+          ],
+          "clipped_current_box": [
+            680.001,
+            215.0,
+            711.0,
+            241.0
+          ],
+          "clipped_margin_box": [
+            680.001,
+            151.999,
+            711.0,
+            241.0
+          ],
+          "current_cut_sides": [
+            "top"
+          ],
+          "margin_cut_sides": []
+        }
+      ]
+    },
+    {
+      "stem": "D15_20260119203927_frame_0164",
+      "sequence_name": "D15_20260119203927",
+      "split": "test",
+      "image_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_2\\D15_20260119203927\\D15_20260119203927_frame_0164.jpg",
+      "label_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\working\\aggregated_labels\\D15_20260119203927_frame_0164.txt",
+      "overlay_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\overlays\\D15_20260119203927_frame_0164_cropped_keep_overlay.jpg",
+      "current_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\current_mask_crops\\D15_20260119203927_frame_0164_current_mask_crop.jpg",
+      "margin_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\margin64_mask_crops\\D15_20260119203927_frame_0164_margin64_mask_crop.jpg",
+      "current_crop": [
+        0,
+        213,
+        2560,
+        1440
+      ],
+      "margin_crop": [
+        0,
+        149,
+        2560,
+        1440
+      ],
+      "boxes": [
+        {
+          "rule": "bottom_center_inside",
+          "center_inside": false,
+          "bottom_center_inside": true,
+          "box_ioa": 0.087245,
+          "original_box": [
+            701.001,
+            151.0,
+            735.0,
+            240.0
+          ],
+          "clipped_current_box": [
+            701.001,
+            213.0,
+            735.0,
+            240.0
+          ],
+          "clipped_margin_box": [
+            701.001,
+            151.0,
+            735.0,
+            240.0
+          ],
+          "current_cut_sides": [
+            "top"
+          ],
+          "margin_cut_sides": []
+        }
+      ]
+    },
+    {
+      "stem": "D15_20260119203927_frame_0165",
+      "sequence_name": "D15_20260119203927",
+      "split": "test",
+      "image_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_2\\D15_20260119203927\\D15_20260119203927_frame_0165.jpg",
+      "label_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\working\\aggregated_labels\\D15_20260119203927_frame_0165.txt",
+      "overlay_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\overlays\\D15_20260119203927_frame_0165_cropped_keep_overlay.jpg",
+      "current_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\current_mask_crops\\D15_20260119203927_frame_0165_current_mask_crop.jpg",
+      "margin_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\margin64_mask_crops\\D15_20260119203927_frame_0165_margin64_mask_crop.jpg",
+      "current_crop": [
+        0,
+        217,
+        2560,
+        1422
+      ],
+      "margin_crop": [
+        0,
+        153,
+        2560,
+        1440
+      ],
+      "boxes": [
+        {
+          "rule": "bottom_center_inside",
+          "center_inside": false,
+          "bottom_center_inside": true,
+          "box_ioa": 0.149305,
+          "original_box": [
+            717.0,
+            156.0,
+            765.0,
+            252.001
+          ],
+          "clipped_current_box": [
+            717.0,
+            217.0,
+            765.0,
+            252.001
+          ],
+          "clipped_margin_box": [
+            717.0,
+            156.0,
+            765.0,
+            252.001
+          ],
+          "current_cut_sides": [
+            "top"
+          ],
+          "margin_cut_sides": []
+        }
+      ]
+    },
+    {
+      "stem": "D15_20260119203927_frame_0166",
+      "sequence_name": "D15_20260119203927",
+      "split": "test",
+      "image_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_2\\D15_20260119203927\\D15_20260119203927_frame_0166.jpg",
+      "label_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\working\\aggregated_labels\\D15_20260119203927_frame_0166.txt",
+      "overlay_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\overlays\\D15_20260119203927_frame_0166_cropped_keep_overlay.jpg",
+      "current_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\current_mask_crops\\D15_20260119203927_frame_0166_current_mask_crop.jpg",
+      "margin_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\margin64_mask_crops\\D15_20260119203927_frame_0166_margin64_mask_crop.jpg",
+      "current_crop": [
+        0,
+        215,
+        2560,
+        1428
+      ],
+      "margin_crop": [
+        0,
+        151,
+        2560,
+        1440
+      ],
+      "boxes": [
+        {
+          "rule": "bottom_center_inside",
+          "center_inside": false,
+          "bottom_center_inside": true,
+          "box_ioa": 0.091094,
+          "original_box": [
+            733.0,
+            161.999,
+            774.001,
+            244.999
+          ],
+          "clipped_current_box": [
+            733.0,
+            215.0,
+            774.001,
+            244.999
+          ],
+          "clipped_margin_box": [
+            733.0,
+            161.999,
+            774.001,
+            244.999
+          ],
+          "current_cut_sides": [
+            "top"
+          ],
+          "margin_cut_sides": []
+        }
+      ]
+    },
+    {
+      "stem": "D15_20260119203927_frame_0167",
+      "sequence_name": "D15_20260119203927",
+      "split": "test",
+      "image_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_2\\D15_20260119203927\\D15_20260119203927_frame_0167.jpg",
+      "label_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\working\\aggregated_labels\\D15_20260119203927_frame_0167.txt",
+      "overlay_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\overlays\\D15_20260119203927_frame_0167_cropped_keep_overlay.jpg",
+      "current_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\current_mask_crops\\D15_20260119203927_frame_0167_current_mask_crop.jpg",
+      "margin_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\margin64_mask_crops\\D15_20260119203927_frame_0167_margin64_mask_crop.jpg",
+      "current_crop": [
+        0,
+        212,
+        2560,
+        1440
+      ],
+      "margin_crop": [
+        0,
+        148,
+        2560,
+        1440
+      ],
+      "boxes": [
+        {
+          "rule": "bottom_center_inside",
+          "center_inside": false,
+          "bottom_center_inside": true,
+          "box_ioa": 0.116443,
+          "original_box": [
+            751.002,
+            162.0,
+            790.001,
+            247.0
+          ],
+          "clipped_current_box": [
+            751.002,
+            212.0,
+            790.001,
+            247.0
+          ],
+          "clipped_margin_box": [
+            751.002,
+            162.0,
+            790.001,
+            247.0
+          ],
+          "current_cut_sides": [
+            "top"
+          ],
+          "margin_cut_sides": []
+        }
+      ]
+    },
+    {
+      "stem": "D15_20260119203927_frame_0168",
+      "sequence_name": "D15_20260119203927",
+      "split": "test",
+      "image_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_2\\D15_20260119203927\\D15_20260119203927_frame_0168.jpg",
+      "label_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\working\\aggregated_labels\\D15_20260119203927_frame_0168.txt",
+      "overlay_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\overlays\\D15_20260119203927_frame_0168_cropped_keep_overlay.jpg",
+      "current_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\current_mask_crops\\D15_20260119203927_frame_0168_current_mask_crop.jpg",
+      "margin_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\margin64_mask_crops\\D15_20260119203927_frame_0168_margin64_mask_crop.jpg",
+      "current_crop": [
+        0,
+        217,
+        2560,
+        1440
+      ],
+      "margin_crop": [
+        0,
+        153,
+        2560,
+        1440
+      ],
+      "boxes": [
+        {
+          "rule": "bottom_center_inside",
+          "center_inside": false,
+          "bottom_center_inside": true,
+          "box_ioa": 0.032744,
+          "original_box": [
+            784.0,
+            160.0,
+            819.0,
+            249.0
+          ],
+          "clipped_current_box": [
+            784.0,
+            217.0,
+            819.0,
+            249.0
+          ],
+          "clipped_margin_box": [
+            784.0,
+            160.0,
+            819.0,
+            249.0
+          ],
+          "current_cut_sides": [
+            "top"
+          ],
+          "margin_cut_sides": []
+        }
+      ]
+    },
+    {
+      "stem": "D15_20260119203927_frame_0169",
+      "sequence_name": "D15_20260119203927",
+      "split": "test",
+      "image_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_2\\D15_20260119203927\\D15_20260119203927_frame_0169.jpg",
+      "label_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\working\\aggregated_labels\\D15_20260119203927_frame_0169.txt",
+      "overlay_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\overlays\\D15_20260119203927_frame_0169_cropped_keep_overlay.jpg",
+      "current_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\current_mask_crops\\D15_20260119203927_frame_0169_current_mask_crop.jpg",
+      "margin_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\margin64_mask_crops\\D15_20260119203927_frame_0169_margin64_mask_crop.jpg",
+      "current_crop": [
+        0,
+        215,
+        2560,
+        1432
+      ],
+      "margin_crop": [
+        0,
+        151,
+        2560,
+        1440
+      ],
+      "boxes": [
+        {
+          "rule": "bottom_center_inside",
+          "center_inside": false,
+          "bottom_center_inside": true,
+          "box_ioa": 0.022012,
+          "original_box": [
+            813.001,
+            163.0,
+            850.001,
+            260.0
+          ],
+          "clipped_current_box": [
+            813.001,
+            215.0,
+            850.001,
+            260.0
+          ],
+          "clipped_margin_box": [
+            813.001,
+            163.0,
+            850.001,
+            260.0
+          ],
+          "current_cut_sides": [
+            "top"
+          ],
+          "margin_cut_sides": []
+        }
+      ]
+    },
+    {
+      "stem": "D15_20260119203927_frame_0170",
+      "sequence_name": "D15_20260119203927",
+      "split": "test",
+      "image_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_2\\D15_20260119203927\\D15_20260119203927_frame_0170.jpg",
+      "label_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\working\\aggregated_labels\\D15_20260119203927_frame_0170.txt",
+      "overlay_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\overlays\\D15_20260119203927_frame_0170_cropped_keep_overlay.jpg",
+      "current_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\current_mask_crops\\D15_20260119203927_frame_0170_current_mask_crop.jpg",
+      "margin_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\margin64_mask_crops\\D15_20260119203927_frame_0170_margin64_mask_crop.jpg",
+      "current_crop": [
+        0,
+        215,
+        2560,
+        1438
+      ],
+      "margin_crop": [
+        0,
+        151,
+        2560,
+        1440
+      ],
+      "boxes": [
+        {
+          "rule": "bottom_center_inside",
+          "center_inside": false,
+          "bottom_center_inside": true,
+          "box_ioa": 0.027582,
+          "original_box": [
+            833.001,
+            161.0,
+            875.0,
+            262.0
+          ],
+          "clipped_current_box": [
+            833.001,
+            215.0,
+            875.0,
+            262.0
+          ],
+          "clipped_margin_box": [
+            833.001,
+            161.0,
+            875.0,
+            262.0
+          ],
+          "current_cut_sides": [
+            "top"
+          ],
+          "margin_cut_sides": []
+        }
+      ]
+    },
+    {
+      "stem": "D15_20260119203927_frame_0171",
+      "sequence_name": "D15_20260119203927",
+      "split": "test",
+      "image_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_2\\D15_20260119203927\\D15_20260119203927_frame_0171.jpg",
+      "label_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\working\\aggregated_labels\\D15_20260119203927_frame_0171.txt",
+      "overlay_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\overlays\\D15_20260119203927_frame_0171_cropped_keep_overlay.jpg",
+      "current_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\current_mask_crops\\D15_20260119203927_frame_0171_current_mask_crop.jpg",
+      "margin_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\margin64_mask_crops\\D15_20260119203927_frame_0171_margin64_mask_crop.jpg",
+      "current_crop": [
+        3,
+        213,
+        2560,
+        1440
+      ],
+      "margin_crop": [
+        0,
+        149,
+        2560,
+        1440
+      ],
+      "boxes": [
+        {
+          "rule": "bottom_center_inside",
+          "center_inside": false,
+          "bottom_center_inside": true,
+          "box_ioa": 0.038801,
+          "original_box": [
+            877.0,
+            160.0,
+            918.999,
+            268.0
+          ],
+          "clipped_current_box": [
+            877.0,
+            213.0,
+            918.999,
+            268.0
+          ],
+          "clipped_margin_box": [
+            877.0,
+            160.0,
+            918.999,
+            268.0
+          ],
+          "current_cut_sides": [
+            "top"
+          ],
+          "margin_cut_sides": []
+        }
+      ]
+    },
+    {
+      "stem": "D15_20260119203927_frame_0174",
+      "sequence_name": "D15_20260119203927",
+      "split": "test",
+      "image_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_2\\D15_20260119203927\\D15_20260119203927_frame_0174.jpg",
+      "label_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\working\\aggregated_labels\\D15_20260119203927_frame_0174.txt",
+      "overlay_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\overlays\\D15_20260119203927_frame_0174_cropped_keep_overlay.jpg",
+      "current_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\current_mask_crops\\D15_20260119203927_frame_0174_current_mask_crop.jpg",
+      "margin_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\margin64_mask_crops\\D15_20260119203927_frame_0174_margin64_mask_crop.jpg",
+      "current_crop": [
+        0,
+        208,
+        2560,
+        1428
+      ],
+      "margin_crop": [
+        0,
+        144,
+        2560,
+        1440
+      ],
+      "boxes": [
+        {
+          "rule": "min_box_ioa",
+          "center_inside": true,
+          "bottom_center_inside": false,
+          "box_ioa": 0.968653,
+          "original_box": [
+            471.999,
+            1166.0,
+            658.999,
+            1440.0
+          ],
+          "clipped_current_box": [
+            471.999,
+            1166.0,
+            658.999,
+            1428.0
+          ],
+          "clipped_margin_box": [
+            471.999,
+            1166.0,
+            658.999,
+            1440.0
+          ],
+          "current_cut_sides": [
+            "bottom"
+          ],
+          "margin_cut_sides": []
+        }
+      ]
+    },
+    {
+      "stem": "D15_20260119203927_frame_0176",
+      "sequence_name": "D15_20260119203927",
+      "split": "test",
+      "image_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_2\\D15_20260119203927\\D15_20260119203927_frame_0176.jpg",
+      "label_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\working\\aggregated_labels\\D15_20260119203927_frame_0176.txt",
+      "overlay_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\overlays\\D15_20260119203927_frame_0176_cropped_keep_overlay.jpg",
+      "current_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\current_mask_crops\\D15_20260119203927_frame_0176_current_mask_crop.jpg",
+      "margin_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\margin64_mask_crops\\D15_20260119203927_frame_0176_margin64_mask_crop.jpg",
+      "current_crop": [
+        0,
+        215,
+        2560,
+        1440
+      ],
+      "margin_crop": [
+        0,
+        151,
+        2560,
+        1440
+      ],
+      "boxes": [
+        {
+          "rule": "bottom_center_inside",
+          "center_inside": false,
+          "bottom_center_inside": true,
+          "box_ioa": 0.018259,
+          "original_box": [
+            1114.001,
+            168.0,
+            1161.0,
+            309.0
+          ],
+          "clipped_current_box": [
+            1114.001,
+            215.0,
+            1161.0,
+            309.0
+          ],
+          "clipped_margin_box": [
+            1114.001,
+            168.0,
+            1161.0,
+            309.0
+          ],
+          "current_cut_sides": [
+            "top"
+          ],
+          "margin_cut_sides": []
+        }
+      ]
+    },
+    {
+      "stem": "D02_20260123070624_frame_0071",
+      "sequence_name": "D02_20260123070624",
+      "split": "test",
+      "image_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_3\\D02_20260123070624\\D02_20260123070624_frame_0071.jpg",
+      "label_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\working\\aggregated_labels\\D02_20260123070624_frame_0071.txt",
+      "overlay_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\overlays\\D02_20260123070624_frame_0071_cropped_keep_overlay.jpg",
+      "current_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\current_mask_crops\\D02_20260123070624_frame_0071_current_mask_crop.jpg",
+      "margin_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\margin64_mask_crops\\D02_20260123070624_frame_0071_margin64_mask_crop.jpg",
+      "current_crop": [
+        22,
+        7,
+        1914,
+        1061
+      ],
+      "margin_crop": [
+        0,
+        0,
+        1920,
+        1080
+      ],
+      "boxes": [
+        {
+          "rule": "bottom_center_inside",
+          "center_inside": false,
+          "bottom_center_inside": true,
+          "box_ioa": 0.504124,
+          "original_box": [
+            454.0,
+            1.0,
+            494.0,
+            86.0
+          ],
+          "clipped_current_box": [
+            454.0,
+            7.0,
+            494.0,
+            86.0
+          ],
+          "clipped_margin_box": [
+            454.0,
+            1.0,
+            494.0,
+            86.0
+          ],
+          "current_cut_sides": [
+            "top"
+          ],
+          "margin_cut_sides": []
+        }
+      ]
+    },
+    {
+      "stem": "D02_20260123070624_frame_0075",
+      "sequence_name": "D02_20260123070624",
+      "split": "test",
+      "image_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_3\\D02_20260123070624\\D02_20260123070624_frame_0075.jpg",
+      "label_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\working\\aggregated_labels\\D02_20260123070624_frame_0075.txt",
+      "overlay_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\overlays\\D02_20260123070624_frame_0075_cropped_keep_overlay.jpg",
+      "current_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\current_mask_crops\\D02_20260123070624_frame_0075_current_mask_crop.jpg",
+      "margin_crop_preview_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\roi_cropped_keep_positive_v2\\margin64_mask_crops\\D02_20260123070624_frame_0075_margin64_mask_crop.jpg",
+      "current_crop": [
+        11,
+        7,
+        1920,
+        1080
+      ],
+      "margin_crop": [
+        0,
+        0,
+        1920,
+        1080
+      ],
+      "boxes": [
+        {
+          "rule": "bottom_center_inside",
+          "center_inside": true,
+          "bottom_center_inside": true,
+          "box_ioa": 0.879682,
+          "original_box": [
+            476.999,
+            1.0,
+            515.0,
+            71.0
+          ],
+          "clipped_current_box": [
+            476.999,
+            7.0,
+            515.0,
+            71.0
+          ],
+          "clipped_margin_box": [
+            476.999,
+            1.0,
+            515.0,
+            71.0
+          ],
+          "current_cut_sides": [
+            "top"
+          ],
+          "margin_cut_sides": []
+        }
+      ]
+    }
+  ]
+}

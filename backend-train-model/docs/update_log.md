@@ -1,5 +1,149 @@
 # Update Log
 
+## 2026-06-10 完成 personcrop 首轮代表帧正式人工复盘
+
+1. 变更来源：用户要求根据 `personcrop代表帧人工复盘模板.md` 完成本次正式人工复盘，基于已有四宫格样本和 summary 数据给出明确结论。
+2. 变更总览：
+   - 新增 `backend-train-model/personcrop-train/train-result/review/review-docs/personcrop首轮代表帧正式人工复盘记录.md`。
+   - 严格按照模板要求对 10 个代表帧逐帧记录：场景标签、fullframe/A/B对比、关键观察、统一判断标签。
+   - 复盘结果显示：70% 代表帧 B 明显优于 A，10% A/B 接近但 B 更稳，20% B 退化。
+   - B 的优势主要体现在 crowded/overlap/dense 场景，核心收益模式是"fallback -> crop"转换。
+   - 明确当前阶段结论：`pred_pc_clo_hardv1` 可升级为默认 `personcrop` 主推进对象，但仍保留 `pred_pc_clo_base` 作为稳定对照，暂不宣布完全替代 fullframe 主线。
+3. 涉及文件：
+   - `backend-train-model/personcrop-train/train-result/review/review-docs/personcrop首轮代表帧正式人工复盘记录.md`
+   - `backend-train-model/docs/update_log.md`
+4. 新增 / 变更配置项：
+   - 无新增 JSON 配置项。
+   - 复盘层面固化了统一判断标签：`B明显优于A`、`A/B接近，但B更稳`、`B有退化，A更稳` 等。
+5. 兼容性注意：
+   - 本轮仅完成人工复盘记录文档，不修改任何训练代码、prepared 数据集、模型权重或在线链路。
+   - 复盘结论支持"B 为默认 candidate"，但明确指出仍需更大范围验证或上线前评估才能正式切换主线。
+6. 本轮明确不改动：
+   - 不新增训练、不重跑评估、不修改 `train_workwear.py`、`review_personcrop_frames.py`、prepared 数据集或现有权重。
+   - 不调整 `inspection-flask/` 在线链路，也不把 person hard examples 并入 clothes 训练。
+
+## 2026-06-08 新增 personcrop 代表帧人工复盘模板
+
+1. 变更来源：用户要求新增一份中文 Markdown 模板，用于指导后续如何查看代表帧、重点看哪些位置、如何统一记录复盘结论。
+2. 变更总览：
+   - 新增 `backend-train-model/personcrop-train/train-docs/personcrop代表帧人工复盘模板.md`。
+   - 模板统一了 `fullframe clothes 基线 / personcrop 上游 A / personcrop 上游 B` 的对比口径。
+   - 明确了四宫格样本的阅读顺序、原图/检测/业务意义的重点观察项，以及人工复盘时容易犯的错误。
+   - 补充统一记录模板、统一结论标签和示意填写样例，便于后续多人协作时保持一致口径。
+3. 涉及文件：
+   - `backend-train-model/personcrop-train/train-docs/personcrop代表帧人工复盘模板.md`
+   - `backend-train-model/docs/update_log.md`
+4. 新增 / 变更配置项：
+   - 无新增 JSON 配置项。
+   - 文档层面的新增统一口径包括：代表帧对比对象命名、四宫格位置理解、结论标签与记录字段。
+5. 兼容性注意：
+   - 本轮仅新增复盘模板文档，不修改训练结果、prepared 数据集、模型权重、project config 或在线链路。
+   - 模板中的示例仅用于展示记录方式，后续填写时仍应以实际看图结论为准。
+6. 本轮明确不改动：
+   - 不新增训练、不重跑评估、不修改 `train_workwear.py`、`review_personcrop_frames.py`、prepared 数据集或现有权重。
+   - 不调整 `inspection-flask/` 在线链路，也不扩展新的训练实验变量。
+
+## 2026-06-08 完成 personcrop 代表帧复盘并固化默认推进结论
+
+1. 变更来源：用户要求继续把复盘部分全部做完，在量化代理复盘基础上补做代表帧级原图业务复盘，并将阶段结论文档化。
+2. 变更总览：
+   - 新增脚本 `backend-train-model/personcrop-train/train-code/review_personcrop_frames.py`，用于对指定原图帧同时运行 fullframe baseline、上游 A pipeline、上游 B pipeline，并生成四宫格复盘样本与 `summary.json`。
+   - 生成代表帧复盘样本目录：`backend-train-model/personcrop-train/train-result/review/personcrop首轮人工复盘样本/`。
+   - 新增 `backend-train-model/personcrop-train/train-result/review/personcrop首轮原图级业务级代表帧复盘结果.md`，固化代表帧层面的业务结论。
+   - 更新 `backend-train-model/personcrop-train/train-result/review/personcrop原图级业务级复盘清单.md`，补充“量化代理复盘 + 代表帧复盘均已完成”的状态。
+   - 更新 `backend-train-model/personcrop-train/train-docs/personcrop下一步推进计划.md`，在 P1 进度中补充“当前已足以支持将 B 升级为默认 personcrop 主推进对象”。
+   - 更新 `backend-train-model/AGENTS.md`，同步当前 personcrop 复盘阶段的最终阶段事实。
+3. 涉及文件：
+   - `backend-train-model/personcrop-train/train-code/review_personcrop_frames.py`
+   - `backend-train-model/personcrop-train/train-result/review/personcrop首轮人工复盘样本/*`
+   - `backend-train-model/personcrop-train/train-result/review/personcrop首轮原图级业务级代表帧复盘结果.md`
+   - `backend-train-model/personcrop-train/train-result/review/personcrop原图级业务级复盘清单.md`
+   - `backend-train-model/personcrop-train/train-docs/personcrop下一步推进计划.md`
+   - `backend-train-model/AGENTS.md`
+   - `backend-train-model/docs/update_log.md`
+4. 新增 / 变更配置项：
+   - 无新增 JSON 配置项。
+   - 新增代表帧复盘样本生成脚本入口：`review_personcrop_frames.py`。
+5. 兼容性注意：
+   - 代表帧复盘是基于选定样本做的原图级业务检查，结论足以支持“B 升级为默认 personcrop 主推进对象”，但仍不等于已经完成 fullframe 主线的最终替换决策。
+   - 复盘样本中的 fullframe / A / B 检测数量主要用于解释收益模式，不应直接替代完整测试集统计指标。
+6. 本轮明确不改动：
+   - 不新增训练、不重跑 A/B 评估、不修改 prepared 数据集、模型权重、project config 或在线系统逻辑。
+   - 不在本轮直接把 person hard examples 并入 clothes 训练。
+
+## 2026-06-08 完成 personcrop 首轮量化代理复盘并清理无用日志
+
+1. 变更来源：用户要求按照 `backend-train-model/personcrop-train/train-result/review/` 下的复盘文档继续执行原图级 / 业务级复盘，并判断 3 个 `.log` 文件是否有保留价值。
+2. 变更总览：
+   - 新增 `backend-train-model/personcrop-train/train-result/review/personcrop首轮原图级业务级量化复盘结果.md`，基于 prepared 文件名差异、A/B 评估结果和现有 review 日志，固化首轮量化代理复盘结论。
+   - 更新 `backend-train-model/personcrop-train/train-result/review/personcrop原图级业务级复盘清单.md`，补充已完成的量化代理复盘入口与当前仍待完成人工视觉确认的部分。
+   - 更新 `backend-train-model/personcrop-train/train-docs/personcrop下一步推进计划.md`，在 P1 段落中记录“量化代理复盘已完成、原图人工确认待完成”的当前进度。
+   - 更新 `backend-train-model/AGENTS.md`，同步当前 personcrop 首轮量化代理复盘的阶段事实。
+   - 删除无独立信息增量的 review 日志：
+     - `pred_pc_person_base.stderr.log`（空文件）
+     - `pred_pc_person_base.stdout.log`（`prepare_report.json` 的 stdout 镜像）
+   - 保留 `pred_pc_person_base_prepare.log`，因为其中包含一次 prepare 失败 traceback，仍具排障参考价值。
+3. 涉及文件：
+   - `backend-train-model/personcrop-train/train-result/review/personcrop首轮原图级业务级量化复盘结果.md`
+   - `backend-train-model/personcrop-train/train-result/review/personcrop原图级业务级复盘清单.md`
+   - `backend-train-model/personcrop-train/train-docs/personcrop下一步推进计划.md`
+   - `backend-train-model/AGENTS.md`
+   - `backend-train-model/docs/update_log.md`
+4. 新增 / 变更配置项：
+   - 无新增 JSON 配置项。
+   - 文档层面的新增阶段事实：已完成首轮量化代理复盘，当前仍需补做代表帧的原图人工复盘。
+5. 兼容性注意：
+   - 本轮量化复盘主要基于 prepared 文件名模式、数量差异和现有评估结果，属于代理性证据，不等于最终人工视觉复盘定论。
+   - 删除的 2 个日志文件不再提供独立信息增量；保留的 `pred_pc_person_base_prepare.log` 仍可能用于后续排查 fallback copy 相关问题。
+6. 本轮明确不改动：
+   - 不新增训练、不重跑评估、不修改任何模型权重、prepared 数据集内容、project config 或在线系统逻辑。
+   - 不在本轮直接宣布 `personcrop` 已完成主线切换，也不把 person hard examples 直接并入 clothes 训练。
+
+## 2026-06-08 完成 personcrop P0 阶段文档沉淀
+
+1. 变更来源：用户要求按照 `backend-train-model/personcrop-train/train-docs/personcrop下一步推进计划.md` 的步骤先完成 P0，并把当前阶段结论、原图级 / 业务级复盘清单固化为文档。
+2. 变更总览：
+   - 新增 `backend-train-model/personcrop-train/train-result/review/personcrop首轮A_B阶段结论.md`，固化当前双上游 A/B 的统一口径、prepared 统计、训练评估结果，以及“B 为默认 candidate、A 为稳定对照”的阶段性结论。
+   - 新增 `backend-train-model/personcrop-train/train-result/review/personcrop原图级业务级复盘清单.md`，把 P0 中“开始做原图级 / 业务级复盘”转成可执行检查清单。
+   - 更新 `backend-train-model/personcrop-train/train-docs/personcrop下一步推进计划.md`，将 P0 四项任务标记为已完成，并补充 P0 产物落点与当前结论。
+   - 更新 `backend-train-model/AGENTS.md`，同步当前 personcrop 双上游 A/B 的 prepared 统计、A/B run test 指标，以及当前阶段结论。
+3. 涉及文件：
+   - `backend-train-model/personcrop-train/train-docs/personcrop下一步推进计划.md`
+   - `backend-train-model/personcrop-train/train-result/review/personcrop首轮A_B阶段结论.md`
+   - `backend-train-model/personcrop-train/train-result/review/personcrop原图级业务级复盘清单.md`
+   - `backend-train-model/AGENTS.md`
+   - `backend-train-model/docs/update_log.md`
+4. 新增 / 变更配置项：
+   - 无新增 JSON 配置项。
+   - 文档层面的当前阶段口径固定为：`pred_pc_clo_hardv1` 是默认 `personcrop` candidate，`pred_pc_clo_base` 是稳定对照。
+5. 兼容性注意：
+   - 本轮只完成 P0 所需的文档与结论沉淀，不新增训练、不重跑评估、不修改 prepared 数据集内容或模型权重。
+   - “默认 candidate” 是当前阶段结论，不等于已经完成最终主线切换；后续仍需结合原图级 / 业务级复盘决定是否升级为默认主线。
+6. 本轮明确不改动：
+   - 不修改 `train_workwear.py`、`prepare_personcrop_from_dataset_yaml.py`、`personcrop_project_config.json`、任何 source dataset 构建配置或在线系统实现。
+   - 不补 clothes hard labels，不扩更多实验变量，也不调整 `inspection-flask/` 在线链路。
+
+## 2026-06-08 新增 personcrop 下一步推进计划文档
+
+1. 变更来源：用户要求在 `backend-train-model/personcrop-train/train-docs/` 下新增一份中文 Markdown 文档，说明在当前双上游 A/B 训练完成后，接下来主要要做什么、如何推进。
+2. 变更总览：
+   - 新增 `backend-train-model/personcrop-train/train-docs/personcrop下一步推进计划.md`。
+   - 文档整理了当前 `personcrop` 正式下游数据口径、A/B prepared 统计、A/B 训练评估结果，以及当前阶段的核心判断。
+   - 明确下一阶段优先事项：先做原图级 / 业务级复盘，把 B 固化为当前默认 candidate、A 保留为稳定对照，并暂不继续扩大实验变量。
+   - 同时写清当前不建议直接做的事项，包括：立即扩更多超参实验、把 person hard examples 直接并入 clothes 训练、以及直接修改在线链路。
+3. 涉及文件：
+   - `backend-train-model/personcrop-train/train-docs/personcrop下一步推进计划.md`
+   - `backend-train-model/docs/update_log.md`
+4. 新增 / 变更配置项：
+   - 无新增 JSON 配置项。
+   - 新文档中的阶段口径为：当前保留 `pred_pc_clo_hardv1` 作为默认 candidate，`pred_pc_clo_base` 作为稳定对照。
+5. 兼容性注意：
+   - 本轮仅新增推进计划文档，不修改任何训练代码、prepared 数据集、模型权重、project config 或在线系统实现。
+   - 文档中的“下一步”属于当前阶段建议，不等于已经完成主线切换决策；后续仍应结合原图级复盘再决定是否升级为默认主线。
+6. 本轮明确不改动：
+   - 不启动新训练、不重新评估、不修改 `train_workwear.py`、`prepare_personcrop_from_dataset_yaml.py`、`personcrop_project_config.json`、prepared 数据集或现有权重。
+   - 不调整 `inspection-flask/` 在线链路、不补 clothes hard labels、也不扩展新的实验变量。
+
 ## 2026-06-07 为 personcrop 增加专用 project config 并修正 A/B 命令落盘口径
 
 1. 变更来源：用户准备启动 `pred_pc_clo_base` 训练，要求训练结果与报告产物明确落到 `backend-train-model/personcrop-train/train-result/artifacts/runs/pred_pc_clo_base` 与 `backend-train-model/personcrop-train/train-result/artifacts/reports/pred_pc_clo_base`，并询问 `pred_pc_person_hardv1` 与 `pred_pc_clo_hardv1` 命名差异。

@@ -1,0 +1,1113 @@
+{
+  "generated_at": "2026-04-28T20:46:18",
+  "source_fpfn_json": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_fpfn_test_conf025\\fpfn_per_image.json",
+  "run_name": "person_roi_aware_v3_mask_then_crop_margin64_from_fullframe",
+  "total_fn_boxes": 35,
+  "bucket_definitions": {
+    "small_boundary_person": {
+      "name_zh": "??????",
+      "rule": "best_iou < 0.5 and rel_height < 0.10 and min_edge_px <= 10",
+      "priority": 1,
+      "action": "????? hard samples??????? keep rule ???????????????"
+    },
+    "small_interior_person": {
+      "name_zh": "???????",
+      "rule": "best_iou < 0.5 and rel_height < 0.10 and min_edge_px > 10",
+      "priority": 2,
+      "action": "??????????????????? imgsz ???"
+    },
+    "medium_large_pose_or_appearance": {
+      "name_zh": "??????/??????",
+      "rule": "best_iou < 0.5 and rel_height >= 0.10",
+      "priority": 3,
+      "action": "???????????????????????? targeted ???"
+    },
+    "crowded_or_localization": {
+      "name_zh": "???? / ??????",
+      "rule": "best_iou >= 0.5",
+      "priority": 4,
+      "action": "??????????????????????????????????"
+    }
+  },
+  "bucket_summary": [
+    {
+      "bucket": "small_boundary_person",
+      "bucket_name_zh": "??????",
+      "rule": "best_iou < 0.5 and rel_height < 0.10 and min_edge_px <= 10",
+      "recommended_action": "????? hard samples??????? keep rule ???????????????",
+      "priority": 1,
+      "fn_box_count": 13,
+      "frame_count": 11,
+      "share_of_all_fn": 0.37142857142857144,
+      "top_sequences": [
+        [
+          "D02_20260123074836",
+          5
+        ],
+        [
+          "D02_20260123070624",
+          4
+        ],
+        [
+          "D15_20260119203927",
+          4
+        ]
+      ],
+      "samples": [
+        {
+          "bucket": "small_boundary_person",
+          "bucket_name_zh": "??????",
+          "sequence_name": "D02_20260123070624",
+          "stem": "D02_20260123070624_frame_0071",
+          "fn_index_in_image": 1,
+          "prepared_image_relpath": "images/test/D02_20260123070624_frame_0071.jpg",
+          "rel_height": 0.07870400000000001,
+          "rel_area": 0.0016396404319999989,
+          "min_edge_px": 1.0000800000000034,
+          "best_iou_with_pred": 0.0,
+          "best_pred_conf": 0.0,
+          "best_pred_kind": "none",
+          "gt_box_xyxy": [
+            454.00032000000004,
+            1.0000800000000034,
+            493.99968,
+            86.00040000000001
+          ]
+        },
+        {
+          "bucket": "small_boundary_person",
+          "bucket_name_zh": "??????",
+          "sequence_name": "D02_20260123070624",
+          "stem": "D02_20260123070624_frame_0074",
+          "fn_index_in_image": 1,
+          "prepared_image_relpath": "images/test/D02_20260123070624_frame_0074.jpg",
+          "rel_height": 0.062963,
+          "rel_area": 0.0014101193479999997,
+          "min_edge_px": 2.999699999999995,
+          "best_iou_with_pred": 0.0,
+          "best_pred_conf": 0.0,
+          "best_pred_kind": "none",
+          "gt_box_xyxy": [
+            478.99968,
+            2.999699999999995,
+            522.0,
+            70.99974
+          ]
+        },
+        {
+          "bucket": "small_boundary_person",
+          "bucket_name_zh": "??????",
+          "sequence_name": "D02_20260123070624",
+          "stem": "D02_20260123070624_frame_0075",
+          "fn_index_in_image": 1,
+          "prepared_image_relpath": "images/test/D02_20260123070624_frame_0075.jpg",
+          "rel_height": 0.06481500000000001,
+          "rel_area": 0.0012828184800000011,
+          "min_edge_px": 0.999540000000003,
+          "best_iou_with_pred": 0.0,
+          "best_pred_conf": 0.0,
+          "best_pred_kind": "none",
+          "gt_box_xyxy": [
+            476.99904,
+            0.999540000000003,
+            514.99968,
+            70.99974
+          ]
+        },
+        {
+          "bucket": "small_boundary_person",
+          "bucket_name_zh": "??????",
+          "sequence_name": "D02_20260123070624",
+          "stem": "D02_20260123070624_frame_0077",
+          "fn_index_in_image": 1,
+          "prepared_image_relpath": "images/test/D02_20260123070624_frame_0077.jpg",
+          "rel_height": 0.044444000000000004,
+          "rel_area": 0.0005323946760000004,
+          "min_edge_px": 2.0001600000000033,
+          "best_iou_with_pred": 0.0,
+          "best_pred_conf": 0.0,
+          "best_pred_kind": "none",
+          "gt_box_xyxy": [
+            436.00032,
+            2.0001600000000033,
+            459.0,
+            49.999680000000005
+          ]
+        },
+        {
+          "bucket": "small_boundary_person",
+          "bucket_name_zh": "??????",
+          "sequence_name": "D02_20260123074836",
+          "stem": "D02_20260123074836_frame_0022",
+          "fn_index_in_image": 1,
+          "prepared_image_relpath": "images/test/D02_20260123074836_frame_0022.jpg",
+          "rel_height": 0.056481,
+          "rel_area": 0.0009413688269999993,
+          "min_edge_px": 1.0006199999999965,
+          "best_iou_with_pred": 0.0,
+          "best_pred_conf": 0.0,
+          "best_pred_kind": "none",
+          "gt_box_xyxy": [
+            1009.9996800000001,
+            1.0006199999999965,
+            1042.00032,
+            62.0001
+          ]
+        },
+        {
+          "bucket": "small_boundary_person",
+          "bucket_name_zh": "??????",
+          "sequence_name": "D02_20260123074836",
+          "stem": "D02_20260123074836_frame_0023",
+          "fn_index_in_image": 1,
+          "prepared_image_relpath": "images/test/D02_20260123074836_frame_0023.jpg",
+          "rel_height": 0.06111100000000002,
+          "rel_area": 0.0012095089119999996,
+          "min_edge_px": 1.9996199999999988,
+          "best_iou_with_pred": 0.0,
+          "best_pred_conf": 0.0,
+          "best_pred_kind": "none",
+          "gt_box_xyxy": [
+            268.99968,
+            1.9996199999999988,
+            307.00032,
+            67.99950000000001
+          ]
+        },
+        {
+          "bucket": "small_boundary_person",
+          "bucket_name_zh": "??????",
+          "sequence_name": "D02_20260123074836",
+          "stem": "D02_20260123074836_frame_0023",
+          "fn_index_in_image": 2,
+          "prepared_image_relpath": "images/test/D02_20260123074836_frame_0023.jpg",
+          "rel_height": 0.05,
+          "rel_area": 0.0009895999999999993,
+          "min_edge_px": 1.0000799999999996,
+          "best_iou_with_pred": 0.0,
+          "best_pred_conf": 0.0,
+          "best_pred_kind": "none",
+          "gt_box_xyxy": [
+            973.00032,
+            1.0000799999999996,
+            1011.00096,
+            55.00008
+          ]
+        },
+        {
+          "bucket": "small_boundary_person",
+          "bucket_name_zh": "??????",
+          "sequence_name": "D02_20260123074836",
+          "stem": "D02_20260123074836_frame_0024",
+          "fn_index_in_image": 1,
+          "prepared_image_relpath": "images/test/D02_20260123074836_frame_0024.jpg",
+          "rel_height": 0.072222,
+          "rel_area": 0.0011660964119999985,
+          "min_edge_px": 6.000480000000006,
+          "best_iou_with_pred": 0.0,
+          "best_pred_conf": 0.0,
+          "best_pred_kind": "none",
+          "gt_box_xyxy": [
+            231.99936,
+            6.000480000000006,
+            262.99967999999996,
+            84.00024
+          ]
+        },
+        {
+          "bucket": "small_boundary_person",
+          "bucket_name_zh": "??????",
+          "sequence_name": "D02_20260123074836",
+          "stem": "D02_20260123074836_frame_0024",
+          "fn_index_in_image": 2,
+          "prepared_image_relpath": "images/test/D02_20260123074836_frame_0024.jpg",
+          "rel_height": 0.039814999999999996,
+          "rel_area": 0.000767274865000002,
+          "min_edge_px": 0.9995399999999992,
+          "best_iou_with_pred": 0.0,
+          "best_pred_conf": 0.0,
+          "best_pred_kind": "none",
+          "gt_box_xyxy": [
+            936.9993599999999,
+            0.9995399999999992,
+            973.99968,
+            43.999739999999996
+          ]
+        },
+        {
+          "bucket": "small_boundary_person",
+          "bucket_name_zh": "??????",
+          "sequence_name": "D15_20260119203927",
+          "stem": "D15_20260119203927_frame_0162",
+          "fn_index_in_image": 1,
+          "prepared_image_relpath": "images/test/D15_20260119203927_frame_0162.jpg",
+          "rel_height": 0.069046,
+          "rel_area": 0.0008360780140000009,
+          "min_edge_px": 0.9989750000000063,
+          "best_iou_with_pred": 0.0,
+          "best_pred_conf": 0.0,
+          "best_pred_kind": "none",
+          "gt_box_xyxy": [
+            680.00128,
+            0.9989750000000063,
+            711.00032,
+            89.999269
+          ]
+        },
+        {
+          "bucket": "small_boundary_person",
+          "bucket_name_zh": "??????",
+          "sequence_name": "D15_20260119203927",
+          "stem": "D15_20260119203927_frame_0164",
+          "fn_index_in_image": 1,
+          "prepared_image_relpath": "images/test/D15_20260119203927_frame_0164.jpg",
+          "rel_height": 0.06893900000000001,
+          "rel_area": 0.0009155788590000007,
+          "min_edge_px": 2.000404500000003,
+          "best_iou_with_pred": 0.0,
+          "best_pred_conf": 0.0,
+          "best_pred_kind": "none",
+          "gt_box_xyxy": [
+            701.0009600000001,
+            2.000404500000003,
+            735.0003200000001,
+            91.00065350000001
+          ]
+        },
+        {
+          "bucket": "small_boundary_person",
+          "bucket_name_zh": "??????",
+          "sequence_name": "D15_20260119203927",
+          "stem": "D15_20260119203927_frame_0165",
+          "fn_index_in_image": 1,
+          "prepared_image_relpath": "images/test/D15_20260119203927_frame_0165.jpg",
+          "rel_height": 0.074592,
+          "rel_area": 0.0013986000000000035,
+          "min_edge_px": 2.9999969999999996,
+          "best_iou_with_pred": 0.0,
+          "best_pred_conf": 0.0,
+          "best_pred_kind": "none",
+          "gt_box_xyxy": [
+            716.99968,
+            2.9999969999999996,
+            764.9996800000001,
+            98.99990100000001
+          ]
+        },
+        {
+          "bucket": "small_boundary_person",
+          "bucket_name_zh": "??????",
+          "sequence_name": "D15_20260119203927",
+          "stem": "D15_20260119203927_frame_0168",
+          "fn_index_in_image": 1,
+          "prepared_image_relpath": "images/test/D15_20260119203927_frame_0168.jpg",
+          "rel_height": 0.069154,
+          "rel_area": 0.0009454734880000027,
+          "min_edge_px": 6.999993000000008,
+          "best_iou_with_pred": 0.0,
+          "best_pred_conf": 0.0,
+          "best_pred_kind": "none",
+          "gt_box_xyxy": [
+            783.9999999999999,
+            6.999993000000008,
+            819.00032,
+            96.00119099999999
+          ]
+        }
+      ]
+    },
+    {
+      "bucket": "small_interior_person",
+      "bucket_name_zh": "???????",
+      "rule": "best_iou < 0.5 and rel_height < 0.10 and min_edge_px > 10",
+      "recommended_action": "??????????????????? imgsz ???",
+      "priority": 2,
+      "fn_box_count": 16,
+      "frame_count": 16,
+      "share_of_all_fn": 0.45714285714285713,
+      "top_sequences": [
+        [
+          "D15_20260119061405",
+          11
+        ],
+        [
+          "D15_20260119203927",
+          5
+        ]
+      ],
+      "samples": [
+        {
+          "bucket": "small_interior_person",
+          "bucket_name_zh": "???????",
+          "sequence_name": "D15_20260119061405",
+          "stem": "D15_20260119061405_frame_0340",
+          "fn_index_in_image": 1,
+          "prepared_image_relpath": "images/test/D15_20260119061405_frame_0340.jpg",
+          "rel_height": 0.07981599999999998,
+          "rel_area": 0.0028683475920000152,
+          "min_edge_px": 159.99927900000003,
+          "best_iou_with_pred": 0.0883299692534076,
+          "best_pred_conf": 0.815696120262146,
+          "best_pred_kind": "fp",
+          "gt_box_xyxy": [
+            1293.0009599999998,
+            159.99927900000003,
+            1384.9996800000004,
+            263.999527
+          ]
+        },
+        {
+          "bucket": "small_interior_person",
+          "bucket_name_zh": "???????",
+          "sequence_name": "D15_20260119061405",
+          "stem": "D15_20260119061405_frame_0341",
+          "fn_index_in_image": 1,
+          "prepared_image_relpath": "images/test/D15_20260119061405_frame_0341.jpg",
+          "rel_height": 0.07503900000000002,
+          "rel_area": 0.0037226097510000052,
+          "min_edge_px": 170.99915099999998,
+          "best_iou_with_pred": 0.10930079002529153,
+          "best_pred_conf": 0.2524603009223938,
+          "best_pred_kind": "fp",
+          "gt_box_xyxy": [
+            1304.00128,
+            170.99915099999998,
+            1431.00032,
+            269.000085
+          ]
+        },
+        {
+          "bucket": "small_interior_person",
+          "bucket_name_zh": "???????",
+          "sequence_name": "D15_20260119061405",
+          "stem": "D15_20260119061405_frame_0342",
+          "fn_index_in_image": 1,
+          "prepared_image_relpath": "images/test/D15_20260119061405_frame_0342.jpg",
+          "rel_height": 0.07616100000000005,
+          "rel_area": 0.003123819575999997,
+          "min_edge_px": 180.00113949999997,
+          "best_iou_with_pred": 0.0,
+          "best_pred_conf": 0.0,
+          "best_pred_kind": "none",
+          "gt_box_xyxy": [
+            1350.9990400000002,
+            180.00113949999997,
+            1456.0,
+            280.0005325
+          ]
+        },
+        {
+          "bucket": "small_interior_person",
+          "bucket_name_zh": "???????",
+          "sequence_name": "D15_20260119061405",
+          "stem": "D15_20260119061405_frame_0343",
+          "fn_index_in_image": 1,
+          "prepared_image_relpath": "images/test/D15_20260119061405_frame_0343.jpg",
+          "rel_height": 0.089163,
+          "rel_area": 0.002821206482999995,
+          "min_edge_px": 171.0001875,
+          "best_iou_with_pred": 0.0,
+          "best_pred_conf": 0.0,
+          "best_pred_kind": "none",
+          "gt_box_xyxy": [
+            1372.0,
+            171.0001875,
+            1453.0009599999998,
+            287.0012505
+          ]
+        },
+        {
+          "bucket": "small_interior_person",
+          "bucket_name_zh": "???????",
+          "sequence_name": "D15_20260119061405",
+          "stem": "D15_20260119061405_frame_0344",
+          "fn_index_in_image": 1,
+          "prepared_image_relpath": "images/test/D15_20260119061405_frame_0344.jpg",
+          "rel_height": 0.088821,
+          "rel_area": 0.004163484374999999,
+          "min_edge_px": 167.99926900000003,
+          "best_iou_with_pred": 0.12653958508900867,
+          "best_pred_conf": 0.5687322020530701,
+          "best_pred_kind": "fp",
+          "gt_box_xyxy": [
+            1386.9990400000002,
+            167.99926900000003,
+            1506.9990400000002,
+            283.999495
+          ]
+        },
+        {
+          "bucket": "small_interior_person",
+          "bucket_name_zh": "???????",
+          "sequence_name": "D15_20260119061405",
+          "stem": "D15_20260119061405_frame_0345",
+          "fn_index_in_image": 1,
+          "prepared_image_relpath": "images/test/D15_20260119061405_frame_0345.jpg",
+          "rel_height": 0.09748699999999998,
+          "rel_area": 0.0024371749999999907,
+          "min_edge_px": 162.99910250000002,
+          "best_iou_with_pred": 0.0,
+          "best_pred_conf": 0.0,
+          "best_pred_kind": "none",
+          "gt_box_xyxy": [
+            1462.00064,
+            162.99910250000002,
+            1526.0006399999997,
+            290.9995335
+          ]
+        },
+        {
+          "bucket": "small_interior_person",
+          "bucket_name_zh": "???????",
+          "sequence_name": "D15_20260119061405",
+          "stem": "D15_20260119061405_frame_0346",
+          "fn_index_in_image": 2,
+          "prepared_image_relpath": "images/test/D15_20260119061405_frame_0346.jpg",
+          "rel_height": 0.089381,
+          "rel_area": 0.0033168395290000055,
+          "min_edge_px": 163.0012615,
+          "best_iou_with_pred": 0.0,
+          "best_pred_conf": 0.0,
+          "best_pred_kind": "none",
+          "gt_box_xyxy": [
+            1482.00064,
+            163.0012615,
+            1576.9996800000001,
+            280.0009905
+          ]
+        },
+        {
+          "bucket": "small_interior_person",
+          "bucket_name_zh": "???????",
+          "sequence_name": "D15_20260119061405",
+          "stem": "D15_20260119061405_frame_0347",
+          "fn_index_in_image": 1,
+          "prepared_image_relpath": "images/test/D15_20260119061405_frame_0347.jpg",
+          "rel_height": 0.08269500000000003,
+          "rel_area": 0.0031333962449999965,
+          "min_edge_px": 171.999547,
+          "best_iou_with_pred": 0.0,
+          "best_pred_conf": 0.0,
+          "best_pred_kind": "none",
+          "gt_box_xyxy": [
+            1500.9984,
+            171.999547,
+            1597.9993599999998,
+            279.99921700000004
+          ]
+        },
+        {
+          "bucket": "small_interior_person",
+          "bucket_name_zh": "???????",
+          "sequence_name": "D15_20260119061405",
+          "stem": "D15_20260119061405_frame_0348",
+          "fn_index_in_image": 1,
+          "prepared_image_relpath": "images/test/D15_20260119061405_frame_0348.jpg",
+          "rel_height": 0.09800900000000001,
+          "rel_area": 0.003981615624999992,
+          "min_edge_px": 168.000575,
+          "best_iou_with_pred": 0.0,
+          "best_pred_conf": 0.0,
+          "best_pred_kind": "none",
+          "gt_box_xyxy": [
+            1533.0009600000003,
+            168.000575,
+            1637.00096,
+            296.000329
+          ]
+        },
+        {
+          "bucket": "small_interior_person",
+          "bucket_name_zh": "???????",
+          "sequence_name": "D15_20260119061405",
+          "stem": "D15_20260119061405_frame_0349",
+          "fn_index_in_image": 1,
+          "prepared_image_relpath": "images/test/D15_20260119061405_frame_0349.jpg",
+          "rel_height": 0.08972399999999997,
+          "rel_area": 0.0038553505560000056,
+          "min_edge_px": 178.00121600000003,
+          "best_iou_with_pred": 0.0,
+          "best_pred_conf": 0.0,
+          "best_pred_kind": "none",
+          "gt_box_xyxy": [
+            1568.99968,
+            178.00121600000003,
+            1679.00032,
+            295.001312
+          ]
+        },
+        {
+          "bucket": "small_interior_person",
+          "bucket_name_zh": "???????",
+          "sequence_name": "D15_20260119061405",
+          "stem": "D15_20260119061405_frame_0350",
+          "fn_index_in_image": 1,
+          "prepared_image_relpath": "images/test/D15_20260119061405_frame_0350.jpg",
+          "rel_height": 0.08499200000000001,
+          "rel_area": 0.0031539681280000056,
+          "min_edge_px": 190.000798,
+          "best_iou_with_pred": 0.0,
+          "best_pred_conf": 0.0,
+          "best_pred_kind": "none",
+          "gt_box_xyxy": [
+            1599.0003199999999,
+            190.000798,
+            1693.99936,
+            301.00035
+          ]
+        },
+        {
+          "bucket": "small_interior_person",
+          "bucket_name_zh": "???????",
+          "sequence_name": "D15_20260119203927",
+          "stem": "D15_20260119203927_frame_0166",
+          "fn_index_in_image": 1,
+          "prepared_image_relpath": "images/test/D15_20260119203927_frame_0166.jpg",
+          "rel_height": 0.06439100000000002,
+          "rel_area": 0.0010312862560000022,
+          "min_edge_px": 10.9996815,
+          "best_iou_with_pred": 0.0,
+          "best_pred_conf": 0.0,
+          "best_pred_kind": "none",
+          "gt_box_xyxy": [
+            732.9996799999999,
+            10.9996815,
+            774.00064,
+            93.99968050000001
+          ]
+        },
+        {
+          "bucket": "small_interior_person",
+          "bucket_name_zh": "???????",
+          "sequence_name": "D15_20260119203927",
+          "stem": "D15_20260119203927_frame_0167",
+          "fn_index_in_image": 1,
+          "prepared_image_relpath": "images/test/D15_20260119203927_frame_0167.jpg",
+          "rel_height": 0.06579,
+          "rel_area": 0.001002244859999998,
+          "min_edge_px": 14.000111999999998,
+          "best_iou_with_pred": 0.0,
+          "best_pred_conf": 0.0,
+          "best_pred_kind": "none",
+          "gt_box_xyxy": [
+            751.0016,
+            14.000111999999998,
+            790.00064,
+            99.000792
+          ]
+        },
+        {
+          "bucket": "small_interior_person",
+          "bucket_name_zh": "???????",
+          "sequence_name": "D15_20260119203927",
+          "stem": "D15_20260119203927_frame_0169",
+          "fn_index_in_image": 1,
+          "prepared_image_relpath": "images/test/D15_20260119203927_frame_0169.jpg",
+          "rel_height": 0.075252,
+          "rel_area": 0.0010876171560000036,
+          "min_edge_px": 12.000589999999999,
+          "best_iou_with_pred": 0.0,
+          "best_pred_conf": 0.0,
+          "best_pred_kind": "none",
+          "gt_box_xyxy": [
+            813.00096,
+            12.000589999999999,
+            850.0006400000001,
+            109.000418
+          ]
+        },
+        {
+          "bucket": "small_interior_person",
+          "bucket_name_zh": "???????",
+          "sequence_name": "D15_20260119203927",
+          "stem": "D15_20260119203927_frame_0170",
+          "fn_index_in_image": 1,
+          "prepared_image_relpath": "images/test/D15_20260119203927_frame_0170.jpg",
+          "rel_height": 0.078355,
+          "rel_area": 0.001285492130000004,
+          "min_edge_px": 10.000706500000001,
+          "best_iou_with_pred": 0.0,
+          "best_pred_conf": 0.0,
+          "best_pred_kind": "none",
+          "gt_box_xyxy": [
+            833.00096,
+            10.000706500000001,
+            875.0003200000001,
+            111.00030149999999
+          ]
+        },
+        {
+          "bucket": "small_interior_person",
+          "bucket_name_zh": "???????",
+          "sequence_name": "D15_20260119203927",
+          "stem": "D15_20260119203927_frame_0171",
+          "fn_index_in_image": 1,
+          "prepared_image_relpath": "images/test/D15_20260119203927_frame_0171.jpg",
+          "rel_height": 0.083656,
+          "rel_area": 0.0013724603360000007,
+          "min_edge_px": 10.999319999999999,
+          "best_iou_with_pred": 0.0,
+          "best_pred_conf": 0.0,
+          "best_pred_kind": "none",
+          "gt_box_xyxy": [
+            876.99968,
+            10.999319999999999,
+            918.99904,
+            118.99921599999999
+          ]
+        }
+      ]
+    },
+    {
+      "bucket": "medium_large_pose_or_appearance",
+      "bucket_name_zh": "??????/??????",
+      "rule": "best_iou < 0.5 and rel_height >= 0.10",
+      "recommended_action": "???????????????????????? targeted ???",
+      "priority": 3,
+      "fn_box_count": 4,
+      "frame_count": 4,
+      "share_of_all_fn": 0.11428571428571428,
+      "top_sequences": [
+        [
+          "D15_20260119061405",
+          2
+        ],
+        [
+          "D15_20260119203927",
+          2
+        ]
+      ],
+      "samples": [
+        {
+          "bucket": "medium_large_pose_or_appearance",
+          "bucket_name_zh": "??????/??????",
+          "sequence_name": "D15_20260119061405",
+          "stem": "D15_20260119061405_frame_0346",
+          "fn_index_in_image": 1,
+          "prepared_image_relpath": "images/test/D15_20260119061405_frame_0346.jpg",
+          "rel_height": 0.2200150000000001,
+          "rel_area": 0.024407804055000003,
+          "min_edge_px": 83.00041749999991,
+          "best_iou_with_pred": 0.0,
+          "best_pred_conf": 0.0,
+          "best_pred_kind": "none",
+          "gt_box_xyxy": [
+            645.00096,
+            937.9999475,
+            928.9996799999999,
+            1225.9995825
+          ]
+        },
+        {
+          "bucket": "medium_large_pose_or_appearance",
+          "bucket_name_zh": "??????/??????",
+          "sequence_name": "D15_20260119061405",
+          "stem": "D15_20260119061405_frame_0356",
+          "fn_index_in_image": 1,
+          "prepared_image_relpath": "images/test/D15_20260119061405_frame_0356.jpg",
+          "rel_height": 0.2075029999999999,
+          "rel_area": 0.023911400701999985,
+          "min_edge_px": 80.00098900000012,
+          "best_iou_with_pred": 0.0,
+          "best_pred_conf": 0.0,
+          "best_pred_kind": "none",
+          "gt_box_xyxy": [
+            532.99968,
+            955.000093,
+            827.9987199999999,
+            1225.9990109999999
+          ]
+        },
+        {
+          "bucket": "medium_large_pose_or_appearance",
+          "bucket_name_zh": "??????/??????",
+          "sequence_name": "D15_20260119203927",
+          "stem": "D15_20260119203927_frame_0173",
+          "fn_index_in_image": 1,
+          "prepared_image_relpath": "images/test/D15_20260119203927_frame_0173.jpg",
+          "rel_height": 0.10085400000000001,
+          "rel_area": 0.007997419638000002,
+          "min_edge_px": 0.0,
+          "best_iou_with_pred": 0.0,
+          "best_pred_conf": 0.0,
+          "best_pred_kind": "none",
+          "gt_box_xyxy": [
+            168.99967999999998,
+            1158.999194,
+            372.0,
+            1289.0
+          ]
+        },
+        {
+          "bucket": "medium_large_pose_or_appearance",
+          "bucket_name_zh": "??????/??????",
+          "sequence_name": "D15_20260119203927",
+          "stem": "D15_20260119203927_frame_0176",
+          "fn_index_in_image": 1,
+          "prepared_image_relpath": "images/test/D15_20260119203927_frame_0176.jpg",
+          "rel_height": 0.109387,
+          "rel_area": 0.0020082359330000064,
+          "min_edge_px": 16.9999765,
+          "best_iou_with_pred": 0.0,
+          "best_pred_conf": 0.0,
+          "best_pred_kind": "none",
+          "gt_box_xyxy": [
+            1114.00064,
+            16.9999765,
+            1160.9996800000001,
+            157.9998195
+          ]
+        }
+      ]
+    },
+    {
+      "bucket": "crowded_or_localization",
+      "bucket_name_zh": "???? / ??????",
+      "rule": "best_iou >= 0.5",
+      "recommended_action": "??????????????????????????????????",
+      "priority": 4,
+      "fn_box_count": 2,
+      "frame_count": 2,
+      "share_of_all_fn": 0.05714285714285714,
+      "top_sequences": [
+        [
+          "D05_20260123074841",
+          2
+        ]
+      ],
+      "samples": [
+        {
+          "bucket": "crowded_or_localization",
+          "bucket_name_zh": "???? / ??????",
+          "sequence_name": "D05_20260123074841",
+          "stem": "D05_20260123074841_frame_0029",
+          "fn_index_in_image": 1,
+          "prepared_image_relpath": "images/test/D05_20260123074841_frame_0029.jpg",
+          "rel_height": 0.086111,
+          "rel_area": 0.001524853588000001,
+          "min_edge_px": 49.00014000000001,
+          "best_iou_with_pred": 0.6339879526658287,
+          "best_pred_conf": 0.78923499584198,
+          "best_pred_kind": "matched",
+          "gt_box_xyxy": [
+            1837.0003199999999,
+            49.00014000000001,
+            1870.99968,
+            142.00002
+          ]
+        },
+        {
+          "bucket": "crowded_or_localization",
+          "bucket_name_zh": "???? / ??????",
+          "sequence_name": "D05_20260123074841",
+          "stem": "D05_20260123074841_frame_0030",
+          "fn_index_in_image": 1,
+          "prepared_image_relpath": "images/test/D05_20260123074841_frame_0030.jpg",
+          "rel_height": 0.08148100000000001,
+          "rel_area": 0.0012731406250000002,
+          "min_edge_px": 44.99981999999999,
+          "best_iou_with_pred": 0.6718609934901445,
+          "best_pred_conf": 0.7983736991882324,
+          "best_pred_kind": "matched",
+          "gt_box_xyxy": [
+            1836.00096,
+            44.99981999999999,
+            1866.00096,
+            132.9993
+          ]
+        }
+      ]
+    }
+  ],
+  "frame_priority_list": [
+    {
+      "sequence_name": "D02_20260123074836",
+      "stem": "D02_20260123074836_frame_0023",
+      "priority": 1,
+      "bucket_counts": {
+        "small_boundary_person": 2
+      },
+      "total_fn_boxes": 2
+    },
+    {
+      "sequence_name": "D02_20260123074836",
+      "stem": "D02_20260123074836_frame_0024",
+      "priority": 1,
+      "bucket_counts": {
+        "small_boundary_person": 2
+      },
+      "total_fn_boxes": 2
+    },
+    {
+      "sequence_name": "D02_20260123070624",
+      "stem": "D02_20260123070624_frame_0071",
+      "priority": 1,
+      "bucket_counts": {
+        "small_boundary_person": 1
+      },
+      "total_fn_boxes": 1
+    },
+    {
+      "sequence_name": "D02_20260123070624",
+      "stem": "D02_20260123070624_frame_0074",
+      "priority": 1,
+      "bucket_counts": {
+        "small_boundary_person": 1
+      },
+      "total_fn_boxes": 1
+    },
+    {
+      "sequence_name": "D02_20260123070624",
+      "stem": "D02_20260123070624_frame_0075",
+      "priority": 1,
+      "bucket_counts": {
+        "small_boundary_person": 1
+      },
+      "total_fn_boxes": 1
+    },
+    {
+      "sequence_name": "D02_20260123070624",
+      "stem": "D02_20260123070624_frame_0077",
+      "priority": 1,
+      "bucket_counts": {
+        "small_boundary_person": 1
+      },
+      "total_fn_boxes": 1
+    },
+    {
+      "sequence_name": "D02_20260123074836",
+      "stem": "D02_20260123074836_frame_0022",
+      "priority": 1,
+      "bucket_counts": {
+        "small_boundary_person": 1
+      },
+      "total_fn_boxes": 1
+    },
+    {
+      "sequence_name": "D15_20260119203927",
+      "stem": "D15_20260119203927_frame_0162",
+      "priority": 1,
+      "bucket_counts": {
+        "small_boundary_person": 1
+      },
+      "total_fn_boxes": 1
+    },
+    {
+      "sequence_name": "D15_20260119203927",
+      "stem": "D15_20260119203927_frame_0164",
+      "priority": 1,
+      "bucket_counts": {
+        "small_boundary_person": 1
+      },
+      "total_fn_boxes": 1
+    },
+    {
+      "sequence_name": "D15_20260119203927",
+      "stem": "D15_20260119203927_frame_0165",
+      "priority": 1,
+      "bucket_counts": {
+        "small_boundary_person": 1
+      },
+      "total_fn_boxes": 1
+    },
+    {
+      "sequence_name": "D15_20260119203927",
+      "stem": "D15_20260119203927_frame_0168",
+      "priority": 1,
+      "bucket_counts": {
+        "small_boundary_person": 1
+      },
+      "total_fn_boxes": 1
+    },
+    {
+      "sequence_name": "D15_20260119061405",
+      "stem": "D15_20260119061405_frame_0346",
+      "priority": 2,
+      "bucket_counts": {
+        "medium_large_pose_or_appearance": 1,
+        "small_interior_person": 1
+      },
+      "total_fn_boxes": 2
+    },
+    {
+      "sequence_name": "D15_20260119061405",
+      "stem": "D15_20260119061405_frame_0340",
+      "priority": 2,
+      "bucket_counts": {
+        "small_interior_person": 1
+      },
+      "total_fn_boxes": 1
+    },
+    {
+      "sequence_name": "D15_20260119061405",
+      "stem": "D15_20260119061405_frame_0341",
+      "priority": 2,
+      "bucket_counts": {
+        "small_interior_person": 1
+      },
+      "total_fn_boxes": 1
+    },
+    {
+      "sequence_name": "D15_20260119061405",
+      "stem": "D15_20260119061405_frame_0342",
+      "priority": 2,
+      "bucket_counts": {
+        "small_interior_person": 1
+      },
+      "total_fn_boxes": 1
+    },
+    {
+      "sequence_name": "D15_20260119061405",
+      "stem": "D15_20260119061405_frame_0343",
+      "priority": 2,
+      "bucket_counts": {
+        "small_interior_person": 1
+      },
+      "total_fn_boxes": 1
+    },
+    {
+      "sequence_name": "D15_20260119061405",
+      "stem": "D15_20260119061405_frame_0344",
+      "priority": 2,
+      "bucket_counts": {
+        "small_interior_person": 1
+      },
+      "total_fn_boxes": 1
+    },
+    {
+      "sequence_name": "D15_20260119061405",
+      "stem": "D15_20260119061405_frame_0345",
+      "priority": 2,
+      "bucket_counts": {
+        "small_interior_person": 1
+      },
+      "total_fn_boxes": 1
+    },
+    {
+      "sequence_name": "D15_20260119061405",
+      "stem": "D15_20260119061405_frame_0347",
+      "priority": 2,
+      "bucket_counts": {
+        "small_interior_person": 1
+      },
+      "total_fn_boxes": 1
+    },
+    {
+      "sequence_name": "D15_20260119061405",
+      "stem": "D15_20260119061405_frame_0348",
+      "priority": 2,
+      "bucket_counts": {
+        "small_interior_person": 1
+      },
+      "total_fn_boxes": 1
+    },
+    {
+      "sequence_name": "D15_20260119061405",
+      "stem": "D15_20260119061405_frame_0349",
+      "priority": 2,
+      "bucket_counts": {
+        "small_interior_person": 1
+      },
+      "total_fn_boxes": 1
+    },
+    {
+      "sequence_name": "D15_20260119061405",
+      "stem": "D15_20260119061405_frame_0350",
+      "priority": 2,
+      "bucket_counts": {
+        "small_interior_person": 1
+      },
+      "total_fn_boxes": 1
+    },
+    {
+      "sequence_name": "D15_20260119203927",
+      "stem": "D15_20260119203927_frame_0166",
+      "priority": 2,
+      "bucket_counts": {
+        "small_interior_person": 1
+      },
+      "total_fn_boxes": 1
+    },
+    {
+      "sequence_name": "D15_20260119203927",
+      "stem": "D15_20260119203927_frame_0167",
+      "priority": 2,
+      "bucket_counts": {
+        "small_interior_person": 1
+      },
+      "total_fn_boxes": 1
+    },
+    {
+      "sequence_name": "D15_20260119203927",
+      "stem": "D15_20260119203927_frame_0169",
+      "priority": 2,
+      "bucket_counts": {
+        "small_interior_person": 1
+      },
+      "total_fn_boxes": 1
+    },
+    {
+      "sequence_name": "D15_20260119203927",
+      "stem": "D15_20260119203927_frame_0170",
+      "priority": 2,
+      "bucket_counts": {
+        "small_interior_person": 1
+      },
+      "total_fn_boxes": 1
+    },
+    {
+      "sequence_name": "D15_20260119203927",
+      "stem": "D15_20260119203927_frame_0171",
+      "priority": 2,
+      "bucket_counts": {
+        "small_interior_person": 1
+      },
+      "total_fn_boxes": 1
+    },
+    {
+      "sequence_name": "D15_20260119061405",
+      "stem": "D15_20260119061405_frame_0356",
+      "priority": 3,
+      "bucket_counts": {
+        "medium_large_pose_or_appearance": 1
+      },
+      "total_fn_boxes": 1
+    },
+    {
+      "sequence_name": "D15_20260119203927",
+      "stem": "D15_20260119203927_frame_0173",
+      "priority": 3,
+      "bucket_counts": {
+        "medium_large_pose_or_appearance": 1
+      },
+      "total_fn_boxes": 1
+    },
+    {
+      "sequence_name": "D15_20260119203927",
+      "stem": "D15_20260119203927_frame_0176",
+      "priority": 3,
+      "bucket_counts": {
+        "medium_large_pose_or_appearance": 1
+      },
+      "total_fn_boxes": 1
+    },
+    {
+      "sequence_name": "D05_20260123074841",
+      "stem": "D05_20260123074841_frame_0029",
+      "priority": 4,
+      "bucket_counts": {
+        "crowded_or_localization": 1
+      },
+      "total_fn_boxes": 1
+    },
+    {
+      "sequence_name": "D05_20260123074841",
+      "stem": "D05_20260123074841_frame_0030",
+      "priority": 4,
+      "bucket_counts": {
+        "crowded_or_localization": 1
+      },
+      "total_fn_boxes": 1
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+ {
+   "schema_version": "v1",
+  "description": "当前激活的人工复核阶段入口。真实阶段内容请以 stage_reviews/ 下对应目录为准。",
+  "active_stage": {
+    "stage_id": "stage_2026-05-13_crowded_overlap_formal_closeout",
+    "display_title": "5.13 crowded/overlap正式收口与下一阶段任务确认",
+    "date_label": "5.13",
+    "stage_dir": "stage_reviews/stage_2026-05-13_crowded_overlap_formal_closeout",
+    "summary_file": "stage_reviews/stage_2026-05-13_crowded_overlap_formal_closeout/semantic_bucket_summary.md",
+    "manifest_file": "stage_reviews/stage_2026-05-13_crowded_overlap_formal_closeout/semantic_bucket_manifest.json",
+    "notes_root": "stage_reviews/stage_2026-05-13_crowded_overlap_formal_closeout/sequence_notes",
+    "status": "active"
+  }
+ }

@@ -1,0 +1,12 @@
+ {
+   "stage_id": "stage_2026-05-07_crowded_overlap_dual_lines",
+   "display_title": "5.7 crowded/overlap机械复盘及双主线推进",
+   "date_label": "5.7",
+   "status": "active",
+   "latest_first_order": 1,
+   "reconstructed_from_root_snapshot": false,
+   "summary_file": "semantic_bucket_summary.md",
+   "manifest_file": "semantic_bucket_manifest.json",
+   "notes_root": "sequence_notes",
+   "shared_assets_root": "../../by_source"
+ }

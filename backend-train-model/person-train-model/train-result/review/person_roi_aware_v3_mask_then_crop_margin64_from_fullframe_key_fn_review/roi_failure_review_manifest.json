@@ -1,0 +1,179 @@
+{
+  "generated_at": "2026-04-28T19:45:25",
+  "run_name": "person_roi_aware_v3_mask_then_crop_margin64_from_fullframe",
+  "fpfn_json": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_fpfn_test_conf025\\fpfn_per_image.json",
+  "roi_config_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\working\\roi\\roi_config.v3.mask_then_crop_margin64.generated.json",
+  "output_root": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_key_fn_review",
+  "samples": [
+    {
+      "stem": "D15_20260119061405_frame_0346",
+      "sequence_name": "D15_20260119061405",
+      "original_image_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_2\\1\\D15_20260119061405_frame_0346.jpg",
+      "prepared_image_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\prepared\\person_roi_aware_v3_mask_then_crop_margin64\\sequence_contiguous\\images\\test\\D15_20260119061405_frame_0346.jpg",
+      "output_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_key_fn_review\\D15_20260119061405_frame_0346_roi_failure_review.jpg",
+      "original_box_count": 5,
+      "kept_boxes": 2,
+      "dropped_boxes": 3,
+      "cropped_kept_boxes": 0,
+      "prepared_tp_count": 0,
+      "prepared_fn_count": 2,
+      "prepared_pred_count": 0,
+      "prepared_fp_count": 0,
+      "fn_relative_heights": [
+        0.2200150000000001,
+        0.089381
+      ],
+      "fn_area_ratios": [
+        0.024407804055000003,
+        0.0033168395290000055
+      ],
+      "fn_min_edge_distances_px": [
+        83.00041749999991,
+        163.0012615
+      ],
+      "fn_triggered_rules": [
+        "bottom_center_inside",
+        "bottom_center_inside"
+      ]
+    },
+    {
+      "stem": "D15_20260119203927_frame_0162",
+      "sequence_name": "D15_20260119203927",
+      "original_image_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_2\\D15_20260119203927\\D15_20260119203927_frame_0162.jpg",
+      "prepared_image_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\prepared\\person_roi_aware_v3_mask_then_crop_margin64\\sequence_contiguous\\images\\test\\D15_20260119203927_frame_0162.jpg",
+      "output_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_key_fn_review\\D15_20260119203927_frame_0162_roi_failure_review.jpg",
+      "original_box_count": 1,
+      "kept_boxes": 1,
+      "dropped_boxes": 0,
+      "cropped_kept_boxes": 0,
+      "prepared_tp_count": 0,
+      "prepared_fn_count": 1,
+      "prepared_pred_count": 0,
+      "prepared_fp_count": 0,
+      "fn_relative_heights": [
+        0.069046
+      ],
+      "fn_area_ratios": [
+        0.0008360780140000009
+      ],
+      "fn_min_edge_distances_px": [
+        0.9989750000000063
+      ],
+      "fn_triggered_rules": [
+        "bottom_center_inside"
+      ]
+    },
+    {
+      "stem": "D15_20260119203927_frame_0168",
+      "sequence_name": "D15_20260119203927",
+      "original_image_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_2\\D15_20260119203927\\D15_20260119203927_frame_0168.jpg",
+      "prepared_image_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\prepared\\person_roi_aware_v3_mask_then_crop_margin64\\sequence_contiguous\\images\\test\\D15_20260119203927_frame_0168.jpg",
+      "output_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_key_fn_review\\D15_20260119203927_frame_0168_roi_failure_review.jpg",
+      "original_box_count": 1,
+      "kept_boxes": 1,
+      "dropped_boxes": 0,
+      "cropped_kept_boxes": 0,
+      "prepared_tp_count": 0,
+      "prepared_fn_count": 1,
+      "prepared_pred_count": 0,
+      "prepared_fp_count": 0,
+      "fn_relative_heights": [
+        0.069154
+      ],
+      "fn_area_ratios": [
+        0.0009454734880000027
+      ],
+      "fn_min_edge_distances_px": [
+        6.999993000000008
+      ],
+      "fn_triggered_rules": [
+        "bottom_center_inside"
+      ]
+    },
+    {
+      "stem": "D15_20260119203927_frame_0173",
+      "sequence_name": "D15_20260119203927",
+      "original_image_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_2\\D15_20260119203927\\D15_20260119203927_frame_0173.jpg",
+      "prepared_image_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\prepared\\person_roi_aware_v3_mask_then_crop_margin64\\sequence_contiguous\\images\\test\\D15_20260119203927_frame_0173.jpg",
+      "output_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_key_fn_review\\D15_20260119203927_frame_0173_roi_failure_review.jpg",
+      "original_box_count": 1,
+      "kept_boxes": 1,
+      "dropped_boxes": 0,
+      "cropped_kept_boxes": 0,
+      "prepared_tp_count": 0,
+      "prepared_fn_count": 1,
+      "prepared_pred_count": 0,
+      "prepared_fp_count": 0,
+      "fn_relative_heights": [
+        0.10085400000000001
+      ],
+      "fn_area_ratios": [
+        0.007997419638000002
+      ],
+      "fn_min_edge_distances_px": [
+        0.0
+      ],
+      "fn_triggered_rules": [
+        "bottom_center_inside"
+      ]
+    },
+    {
+      "stem": "D02_20260123074836_frame_0023",
+      "sequence_name": "D02_20260123074836",
+      "original_image_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_3\\D02_20260123074836\\D02_20260123074836_frame_0023.jpg",
+      "prepared_image_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\prepared\\person_roi_aware_v3_mask_then_crop_margin64\\sequence_contiguous\\images\\test\\D02_20260123074836_frame_0023.jpg",
+      "output_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_key_fn_review\\D02_20260123074836_frame_0023_roi_failure_review.jpg",
+      "original_box_count": 4,
+      "kept_boxes": 4,
+      "dropped_boxes": 0,
+      "cropped_kept_boxes": 0,
+      "prepared_tp_count": 2,
+      "prepared_fn_count": 2,
+      "prepared_pred_count": 2,
+      "prepared_fp_count": 0,
+      "fn_relative_heights": [
+        0.06111100000000002,
+        0.05
+      ],
+      "fn_area_ratios": [
+        0.0012095089119999996,
+        0.0009895999999999993
+      ],
+      "fn_min_edge_distances_px": [
+        1.9996199999999988,
+        1.0000799999999996
+      ],
+      "fn_triggered_rules": [
+        "bottom_center_inside",
+        "bottom_center_inside"
+      ]
+    },
+    {
+      "stem": "D02_20260123070624_frame_0071",
+      "sequence_name": "D02_20260123070624",
+      "original_image_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_3\\D02_20260123070624\\D02_20260123070624_frame_0071.jpg",
+      "prepared_image_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\prepared\\person_roi_aware_v3_mask_then_crop_margin64\\sequence_contiguous\\images\\test\\D02_20260123070624_frame_0071.jpg",
+      "output_path": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\yolov8-program\\backend-train-model\\person-train-model\\train-result\\review\\person_roi_aware_v3_mask_then_crop_margin64_from_fullframe_key_fn_review\\D02_20260123070624_frame_0071_roi_failure_review.jpg",
+      "original_box_count": 2,
+      "kept_boxes": 2,
+      "dropped_boxes": 0,
+      "cropped_kept_boxes": 0,
+      "prepared_tp_count": 1,
+      "prepared_fn_count": 1,
+      "prepared_pred_count": 1,
+      "prepared_fp_count": 0,
+      "fn_relative_heights": [
+        0.07870400000000001
+      ],
+      "fn_area_ratios": [
+        0.0016396404319999989
+      ],
+      "fn_min_edge_distances_px": [
+        1.0000800000000034
+      ],
+      "fn_triggered_rules": [
+        "bottom_center_inside"
+      ]
+    }
+  ]
+}

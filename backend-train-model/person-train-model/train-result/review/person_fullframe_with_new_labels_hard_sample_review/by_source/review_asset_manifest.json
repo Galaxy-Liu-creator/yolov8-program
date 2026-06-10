@@ -1,0 +1,299 @@
+{
+  "description": "按 prepare_report.json 的 8 个来源整理人工复核图片、标签和 overlay。",
+  "selection_policy": {
+    "auto_top12": "自动预筛 suggested_manual_review_frames 前 12 张",
+    "note_extra": "当前各序列 notes.md 中额外强调的边界 / 拥挤代表帧",
+    "d15_19203927_fill": "为第二优先级主序列 D15_20260119203927 补齐的 top 帧"
+  },
+  "all_sources_zip": "by_source\\send_packages\\all_sources__review_bundle.zip",
+  "sources": [
+    {
+      "source_name": "D04_20260123074846",
+      "source_root": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_1\\D04_20260123074846",
+      "selected_frame_count": 0,
+      "sequences": []
+    },
+    {
+      "source_name": "D05_20260123074841",
+      "source_root": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_1\\D05_20260123074841",
+      "selected_frame_count": 3,
+      "sequences": [
+        {
+          "sequence_name": "D05_20260123074841",
+          "frames": [
+            {
+              "stem": "D05_20260123074841_frame_0026",
+              "selection_reason": "auto_top12",
+              "image_file": "images/D05_20260123074841_frame_0026.jpg",
+              "label_file": "labels/D05_20260123074841_frame_0026.txt",
+              "runs": [
+                "baseline_val",
+                "img768_val"
+              ],
+              "overlay_files": [
+                "overlays/baseline_val__D05_20260123074841_frame_0026.jpg",
+                "overlays/img768_val__D05_20260123074841_frame_0026.jpg"
+              ]
+            },
+            {
+              "stem": "D05_20260123074841_frame_0029",
+              "selection_reason": "note_extra",
+              "image_file": "images/D05_20260123074841_frame_0029.jpg",
+              "label_file": "labels/D05_20260123074841_frame_0029.txt",
+              "runs": [
+                "baseline_test",
+                "img768_test"
+              ],
+              "overlay_files": [
+                "overlays/baseline_test__D05_20260123074841_frame_0029.jpg",
+                "overlays/img768_test__D05_20260123074841_frame_0029.jpg"
+              ]
+            },
+            {
+              "stem": "D05_20260123074841_frame_0030",
+              "selection_reason": "note_extra",
+              "image_file": "images/D05_20260123074841_frame_0030.jpg",
+              "label_file": "labels/D05_20260123074841_frame_0030.txt",
+              "runs": [
+                "baseline_test",
+                "img768_test"
+              ],
+              "overlay_files": [
+                "overlays/baseline_test__D05_20260123074841_frame_0030.jpg",
+                "overlays/img768_test__D05_20260123074841_frame_0030.jpg"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "source_name": "D15_20260123074848",
+      "source_root": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_1\\D15_20260123074848",
+      "selected_frame_count": 0,
+      "sequences": []
+    },
+    {
+      "source_name": "1",
+      "source_root": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_2\\1",
+      "selected_frame_count": 4,
+      "sequences": [
+        {
+          "sequence_name": "D15_20260119061405",
+          "frames": [
+            {
+              "stem": "D15_20260119061405_frame_0345",
+              "selection_reason": "auto_top12",
+              "image_file": "images/D15_20260119061405_frame_0345.jpg",
+              "label_file": "labels/D15_20260119061405_frame_0345.txt",
+              "runs": [
+                "baseline_test",
+                "img768_test"
+              ],
+              "overlay_files": [
+                "overlays/baseline_test__D15_20260119061405_frame_0345.jpg",
+                "overlays/img768_test__D15_20260119061405_frame_0345.jpg"
+              ]
+            },
+            {
+              "stem": "D15_20260119061405_frame_0346",
+              "selection_reason": "auto_top12",
+              "image_file": "images/D15_20260119061405_frame_0346.jpg",
+              "label_file": "labels/D15_20260119061405_frame_0346.txt",
+              "runs": [
+                "baseline_test",
+                "img768_test"
+              ],
+              "overlay_files": [
+                "overlays/baseline_test__D15_20260119061405_frame_0346.jpg",
+                "overlays/img768_test__D15_20260119061405_frame_0346.jpg"
+              ]
+            },
+            {
+              "stem": "D15_20260119061405_frame_0348",
+              "selection_reason": "auto_top12",
+              "image_file": "images/D15_20260119061405_frame_0348.jpg",
+              "label_file": "labels/D15_20260119061405_frame_0348.txt",
+              "runs": [
+                "baseline_test",
+                "img768_test"
+              ],
+              "overlay_files": [
+                "overlays/baseline_test__D15_20260119061405_frame_0348.jpg",
+                "overlays/img768_test__D15_20260119061405_frame_0348.jpg"
+              ]
+            },
+            {
+              "stem": "D15_20260119061405_frame_0355",
+              "selection_reason": "auto_top12",
+              "image_file": "images/D15_20260119061405_frame_0355.jpg",
+              "label_file": "labels/D15_20260119061405_frame_0355.txt",
+              "runs": [
+                "baseline_test",
+                "img768_test"
+              ],
+              "overlay_files": [
+                "overlays/baseline_test__D15_20260119061405_frame_0355.jpg",
+                "overlays/img768_test__D15_20260119061405_frame_0355.jpg"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "source_name": "D15_20260119203927",
+      "source_root": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_2\\D15_20260119203927",
+      "selected_frame_count": 3,
+      "sequences": [
+        {
+          "sequence_name": "D15_20260119203927",
+          "frames": [
+            {
+              "stem": "D15_20260119203927_frame_0142",
+              "selection_reason": "d15_19203927_fill",
+              "image_file": "images/D15_20260119203927_frame_0142.jpg",
+              "label_file": "labels/D15_20260119203927_frame_0142.txt",
+              "runs": [
+                "baseline_val",
+                "img768_val"
+              ],
+              "overlay_files": [
+                "overlays/baseline_val__D15_20260119203927_frame_0142.jpg",
+                "overlays/img768_val__D15_20260119203927_frame_0142.jpg"
+              ]
+            },
+            {
+              "stem": "D15_20260119203927_frame_0143",
+              "selection_reason": "d15_19203927_fill",
+              "image_file": "images/D15_20260119203927_frame_0143.jpg",
+              "label_file": "labels/D15_20260119203927_frame_0143.txt",
+              "runs": [
+                "baseline_val",
+                "img768_val"
+              ],
+              "overlay_files": [
+                "overlays/baseline_val__D15_20260119203927_frame_0143.jpg",
+                "overlays/img768_val__D15_20260119203927_frame_0143.jpg"
+              ]
+            },
+            {
+              "stem": "D15_20260119203927_frame_0180",
+              "selection_reason": "d15_19203927_fill",
+              "image_file": "images/D15_20260119203927_frame_0180.jpg",
+              "label_file": "labels/D15_20260119203927_frame_0180.txt",
+              "runs": [
+                "baseline_test",
+                "img768_test"
+              ],
+              "overlay_files": [
+                "overlays/baseline_test__D15_20260119203927_frame_0180.jpg",
+                "overlays/img768_test__D15_20260119203927_frame_0180.jpg"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "source_name": "D02_20260123070624",
+      "source_root": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_3\\D02_20260123070624",
+      "selected_frame_count": 2,
+      "sequences": [
+        {
+          "sequence_name": "D02_20260123070624",
+          "frames": [
+            {
+              "stem": "D02_20260123070624_frame_0060",
+              "selection_reason": "auto_top12",
+              "image_file": "images/D02_20260123070624_frame_0060.jpg",
+              "label_file": "labels/D02_20260123070624_frame_0060.txt",
+              "runs": [
+                "baseline_val",
+                "img768_val"
+              ],
+              "overlay_files": [
+                "overlays/baseline_val__D02_20260123070624_frame_0060.jpg",
+                "overlays/img768_val__D02_20260123070624_frame_0060.jpg"
+              ]
+            },
+            {
+              "stem": "D02_20260123070624_frame_0061",
+              "selection_reason": "auto_top12",
+              "image_file": "images/D02_20260123070624_frame_0061.jpg",
+              "label_file": "labels/D02_20260123070624_frame_0061.txt",
+              "runs": [
+                "baseline_val",
+                "img768_val"
+              ],
+              "overlay_files": [
+                "overlays/baseline_val__D02_20260123070624_frame_0061.jpg",
+                "overlays/img768_val__D02_20260123070624_frame_0061.jpg"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "source_name": "D02_20260123074836",
+      "source_root": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\person_labels\\group3_3\\D02_20260123074836",
+      "selected_frame_count": 3,
+      "sequences": [
+        {
+          "sequence_name": "D02_20260123074836",
+          "frames": [
+            {
+              "stem": "D02_20260123074836_frame_0022",
+              "selection_reason": "note_extra",
+              "image_file": "images/D02_20260123074836_frame_0022.jpg",
+              "label_file": "labels/D02_20260123074836_frame_0022.txt",
+              "runs": [
+                "baseline_test",
+                "img768_test"
+              ],
+              "overlay_files": [
+                "overlays/baseline_test__D02_20260123074836_frame_0022.jpg",
+                "overlays/img768_test__D02_20260123074836_frame_0022.jpg"
+              ]
+            },
+            {
+              "stem": "D02_20260123074836_frame_0023",
+              "selection_reason": "note_extra",
+              "image_file": "images/D02_20260123074836_frame_0023.jpg",
+              "label_file": "labels/D02_20260123074836_frame_0023.txt",
+              "runs": [
+                "baseline_test",
+                "img768_test"
+              ],
+              "overlay_files": [
+                "overlays/baseline_test__D02_20260123074836_frame_0023.jpg",
+                "overlays/img768_test__D02_20260123074836_frame_0023.jpg"
+              ]
+            },
+            {
+              "stem": "D02_20260123074836_frame_0024",
+              "selection_reason": "note_extra",
+              "image_file": "images/D02_20260123074836_frame_0024.jpg",
+              "label_file": "labels/D02_20260123074836_frame_0024.txt",
+              "runs": [
+                "baseline_test",
+                "img768_test"
+              ],
+              "overlay_files": [
+                "overlays/baseline_test__D02_20260123074836_frame_0024.jpg",
+                "overlays/img768_test__D02_20260123074836_frame_0024.jpg"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "source_name": "images",
+      "source_root": "D:\\University-Competition\\Innovation_Entrepreneurship\\MyProgram\\all_labels\\new_person_labels\\images",
+      "selected_frame_count": 0,
+      "sequences": []
+    }
+  ]
+}
