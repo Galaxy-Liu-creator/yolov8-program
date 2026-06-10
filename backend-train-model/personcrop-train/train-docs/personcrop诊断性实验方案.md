@@ -56,7 +56,7 @@
 python backend-train-model/train_workwear.py evaluate --mode fullframe --weights All-train-model/artifacts/runs/clothes_merged_v2_balanced_from_first_holdout_v1/weights/best.pt --data new_clothes_train/train-result/datasets/clothes_merged_with_new_labels_v1/dataset.yaml --split test --conf 0.45
 
 # Step 2: Personcrop A/B 映射回原图评估
-python backend-train-model/personcrop-train/train-code/evaluate_personcrop_on_original.py --personcrop-data-a personcrop-train/train-result/prepared/pred_pc_person_base/dataset.yaml --personcrop-weights-a personcrop-train/train-result/artifacts/runs/pred_pc_clo_base/weights/best.pt --personcrop-data-b personcrop-train/train-result/prepared/pred_pc_person_hardv1/dataset.yaml --personcrop-weights-b personcrop-train/train-result/artifacts/runs/pred_pc_clo_hardv1/weights/best.pt --source-dataset new_clothes_train/train-result/datasets/clothes_merged_with_new_labels_v1/dataset.yaml --split test --conf 0.45 --output personcrop-train/train-result/review/diagnostic_exp1_original_level_comparison/
+python backend-train-model/personcrop-train/train-code/evaluate_personcrop_on_original.py --personcrop-data-a personcrop-train/train-result/prepared/pred_pc_person_base/dataset.yaml --personcrop-weights-a personcrop-train/train-result/artifacts/runs/pred_pc_clo_base/weights/best.pt --personcrop-data-b personcrop-train/train-result/prepared/pred_pc_person_hardv1/dataset.yaml --personcrop-weights-b personcrop-train/train-result/artifacts/runs/pred_pc_clo_hardv1/weights/best.pt --source-dataset new_clothes_train/train-result/datasets/clothes_merged_with_new_labels_v1/dataset.yaml --split test --conf 0.45 --output personcrop-train/train-result/review/diag_exp1_original_compare/
 ```
 
 #### **预期产出**
@@ -96,7 +96,7 @@ python backend-train-model/personcrop-train/train-code/evaluate_personcrop_on_or
 
 ```bash
 # 实验2：Person 召回瓶颈量化分析
-python backend-train-model/personcrop-train/train-code/analyze_person_bottleneck.py --source-dataset new_clothes_train/train-result/datasets/clothes_merged_with_new_labels_v1/dataset.yaml --person-weights-a person-train-model/train-result/export/person_detect_yolov8_with_new_labels.pt --person-weights-b person-train-model/train-result/export/person_detect_yolov8_with_new_labels_and_hard_examples_v1.pt --split test --person-conf 0.20 --assignment-min-ioa 0.35 --output personcrop-train/train-result/review/diagnostic_exp2_person_bottleneck_analysis/
+python backend-train-model/personcrop-train/train-code/analyze_person_bottleneck.py --source-dataset new_clothes_train/train-result/datasets/clothes_merged_with_new_labels_v1/dataset.yaml --person-weights-a person-train-model/train-result/export/person_detect_yolov8_with_new_labels.pt --person-weights-b person-train-model/train-result/export/person_detect_yolov8_with_new_labels_and_hard_examples_v1.pt --split test --person-conf 0.20 --assignment-min-ioa 0.35 --output personcrop-train/train-result/review/diag_exp2_person_bottleneck/
 ```
 
 #### **预期产出**
