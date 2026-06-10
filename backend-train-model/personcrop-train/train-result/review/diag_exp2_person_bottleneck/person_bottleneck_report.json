@@ -1,0 +1,5376 @@
+{
+  "config": {
+    "source_dataset": "backend-train-model/new_clothes_train/train-result/datasets/clothes_merged_with_new_labels_v1/dataset.yaml",
+    "split": "test",
+    "person_conf": 0.2,
+    "assignment_min_ioa": 0.35
+  },
+  "person_model_a": {
+    "weights": "backend-train-model/person-train-model/train-result/export/person_detect_yolov8_with_new_labels.pt",
+    "total_clothes_gt": 800,
+    "unassigned_clothes": 10,
+    "bottleneck_ratio": 0.0125,
+    "per_image": [
+      {
+        "image": "g31__D04_20260123074846_frame_0003.jpg",
+        "detected_person": 6,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g31__D04_20260123074846_frame_0010.jpg",
+        "detected_person": 5,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g31__D04_20260123074846_frame_0017.jpg",
+        "detected_person": 2,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g31__D04_20260123074846_frame_0020.jpg",
+        "detected_person": 2,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g31__D05_20260123074841_frame_0003.jpg",
+        "detected_person": 5,
+        "gt_clothes": 5,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g31__D05_20260123074841_frame_0005.jpg",
+        "detected_person": 4,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g31__D05_20260123074841_frame_0009.jpg",
+        "detected_person": 7,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g31__D05_20260123074841_frame_0010.jpg",
+        "detected_person": 5,
+        "gt_clothes": 5,
+        "unassigned_clothes": 1
+      },
+      {
+        "image": "g31__D15_20260123074848_frame_0001.jpg",
+        "detected_person": 8,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g31__D15_20260123074848_frame_0006.jpg",
+        "detected_person": 9,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g31__D15_20260123074848_frame_0007.jpg",
+        "detected_person": 11,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g31__D15_20260123074848_frame_0009.jpg",
+        "detected_person": 7,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g31__D15_20260123074848_frame_0017.jpg",
+        "detected_person": 5,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g31__D15_20260123074848_frame_0021.jpg",
+        "detected_person": 4,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g32__D15_20260119061405_frame_0245.jpg",
+        "detected_person": 4,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g32__D15_20260119061405_frame_0251.jpg",
+        "detected_person": 3,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g32__D15_20260119061405_frame_0259.jpg",
+        "detected_person": 3,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g32__D15_20260119061405_frame_0272.jpg",
+        "detected_person": 4,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g32__D15_20260119061405_frame_0273.jpg",
+        "detected_person": 4,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g32__D15_20260119061405_frame_0276.jpg",
+        "detected_person": 4,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g32__D15_20260119061405_frame_0285.jpg",
+        "detected_person": 3,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g32__D15_20260119061405_frame_0289.jpg",
+        "detected_person": 4,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g32__D15_20260119061405_frame_0299.jpg",
+        "detected_person": 4,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g32__D15_20260119061405_frame_0305.jpg",
+        "detected_person": 4,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g32__D15_20260119061405_frame_0309.jpg",
+        "detected_person": 3,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g32__D15_20260119061405_frame_0322.jpg",
+        "detected_person": 4,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g32__D15_20260119061405_frame_0329.jpg",
+        "detected_person": 4,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g32__D15_20260119061405_frame_0332.jpg",
+        "detected_person": 5,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g32__D15_20260119061405_frame_0343.jpg",
+        "detected_person": 5,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g32__D15_20260119061405_frame_0345.jpg",
+        "detected_person": 4,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g32__D15_20260119061405_frame_0347.jpg",
+        "detected_person": 4,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g32__D15_20260119203927_frame_0000.jpg",
+        "detected_person": 3,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g32__D15_20260119203927_frame_0004.jpg",
+        "detected_person": 3,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g32__D15_20260119203927_frame_0009.jpg",
+        "detected_person": 3,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g32__D15_20260119203927_frame_0014.jpg",
+        "detected_person": 3,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g32__D15_20260119203927_frame_0015.jpg",
+        "detected_person": 3,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g32__D15_20260119203927_frame_0016.jpg",
+        "detected_person": 3,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g32__D15_20260119203927_frame_0017.jpg",
+        "detected_person": 3,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g32__D15_20260119203927_frame_0026.jpg",
+        "detected_person": 2,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g32__D15_20260119203927_frame_0044.jpg",
+        "detected_person": 4,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g32__D15_20260119203927_frame_0054.jpg",
+        "detected_person": 6,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g32__D15_20260119203927_frame_0055.jpg",
+        "detected_person": 5,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g32__D15_20260119203927_frame_0060.jpg",
+        "detected_person": 6,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g32__D15_20260119203927_frame_0067.jpg",
+        "detected_person": 5,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g32__D15_20260119203927_frame_0071.jpg",
+        "detected_person": 6,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g32__D15_20260119203927_frame_0088.jpg",
+        "detected_person": 5,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g32__D15_20260119203927_frame_0089.jpg",
+        "detected_person": 5,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g32__D15_20260119203927_frame_0114.jpg",
+        "detected_person": 4,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g32__D15_20260119203927_frame_0115.jpg",
+        "detected_person": 4,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g32__D15_20260119203927_frame_0122.jpg",
+        "detected_person": 4,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g32__D15_20260119203927_frame_0123.jpg",
+        "detected_person": 4,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g32__D15_20260119203927_frame_0125.jpg",
+        "detected_person": 3,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g32__D15_20260119203927_frame_0127.jpg",
+        "detected_person": 3,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g32__D15_20260119203927_frame_0143.jpg",
+        "detected_person": 2,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g32__D15_20260119203927_frame_0149.jpg",
+        "detected_person": 2,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g33__D02_20260123070624_frame_0004.jpg",
+        "detected_person": 2,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g33__D02_20260123070624_frame_0007.jpg",
+        "detected_person": 1,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g33__D02_20260123070624_frame_0013.jpg",
+        "detected_person": 1,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g33__D02_20260123070624_frame_0016.jpg",
+        "detected_person": 3,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g33__D02_20260123070624_frame_0020.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g33__D02_20260123070624_frame_0026.jpg",
+        "detected_person": 3,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g33__D02_20260123070624_frame_0028.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g33__D02_20260123070624_frame_0032.jpg",
+        "detected_person": 1,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g33__D02_20260123070624_frame_0060.jpg",
+        "detected_person": 1,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g33__D02_20260123070624_frame_0063.jpg",
+        "detected_person": 1,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g33__D02_20260123074836_frame_0004.jpg",
+        "detected_person": 2,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g33__D02_20260123074836_frame_0015.jpg",
+        "detected_person": 2,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g33__D02_20260123074836_frame_0021.jpg",
+        "detected_person": 2,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00003.jpg",
+        "detected_person": 1,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00005.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00014.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00015.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00027.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00031.jpg",
+        "detected_person": 1,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00044.jpg",
+        "detected_person": 1,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00048.jpg",
+        "detected_person": 1,
+        "gt_clothes": 2,
+        "unassigned_clothes": 1
+      },
+      {
+        "image": "gnew__00065.jpg",
+        "detected_person": 3,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00080.jpg",
+        "detected_person": 3,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00107.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00108.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00113.jpg",
+        "detected_person": 3,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00115.jpg",
+        "detected_person": 3,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00121.jpg",
+        "detected_person": 2,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00122.jpg",
+        "detected_person": 2,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00124.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00125.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00127.jpg",
+        "detected_person": 2,
+        "gt_clothes": 2,
+        "unassigned_clothes": 1
+      },
+      {
+        "image": "gnew__00129.jpg",
+        "detected_person": 2,
+        "gt_clothes": 2,
+        "unassigned_clothes": 1
+      },
+      {
+        "image": "gnew__00135.jpg",
+        "detected_person": 3,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00136.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00143.jpg",
+        "detected_person": 1,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00144.jpg",
+        "detected_person": 1,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00145.jpg",
+        "detected_person": 1,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00150.jpg",
+        "detected_person": 1,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00159.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00169.jpg",
+        "detected_person": 3,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00186.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00196.jpg",
+        "detected_person": 3,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00200.jpg",
+        "detected_person": 3,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00201.jpg",
+        "detected_person": 3,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00202.jpg",
+        "detected_person": 6,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00207.jpg",
+        "detected_person": 3,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00209.jpg",
+        "detected_person": 3,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00210.jpg",
+        "detected_person": 3,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00232.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00238.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00246.jpg",
+        "detected_person": 2,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00254.jpg",
+        "detected_person": 3,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00256.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00266.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00269.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00271.jpg",
+        "detected_person": 3,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00279.jpg",
+        "detected_person": 4,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00280.jpg",
+        "detected_person": 4,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00292.jpg",
+        "detected_person": 3,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00293.jpg",
+        "detected_person": 3,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00296.jpg",
+        "detected_person": 3,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00301.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00326.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00331.jpg",
+        "detected_person": 2,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00335.jpg",
+        "detected_person": 3,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00346.jpg",
+        "detected_person": 3,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00347.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00369.jpg",
+        "detected_person": 3,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00379.jpg",
+        "detected_person": 3,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00385.jpg",
+        "detected_person": 3,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00392.jpg",
+        "detected_person": 1,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00397.jpg",
+        "detected_person": 1,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00401.jpg",
+        "detected_person": 1,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00404.jpg",
+        "detected_person": 1,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00408.jpg",
+        "detected_person": 1,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00427.jpg",
+        "detected_person": 1,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00428.jpg",
+        "detected_person": 1,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00429.jpg",
+        "detected_person": 1,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00430.jpg",
+        "detected_person": 1,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00442.jpg",
+        "detected_person": 1,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00446.jpg",
+        "detected_person": 1,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00448.jpg",
+        "detected_person": 1,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00457.jpg",
+        "detected_person": 1,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00467.jpg",
+        "detected_person": 1,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00482.jpg",
+        "detected_person": 1,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00485.jpg",
+        "detected_person": 1,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00489.jpg",
+        "detected_person": 2,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00490.jpg",
+        "detected_person": 2,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00493.jpg",
+        "detected_person": 2,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00498.jpg",
+        "detected_person": 1,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00505.jpg",
+        "detected_person": 1,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00517.jpg",
+        "detected_person": 1,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00520.jpg",
+        "detected_person": 1,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00525.jpg",
+        "detected_person": 1,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00537.jpg",
+        "detected_person": 1,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00538.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00557.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00558.jpg",
+        "detected_person": 1,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00568.jpg",
+        "detected_person": 1,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00571.jpg",
+        "detected_person": 1,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00575.jpg",
+        "detected_person": 1,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00578.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00583.jpg",
+        "detected_person": 1,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00584.jpg",
+        "detected_person": 1,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00598.jpg",
+        "detected_person": 1,
+        "gt_clothes": 1,
+        "unassigned_clothes": 1
+      },
+      {
+        "image": "gnew__00600.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00602.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00603.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00610.jpg",
+        "detected_person": 4,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00614.jpg",
+        "detected_person": 3,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00616.jpg",
+        "detected_person": 6,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00621.jpg",
+        "detected_person": 4,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00623.jpg",
+        "detected_person": 3,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00625.jpg",
+        "detected_person": 3,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00633.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00634.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00636.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00646.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00649.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00652.jpg",
+        "detected_person": 1,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00662.jpg",
+        "detected_person": 1,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00669.jpg",
+        "detected_person": 1,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00672.jpg",
+        "detected_person": 1,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00674.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00676.jpg",
+        "detected_person": 1,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00707.jpg",
+        "detected_person": 1,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00708.jpg",
+        "detected_person": 1,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00731.jpg",
+        "detected_person": 1,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00735.jpg",
+        "detected_person": 1,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00736.jpg",
+        "detected_person": 1,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00749.jpg",
+        "detected_person": 1,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00750.jpg",
+        "detected_person": 1,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00772.jpg",
+        "detected_person": 1,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00791.jpg",
+        "detected_person": 1,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00801.jpg",
+        "detected_person": 1,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00803.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00807.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00812.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00818.jpg",
+        "detected_person": 6,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00820.jpg",
+        "detected_person": 3,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00826.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00831.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00834.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00841.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00857.jpg",
+        "detected_person": 4,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00859.jpg",
+        "detected_person": 3,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00865.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00890.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00896.jpg",
+        "detected_person": 1,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00905.jpg",
+        "detected_person": 1,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00916.jpg",
+        "detected_person": 2,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00917.jpg",
+        "detected_person": 2,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00924.jpg",
+        "detected_person": 2,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00928.jpg",
+        "detected_person": 2,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00950.jpg",
+        "detected_person": 1,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00971.jpg",
+        "detected_person": 4,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00983.jpg",
+        "detected_person": 7,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00994.jpg",
+        "detected_person": 3,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01006.jpg",
+        "detected_person": 3,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01021.jpg",
+        "detected_person": 4,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01024.jpg",
+        "detected_person": 4,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01028.jpg",
+        "detected_person": 4,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01031.jpg",
+        "detected_person": 4,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01033.jpg",
+        "detected_person": 4,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01039.jpg",
+        "detected_person": 5,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01040.jpg",
+        "detected_person": 5,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01048.jpg",
+        "detected_person": 6,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01065.jpg",
+        "detected_person": 5,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01071.jpg",
+        "detected_person": 5,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01073.jpg",
+        "detected_person": 5,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01074.jpg",
+        "detected_person": 4,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01077.jpg",
+        "detected_person": 6,
+        "gt_clothes": 4,
+        "unassigned_clothes": 1
+      },
+      {
+        "image": "gnew__01088.jpg",
+        "detected_person": 5,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01089.jpg",
+        "detected_person": 5,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01102.jpg",
+        "detected_person": 4,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01104.jpg",
+        "detected_person": 3,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01105.jpg",
+        "detected_person": 3,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01106.jpg",
+        "detected_person": 5,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01109.jpg",
+        "detected_person": 4,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01114.jpg",
+        "detected_person": 6,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01121.jpg",
+        "detected_person": 4,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01125.jpg",
+        "detected_person": 3,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01131.jpg",
+        "detected_person": 3,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01138.jpg",
+        "detected_person": 6,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01140.jpg",
+        "detected_person": 6,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01145.jpg",
+        "detected_person": 6,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01154.jpg",
+        "detected_person": 4,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01159.jpg",
+        "detected_person": 3,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01160.jpg",
+        "detected_person": 4,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01163.jpg",
+        "detected_person": 4,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01175.jpg",
+        "detected_person": 4,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01180.jpg",
+        "detected_person": 3,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01183.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01187.jpg",
+        "detected_person": 3,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01192.jpg",
+        "detected_person": 4,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01193.jpg",
+        "detected_person": 4,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01201.jpg",
+        "detected_person": 4,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01203.jpg",
+        "detected_person": 4,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01209.jpg",
+        "detected_person": 4,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01210.jpg",
+        "detected_person": 4,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01217.jpg",
+        "detected_person": 5,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01236.jpg",
+        "detected_person": 4,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01247.jpg",
+        "detected_person": 4,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01259.jpg",
+        "detected_person": 5,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01266.jpg",
+        "detected_person": 2,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01283.jpg",
+        "detected_person": 3,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01285.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01287.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01290.jpg",
+        "detected_person": 1,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01291.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01294.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01297.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01299.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01300.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01303.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01305.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01311.jpg",
+        "detected_person": 3,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01312.jpg",
+        "detected_person": 3,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01314.jpg",
+        "detected_person": 3,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01317.jpg",
+        "detected_person": 3,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01333.jpg",
+        "detected_person": 1,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01336.jpg",
+        "detected_person": 3,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01337.jpg",
+        "detected_person": 3,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01344.jpg",
+        "detected_person": 1,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01345.jpg",
+        "detected_person": 1,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01346.jpg",
+        "detected_person": 1,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01350.jpg",
+        "detected_person": 1,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01351.jpg",
+        "detected_person": 1,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01384.jpg",
+        "detected_person": 2,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01391.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01394.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01403.jpg",
+        "detected_person": 1,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01417.jpg",
+        "detected_person": 4,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01422.jpg",
+        "detected_person": 3,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01423.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01433.jpg",
+        "detected_person": 4,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01437.jpg",
+        "detected_person": 3,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01439.jpg",
+        "detected_person": 2,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01441.jpg",
+        "detected_person": 3,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01443.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01456.jpg",
+        "detected_person": 3,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01460.jpg",
+        "detected_person": 3,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01480.jpg",
+        "detected_person": 4,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01497.jpg",
+        "detected_person": 3,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01526.jpg",
+        "detected_person": 4,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01530.jpg",
+        "detected_person": 4,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01561.jpg",
+        "detected_person": 6,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01565.jpg",
+        "detected_person": 3,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01566.jpg",
+        "detected_person": 4,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01568.jpg",
+        "detected_person": 5,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01573.jpg",
+        "detected_person": 5,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01576.jpg",
+        "detected_person": 5,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01587.jpg",
+        "detected_person": 4,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01589.jpg",
+        "detected_person": 4,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01593.jpg",
+        "detected_person": 4,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01608.jpg",
+        "detected_person": 5,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01613.jpg",
+        "detected_person": 5,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01616.jpg",
+        "detected_person": 5,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01617.jpg",
+        "detected_person": 5,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01620.jpg",
+        "detected_person": 4,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01631.jpg",
+        "detected_person": 3,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01646.jpg",
+        "detected_person": 5,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01650.jpg",
+        "detected_person": 5,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01664.jpg",
+        "detected_person": 6,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01687.jpg",
+        "detected_person": 5,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01693.jpg",
+        "detected_person": 3,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01698.jpg",
+        "detected_person": 3,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01708.jpg",
+        "detected_person": 7,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01709.jpg",
+        "detected_person": 7,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01719.jpg",
+        "detected_person": 10,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01720.jpg",
+        "detected_person": 8,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01724.jpg",
+        "detected_person": 7,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01729.jpg",
+        "detected_person": 7,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01731.jpg",
+        "detected_person": 7,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01732.jpg",
+        "detected_person": 5,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01734.jpg",
+        "detected_person": 5,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01744.jpg",
+        "detected_person": 5,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01754.jpg",
+        "detected_person": 6,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01769.jpg",
+        "detected_person": 6,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01781.jpg",
+        "detected_person": 5,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01784.jpg",
+        "detected_person": 5,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01788.jpg",
+        "detected_person": 3,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01792.jpg",
+        "detected_person": 2,
+        "gt_clothes": 2,
+        "unassigned_clothes": 1
+      },
+      {
+        "image": "gnew__01794.jpg",
+        "detected_person": 3,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01795.jpg",
+        "detected_person": 3,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01801.jpg",
+        "detected_person": 3,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01806.jpg",
+        "detected_person": 3,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01814.jpg",
+        "detected_person": 4,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01842.jpg",
+        "detected_person": 4,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01843.jpg",
+        "detected_person": 3,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01844.jpg",
+        "detected_person": 3,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01845.jpg",
+        "detected_person": 4,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01858.jpg",
+        "detected_person": 4,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01873.jpg",
+        "detected_person": 4,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01877.jpg",
+        "detected_person": 4,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01881.jpg",
+        "detected_person": 2,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01891.jpg",
+        "detected_person": 5,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01892.jpg",
+        "detected_person": 5,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01950.jpg",
+        "detected_person": 5,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01956.jpg",
+        "detected_person": 5,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01966.jpg",
+        "detected_person": 5,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01967.jpg",
+        "detected_person": 5,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01969.jpg",
+        "detected_person": 5,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01976.jpg",
+        "detected_person": 4,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01981.jpg",
+        "detected_person": 5,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01984.jpg",
+        "detected_person": 5,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01991.jpg",
+        "detected_person": 5,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01992.jpg",
+        "detected_person": 5,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01998.jpg",
+        "detected_person": 3,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02002.jpg",
+        "detected_person": 5,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02003.jpg",
+        "detected_person": 5,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02007.jpg",
+        "detected_person": 6,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02008.jpg",
+        "detected_person": 5,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02018.jpg",
+        "detected_person": 3,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02024.jpg",
+        "detected_person": 2,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02028.jpg",
+        "detected_person": 3,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02045.jpg",
+        "detected_person": 4,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02061.jpg",
+        "detected_person": 3,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02077.jpg",
+        "detected_person": 5,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02080.jpg",
+        "detected_person": 5,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02086.jpg",
+        "detected_person": 4,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02092.jpg",
+        "detected_person": 2,
+        "gt_clothes": 3,
+        "unassigned_clothes": 1
+      },
+      {
+        "image": "gnew__02095.jpg",
+        "detected_person": 2,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02096.jpg",
+        "detected_person": 2,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02117.jpg",
+        "detected_person": 3,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02119.jpg",
+        "detected_person": 3,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02124.jpg",
+        "detected_person": 2,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02125.jpg",
+        "detected_person": 2,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02131.jpg",
+        "detected_person": 0,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02143.jpg",
+        "detected_person": 1,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02150.jpg",
+        "detected_person": 1,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02151.jpg",
+        "detected_person": 1,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02155.jpg",
+        "detected_person": 2,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02168.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02171.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02175.jpg",
+        "detected_person": 3,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02182.jpg",
+        "detected_person": 2,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02183.jpg",
+        "detected_person": 2,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02186.jpg",
+        "detected_person": 2,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02188.jpg",
+        "detected_person": 2,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02193.jpg",
+        "detected_person": 1,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02194.jpg",
+        "detected_person": 1,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02205.jpg",
+        "detected_person": 3,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02218.jpg",
+        "detected_person": 3,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02220.jpg",
+        "detected_person": 3,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02224.jpg",
+        "detected_person": 3,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02242.jpg",
+        "detected_person": 7,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02252.jpg",
+        "detected_person": 6,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02257.jpg",
+        "detected_person": 5,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02273.jpg",
+        "detected_person": 5,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02278.jpg",
+        "detected_person": 4,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02279.jpg",
+        "detected_person": 7,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02288.jpg",
+        "detected_person": 6,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02290.jpg",
+        "detected_person": 6,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02293.jpg",
+        "detected_person": 5,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02300.jpg",
+        "detected_person": 4,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02303.jpg",
+        "detected_person": 5,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02304.jpg",
+        "detected_person": 5,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02305.jpg",
+        "detected_person": 5,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02324.jpg",
+        "detected_person": 6,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02330.jpg",
+        "detected_person": 5,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02334.jpg",
+        "detected_person": 7,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02347.jpg",
+        "detected_person": 5,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02353.jpg",
+        "detected_person": 4,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02365.jpg",
+        "detected_person": 4,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02371.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02372.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02383.jpg",
+        "detected_person": 3,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02390.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02395.jpg",
+        "detected_person": 5,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02411.jpg",
+        "detected_person": 3,
+        "gt_clothes": 3,
+        "unassigned_clothes": 1
+      },
+      {
+        "image": "gnew__02415.jpg",
+        "detected_person": 3,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02416.jpg",
+        "detected_person": 4,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02433.jpg",
+        "detected_person": 5,
+        "gt_clothes": 2,
+        "unassigned_clothes": 1
+      },
+      {
+        "image": "gnew__02435.jpg",
+        "detected_person": 6,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02445.jpg",
+        "detected_person": 3,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02447.jpg",
+        "detected_person": 4,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02449.jpg",
+        "detected_person": 4,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02456.jpg",
+        "detected_person": 3,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02462.jpg",
+        "detected_person": 1,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02463.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02471.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02482.jpg",
+        "detected_person": 3,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02486.jpg",
+        "detected_person": 1,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02487.jpg",
+        "detected_person": 1,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02496.jpg",
+        "detected_person": 1,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02498.jpg",
+        "detected_person": 1,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02500.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02501.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02502.jpg",
+        "detected_person": 1,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      }
+    ]
+  },
+  "person_model_b": {
+    "weights": "backend-train-model/person-train-model/train-result/export/person_detect_yolov8_with_new_labels_and_hard_examples_v1.pt",
+    "total_clothes_gt": 800,
+    "unassigned_clothes": 10,
+    "bottleneck_ratio": 0.0125,
+    "per_image": [
+      {
+        "image": "g31__D04_20260123074846_frame_0003.jpg",
+        "detected_person": 6,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g31__D04_20260123074846_frame_0010.jpg",
+        "detected_person": 5,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g31__D04_20260123074846_frame_0017.jpg",
+        "detected_person": 2,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g31__D04_20260123074846_frame_0020.jpg",
+        "detected_person": 2,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g31__D05_20260123074841_frame_0003.jpg",
+        "detected_person": 5,
+        "gt_clothes": 5,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g31__D05_20260123074841_frame_0005.jpg",
+        "detected_person": 4,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g31__D05_20260123074841_frame_0009.jpg",
+        "detected_person": 5,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g31__D05_20260123074841_frame_0010.jpg",
+        "detected_person": 4,
+        "gt_clothes": 5,
+        "unassigned_clothes": 1
+      },
+      {
+        "image": "g31__D15_20260123074848_frame_0001.jpg",
+        "detected_person": 11,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g31__D15_20260123074848_frame_0006.jpg",
+        "detected_person": 9,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g31__D15_20260123074848_frame_0007.jpg",
+        "detected_person": 7,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g31__D15_20260123074848_frame_0009.jpg",
+        "detected_person": 8,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g31__D15_20260123074848_frame_0017.jpg",
+        "detected_person": 5,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g31__D15_20260123074848_frame_0021.jpg",
+        "detected_person": 3,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g32__D15_20260119061405_frame_0245.jpg",
+        "detected_person": 4,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g32__D15_20260119061405_frame_0251.jpg",
+        "detected_person": 3,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g32__D15_20260119061405_frame_0259.jpg",
+        "detected_person": 4,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g32__D15_20260119061405_frame_0272.jpg",
+        "detected_person": 4,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g32__D15_20260119061405_frame_0273.jpg",
+        "detected_person": 4,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g32__D15_20260119061405_frame_0276.jpg",
+        "detected_person": 4,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g32__D15_20260119061405_frame_0285.jpg",
+        "detected_person": 3,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g32__D15_20260119061405_frame_0289.jpg",
+        "detected_person": 4,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g32__D15_20260119061405_frame_0299.jpg",
+        "detected_person": 4,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g32__D15_20260119061405_frame_0305.jpg",
+        "detected_person": 4,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g32__D15_20260119061405_frame_0309.jpg",
+        "detected_person": 3,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g32__D15_20260119061405_frame_0322.jpg",
+        "detected_person": 4,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g32__D15_20260119061405_frame_0329.jpg",
+        "detected_person": 4,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g32__D15_20260119061405_frame_0332.jpg",
+        "detected_person": 5,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g32__D15_20260119061405_frame_0343.jpg",
+        "detected_person": 5,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g32__D15_20260119061405_frame_0345.jpg",
+        "detected_person": 5,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g32__D15_20260119061405_frame_0347.jpg",
+        "detected_person": 4,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g32__D15_20260119203927_frame_0000.jpg",
+        "detected_person": 3,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g32__D15_20260119203927_frame_0004.jpg",
+        "detected_person": 3,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g32__D15_20260119203927_frame_0009.jpg",
+        "detected_person": 3,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g32__D15_20260119203927_frame_0014.jpg",
+        "detected_person": 3,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g32__D15_20260119203927_frame_0015.jpg",
+        "detected_person": 3,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g32__D15_20260119203927_frame_0016.jpg",
+        "detected_person": 3,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g32__D15_20260119203927_frame_0017.jpg",
+        "detected_person": 3,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g32__D15_20260119203927_frame_0026.jpg",
+        "detected_person": 2,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g32__D15_20260119203927_frame_0044.jpg",
+        "detected_person": 5,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g32__D15_20260119203927_frame_0054.jpg",
+        "detected_person": 4,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g32__D15_20260119203927_frame_0055.jpg",
+        "detected_person": 5,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g32__D15_20260119203927_frame_0060.jpg",
+        "detected_person": 6,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g32__D15_20260119203927_frame_0067.jpg",
+        "detected_person": 4,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g32__D15_20260119203927_frame_0071.jpg",
+        "detected_person": 5,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g32__D15_20260119203927_frame_0088.jpg",
+        "detected_person": 5,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g32__D15_20260119203927_frame_0089.jpg",
+        "detected_person": 5,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g32__D15_20260119203927_frame_0114.jpg",
+        "detected_person": 4,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g32__D15_20260119203927_frame_0115.jpg",
+        "detected_person": 4,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g32__D15_20260119203927_frame_0122.jpg",
+        "detected_person": 3,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g32__D15_20260119203927_frame_0123.jpg",
+        "detected_person": 3,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g32__D15_20260119203927_frame_0125.jpg",
+        "detected_person": 3,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g32__D15_20260119203927_frame_0127.jpg",
+        "detected_person": 3,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g32__D15_20260119203927_frame_0143.jpg",
+        "detected_person": 2,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g32__D15_20260119203927_frame_0149.jpg",
+        "detected_person": 2,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g33__D02_20260123070624_frame_0004.jpg",
+        "detected_person": 2,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g33__D02_20260123070624_frame_0007.jpg",
+        "detected_person": 1,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g33__D02_20260123070624_frame_0013.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g33__D02_20260123070624_frame_0016.jpg",
+        "detected_person": 3,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g33__D02_20260123070624_frame_0020.jpg",
+        "detected_person": 3,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g33__D02_20260123070624_frame_0026.jpg",
+        "detected_person": 3,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g33__D02_20260123070624_frame_0028.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g33__D02_20260123070624_frame_0032.jpg",
+        "detected_person": 1,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g33__D02_20260123070624_frame_0060.jpg",
+        "detected_person": 1,
+        "gt_clothes": 1,
+        "unassigned_clothes": 1
+      },
+      {
+        "image": "g33__D02_20260123070624_frame_0063.jpg",
+        "detected_person": 1,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g33__D02_20260123074836_frame_0004.jpg",
+        "detected_person": 2,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g33__D02_20260123074836_frame_0015.jpg",
+        "detected_person": 2,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "g33__D02_20260123074836_frame_0021.jpg",
+        "detected_person": 2,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00003.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00005.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00014.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00015.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00027.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00031.jpg",
+        "detected_person": 1,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00044.jpg",
+        "detected_person": 1,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00048.jpg",
+        "detected_person": 1,
+        "gt_clothes": 2,
+        "unassigned_clothes": 1
+      },
+      {
+        "image": "gnew__00065.jpg",
+        "detected_person": 3,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00080.jpg",
+        "detected_person": 3,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00107.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00108.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00113.jpg",
+        "detected_person": 3,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00115.jpg",
+        "detected_person": 2,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00121.jpg",
+        "detected_person": 2,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00122.jpg",
+        "detected_person": 2,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00124.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00125.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00127.jpg",
+        "detected_person": 3,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00129.jpg",
+        "detected_person": 2,
+        "gt_clothes": 2,
+        "unassigned_clothes": 1
+      },
+      {
+        "image": "gnew__00135.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00136.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00143.jpg",
+        "detected_person": 1,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00144.jpg",
+        "detected_person": 1,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00145.jpg",
+        "detected_person": 1,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00150.jpg",
+        "detected_person": 1,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00159.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00169.jpg",
+        "detected_person": 3,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00186.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00196.jpg",
+        "detected_person": 3,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00200.jpg",
+        "detected_person": 3,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00201.jpg",
+        "detected_person": 3,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00202.jpg",
+        "detected_person": 3,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00207.jpg",
+        "detected_person": 3,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00209.jpg",
+        "detected_person": 3,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00210.jpg",
+        "detected_person": 3,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00232.jpg",
+        "detected_person": 1,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00238.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00246.jpg",
+        "detected_person": 2,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00254.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00256.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00266.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00269.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00271.jpg",
+        "detected_person": 3,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00279.jpg",
+        "detected_person": 4,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00280.jpg",
+        "detected_person": 4,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00292.jpg",
+        "detected_person": 4,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00293.jpg",
+        "detected_person": 3,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00296.jpg",
+        "detected_person": 3,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00301.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00326.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00331.jpg",
+        "detected_person": 3,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00335.jpg",
+        "detected_person": 5,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00346.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00347.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00369.jpg",
+        "detected_person": 3,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00379.jpg",
+        "detected_person": 3,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00385.jpg",
+        "detected_person": 3,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00392.jpg",
+        "detected_person": 1,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00397.jpg",
+        "detected_person": 1,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00401.jpg",
+        "detected_person": 1,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00404.jpg",
+        "detected_person": 1,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00408.jpg",
+        "detected_person": 1,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00427.jpg",
+        "detected_person": 1,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00428.jpg",
+        "detected_person": 1,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00429.jpg",
+        "detected_person": 1,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00430.jpg",
+        "detected_person": 1,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00442.jpg",
+        "detected_person": 1,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00446.jpg",
+        "detected_person": 1,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00448.jpg",
+        "detected_person": 1,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00457.jpg",
+        "detected_person": 1,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00467.jpg",
+        "detected_person": 1,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00482.jpg",
+        "detected_person": 1,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00485.jpg",
+        "detected_person": 1,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00489.jpg",
+        "detected_person": 2,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00490.jpg",
+        "detected_person": 2,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00493.jpg",
+        "detected_person": 2,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00498.jpg",
+        "detected_person": 1,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00505.jpg",
+        "detected_person": 1,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00517.jpg",
+        "detected_person": 1,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00520.jpg",
+        "detected_person": 1,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00525.jpg",
+        "detected_person": 1,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00537.jpg",
+        "detected_person": 1,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00538.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00557.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00558.jpg",
+        "detected_person": 1,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00568.jpg",
+        "detected_person": 1,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00571.jpg",
+        "detected_person": 1,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00575.jpg",
+        "detected_person": 1,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00578.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00583.jpg",
+        "detected_person": 1,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00584.jpg",
+        "detected_person": 1,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00598.jpg",
+        "detected_person": 1,
+        "gt_clothes": 1,
+        "unassigned_clothes": 1
+      },
+      {
+        "image": "gnew__00600.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00602.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00603.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00610.jpg",
+        "detected_person": 4,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00614.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00616.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00621.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00623.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00625.jpg",
+        "detected_person": 3,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00633.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00634.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00636.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00646.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00649.jpg",
+        "detected_person": 1,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00652.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00662.jpg",
+        "detected_person": 1,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00669.jpg",
+        "detected_person": 1,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00672.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00674.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00676.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00707.jpg",
+        "detected_person": 1,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00708.jpg",
+        "detected_person": 1,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00731.jpg",
+        "detected_person": 1,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00735.jpg",
+        "detected_person": 1,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00736.jpg",
+        "detected_person": 1,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00749.jpg",
+        "detected_person": 1,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00750.jpg",
+        "detected_person": 1,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00772.jpg",
+        "detected_person": 1,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00791.jpg",
+        "detected_person": 1,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00801.jpg",
+        "detected_person": 1,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00803.jpg",
+        "detected_person": 3,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00807.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00812.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00818.jpg",
+        "detected_person": 3,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00820.jpg",
+        "detected_person": 3,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00826.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00831.jpg",
+        "detected_person": 3,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00834.jpg",
+        "detected_person": 1,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00841.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00857.jpg",
+        "detected_person": 4,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00859.jpg",
+        "detected_person": 3,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00865.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00890.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00896.jpg",
+        "detected_person": 1,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00905.jpg",
+        "detected_person": 1,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00916.jpg",
+        "detected_person": 2,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00917.jpg",
+        "detected_person": 2,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00924.jpg",
+        "detected_person": 2,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00928.jpg",
+        "detected_person": 2,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00950.jpg",
+        "detected_person": 1,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00971.jpg",
+        "detected_person": 4,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00983.jpg",
+        "detected_person": 5,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__00994.jpg",
+        "detected_person": 5,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01006.jpg",
+        "detected_person": 3,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01021.jpg",
+        "detected_person": 4,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01024.jpg",
+        "detected_person": 4,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01028.jpg",
+        "detected_person": 4,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01031.jpg",
+        "detected_person": 4,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01033.jpg",
+        "detected_person": 4,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01039.jpg",
+        "detected_person": 5,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01040.jpg",
+        "detected_person": 5,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01048.jpg",
+        "detected_person": 6,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01065.jpg",
+        "detected_person": 5,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01071.jpg",
+        "detected_person": 5,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01073.jpg",
+        "detected_person": 6,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01074.jpg",
+        "detected_person": 4,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01077.jpg",
+        "detected_person": 5,
+        "gt_clothes": 4,
+        "unassigned_clothes": 1
+      },
+      {
+        "image": "gnew__01088.jpg",
+        "detected_person": 5,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01089.jpg",
+        "detected_person": 5,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01102.jpg",
+        "detected_person": 4,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01104.jpg",
+        "detected_person": 3,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01105.jpg",
+        "detected_person": 3,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01106.jpg",
+        "detected_person": 5,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01109.jpg",
+        "detected_person": 4,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01114.jpg",
+        "detected_person": 4,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01121.jpg",
+        "detected_person": 4,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01125.jpg",
+        "detected_person": 3,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01131.jpg",
+        "detected_person": 3,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01138.jpg",
+        "detected_person": 6,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01140.jpg",
+        "detected_person": 6,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01145.jpg",
+        "detected_person": 6,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01154.jpg",
+        "detected_person": 4,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01159.jpg",
+        "detected_person": 3,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01160.jpg",
+        "detected_person": 3,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01163.jpg",
+        "detected_person": 4,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01175.jpg",
+        "detected_person": 4,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01180.jpg",
+        "detected_person": 3,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01183.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01187.jpg",
+        "detected_person": 3,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01192.jpg",
+        "detected_person": 4,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01193.jpg",
+        "detected_person": 4,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01201.jpg",
+        "detected_person": 4,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01203.jpg",
+        "detected_person": 4,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01209.jpg",
+        "detected_person": 4,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01210.jpg",
+        "detected_person": 4,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01217.jpg",
+        "detected_person": 5,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01236.jpg",
+        "detected_person": 4,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01247.jpg",
+        "detected_person": 4,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01259.jpg",
+        "detected_person": 5,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01266.jpg",
+        "detected_person": 2,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01283.jpg",
+        "detected_person": 3,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01285.jpg",
+        "detected_person": 1,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01287.jpg",
+        "detected_person": 1,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01290.jpg",
+        "detected_person": 1,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01291.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01294.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01297.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01299.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01300.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01303.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01305.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01311.jpg",
+        "detected_person": 3,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01312.jpg",
+        "detected_person": 3,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01314.jpg",
+        "detected_person": 3,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01317.jpg",
+        "detected_person": 3,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01333.jpg",
+        "detected_person": 1,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01336.jpg",
+        "detected_person": 3,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01337.jpg",
+        "detected_person": 3,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01344.jpg",
+        "detected_person": 1,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01345.jpg",
+        "detected_person": 1,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01346.jpg",
+        "detected_person": 1,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01350.jpg",
+        "detected_person": 1,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01351.jpg",
+        "detected_person": 1,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01384.jpg",
+        "detected_person": 2,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01391.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01394.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01403.jpg",
+        "detected_person": 1,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01417.jpg",
+        "detected_person": 4,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01422.jpg",
+        "detected_person": 3,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01423.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01433.jpg",
+        "detected_person": 4,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01437.jpg",
+        "detected_person": 2,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01439.jpg",
+        "detected_person": 2,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01441.jpg",
+        "detected_person": 3,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01443.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01456.jpg",
+        "detected_person": 3,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01460.jpg",
+        "detected_person": 3,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01480.jpg",
+        "detected_person": 4,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01497.jpg",
+        "detected_person": 3,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01526.jpg",
+        "detected_person": 4,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01530.jpg",
+        "detected_person": 4,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01561.jpg",
+        "detected_person": 6,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01565.jpg",
+        "detected_person": 3,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01566.jpg",
+        "detected_person": 4,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01568.jpg",
+        "detected_person": 5,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01573.jpg",
+        "detected_person": 5,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01576.jpg",
+        "detected_person": 5,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01587.jpg",
+        "detected_person": 4,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01589.jpg",
+        "detected_person": 4,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01593.jpg",
+        "detected_person": 4,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01608.jpg",
+        "detected_person": 5,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01613.jpg",
+        "detected_person": 5,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01616.jpg",
+        "detected_person": 5,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01617.jpg",
+        "detected_person": 5,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01620.jpg",
+        "detected_person": 4,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01631.jpg",
+        "detected_person": 3,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01646.jpg",
+        "detected_person": 5,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01650.jpg",
+        "detected_person": 5,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01664.jpg",
+        "detected_person": 5,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01687.jpg",
+        "detected_person": 5,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01693.jpg",
+        "detected_person": 3,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01698.jpg",
+        "detected_person": 3,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01708.jpg",
+        "detected_person": 7,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01709.jpg",
+        "detected_person": 7,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01719.jpg",
+        "detected_person": 7,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01720.jpg",
+        "detected_person": 7,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01724.jpg",
+        "detected_person": 8,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01729.jpg",
+        "detected_person": 6,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01731.jpg",
+        "detected_person": 5,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01732.jpg",
+        "detected_person": 5,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01734.jpg",
+        "detected_person": 5,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01744.jpg",
+        "detected_person": 5,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01754.jpg",
+        "detected_person": 6,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01769.jpg",
+        "detected_person": 6,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01781.jpg",
+        "detected_person": 4,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01784.jpg",
+        "detected_person": 6,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01788.jpg",
+        "detected_person": 5,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01792.jpg",
+        "detected_person": 4,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01794.jpg",
+        "detected_person": 3,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01795.jpg",
+        "detected_person": 3,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01801.jpg",
+        "detected_person": 3,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01806.jpg",
+        "detected_person": 3,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01814.jpg",
+        "detected_person": 4,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01842.jpg",
+        "detected_person": 6,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01843.jpg",
+        "detected_person": 3,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01844.jpg",
+        "detected_person": 3,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01845.jpg",
+        "detected_person": 4,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01858.jpg",
+        "detected_person": 4,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01873.jpg",
+        "detected_person": 4,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01877.jpg",
+        "detected_person": 4,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01881.jpg",
+        "detected_person": 2,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01891.jpg",
+        "detected_person": 5,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01892.jpg",
+        "detected_person": 5,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01950.jpg",
+        "detected_person": 5,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01956.jpg",
+        "detected_person": 5,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01966.jpg",
+        "detected_person": 5,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01967.jpg",
+        "detected_person": 5,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01969.jpg",
+        "detected_person": 5,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01976.jpg",
+        "detected_person": 4,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01981.jpg",
+        "detected_person": 6,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01984.jpg",
+        "detected_person": 5,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01991.jpg",
+        "detected_person": 5,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01992.jpg",
+        "detected_person": 5,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__01998.jpg",
+        "detected_person": 3,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02002.jpg",
+        "detected_person": 5,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02003.jpg",
+        "detected_person": 5,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02007.jpg",
+        "detected_person": 6,
+        "gt_clothes": 4,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02008.jpg",
+        "detected_person": 5,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02018.jpg",
+        "detected_person": 3,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02024.jpg",
+        "detected_person": 2,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02028.jpg",
+        "detected_person": 3,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02045.jpg",
+        "detected_person": 3,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02061.jpg",
+        "detected_person": 3,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02077.jpg",
+        "detected_person": 5,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02080.jpg",
+        "detected_person": 5,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02086.jpg",
+        "detected_person": 4,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02092.jpg",
+        "detected_person": 3,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02095.jpg",
+        "detected_person": 1,
+        "gt_clothes": 2,
+        "unassigned_clothes": 1
+      },
+      {
+        "image": "gnew__02096.jpg",
+        "detected_person": 2,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02117.jpg",
+        "detected_person": 3,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02119.jpg",
+        "detected_person": 3,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02124.jpg",
+        "detected_person": 2,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02125.jpg",
+        "detected_person": 2,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02131.jpg",
+        "detected_person": 1,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02143.jpg",
+        "detected_person": 1,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02150.jpg",
+        "detected_person": 1,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02151.jpg",
+        "detected_person": 1,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02155.jpg",
+        "detected_person": 2,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02168.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02171.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02175.jpg",
+        "detected_person": 3,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02182.jpg",
+        "detected_person": 2,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02183.jpg",
+        "detected_person": 2,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02186.jpg",
+        "detected_person": 1,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02188.jpg",
+        "detected_person": 2,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02193.jpg",
+        "detected_person": 1,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02194.jpg",
+        "detected_person": 1,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02205.jpg",
+        "detected_person": 3,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02218.jpg",
+        "detected_person": 3,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02220.jpg",
+        "detected_person": 3,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02224.jpg",
+        "detected_person": 3,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02242.jpg",
+        "detected_person": 6,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02252.jpg",
+        "detected_person": 5,
+        "gt_clothes": 3,
+        "unassigned_clothes": 1
+      },
+      {
+        "image": "gnew__02257.jpg",
+        "detected_person": 5,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02273.jpg",
+        "detected_person": 5,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02278.jpg",
+        "detected_person": 5,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02279.jpg",
+        "detected_person": 6,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02288.jpg",
+        "detected_person": 5,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02290.jpg",
+        "detected_person": 6,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02293.jpg",
+        "detected_person": 6,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02300.jpg",
+        "detected_person": 5,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02303.jpg",
+        "detected_person": 5,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02304.jpg",
+        "detected_person": 4,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02305.jpg",
+        "detected_person": 4,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02324.jpg",
+        "detected_person": 6,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02330.jpg",
+        "detected_person": 5,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02334.jpg",
+        "detected_person": 6,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02347.jpg",
+        "detected_person": 4,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02353.jpg",
+        "detected_person": 4,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02365.jpg",
+        "detected_person": 3,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02371.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02372.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02383.jpg",
+        "detected_person": 3,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02390.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02395.jpg",
+        "detected_person": 4,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02411.jpg",
+        "detected_person": 3,
+        "gt_clothes": 3,
+        "unassigned_clothes": 1
+      },
+      {
+        "image": "gnew__02415.jpg",
+        "detected_person": 4,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02416.jpg",
+        "detected_person": 4,
+        "gt_clothes": 3,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02433.jpg",
+        "detected_person": 4,
+        "gt_clothes": 2,
+        "unassigned_clothes": 1
+      },
+      {
+        "image": "gnew__02435.jpg",
+        "detected_person": 4,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02445.jpg",
+        "detected_person": 3,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02447.jpg",
+        "detected_person": 4,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02449.jpg",
+        "detected_person": 4,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02456.jpg",
+        "detected_person": 3,
+        "gt_clothes": 2,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02462.jpg",
+        "detected_person": 1,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02463.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02471.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02482.jpg",
+        "detected_person": 3,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02486.jpg",
+        "detected_person": 1,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02487.jpg",
+        "detected_person": 1,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02496.jpg",
+        "detected_person": 1,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02498.jpg",
+        "detected_person": 1,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02500.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02501.jpg",
+        "detected_person": 2,
+        "gt_clothes": 1,
+        "unassigned_clothes": 0
+      },
+      {
+        "image": "gnew__02502.jpg",
+        "detected_person": 1,
+        "gt_clothes": 0,
+        "unassigned_clothes": 0
+      }
+    ]
+  }
+}

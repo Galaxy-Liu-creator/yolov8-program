@@ -1,5 +1,23 @@
 # Update Log
 
+## 2026-06-10 解除实验二脚本对 tqdm 的硬依赖
+
+1. 变更来源：用户运行 `analyze_person_bottleneck.py` 实验二命令时报错 `ModuleNotFoundError: No module named 'tqdm'`。
+2. 变更总览：
+   - 将 `backend-train-model/personcrop-train/train-code/analyze_person_bottleneck.py` 中的 `tqdm` 导入改为可选依赖。
+   - 当环境中缺少 `tqdm` 时，脚本退化为普通迭代，不显示进度条，但不影响瓶颈统计逻辑。
+3. 涉及文件：
+   - `backend-train-model/personcrop-train/train-code/analyze_person_bottleneck.py`
+   - `backend-train-model/docs/update_log.md`
+4. 新增 / 变更配置项：
+   - 无新增 JSON 配置项。
+   - 无新增命令行参数。
+5. 兼容性注意：
+   - 已安装 `tqdm` 的环境仍会显示进度条；未安装 `tqdm` 的环境可直接运行实验二。
+   - 本轮不改变实验二的统计口径、阈值、模型权重或输出格式。
+6. 本轮明确不改动：
+   - 不安装新依赖、不重跑实验、不修改数据集、权重或诊断方案判断标准。
+
 ## 2026-06-10 修正 personcrop 诊断性实验方案命令与基准判断
 
 1. 变更来源：用户要求检查并修正 `personcrop诊断性实验方案.md` 中实验二命令，同时修正方案内的基准判断口径。
