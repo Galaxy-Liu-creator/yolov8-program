@@ -52,13 +52,31 @@
 
 #### **执行步骤**
 
+**方法A：简化快速验证（推荐优先执行，10-30分钟）**
+
+用 personcrop 权重直接在原图上评估，验证模型泛化能力：
+
+```bash
+# 简化验证：用 personcrop B 权重在原图 test split 上评估
+python backend-train-model/train_workwear.py evaluate --mode fullframe --weights personcrop-train/train-result/artifacts/runs/pred_pc_clo_hardv1/weights/best.pt --data new_clothes_train/train-result/datasets/clothes_merged_with_new_labels_v1/dataset.yaml --split test --conf 0.45
+```
+
+**判断标准**：
+- 如果 mAP50-95 ≥ 0.75：Personcrop 模型泛化能力强，路线可能成功
+- 如果 mAP50-95 在 0.70-0.75：中等，需要进一步分析
+- 如果 mAP50-95 < 0.70：模型过拟合 crop 空间，路线可能失败
+
+**方法B：完整原图级对比（严谨但复杂，需补充脚本完整实现）**
+
 ```bash
 # Step 1: Fullframe baseline 在 test split 上评估
 python backend-train-model/train_workwear.py evaluate --project-config backend-train-model/new_clothes_train/new_clothes_train_project_config.json --weights backend-train-model/new_clothes_train/train-result/artifacts/runs/clothes_merged_with_new_labels_v1_baseline/weights/best.pt --dataset-yaml backend-train-model/new_clothes_train/train-result/datasets/clothes_merged_with_new_labels_v1/dataset.yaml --report-name diag_exp1_fullframe_new_labels_eval.json
 
-# Step 2: Personcrop A/B 映射回原图评估
+# Step 2: Personcrop A/B 映射回原图评估（需要补充完整实现）
 python backend-train-model/personcrop-train/train-code/evaluate_personcrop_on_original.py --personcrop-data-a backend-train-model/personcrop-train/train-result/prepared/pred_pc_person_base/dataset.yaml --personcrop-weights-a backend-train-model/personcrop-train/train-result/artifacts/runs/pred_pc_clo_base/weights/best.pt --personcrop-data-b backend-train-model/personcrop-train/train-result/prepared/pred_pc_person_hardv1/dataset.yaml --personcrop-weights-b backend-train-model/personcrop-train/train-result/artifacts/runs/pred_pc_clo_hardv1/weights/best.pt --source-dataset backend-train-model/new_clothes_train/train-result/datasets/clothes_merged_with_new_labels_v1/dataset.yaml --split test --conf 0.45 --output backend-train-model/personcrop-train/train-result/review/diag_exp1_original_compare/
 ```
+
+**注意**：方法B需要完整实现坐标映射逻辑，建议先执行方法A快速验证。
 
 #### **预期产出**
 
