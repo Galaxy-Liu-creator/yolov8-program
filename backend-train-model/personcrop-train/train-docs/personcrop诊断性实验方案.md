@@ -53,23 +53,10 @@
 
 ```bash
 # Step 1: Fullframe baseline 在 test split 上评估
-python backend-train-model/train_workwear.py evaluate \
-  --mode fullframe \
-  --weights All-train-model/artifacts/runs/clothes_merged_v2_balanced_from_first_holdout_v1/weights/best.pt \
-  --data new_clothes_train/train-result/datasets/clothes_merged_with_new_labels_v1/dataset.yaml \
-  --split test \
-  --conf 0.45
+python backend-train-model/train_workwear.py evaluate --mode fullframe --weights All-train-model/artifacts/runs/clothes_merged_v2_balanced_from_first_holdout_v1/weights/best.pt --data new_clothes_train/train-result/datasets/clothes_merged_with_new_labels_v1/dataset.yaml --split test --conf 0.45
 
 # Step 2: Personcrop A/B 映射回原图评估
-python backend-train-model/personcrop-train/train-code/evaluate_personcrop_on_original.py \
-  --personcrop-data-a personcrop-train/train-result/prepared/pred_pc_person_base/dataset.yaml \
-  --personcrop-weights-a personcrop-train/train-result/artifacts/runs/pred_pc_clo_base/weights/best.pt \
-  --personcrop-data-b personcrop-train/train-result/prepared/pred_pc_person_hardv1/dataset.yaml \
-  --personcrop-weights-b personcrop-train/train-result/artifacts/runs/pred_pc_clo_hardv1/weights/best.pt \
-  --source-dataset new_clothes_train/train-result/datasets/clothes_merged_with_new_labels_v1/dataset.yaml \
-  --split test \
-  --conf 0.45 \
-  --output personcrop-train/train-result/review/original_level_comparison/
+python backend-train-model/personcrop-train/train-code/evaluate_personcrop_on_original.py --personcrop-data-a personcrop-train/train-result/prepared/pred_pc_person_base/dataset.yaml --personcrop-weights-a personcrop-train/train-result/artifacts/runs/pred_pc_clo_base/weights/best.pt --personcrop-data-b personcrop-train/train-result/prepared/pred_pc_person_hardv1/dataset.yaml --personcrop-weights-b personcrop-train/train-result/artifacts/runs/pred_pc_clo_hardv1/weights/best.pt --source-dataset new_clothes_train/train-result/datasets/clothes_merged_with_new_labels_v1/dataset.yaml --split test --conf 0.45 --output personcrop-train/train-result/review/diagnostic_exp1_original_level_comparison/
 ```
 
 #### **预期产出**
@@ -108,14 +95,8 @@ python backend-train-model/personcrop-train/train-code/evaluate_personcrop_on_or
 #### **执行步骤**
 
 ```bash
-python backend-train-model/personcrop-train/train-code/analyze_person_bottleneck.py \
-  --source-dataset new_clothes_train/train-result/datasets/clothes_merged_with_new_labels_v1/dataset.yaml \
-  --person-weights-a person-train-model/train-result/export/person_detect_yolov8_with_new_labels.pt \
-  --person-weights-b person-train-model/train-result/export/person_detect_yolov8_with_new_labels_and_hard_examples_v1.pt \
-  --split test \
-  --person-conf 0.20 \
-  --assignment-min-ioa 0.35 \
-  --output personcrop-train/train-result/review/person_bottleneck_analysis/
+# 实验2：Person 召回瓶颈量化分析
+python backend-train-model/personcrop-train/train-code/analyze_person_bottleneck.py --source-dataset new_clothes_train/train-result/datasets/clothes_merged_with_new_labels_v1/dataset.yaml --person-weights-a person-train-model/train-result/export/person_detect_yolov8_with_new_labels.pt --person-weights-b person-train-model/train-result/export/person_detect_yolov8_with_new_labels_and_hard_examples_v1.pt --split test --person-conf 0.20 --assignment-min-ioa 0.35 --output personcrop-train/train-result/review/diagnostic_exp2_person_bottleneck_analysis/
 ```
 
 #### **预期产出**
@@ -154,30 +135,16 @@ python backend-train-model/personcrop-train/train-code/analyze_person_bottleneck
 
 ```bash
 # Step 1: 生成"理想 person"数据集
-python backend-train-model/personcrop-train/train-code/prepare_personcrop_with_gt_person.py \
-  --dataset-yaml new_clothes_train/train-result/datasets/clothes_merged_with_new_labels_v1/dataset.yaml \
-  --output-root personcrop-train/train-result/prepared/pred_pc_person_ideal_gt \
-  --assignment-min-ioa 0.35 \
-  --device 0
+python backend-train-model/personcrop-train/train-code/prepare_personcrop_with_gt_person.py --dataset-yaml new_clothes_train/train-result/datasets/clothes_merged_with_new_labels_v1/dataset.yaml --output-root personcrop-train/train-result/prepared/pred_pc_person_ideal_gt --assignment-min-ioa 0.35 --device 0
 
 # Step 2: 训练 clothes 模型
-python backend-train-model/train_workwear.py train \
-  --mode personcrop \
-  --project-config personcrop-train/personcrop_project_config.json \
-  --run-name pred_pc_clo_ideal_gt \
-  --data personcrop-train/train-result/prepared/pred_pc_person_ideal_gt/dataset.yaml \
-  --model yolov8n.pt \
-  --device 0
+python backend-train-model/train_workwear.py train --mode personcrop --project-config personcrop-train/personcrop_project_config.json --run-name pred_pc_clo_ideal_gt --data personcrop-train/train-result/prepared/pred_pc_person_ideal_gt/dataset.yaml --model yolov8n.pt --device 0
 
 # Step 3: 评估
-python backend-train-model/train_workwear.py evaluate \
-  --mode personcrop \
-  --project-config personcrop-train/personcrop_project_config.json \
-  --run-name pred_pc_clo_ideal_gt_eval \
-  --weights personcrop-train/train-result/artifacts/runs/pred_pc_clo_ideal_gt/weights/best.pt \
-  --data personcrop-train/train-result/prepared/pred_pc_person_ideal_gt/dataset.yaml \
-  --split test
+python backend-train-model/train_workwear.py evaluate --mode personcrop --project-config personcrop-train/personcrop_project_config.json --run-name pred_pc_clo_ideal_gt_eval --weights personcrop-train/train-result/artifacts/runs/pred_pc_clo_ideal_gt/weights/best.pt --data personcrop-train/train-result/prepared/pred_pc_person_ideal_gt/dataset.yaml --split test
 ```
+
+**注意**：实验3的产出会自动保存到 `personcrop-train/train-result/artifacts/reports/pred_pc_clo_ideal_gt_eval/` 目录。
 
 #### **预期产出**
 
@@ -201,12 +168,8 @@ python backend-train-model/train_workwear.py evaluate \
 **尝试**：降低到 `0.15` 或 `0.10`
 
 ```bash
-python backend-train-model/personcrop-train/train-code/prepare_personcrop_from_dataset_yaml.py \
-  --dataset-yaml new_clothes_train/train-result/datasets/clothes_merged_with_new_labels_v1/dataset.yaml \
-  --output-root personcrop-train/train-result/prepared/pred_pc_person_hardv1_conf015 \
-  --person-weights person-train-model/train-result/export/person_detect_yolov8_with_new_labels_and_hard_examples_v1.pt \
-  --person-conf 0.15 \
-  --device 0
+# 优化方向A.1：降低 person_conf 阈值
+python backend-train-model/personcrop-train/train-code/prepare_personcrop_from_dataset_yaml.py --dataset-yaml new_clothes_train/train-result/datasets/clothes_merged_with_new_labels_v1/dataset.yaml --output-root personcrop-train/train-result/prepared/pred_pc_person_hardv1_conf015 --person-weights person-train-model/train-result/export/person_detect_yolov8_with_new_labels_and_hard_examples_v1.pt --person-conf 0.15 --device 0
 ```
 
 **预期收益**：
@@ -242,11 +205,8 @@ python backend-train-model/personcrop-train/train-code/prepare_personcrop_from_d
 - 调整 assignment_min_ioa（当前 0.35，可尝试 0.30）
 
 ```bash
-python backend-train-model/personcrop-train/train-code/prepare_personcrop_from_dataset_yaml.py \
-  --dataset-yaml ... \
-  --assignment-min-ioa 0.30 \
-  --crop-margin 16 \
-  --output-root personcrop-train/train-result/prepared/pred_pc_person_hardv1_margin16
+# 优化方向B.1：优化裁剪策略
+python backend-train-model/personcrop-train/train-code/prepare_personcrop_from_dataset_yaml.py --dataset-yaml new_clothes_train/train-result/datasets/clothes_merged_with_new_labels_v1/dataset.yaml --assignment-min-ioa 0.30 --crop-margin 16 --output-root personcrop-train/train-result/prepared/pred_pc_person_hardv1_margin16 --person-weights person-train-model/train-result/export/person_detect_yolov8_with_new_labels_and_hard_examples_v1.pt --device 0
 ```
 
 ---
@@ -256,13 +216,8 @@ python backend-train-model/personcrop-train/train-code/prepare_personcrop_from_d
 **尝试 yolov8s**（更大容量）：
 
 ```bash
-python backend-train-model/train_workwear.py train \
-  --mode personcrop \
-  --project-config personcrop-train/personcrop_project_config.json \
-  --run-name pred_pc_clo_hardv1_yolov8s \
-  --data personcrop-train/train-result/prepared/pred_pc_person_hardv1/dataset.yaml \
-  --model yolov8s.pt \
-  --device 0
+# 优化方向B.2：升级 clothes 模型（yolov8s）
+python backend-train-model/train_workwear.py train --mode personcrop --project-config personcrop-train/personcrop_project_config.json --run-name pred_pc_clo_hardv1_yolov8s --data personcrop-train/train-result/prepared/pred_pc_person_hardv1/dataset.yaml --model yolov8s.pt --device 0
 ```
 
 ---
